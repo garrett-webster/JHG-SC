@@ -8,7 +8,7 @@ class ServerConnectionManager(ConnectionManager):
     def __init__(self, host, port, num_players, num_bots = 0):
         super().__init__(host, port)
         self.socket.bind((host, port))
-        self.socket.listen(12)  # Allow only one connection
+        self.socket.listen(num_players)  # Allow only one connection
 
         # Init server-specific attributes
         self.num_players = num_players
