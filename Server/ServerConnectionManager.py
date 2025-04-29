@@ -1,10 +1,7 @@
 import json
 import select
 
-try:
-    from GeneSimulation_py.ConnectionManager import ConnectionManager
-except ModuleNotFoundError:
-    from Code.GeneSimulation_py.ConnectionManager import ConnectionManager
+from ConnectionManager import ConnectionManager
 
 
 class ServerConnectionManager(ConnectionManager):
