@@ -84,14 +84,16 @@ def disable_sc_buttons(main_window):
 
 def get_winning_vote(votes):
     vote_counts = {"0": 0, "1": 0, "2": 0}
+    # print(votes.values())
     for vote in votes.values():
         if vote != -1:
             vote_counts[str(vote)] += 1
+    # print(vote_counts)
     winning_vote = int(max(vote_counts, key=vote_counts.get))
 
     if vote_counts[str(winning_vote)] <= len(votes) // 2:
         winning_vote = 0
 
-    winning_vote -= 1  # Winning vote is one indexed, so it needs to be converted to 0 index
+    winning_vote += 1  # Winning vote is zero indexed, so it needs to be converted to 1 index
 
     return winning_vote

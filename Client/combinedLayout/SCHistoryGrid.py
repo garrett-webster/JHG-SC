@@ -46,7 +46,9 @@ class SCHistoryGrid(SCGrid):
         # for every other cause to white
         for row_idx, row in enumerate(self.cause_utility_labels):
             for cause_idx, label in enumerate(row):
-                if cause_idx == winning_vote:
+                # print("Winning_vote: ", winning_vote)
+                # print("Cause_idx: ", cause_idx)
+                if cause_idx == winning_vote - 1:
                     if utilities[row_idx][winning_vote] > 0:
                         label.setStyleSheet("color: green;")
                     elif utilities[row_idx][winning_vote] < 0:
@@ -59,7 +61,7 @@ class SCHistoryGrid(SCGrid):
         for i, label in enumerate(self.header_labels):
             label.setStyleSheet("color: white;")
             if winning_vote != -1:
-                if i - 2 == winning_vote: # There are two columns before the utility labels start, so you need to subtract 2
+                if i - 1 == winning_vote:
                     label.setStyleSheet("color: green;")
 
         # Draw the graph for the selected round
