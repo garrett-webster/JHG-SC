@@ -95,6 +95,7 @@ class MainWindow(QMainWindow):
         # 4# Block four: Lays out the client. Dependent on blocks 1&2
         self.JHG_panel = QWidget()
         self.JHG_panel.setMinimumWidth(400)
+        self.JHG_panel.setMinimumHeight(2400)
         self.JHG_panel.setLayout(JhgPanel(self.round_state, connection_manager, self.token_label,
                                           self.jhg_popularity_graph, self.jhg_network, self.jhg_buttons))
         self.JHG_panel.setObjectName("JHG_Panel")

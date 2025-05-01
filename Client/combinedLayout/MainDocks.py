@@ -1,6 +1,6 @@
 from PyQt6.QtCore import Qt, QMimeData
 from PyQt6.QtGui import QDrag
-from PyQt6.QtWidgets import QLabel, QWidget, QSizePolicy, QVBoxLayout, QSplitter, QFrame
+from PyQt6.QtWidgets import QLabel, QWidget, QSizePolicy, QVBoxLayout, QSplitter, QFrame, QScrollArea
 
 
 # Draggable panel widget
@@ -55,7 +55,7 @@ class DraggablePanel(QWidget):
         outer_layout.addWidget(self.frame)
 
         self.setAcceptDrops(True)
-        self.setMinimumSize(120, 80)
+        self.setMinimumSize(450, 400)
         self.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
 
 
@@ -117,14 +117,15 @@ class CornerContainer(QWidget):
         super().__init__()
 
         # Create draggable panels
-        top_left = DraggablePanel(top_left_widget, "Junior High Game")
-        top_left.setMinimumSize(420, top_left_widget.property("min-height"))
+        scrollable_top_left = self.make_scrollable(top_left_widget, min_height=top_left_widget.property("min-height"))
+        scrollable_bottom_left = self.make_scrollable(bottom_left_widget, min_height=bottom_left_widget.property("min-height"))
+
+        # Create draggable panels
+        top_left = DraggablePanel(scrollable_top_left, "Junior High Game")
+        top_left.setMinimumHeight(400)
         top_right = DraggablePanel(top_right_widget, "JHG Graphs")
-        top_right.setMinimumSize(400, 400)
-        bottom_left = DraggablePanel(bottom_left_widget, "Social Choice Voting")
-        bottom_left.setMinimumSize(400, bottom_left_widget.property("min-height"))
+        bottom_left = DraggablePanel(scrollable_bottom_left, "Social Choice Voting")
         bottom_right = DraggablePanel(bottom_right_widget, "Social Choice Graphs")
-        bottom_right.setMinimumSize(400, 400)
 
 
         # Splitter for top row
@@ -160,3 +161,57 @@ class CornerContainer(QWidget):
         layout.addWidget(main_splitter)
 
         self.setLayout(layout)
+
+    def make_scrollable(self, widget, min_height=400):
+        wrapper = QWidget()
+        layout = QVBoxLayout(wrapper)
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(0)
+        layout.addWidget(widget)
+
+        widget.setMinimumHeight(min_height)  # Content wants to scroll
+        wrapper.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
+
+        scroll_area = QScrollArea()
+        scroll_area.setWidget(wrapper)
+        scroll_area.setWidgetResizable(True)
+
+        scroll_area.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+        scroll_area.setMinimumSize(0, 0)
+        scroll_area.setMaximumHeight(10000000)
+
+        scroll_area.setStyleSheet(""" 
+            QScrollArea {
+                background-color: #171717;
+            }
+            QScrollArea QWidget {
+                background-color: transparent;
+            }
+            QScrollArea QPushButton {
+                background-color: #3a414a;
+                border: solid 2px black;
+                border-radius: 5px;
+                color: white;
+                min-height: 2em;
+            }
+            QScrollArea QPushButton:disabled {
+                background-color: #2a2f35;
+                color: #777;
+                border: solid 2px #444;
+            }
+            QScrollArea QPushButton:hover {
+                background-color: #2c353f;
+                border: solid 2px #2980b9;
+                color: #ecf0f1;
+            }
+            QScrollBar:horizontal, QScrollBar:vertical {
+                background-color: #171717;
+                border: none;
+            }
+            QScrollBar::handle:horizontal, QScrollBar::handle:vertical {
+                background-color: #888;
+                border-radius: 5px;
+            }
+        """)
+
+        return scroll_area
