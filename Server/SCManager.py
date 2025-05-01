@@ -45,8 +45,6 @@ class SCManager:
                                                    self.current_options_matrix)
 
     def play_social_choice_round(self):
-        # self.init_next_round()
-
         # Run the voting and collect the votes
         player_votes = self.run_sc_voting()
         zero_idx_votes, one_idx_votes = self.compile_sc_votes(player_votes, self.current_options_matrix, self.round_num)

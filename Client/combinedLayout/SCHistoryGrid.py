@@ -46,8 +46,6 @@ class SCHistoryGrid(SCGrid):
         # for every other cause to white
         for row_idx, row in enumerate(self.cause_utility_labels):
             for cause_idx, label in enumerate(row):
-                # print("Winning_vote: ", winning_vote)
-                # print("Cause_idx: ", cause_idx)
                 if cause_idx == winning_vote - 1:
                     if utilities[row_idx][winning_vote] > 0:
                         label.setStyleSheet("color: green;")
