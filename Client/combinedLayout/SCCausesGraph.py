@@ -82,7 +82,7 @@ class SCCausesGraph(QWidget):
             colors = []
 
             # Update or add annotations to the axes
-            if winning_vote:
+            if winning_vote and winning_vote != -1:
                 winning_vote += 1
 
             # Lists to store node info based on type

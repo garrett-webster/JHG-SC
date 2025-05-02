@@ -120,6 +120,7 @@ class ServerConnectionManager(ConnectionManager):
         # Accept new connections and add them to the connection manager until the specified number of connections have been made
         while len(self.clients) < num_clients:
             client_socket, client_address = self.socket.accept()
+            print("Received new client from: ", client_address)
             self.clients[next_id] = client_socket
             self.num_clients += 1
             next_id += 1
