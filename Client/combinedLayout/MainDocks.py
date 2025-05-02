@@ -208,7 +208,7 @@ class CornerContainer(QWidget):
                 background-color: #171717;
                 border: none;
             }
-            QScrollArea QPushButton[btnState="checked"] {
+            QScrollArea *[btnState="checked"] {
                 background-color: #2980b9;
                 color: #ecf0f1;
                 border: solid 2px #2980b9;
