@@ -1,26 +1,30 @@
 import copy
 import math
+import random
 from collections import Counter
 
 import numpy as np
 
+
 from Server.options_creation import generate_two_plus_one_groups_options_best_of_three
-from Server.Bots.Pareto import ParetoBot
-from Server.Bots.Greedy import GreedyBot
-from Server.Bots.gameTheory import gameTheoryBot
-from Server.Bots.Random import RandomBot
+from Server.SC_Bots.Greedy import GreedyBot
+from Server.SC_Bots.betterGreedy import betterGreedy
+from Server.SC_Bots.Pareto import ParetoBot
+from Server.SC_Bots.gameTheory import gameTheoryBot
+from Server.SC_Bots.Random import RandomBot
 from Server.Node import Node
 
 NUM_CAUSES = 3
 
 
 class Social_Choice_Sim:
-    def __init__(self, total_players, num_humans, type_bot):
+    def __init__(self, total_players, num_causes, num_humans, bot_type):
         self.total_players = total_players
         self.num_humans = num_humans
         self.num_bots = total_players - num_humans
-        self.type_bot = type_bot
+        self.bot_type = bot_type
         self.players = self.create_players()
+        self.num_causes = num_causes
         self.cpp = 3
         self.rad = 5  # hardcoded just work with me here
         self.causes = self.create_cause_nodes()
@@ -38,14 +42,16 @@ class Social_Choice_Sim:
     def create_bots(self):
         bots_array = []
         for i in range(self.num_bots): # this is where we can add more bots.
-            if self.type_bot == 1:  # pareto optimal bots for now
+            if self.bot_type == 1:  # pareto optimal bots for now
                 bots_array.append(ParetoBot(i))
-            if self.type_bot == 2:
+            if self.bot_type == 2:
                 bots_array.append(GreedyBot(i))
-            if self.type_bot == 3:
+            if self.bot_type == 3:
                 bots_array.append(gameTheoryBot(i))
-            if self.type_bot == 4:
+            if self.bot_type == 4:
                 bots_array.append(RandomBot(i))
+            if self.bot_type == 5:
+                bots_array.append(betterGreedy(i))
 
         return bots_array
 
@@ -71,7 +77,15 @@ class Social_Choice_Sim:
 
 
     def create_options_matrix(self, groups):
-        self.options_matrix = generate_two_plus_one_groups_options_best_of_three(groups)
+        if groups:
+            self.options_matrix = generate_two_plus_one_groups_options_best_of_three(groups)
+        else: # so we have to generate noise to try and "mimic" the other stuff.
+            self.options_matrix = [[random.randint(-8, 8) for _ in range(self.num_causes)] for _ in range(self.total_players)]
+            noise_matrix = [[random.choice([-2, 2]) for _ in range(self.num_causes)] for _ in range(self.total_players)]
+            self.options_matrix = [
+                [original + noise for original, noise in zip(row, noise_row)]
+                for row, noise_row in zip(self.options_matrix, noise_matrix)
+            ]
         return self.options_matrix # because why not
 
 
@@ -136,7 +150,7 @@ class Social_Choice_Sim:
         winning_vote_count = Counter(total_votes.values()).most_common(1)[0][1]
         winning_vote = Counter(total_votes.values()).most_common(1)[0][0]
         if not (winning_vote_count > len(total_votes) // 2):
-            winning_vote = -1
+            winning_vote = -2
 
         if winning_vote != -1: # if its -1, then nothing happend. NOT the last entry in the fetcher. that was a big bug that flew under the radar.
             for i in range(len(total_votes)):
@@ -146,6 +160,11 @@ class Social_Choice_Sim:
                 results.append(0)
 
         return winning_vote, results
+
+    def run_voting(self, num_cycles):
+        previous_votes = {}
+        for i in range(num_cycles):
+            bot_votes =
 
 
     ###--- NODE CREATION FOR FRONT END. NOT USEFUL FOR GENETIC STUFF. ---###
@@ -272,8 +291,8 @@ class Social_Choice_Sim:
                     new_options[i][j] /= new_sum
         return new_options
 
-
-    def start_round(self, groups):
+    # default to groups being None,
+    def start_round(self, groups=None):
         # options may change, but the causes themselves don't, so we can generate them in init functionality.
         self.current_options_matrix = self.create_options_matrix(groups)
         self.player_nodes = self.create_player_nodes()

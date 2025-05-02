@@ -173,7 +173,7 @@ cython_debug/
 # PyPI configuration file
 .pypirc
 
-Server/Bots/logs
-Server/Bots/chromosomeRepo
-Server/Bots/chromosomesToKeepAround
+offlineSimStuff/Bots/logs
+offlineSimStuff/Bots/chromosomeRepo
+offlineSimStuff/Bots/chromosomesToKeepAround
 .idea
