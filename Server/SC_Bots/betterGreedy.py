@@ -14,7 +14,7 @@ class betterGreedy:
         self.chromosome = chromosome
 
     # here is what teh scturecture is going to look like. store an array, and at that index store the value of what they ahve voted for.
-    def get_vote(self, big_boy_list, current_options_matrix):
+    def get_vote(self, current_options_matrix, previous_votes=None):
 
         self_id = self.self_id
         mutable_matrix = [[max(val + 1, 0) for val in [0] + row] for row in current_options_matrix]

@@ -11,7 +11,7 @@ from pathlib import Path
 
 
 if __name__ == "__main__":
-    bot_type = 1 # 1 is pareto, 2 is greedy, 3 is GT, 4 is random, 5 is betterGreedy,
+    bot_type = 5 # 1 is pareto, 2 is greedy, 3 is GT, 4 is random, 5 is betterGreedy,
     sim = Social_Choice_Sim(11, 3, 0, bot_type)  # starts the social choice sim, call it whatever you want
     #current_file = "Bots/chromosomesToKeepAround/generation_199.csv"
     #df = pd.read_csv(current_file, comment="#")
@@ -30,7 +30,7 @@ if __name__ == "__main__":
     start_time = time.time()
     num_genes = 20
     cooperation_score = 0
-    num_cycles = 3
+    num_cycles = 1
     sim.set_chromosome(chromosomes) # in this case its the same every time.
 
     for i in range(num_rounds): # just a ridicuously large number
@@ -39,8 +39,11 @@ if __name__ == "__main__":
         sim.start_round() # creates the current current options matrix, makes da player nodes, sets up causes, etc.
         current_options_matrix = sim.get_current_options_matrix() # need this for JHG sim and bot votes.
         #bot_votes = sim.get_votes_single_chromosome() # this one is optimized for testing the results of a single chromosome.
-        sim.run_voting()
-
+        #bot_votes = {}
+        #for i in range(num_cycles):
+            # we start with this as a blank dict, update it and when it finishes it has the most recent bot votes after cycles.
+            #bot_votes = sim.get_votes(bot_votes)
+        bot_votes = sim.get_votes()
 
         total_votes = len(bot_votes)
         winning_vote, round_results = sim.return_win(bot_votes)  # is all votes, works here

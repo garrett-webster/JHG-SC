@@ -10,8 +10,8 @@ class RandomBot():
     def set_chromosome(self, chromosome): # doesn't actually get used, just for conveience sake
         self.chromosome = chromosome
 
-    def get_vote(self, empty_list, current_options_matrix):
-        total_options = len(current_options_matrix[0]) # how many cuases are there
-        final_vote = random.randint(0, total_options)
+    def get_vote(self, current_options_matrix, previous_votes=None):
+        total_options = len(current_options_matrix[0]) # how many cuases are there w/ abstaining. Before they couldn't vote for cause 3.
+        final_vote = random.randint(0, total_options) # so this is inclusive of upper limit,
         final_vote -= 1 # off my one error.
         return final_vote

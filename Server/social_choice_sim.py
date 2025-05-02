@@ -113,17 +113,11 @@ class Social_Choice_Sim:
         return self.probabilities
 
 
-    def get_votes(self): # generic get votes for all bot types. Not optimized for a single chromosome
+    def get_votes(self, previous_votes=None): # generic get votes for all bot types. Not optimized for a single chromosome
         bot_votes = {}
-        self.all_combinations = [] # used for the current implementation of the GT bot.
 
         for i, bot in enumerate(self.bots):
-            if bot.type == "GT":
-                if not self.all_combinations:
-                    self.all_combinations = bot.generate_all_possibilities(self.current_options_matrix)
-                bot_votes[i] = bot.get_vote(self.all_combinations, self.current_options_matrix)
-            else: # only generate the probability matrix if we need it, fetcher is expensive.
-                bot_votes[i] = bot.get_vote([], self.current_options_matrix)
+                bot_votes[i] = bot.get_vote(self.current_options_matrix, previous_votes)
 
         return bot_votes
 
@@ -161,10 +155,6 @@ class Social_Choice_Sim:
 
         return winning_vote, results
 
-    def run_voting(self, num_cycles):
-        previous_votes = {}
-        for i in range(num_cycles):
-            bot_votes =
 
 
     ###--- NODE CREATION FOR FRONT END. NOT USEFUL FOR GENETIC STUFF. ---###

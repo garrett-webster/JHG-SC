@@ -14,7 +14,7 @@ class gameTheoryBot:
         self.chromosome = chromosome
 
     # here is what teh scturecture is going to look like. store an array, and at that index store the value of what they ahve voted for.
-    def get_vote(self, big_boy_list, current_options_matrix):
+    def get_vote(self, current_options_matrix, previous_votes=None):
         cause_probability = self.get_cause_probability(big_boy_list)
         normalized_cause_probability = copy.copy(cause_probability)
         normalized_cause_probability = [(x / sum(normalized_cause_probability)) for x in normalized_cause_probability]

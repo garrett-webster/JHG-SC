@@ -9,7 +9,7 @@ class ParetoBot:
     def set_chromosome(self, chromosome):
         self.chromosome = chromosome
 
-    def get_vote(self, empty_list, current_options_matrix):
+    def get_vote(self, current_options_matrix, previous_votes=None):
 
         options = {}
 
