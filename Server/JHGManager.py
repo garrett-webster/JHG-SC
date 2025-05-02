@@ -1,4 +1,4 @@
-from sim_interface import JHG_simulator
+from Server.sim_interface import JHG_simulator
 
 
 class JHGManager:

@@ -1,12 +1,12 @@
-from JHGManager import JHGManager
-from SCManager import SCManager
-from ServerConnectionManager import ServerConnectionManager
+from Server.JHGManager import JHGManager
+from Server.SCManager import SCManager
+from Server.ServerConnectionManager import ServerConnectionManager
 
 
 OPTIONS = {
     #General settings
     "NUM_HUMANS": 1,
-    "TOTAL_PLAYERS": 5,
+    "TOTAL_PLAYERS": 15,
     "JHG_ROUNDS_PER_SC_ROUND" : 1,
     "MAX_ROUNDS": 1000,
     "SC_GROUP_OPTION": 2, # See options_creation.py -> group_size_options to understand what this means

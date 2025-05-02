@@ -36,7 +36,7 @@ class JHG_simulator():
         for i in range(0, len(configured_players)):
             player_idxs = np.append(player_idxs, popSize + i)
 
-        theFolder = "Engine"
+        theFolder = "Server/Engine"
         theGen = 199
         num_gene_copies = 3
 

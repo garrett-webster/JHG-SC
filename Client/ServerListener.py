@@ -1,3 +1,4 @@
+import time
 from collections import defaultdict
 
 import numpy as np
@@ -40,12 +41,17 @@ class ServerListener(QObject):
     # continuously listens for data from the server. This is the entrance point for all functionality based on
     # receiving data from the server. Kinda a switch board of sorts
     def start_listening(self):
+        time.sleep(1)
         while True:
             # Get all of the messages from the server waiting
             messages = self.connection_manager.get_message()
             for message in messages:
                 # Run the appropriate function based on the message type
-                self.response_functions[message["TYPE"]](message)
+                try:
+                    self.response_functions[message["TYPE"]](message)
+                except Exception as e:
+                    print(message)
+                    raise e
 
 
     def JHG_OVER(self, message):

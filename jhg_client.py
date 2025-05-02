@@ -11,17 +11,16 @@ def resource_path(relative_path):
     """Get absolute path to resource, works for dev and for PyInstaller."""
     if hasattr(sys, '_MEIPASS'):
         return os.path.join(sys._MEIPASS, relative_path)
-    return os.path.join(os.path.abspath("."), relative_path)
+    return os.path.join(os.path.abspath("Client"), relative_path)
 
 import pyqtgraph
 
 
 # --- Everything above this line is necessary for building the executable --- #
 
-
 from PyQt6.QtWidgets import QApplication
-from ClientConnectionManager import ClientConnectionManager
-from combinedLayout.MainWindow import MainWindow
+from Client.ClientConnectionManager import ClientConnectionManager
+from Client.combinedLayout.MainWindow import MainWindow
 
 def load_stylesheet(path):
     with open(resource_path(path), "r") as file:
@@ -32,7 +31,7 @@ if __name__ == "__main__":
     app.setStyleSheet(load_stylesheet("combinedLayout/style.qss"))
 
     host = '127.0.0.1'
-    port = 12346
+    port = 12345
 
     connection_manager = ClientConnectionManager(host, port)
 

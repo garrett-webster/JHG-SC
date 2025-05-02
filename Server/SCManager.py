@@ -1,8 +1,8 @@
 import time
 from collections import Counter
 
-from social_choice_sim import Social_Choice_Sim
-from options_creation import generate_two_plus_one_groups
+from Server.social_choice_sim import Social_Choice_Sim
+from Server.options_creation import generate_two_plus_one_groups
 
 
 def create_empty_vote_matrix(num_players):

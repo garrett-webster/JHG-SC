@@ -4,12 +4,12 @@ from collections import Counter
 
 import numpy as np
 
-from options_creation import generate_two_plus_one_groups_options_best_of_three
-from Bots.Pareto import ParetoBot
-from Bots.Greedy import GreedyBot
-from Bots.gameTheory import gameTheoryBot
-from Bots.Random import RandomBot
-from Node import Node
+from Server.options_creation import generate_two_plus_one_groups_options_best_of_three
+from Server.Bots.Pareto import ParetoBot
+from Server.Bots.Greedy import GreedyBot
+from Server.Bots.gameTheory import gameTheoryBot
+from Server.Bots.Random import RandomBot
+from Server.Node import Node
 
 NUM_CAUSES = 3
 
