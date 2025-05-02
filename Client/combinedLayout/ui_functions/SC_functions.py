@@ -92,8 +92,9 @@ def get_winning_vote(votes):
     winning_vote = int(max(vote_counts, key=vote_counts.get))
 
     if vote_counts[str(winning_vote)] <= len(votes) // 2:
-        winning_vote = 0
+        winning_vote = -1
 
     winning_vote += 1  # Winning vote is zero indexed, so it needs to be converted to 1 index
 
+    print(winning_vote)
     return winning_vote
