@@ -1,6 +1,5 @@
 import json
 import socket
-import time
 
 
 class ConnectionManager:
@@ -9,11 +8,8 @@ class ConnectionManager:
         self.received_message_type_names = {}
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-
     def send_message(self, *args):
-        # TODO: Once you figure out how to queue incoming messages,
-        # time.sleep(1)
-        if type(args[0]) == socket.socket:
+        if isinstance(args[0], socket.socket):
             target_socket = args[0]
             message_args = args[1:]
         else:
@@ -21,17 +17,17 @@ class ConnectionManager:
             message_args = args
 
         try:
-            target_socket.send(json.dumps(self.compile_message(*message_args)).encode())
+            message_dict = self.compile_message(*message_args)
+            message_str = json.dumps(message_dict) + '\n'  # Newline delimiter
+            target_socket.sendall(message_str.encode('utf-8'))
         except (socket.error, BrokenPipeError) as e:
             print(f"Error sending message: {e}")
-
 
     def compile_message(self, *args):
         message_type = args[0]
         message = {"TYPE": message_type}
-
-        for i, arg in enumerate(args):
-            if i != 0:
-                message[self.message_type_names[message_type][i - 1]] = arg
-
+        for i, arg in enumerate(args[1:]):
+            key = self.message_type_names.get(message_type, [])[i]
+            if key:
+                message[key] = arg
         return message
