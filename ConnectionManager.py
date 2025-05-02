@@ -12,7 +12,7 @@ class ConnectionManager:
 
     def send_message(self, *args):
         # TODO: Once you figure out how to queue incoming messages,
-        time.sleep(1)
+        # time.sleep(1)
         if type(args[0]) == socket.socket:
             target_socket = args[0]
             message_args = args[1:]
