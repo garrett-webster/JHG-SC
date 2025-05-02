@@ -208,8 +208,10 @@ class CornerContainer(QWidget):
                 background-color: #171717;
                 border: none;
             }
-            QScrollBar QTabBar::tab:selected {
-                background-color: #ced4db;
+            QPushButton[btnState="checked"] {
+                background-color: #2980b9;
+                color: #ecf0f1;
+                border: solid 2px #2980b9;
             }
             QScrollBar::handle:horizontal, QScrollBar::handle:vertical {
                 background-color: #888;
