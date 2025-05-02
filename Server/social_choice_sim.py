@@ -144,7 +144,7 @@ class Social_Choice_Sim:
         winning_vote_count = Counter(total_votes.values()).most_common(1)[0][1]
         winning_vote = Counter(total_votes.values()).most_common(1)[0][0]
         if not (winning_vote_count > len(total_votes) // 2):
-            winning_vote = -2
+            winning_vote = -1
 
         if winning_vote != -1: # if its -1, then nothing happend. NOT the last entry in the fetcher. that was a big bug that flew under the radar.
             for i in range(len(total_votes)):

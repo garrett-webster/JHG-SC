@@ -11,7 +11,7 @@ from pathlib import Path
 
 
 if __name__ == "__main__":
-    bot_type = 5 # 1 is pareto, 2 is greedy, 3 is GT, 4 is random, 5 is betterGreedy,
+    bot_type = 2 # 1 is pareto, 2 is greedy, 3 is GT, 4 is random, 5 is betterGreedy,
     sim = Social_Choice_Sim(11, 3, 0, bot_type)  # starts the social choice sim, call it whatever you want
     #current_file = "Bots/chromosomesToKeepAround/generation_199.csv"
     #df = pd.read_csv(current_file, comment="#")
