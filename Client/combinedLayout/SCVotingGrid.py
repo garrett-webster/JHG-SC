@@ -74,7 +74,7 @@ class SCVotingGrid(SCGrid):
             elif vote_button.objectName() == "SCSubmitButton":
                 button_found = True
             else:
-                vote_button.setProperty("btnState", "unchecked")
+                vote_button.setProperty("btnState", None)
 
             vote_button.style().unpolish(vote_button)
             vote_button.style().polish(vote_button)
