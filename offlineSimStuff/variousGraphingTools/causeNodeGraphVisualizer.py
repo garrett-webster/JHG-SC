@@ -12,7 +12,7 @@ class causeNodeGraphVisualizer:
 
     def create_graph(self, all_nodes, all_votes, winning_vote, current_options_matrix):
         fig = plt.figure(figsize=(13, 6))  # Compact figure size
-        gs = gridspec.GridSpec(1, 2, width_ratios=[1.2, 2])  # tighter left:right ratio
+        gs = gridspec.GridSpec(1, 2, width_ratios=[0.8, 3.2])  # tighter left:right ratio
 
         # --- LEFT PANEL: Matrix + Vote (tight & aligned) ---
         ax_matrix = fig.add_subplot(gs[0])
@@ -90,6 +90,6 @@ class causeNodeGraphVisualizer:
                 ax.add_patch(arrow)
 
         # Reduce space between matrix and graph and the overall layout
-        fig.subplots_adjust(wspace=0.05, left=0.05, right=0.95, top=0.95, bottom=0.15)  # Adjust bottom margin
+        fig.subplots_adjust(wspace=0.01, left=0.05, right=0.95, top=0.95, bottom=0.15)  # Adjust bottom margin
 
         plt.show()
