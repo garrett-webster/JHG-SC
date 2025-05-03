@@ -39,8 +39,8 @@ class causeNodeGraphVisualizer:
         ax_matrix.set_ylim(-num_rows, 1)
 
         # --- Add Winning Vote Text Below Matrix ---
-        ax_matrix.text(0.5, -num_rows - 0.2, f"Winning vote: {winning_vote}", ha='center', va='center',
-                       transform=ax_matrix.transAxes, fontsize=12, color='red')
+        ax_matrix.text(1, -num_rows - 1, f"Winning vote: {winning_vote+1}", ha='left', va='center',
+                       fontsize=12, color='red')
 
         # --- RIGHT PANEL: Graph ---
         ax = fig.add_subplot(gs[1])
@@ -63,7 +63,7 @@ class causeNodeGraphVisualizer:
                 number = label
 
             if node_type == "CAUSE":
-                color = 'red' if label == winning_vote else 'lightblue'
+                color = 'red' if label == "Cause " + str(winning_vote+1) else 'lightblue'
                 shape = patches.RegularPolygon((x, y), numVertices=3, radius=1.0, orientation=0,
                                                color=color, ec='black', zorder=2)
                 ax.add_patch(shape)
@@ -81,7 +81,7 @@ class causeNodeGraphVisualizer:
                 x_start, y_start = node_positions[player_label]
                 x_end, y_end = node_positions[cause_label]
 
-                is_winning_vote = cause_label == winning_vote + 1
+                is_winning_vote = cause_label == "Cause " + str(winning_vote + 1)
                 arrow_color = 'red' if is_winning_vote else 'gray'
 
                 arrow = FancyArrowPatch((x_start, y_start), (x_end, y_end),
