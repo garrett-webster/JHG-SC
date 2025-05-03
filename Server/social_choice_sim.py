@@ -12,6 +12,7 @@ from Server.SC_Bots.betterGreedy import betterGreedy
 from Server.SC_Bots.Pareto import ParetoBot
 from Server.SC_Bots.gameTheory import gameTheoryBot
 from Server.SC_Bots.Random import RandomBot
+from Server.SC_Bots.limitedAwareGreedy import limitedAwarenessGreedy
 from Server.Node import Node
 
 NUM_CAUSES = 3
@@ -41,20 +42,32 @@ class Social_Choice_Sim:
 
     def create_bots(self):
         bots_array = []
-        for i in range(self.num_bots): # this is where we can add more bots.
-            if self.bot_type == 1:  # pareto optimal bots for now
-                bots_array.append(ParetoBot(i))
-            if self.bot_type == 2:
-                bots_array.append(GreedyBot(i))
-            if self.bot_type == 3:
-                bots_array.append(gameTheoryBot(i))
-            if self.bot_type == 4:
-                bots_array.append(RandomBot(i))
-            if self.bot_type == 5:
-                bots_array.append(betterGreedy(i))
+        if isinstance(self.bot_type, int):
+
+            for i in range(self.num_bots): # this is where we can add more bots.
+                self.match_bot_type(self.bot_type, bots_array, i)
+
+        else:
+            if len(self.bot_type) != self.num_bots:
+                print("THERE HAS BEEN AN ERROR!! WAAAH")
+                return # early return, blow everything up.
+            else:
+                for i, bot_type in enumerate(self.bot_type):
+                    self.match_bot_type(bot_type, bots_array, bot_type)
 
         return bots_array
 
+    def match_bot_type(self, bot_type, bots_array, i):
+        if bot_type == 1:  # pareto optimal bots for now
+            bots_array.append(ParetoBot(i))
+        if bot_type == 2:
+            bots_array.append(GreedyBot(i))
+        if bot_type == 3:
+            bots_array.append(RandomBot(i))
+        if bot_type == 4:
+            bots_array.append(betterGreedy(i))
+        if bot_type == 5:
+            bots_array.append(limitedAwarenessGreedy(i))
 
     def create_players(self):
         players = {}
@@ -364,3 +377,6 @@ class Social_Choice_Sim:
             if player.getType() != "Human":
                 votes[str(i)] = player.getVote(current_options_matrix, i)
         return votes
+
+    def get_bot_type(self):
+        return self.bot_type
