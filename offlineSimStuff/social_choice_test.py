@@ -26,17 +26,19 @@ def run_trial(sim, num_rounds, num_cycles):
     for i in range(11): # total_players
         results[i] = [] # just throw in all the utilites
 
-    for i in tqdm(range(num_rounds)): # just a ridicuously large number
+    for curr_round in tqdm(range(num_rounds)): # just a ridicuously large number
         current_start_time = time.time()
 
         sim.start_round() # creates the current current options matrix, makes da player nodes, sets up causes, etc.
         current_options_matrix = sim.get_current_options_matrix() # need this for JHG sim and bot votes.
         #bot_votes = sim.get_votes_single_chromosome() # this one is optimized for testing the results of a single chromosome.
         bot_votes = {}
-        for i in range(num_cycles):
+        for cycle in range(num_cycles):
             #we start with this as a blank dict, update it and when it finishes it has the most recent bot votes after cycles.
             # set the cycle counter here, so that way I can keep track of it for graphing. there is a built in getter function for da graphign.
-            bot_votes[i] = sim.get_votes(bot_votes, i)
+            print("this is the round under cycle! ", curr_round)
+            bot_votes[cycle] = sim.get_votes(bot_votes, cycle)
+            graph_nodes(sim, curr_round, cycle)
         # bot_votes = sim.get_votes()
 
         bot_votes = bot_votes[num_cycles-1] # grab just the last votes, they are the only ones that matter anyway.
@@ -149,17 +151,17 @@ def run_trial(sim, num_rounds, num_cycles):
     plt.show()
 
 
-def graph_nodes(sim):
+def graph_nodes(sim, curr_round, cycle):
     currVisualizer = causeNodeGraphVisualizer()
-    currVisualizer.create_graph(sim)
+    currVisualizer.create_graph(sim, curr_round, cycle)
 
 
 def create_sim():
-    bot_type = 4 # 1 is pareto, 2 is greedy, 3 is random, 4 is betterGreedy, 5 is limitedAwareness, 6 is secondChoice
+    bot_type = 4 # 0 is random, 1 is pareto, 2 is greedy, 3 is betterGreedy, 4 is limitedAwareness, 5 is secondChoiceGreedy
 
     chromosomes = r"C:/Users/Sean/Documents/GitHub/OtherGarrettStuff/JHG-SC/offlineSimStuff/chromosomes/bGStandard.csv"
     # SUM: this sets the bot list type, so we can have siutaions set up
-    scenario = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\offlineSimStuff\scenarioIndicator\allGreedy"
+    scenario = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\offlineSimStuff\scenarioIndicator\limitedAwareGreedy+secondChoice"
     cycle = -1 # a negative cycle indicates to me that this is a test - that, or something is really really wrong.
 
     sim = Social_Choice_Sim(11, 3, 0, bot_type, cycle, chromosomes, scenario)
@@ -169,7 +171,7 @@ def create_sim():
 
 
 if __name__ == "__main__":
-    num_rounds = 1000
+    num_rounds = 2
     num_cycles = 3
     current_sim = create_sim()
     run_trial(current_sim, num_rounds, num_cycles)

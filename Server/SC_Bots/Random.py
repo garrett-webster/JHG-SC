@@ -6,7 +6,7 @@ class RandomBot():
     def __init__(self, self_id):
         self.self_id = self_id
         self.type = "R"
-        self.type = 0
+        self.number_type = 0
 
     def set_chromosome(self, chromosome): # doesn't actually get used, just for conveience sake
         self.chromosome = chromosome

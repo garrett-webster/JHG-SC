@@ -6,7 +6,7 @@ class betterGreedy:
     def __init__(self, self_id):
         self.self_id = self_id
         self.type = "BG"
-        self.number_type = 4
+        self.number_type = 3
         self.chromosome = None
         self.risk_adversity = "MAX"
         # so RISK adversity is MAX (1) and High (0). It's not implemented yet.

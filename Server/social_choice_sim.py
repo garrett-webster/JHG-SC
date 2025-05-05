@@ -24,8 +24,6 @@ class Social_Choice_Sim:
         self.num_humans = num_humans
         self.num_bots = total_players - num_humans
         # the next two lines only exist to work with default architecture.
-        self.bot_type = bot_type
-        self.bots = self.create_bots()
         # updated bot creation thing
         self.bot_type = self.set_bot_list(scenario)
         self.bots = self.create_bots()
@@ -35,51 +33,46 @@ class Social_Choice_Sim:
 
         self.players = self.create_players()
         self.num_causes = num_causes
-        self.cpp = 3
         self.rad = 5  # hardcoded just work with me here
         self.causes = self.create_cause_nodes()
         self.current_options_matrix = {}
         self.player_nodes = []
         self.all_votes = {}
-        self.organized_distance_dict = [] # set it to an empty dict for now
-        self.default_greedy = [] # len = num players, contains the current cuase that they are voting for.
 
         self.current_votes = [] # we need to add support for if anyone else has cast a vote. Right now it doesn't reall matter
-        self.probabilities = []
         self.options_matrix = None
         self.cycle = cycle
 
 
     def create_bots(self):
         bots_array = []
-        if isinstance(self.bot_type, int):
 
-            for i in range(self.num_bots): # this is where we can add more bots.
-                self.match_bot_type(self.bot_type, bots_array, i)
 
+        if len(self.bot_type) != self.num_bots:
+            print("THERE HAS BEEN AN ERROR!! WAAAH")
+            return # early return, blow everything up.
         else:
-            if len(self.bot_type) != self.num_bots:
-                print("THERE HAS BEEN AN ERROR!! WAAAH")
-                return # early return, blow everything up.
-            else:
-                for i, bot_type in enumerate(self.bot_type):
-                    self.match_bot_type(bot_type, bots_array, bot_type)
+            for i, bot_type in enumerate(self.bot_type):
+                bots_array.append(self.match_bot_type(bot_type, i))
 
         return bots_array
 
-    def match_bot_type(self, bot_type, bots_array, i):
+    def match_bot_type(self, bot_type, i):
+        new_bot = None
+        if bot_type == 0:
+            new_bot = (RandomBot(i))
         if bot_type == 1:  # pareto optimal bots for now
-            bots_array.append(ParetoBot(i))
+            new_bot = (ParetoBot(i))
         if bot_type == 2:
-            bots_array.append(GreedyBot(i))
+            new_bot = (GreedyBot(i))
         if bot_type == 3:
-            bots_array.append(RandomBot(i))
+            new_bot = (betterGreedy(i))
         if bot_type == 4:
-            bots_array.append(betterGreedy(i))
+            new_bot = (limitedAwarenessGreedy(i))
         if bot_type == 5:
-            bots_array.append(limitedAwarenessGreedy(i))
-        if bot_type == 6:
-            bots_array.append(secondChoiceGreedy(i))
+            new_bot = (secondChoiceGreedy(i))
+
+        return new_bot # the matched bot that we were looking for.
 
     def create_players(self):
         players = {}
@@ -134,10 +127,6 @@ class Social_Choice_Sim:
         return self.players
 
 
-    def get_probabilities(self):
-        return self.probabilities
-
-
     def get_votes(self, previous_votes=None, cycle=0): # generic get votes for all bot types. Not optimized for a single chromosome
         self.cycle = cycle
         bot_votes = {}
@@ -148,22 +137,6 @@ class Social_Choice_Sim:
                 bot_votes[i] = final_votes
 
         self.final_votes = bot_votes
-
-        return bot_votes
-
-
-    def get_votes_single_chromosome(self): # if we want to visualize/test a single chromosome, use this one.
-        if self.bots[0].type != "GT":
-            print("Hey thats wrong, try again ")
-            return
-        bot_votes = {}
-        self.all_combinations = [] # used for the current implementation of the GT bot.
-
-        for i, bot in enumerate(self.bots):
-            if bot.type == "GT":
-                if not self.all_combinations:
-                    self.probabilities = bot.generate_probabilities(self.current_options_matrix)
-                bot_votes[i] = bot.get_vote_optimized_single(self.probabilities, self.current_options_matrix)
 
         return bot_votes
 
@@ -331,17 +304,6 @@ class Social_Choice_Sim:
 
         return x_reflected, y_reflected
 
-
-    def normalize_current_options_matrix(self):
-        print("This si the current options matrix \n", self.current_options_matrix)
-        new_options = copy.deepcopy(self.current_options_matrix)
-        for i, row in enumerate(new_options):
-            new_sum = sum(abs(value) for value in row)
-            if new_sum != 0:
-                for j in range(len(row)):
-                    new_options[i][j] /= new_sum
-        return new_options
-
     # default to groups being None,
     def start_round(self, groups=None):
         # options may change, but the causes themselves don't, so we can generate them in init functionality.
@@ -350,16 +312,6 @@ class Social_Choice_Sim:
 
 
     # takes in the influence matrix, and then spits out the 3 strongest calculated relations for every player.
-    def calculate_relation_strength(self, new_relations):
-        cpp = self.cpp # how many closest personal promises each player has or something.
-        # this is where I had to decide how I wanted to gauge the strength of relations
-        new_values = self.apply_heuristic(new_relations)
-        # specialized bc of negative values and possible stealing.
-        normalized_values = self.normalize(new_values)
-        # goes through the normalized heuristic, finds the cpp strongest, and makes them into a serializable dictionary we can send across.
-        return_values = self.make_dict(normalized_values, cpp)
-        return_values = self.make_native_type(return_values)
-        return return_values
 
 
     def make_native_type(self, return_values):
@@ -371,20 +323,6 @@ class Social_Choice_Sim:
                 new_inner_dict[item] = value.item if isinstance(value, np.generic) else value
             new_dict[new_key] = new_inner_dict
         return new_dict
-
-
-    def make_dict(self, normalized_values, cpp):
-        return_values = {}
-        for i in range(len(normalized_values)): # its square so it doesn't really matter
-            row = np.array(normalized_values[i]) # I think that works?
-            indices = np.argsort(np.abs(row))[-cpp:]
-            extreme_values = row[indices]
-            return_values[i] = {}
-            dict_pop = {}
-            for idx, value in zip(indices, extreme_values):
-                dict_pop[idx] = value
-            return_values[i] = dict_pop
-        return return_values
 
 
     def normalize(self, new_values):

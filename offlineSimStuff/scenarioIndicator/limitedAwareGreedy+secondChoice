@@ -1,2 +1,2 @@
-# this specifically is to see if the limitedawarenessagents will swap when given the opportunity.
-5,5,5,5,5,5,6,6,6,6,6
+# this specifically is to see if the limitedawarenessagents will swap when given the opportunity. # 0 is random, 1 is pareto, 2 is greedy, 3 is betterGreedy, 4 is limitedAwareness, 5 is secondChoiceGreedy
+4,4,4,4,4,4,4,4,5,5,5

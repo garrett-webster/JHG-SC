@@ -9,7 +9,7 @@ class limitedAwarenessGreedy:
         self.type = "BG"
         self.chromosome = None
         self.risk_adversity = "MAX"
-        self.number_type = 5
+        self.number_type = 4
         # so RISK adversity is MAX (1) and High (0). It's not implemented yet.
 
     def set_chromosome(self, chromosome):
@@ -111,13 +111,11 @@ class limitedAwarenessGreedy:
                 risk_aversion = self.chromosome[0]
                 for i, val in enumerate(our_row):
                     if val > 0:
-                        print("THE GOOD KUSH")
                         # new_row.append(col_probs[i + 1] * val) # straight expected value.
                         new_prob = col_probs[i + 1] ** risk_aversion  # scalable risk stuff.
                         new_row.append(new_prob * val)
 
                     else:
-                        print("THERE IS NOTHING GOOD")
                         new_row.append(0)
 
                 return new_row.index(max(new_row)) - 1

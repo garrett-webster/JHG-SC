@@ -7,19 +7,19 @@ from matplotlib.patches import FancyArrowPatch
 import matplotlib.gridspec as gridspec
 from pathlib import Path
 from matplotlib.patches import Patch
-
+import os
 
 class causeNodeGraphVisualizer:
     def __init__(self):
         pass
 
     #def create_graph(self, all_nodes, all_votes, winning_vote, current_options_matrix):
-    def create_graph(self, current_sim):
+    def create_graph(self, current_sim, curr_round, cycle): # for right now, pass the cycle in. I might add him in later.
 
         all_nodes, all_votes, winning_vote, current_options_matrix, bot_list = current_sim.prepare_graph()
 
         bot_color_map = {
-            # 0 is random, 1 is pareto, 2 is greedy, 3 is random, 4 is betterGreedy, 5 is limitedAwareness, 6 is secondChoice
+            # 0 is random, 1 is pareto, 2 is greedy, 3 is betterGreedy, 4 is limitedAwareness, 5 is secondChoice
             "0": "purple",
             "1": "lightgreen",
             "2": "darkgreen",
@@ -34,10 +34,9 @@ class causeNodeGraphVisualizer:
             "0": "Random",
             "1": "Pareto",
             "2": "Greedy",
-            "3": "AltRandom",
-            "4": "BetterGreedy",
-            "5": "LimitedAware",
-            "6": "SecondChoice"
+            "3": "betterGreedy",
+            "4": "limitedAwareness",
+            "5": "secondChoice",
         }
 
 
@@ -128,7 +127,7 @@ class causeNodeGraphVisualizer:
         path = Path(current_sim.scenario)
         current_scenario = path.name
 
-        fig.suptitle(f"Round: {0}   Situation: {current_scenario}   Cycle: {current_sim.cycle}",
+        fig.suptitle(f"Round: {curr_round}   Situation: {current_scenario}   Cycle: {current_sim.cycle}",
                      fontsize=16, fontweight='bold', y=0.98)
 
         # creates a legend that allows us to see which bot types are active, and which ones are what
@@ -145,7 +144,10 @@ class causeNodeGraphVisualizer:
 
         # Reduce space between matrix and graph and the overall layout
         fig.subplots_adjust(wspace=0.01, left=0.05, right=0.95, top=0.95, bottom=0.15)  # Adjust bottom margin
+        print("This is the round at the end!! ", curr_round)
 
-        plt.show()
+        my_path = os.path.dirname(os.path.abspath(__file__))
+        plt.savefig(my_path + "/individualRoundGraphs/ round " + str(curr_round) + str(" ") + str("cycle ") + str(cycle), dpi=300) # I want it to have the round, and cycle, and that shoudl do it
+        #plt.show()
 
 
