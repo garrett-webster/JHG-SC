@@ -14,6 +14,7 @@ from Server.SC_Bots.gameTheory import gameTheoryBot
 from Server.SC_Bots.Random import RandomBot
 from Server.SC_Bots.limitedAwareGreedy import limitedAwarenessGreedy
 from Server.Node import Node
+from Server.SC_Bots.secondChoiceGreedy import secondChoiceGreedy
 
 NUM_CAUSES = 3
 
@@ -68,6 +69,8 @@ class Social_Choice_Sim:
             bots_array.append(betterGreedy(i))
         if bot_type == 5:
             bots_array.append(limitedAwarenessGreedy(i))
+        if bot_type == 6:
+            bots_array.append(secondChoiceGreedy(i))
 
     def create_players(self):
         players = {}
