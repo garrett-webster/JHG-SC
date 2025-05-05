@@ -35,9 +35,10 @@ def run_trial(sim, num_rounds, num_cycles):
         bot_votes = {}
         for i in range(num_cycles):
             #we start with this as a blank dict, update it and when it finishes it has the most recent bot votes after cycles.
-            bot_votes = sim.get_votes(bot_votes)
+            bot_votes[i] = sim.get_votes(bot_votes)
         # bot_votes = sim.get_votes()
 
+        bot_votes = bot_votes[num_cycles-1] # grab just the last votes, they are the only ones that matter anyway.
         total_votes = len(bot_votes)
         winning_vote, round_results = sim.return_win(bot_votes)  # is all votes, works here
         if winning_vote != -1:  # keep track of how often they cooperate.
@@ -171,7 +172,7 @@ if __name__ == "__main__":
     num_rounds = 100
     num_cycles = 3
     current_sim = create_sim()
-    #run_trial(current_sim, num_rounds, num_cycles)
+    run_trial(current_sim, num_rounds, num_cycles)
     # set up a fake round and then graph it
     current_sim.start_round()
     current_sim.create_player_nodes()
