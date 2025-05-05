@@ -67,7 +67,7 @@ def run_trial(sim, num_rounds, num_cycles):
         new_list.append(sums_per_round[bot][num_rounds-1])
     std = np.std(new_list)
     mean = np.mean(new_list)
-    cv = std / abs(mean) # measures distribution better than, say, std or mean on their own.
+    cv = std / abs(mean) # measures distribution bet  ter than, say, std or mean on their own.
 
     cooperation_score = cooperation_score / num_rounds # as a percent, how often we cooperated. (had a non negative cause pass)
 
@@ -155,11 +155,11 @@ def graph_nodes(sim):
 
 
 def create_sim():
-    bot_type = 5 # 1 is pareto, 2 is greedy, 3 is random, 4 is betterGreedy, 5 is limitedAwareness, 6 is secondChoice
-    #
+    bot_type = 4 # 1 is pareto, 2 is greedy, 3 is random, 4 is betterGreedy, 5 is limitedAwareness, 6 is secondChoice
+
     chromosomes = r"C:/Users/Sean/Documents/GitHub/OtherGarrettStuff/JHG-SC/offlineSimStuff/chromosomes/bGStandard.csv"
     # SUM: this sets the bot list type, so we can have siutaions set up
-    scenario = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\offlineSimStuff\scenarioIndicator\limitedAwareGreedy+secondChoice"
+    scenario = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\offlineSimStuff\scenarioIndicator\allGreedy"
     cycle = -1 # a negative cycle indicates to me that this is a test - that, or something is really really wrong.
 
     sim = Social_Choice_Sim(11, 3, 0, bot_type, cycle, chromosomes, scenario)
@@ -169,7 +169,7 @@ def create_sim():
 
 
 if __name__ == "__main__":
-    num_rounds = 100
+    num_rounds = 1000
     num_cycles = 3
     current_sim = create_sim()
     run_trial(current_sim, num_rounds, num_cycles)
