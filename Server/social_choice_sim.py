@@ -23,9 +23,14 @@ class Social_Choice_Sim:
         self.total_players = total_players
         self.num_humans = num_humans
         self.num_bots = total_players - num_humans
+        # the next two lines only exist to work with default architecture.
         self.bot_type = bot_type
         self.bots = self.create_bots()
+        # updated bot creation thing
         self.bot_type = self.set_bot_list(scenario)
+        self.bots = self.create_bots()
+        self.scenario = scenario
+        self.cycle = cycle
         self.set_chromosomes(chromosomes)
 
         self.players = self.create_players()
@@ -433,5 +438,4 @@ class Social_Choice_Sim:
 
         winning_vote, _ = self.return_win(self.final_votes)
 
-        return current_node_json, self.final_votes, winning_vote, self.current_options_matrix
-
+        return current_node_json, self.final_votes, winning_vote, self.current_options_matrix, self.bots

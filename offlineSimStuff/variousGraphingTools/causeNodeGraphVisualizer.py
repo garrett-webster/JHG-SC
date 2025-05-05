@@ -5,6 +5,9 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 from matplotlib.patches import FancyArrowPatch
 import matplotlib.gridspec as gridspec
+from pathlib import Path
+from matplotlib.patches import Patch
+
 
 class causeNodeGraphVisualizer:
     def __init__(self):
@@ -13,7 +16,30 @@ class causeNodeGraphVisualizer:
     #def create_graph(self, all_nodes, all_votes, winning_vote, current_options_matrix):
     def create_graph(self, current_sim):
 
-        all_nodes, all_votes, winning_vote, current_options_matrix = current_sim.prepare_graph()
+        all_nodes, all_votes, winning_vote, current_options_matrix, bot_list = current_sim.prepare_graph()
+
+        bot_color_map = {
+            # 0 is random, 1 is pareto, 2 is greedy, 3 is random, 4 is betterGreedy, 5 is limitedAwareness, 6 is secondChoice
+            "0": "purple",
+            "1": "lightgreen",
+            "2": "darkgreen",
+            "3": "blue",
+            "4": "orange",
+            "5": "plum",
+            "6": "lightblue",
+            "default": "gray"
+        }
+
+        bot_name_map = {
+            "0": "Random",
+            "1": "Pareto",
+            "2": "Greedy",
+            "3": "AltRandom",
+            "4": "BetterGreedy",
+            "5": "LimitedAware",
+            "6": "SecondChoice"
+        }
+
 
         fig = plt.figure(figsize=(13, 6))  # Compact figure size
         gs = gridspec.GridSpec(1, 2, width_ratios=[0.8, 3.2])  # tighter left:right ratio
@@ -55,6 +81,7 @@ class causeNodeGraphVisualizer:
 
         node_positions = {node["text"]: (node["x_pos"], node["y_pos"]) for node in all_nodes}
         node_types = {node["text"]: node["type"] for node in all_nodes}
+        used_bot_types = set()
 
         for node in all_nodes:
             x, y = node["x_pos"], node["y_pos"]
@@ -67,13 +94,18 @@ class causeNodeGraphVisualizer:
                 number = label
 
             if node_type == "CAUSE":
-                color = 'red' if label == "Cause " + str(winning_vote+1) else 'lightblue'
+                color = 'red' if label == "Cause " + str(winning_vote+1) else 'darkgrey'
                 shape = patches.RegularPolygon((x, y), numVertices=3, radius=1.0, orientation=0,
                                                color=color, ec='black', zorder=2)
                 ax.add_patch(shape)
             elif node_type == "PLAYER":
-                shape = plt.Circle((x, y), 0.7, color='lightgreen', ec='black', zorder=2)
+                string = node["text"].split(" ")
+                id = bot_list[int(string[1])-1].get_number_type()
+                used_bot_types.add(str(id))
+                color = bot_color_map[str(id)]
+                shape = plt.Circle((x, y), 0.7, color=color, ec='black', zorder=2)
                 ax.add_patch(shape)
+
 
             ax.text(x, y, str(number), ha='center', va='center', fontsize=14, weight='bold', zorder=3)
 
@@ -93,7 +125,27 @@ class causeNodeGraphVisualizer:
                                         mutation_scale=15, lw=2, zorder=1)
                 ax.add_patch(arrow)
 
+        path = Path(current_sim.scenario)
+        current_scenario = path.name
+
+        fig.suptitle(f"Round: {0}   Situation: {current_scenario}   Cycle: {current_sim.cycle}",
+                     fontsize=16, fontweight='bold', y=0.98)
+
+        # creates a legend that allows us to see which bot types are active, and which ones are what
+        legend_elements = []
+
+        for bot_type in sorted(used_bot_types):
+            label = bot_name_map.get(bot_type, f"Type {bot_type}")
+            color = bot_color_map.get(bot_type, bot_color_map["default"])
+            legend_elements.append(Patch(facecolor=color, edgecolor='black', label=label))
+
+        # You can put the legend on the right side of the graph area
+        ax.legend(handles=legend_elements, loc='lower right', bbox_to_anchor=(1.0, -0.05),
+                  ncol=2, fontsize=10, frameon=True, title="Bot Types")
+
         # Reduce space between matrix and graph and the overall layout
         fig.subplots_adjust(wspace=0.01, left=0.05, right=0.95, top=0.95, bottom=0.15)  # Adjust bottom margin
 
         plt.show()
+
+

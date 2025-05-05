@@ -6,9 +6,13 @@ class RandomBot():
     def __init__(self, self_id):
         self.self_id = self_id
         self.type = "R"
+        self.type = 0
 
     def set_chromosome(self, chromosome): # doesn't actually get used, just for conveience sake
         self.chromosome = chromosome
+
+    def get_number_type(self):
+        return self.number_type
 
     def get_vote(self, current_options_matrix, previous_votes=None):
         total_options = len(current_options_matrix[0]) # how many cuases are there w/ abstaining. Before they couldn't vote for cause 3.

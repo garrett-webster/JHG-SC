@@ -6,12 +6,16 @@ class betterGreedy:
     def __init__(self, self_id):
         self.self_id = self_id
         self.type = "BG"
+        self.number_type = 4
         self.chromosome = None
         self.risk_adversity = "MAX"
         # so RISK adversity is MAX (1) and High (0). It's not implemented yet.
 
     def set_chromosome(self, chromosome):
         self.chromosome = chromosome
+
+    def get_number_type(self):
+        return self.number_type
 
     # here is what teh scturecture is going to look like. store an array, and at that index store the value of what they ahve voted for.
     def get_vote(self, current_options_matrix, previous_votes=None):

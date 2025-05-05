@@ -7,9 +7,13 @@ class GreedyBot():
     def __init__(self, self_id):
         self.self_id = self_id
         self.type = "G"
+        self.number_type = 2
 
     def set_chromosome(self, chromosome):
         self.chromosome = chromosome
+
+    def get_number_type(self):
+        return self.number_type
 
     def get_vote(self, current_options_matrix, previous_votes=None):
         current_row = current_options_matrix[self.self_id]

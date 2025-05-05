@@ -159,7 +159,7 @@ def create_sim():
     #
     chromosomes = r"C:/Users/Sean/Documents/GitHub/OtherGarrettStuff/JHG-SC/offlineSimStuff/chromosomes/bGStandard.csv"
     # SUM: this sets the bot list type, so we can have siutaions set up
-    scenario = "/offlineSimStuff/scenarioIndicator/limitedAwareGreedy+secondChoice"
+    scenario = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\offlineSimStuff\scenarioIndicator\limitedAwareGreedy+secondChoice"
     cycle = -1 # a negative cycle indicates to me that this is a test - that, or something is really really wrong.
 
     sim = Social_Choice_Sim(11, 3, 0, bot_type, cycle, chromosomes, scenario)
@@ -172,11 +172,11 @@ if __name__ == "__main__":
     num_rounds = 100
     num_cycles = 3
     current_sim = create_sim()
-    #run_trial(current_sim, num_rounds, num_cycles)
+    run_trial(current_sim, num_rounds, num_cycles)
     # set up a fake round and then graph it
     current_sim.start_round()
     current_sim.get_votes() # literally just to place votes somewhere, yeah?
-    graph_nodes(current_sim)
+    #graph_nodes(current_sim)
 
 
 
