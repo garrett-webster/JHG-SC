@@ -10,7 +10,11 @@ class causeNodeGraphVisualizer:
     def __init__(self):
         pass
 
-    def create_graph(self, all_nodes, all_votes, winning_vote, current_options_matrix):
+    #def create_graph(self, all_nodes, all_votes, winning_vote, current_options_matrix):
+    def create_graph(self, current_sim):
+
+        all_nodes, all_votes, winning_vote, current_options_matrix = current_sim.prepare_graph()
+
         fig = plt.figure(figsize=(13, 6))  # Compact figure size
         gs = gridspec.GridSpec(1, 2, width_ratios=[0.8, 3.2])  # tighter left:right ratio
 

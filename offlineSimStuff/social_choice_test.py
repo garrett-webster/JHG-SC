@@ -35,7 +35,8 @@ def run_trial(sim, num_rounds, num_cycles):
         bot_votes = {}
         for i in range(num_cycles):
             #we start with this as a blank dict, update it and when it finishes it has the most recent bot votes after cycles.
-            bot_votes[i] = sim.get_votes(bot_votes)
+            # set the cycle counter here, so that way I can keep track of it for graphing. there is a built in getter function for da graphign.
+            bot_votes[i] = sim.get_votes(bot_votes, i)
         # bot_votes = sim.get_votes()
 
         bot_votes = bot_votes[num_cycles-1] # grab just the last votes, they are the only ones that matter anyway.
@@ -148,22 +149,21 @@ def run_trial(sim, num_rounds, num_cycles):
     plt.show()
 
 
-def graph_nodes(all_nodes, all_votes, winning_vote, current_options_matrix):
+def graph_nodes(sim):
     currVisualizer = causeNodeGraphVisualizer()
-    currVisualizer.create_graph(all_nodes, all_votes, winning_vote, current_options_matrix)
+    currVisualizer.create_graph(sim)
 
 
 def create_sim():
-    bot_type = 5 # 1 is pareto, 2 is greedy, 3 is random, 4 is betterGreedy, 6 is limitedAwarenessGreedy
-    sim = Social_Choice_Sim(11, 3, 0, bot_type)  # starts the social choice sim, call it whatever you want
-    #current_file = "Bots/chromosomesToKeepAround/generation_199.csv"
-    current_file = r"C:/Users/Sean/Documents/GitHub/OtherGarrettStuff/JHG-SC/offlineSimStuff/chromosomes/bGStandard.csv"
-    df = pd.read_csv(current_file, comment="#")
-    chromosomes = [[1]] * 11
-    num_genes = 20
-    cooperation_score = 0
-    num_cycles = 1
-    sim.set_chromosome(chromosomes) # in this case its the same every time.
+    bot_type = 5 # 1 is pareto, 2 is greedy, 3 is random, 4 is betterGreedy, 5 is limitedAwareness, 6 is secondChoice
+    #
+    chromosomes = r"C:/Users/Sean/Documents/GitHub/OtherGarrettStuff/JHG-SC/offlineSimStuff/chromosomes/bGStandard.csv"
+    # SUM: this sets the bot list type, so we can have siutaions set up
+    scenario = "/offlineSimStuff/scenarioIndicator/limitedAwareGreedy+secondChoice"
+    cycle = -1 # a negative cycle indicates to me that this is a test - that, or something is really really wrong.
+
+    sim = Social_Choice_Sim(11, 3, 0, bot_type, cycle, chromosomes, scenario)
+
     return sim
 
 
@@ -172,21 +172,11 @@ if __name__ == "__main__":
     num_rounds = 100
     num_cycles = 3
     current_sim = create_sim()
-    run_trial(current_sim, num_rounds, num_cycles)
+    #run_trial(current_sim, num_rounds, num_cycles)
     # set up a fake round and then graph it
     current_sim.start_round()
-    current_sim.create_player_nodes()
-    current_nodes = current_sim.compile_nodes()
-    current_node_json = []
-    for node in current_nodes:
-        current_node_json.append(node.to_json())
-
-
-
-    total_votes = current_sim.get_votes()
-    winning_vote, _ = current_sim.return_win(total_votes)
-    print("these were the roudn results! ", winning_vote)
-    graph_nodes(current_node_json, total_votes, winning_vote, current_sim.current_options_matrix)
+    current_sim.get_votes() # literally just to place votes somewhere, yeah?
+    graph_nodes(current_sim)
 
 
 

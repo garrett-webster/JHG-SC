@@ -10,7 +10,6 @@ from Server.options_creation import generate_two_plus_one_groups_options_best_of
 from Server.SC_Bots.Greedy import GreedyBot
 from Server.SC_Bots.betterGreedy import betterGreedy
 from Server.SC_Bots.Pareto import ParetoBot
-from Server.SC_Bots.gameTheory import gameTheoryBot
 from Server.SC_Bots.Random import RandomBot
 from Server.SC_Bots.limitedAwareGreedy import limitedAwarenessGreedy
 from Server.Node import Node
@@ -20,11 +19,15 @@ NUM_CAUSES = 3
 
 
 class Social_Choice_Sim:
-    def __init__(self, total_players, num_causes, num_humans, bot_type):
+    def __init__(self, total_players, num_causes, num_humans, bot_type, cycle=0, chromosomes="", scenario=""):
         self.total_players = total_players
         self.num_humans = num_humans
         self.num_bots = total_players - num_humans
         self.bot_type = bot_type
+        self.bots = self.create_bots()
+        self.bot_type = self.set_bot_list(scenario)
+        self.set_chromosomes(chromosomes)
+
         self.players = self.create_players()
         self.num_causes = num_causes
         self.cpp = 3
@@ -35,10 +38,11 @@ class Social_Choice_Sim:
         self.all_votes = {}
         self.organized_distance_dict = [] # set it to an empty dict for now
         self.default_greedy = [] # len = num players, contains the current cuase that they are voting for.
-        self.bots = self.create_bots()
+
         self.current_votes = [] # we need to add support for if anyone else has cast a vote. Right now it doesn't reall matter
         self.probabilities = []
         self.options_matrix = None
+        self.cycle = cycle
 
 
     def create_bots(self):
@@ -129,11 +133,16 @@ class Social_Choice_Sim:
         return self.probabilities
 
 
-    def get_votes(self, previous_votes=None): # generic get votes for all bot types. Not optimized for a single chromosome
+    def get_votes(self, previous_votes=None, cycle=0): # generic get votes for all bot types. Not optimized for a single chromosome
+        self.cycle = cycle
         bot_votes = {}
 
+        final_votes = None
         for i, bot in enumerate(self.bots):
-                bot_votes[i] = bot.get_vote(self.current_options_matrix, previous_votes)
+                final_votes = bot.get_vote(self.current_options_matrix, previous_votes)
+                bot_votes[i] = final_votes
+
+        self.final_votes = bot_votes
 
         return bot_votes
 
@@ -170,6 +179,37 @@ class Social_Choice_Sim:
                 results.append(0)
 
         return winning_vote, results
+
+
+    def get_cycle(self):
+        return self.cycle
+
+    # SUM: sets up the bot list with a current file. Will override any potential single types as those seem to be more important. will likely be refactored.
+    def set_bot_list(self, current_file):
+        if current_file != "":
+            with open(current_file, "r") as file:
+                for line in file:
+                    if line.startswith("#"):
+                        continue # skip the comment lines
+                    bot_types = [int(x) for x in line.strip().split(",")]
+                    break # stop when teh numbers are over.
+            return bot_types
+
+    def set_chromosomes(self, current_file):
+        chromosomes_list = []
+        if current_file != "":
+            with open(current_file, "r") as file:
+                for line in file:
+                    if line.startswith("#"):
+                        continue
+                    parts = line.strip().split(",")
+                    if parts:  # make sure the line isn't empty
+                        try:
+                            chromosomes_list.append([float(parts[1])])
+                        except ValueError:
+                            pass  # skip lines that don't have valid integers
+        self.set_chromosome(chromosomes_list)
+
 
 
 
@@ -383,3 +423,15 @@ class Social_Choice_Sim:
 
     def get_bot_type(self):
         return self.bot_type
+
+    def prepare_graph(self):
+        self.create_player_nodes()
+        current_nodes = self.compile_nodes()
+        current_node_json = []
+        for node in current_nodes:
+            current_node_json.append(node.to_json())
+
+        winning_vote, _ = self.return_win(self.final_votes)
+
+        return current_node_json, self.final_votes, winning_vote, self.current_options_matrix
+

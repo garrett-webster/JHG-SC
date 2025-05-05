@@ -1,7 +1,6 @@
 import copy
 from collections import Counter
 import numpy as np
-from pyqtgraph.examples.colorMapsLinearized import previous
 
 
 class limitedAwarenessGreedy:
@@ -58,9 +57,7 @@ class limitedAwarenessGreedy:
 
         else: # this is where the fun begins
             if previous_votes:
-                pass # no switching info, so just modify the probabilities like we have expected.
-                    # if the votes are unusual, we might have to cooperate differently.
-                    # for testing purposes, I might have the random bot always make the SAME decision so that they can be infulenced by the others.
+
                 self_id = self.self_id
                 mutable_matrix = [[max(val + 1, 0) for val in [0] + row] for row in current_options_matrix]
 
@@ -72,8 +69,29 @@ class limitedAwarenessGreedy:
                             row[i] /= total
 
                 # the previous vote information would likely be considered here - go through, and if they actually voted for it, add a 1 to it normalized and then renormalize it.
+                keys = []
                 for vote in previous_votes:
-                    pass
+                    keys.append(vote)
+                player_dict = {}
+                for player in previous_votes[keys[0]]:
+                    player_dict[player] = [] # make it a list
+
+                for key in keys:
+                    for player in previous_votes[key]:
+                        player_dict[player].append(previous_votes[key][player])
+
+                for key in player_dict: # just unfold the fetcher
+                    for i in range(len(player_dict[key])): # i is the player number
+                        index = player_dict[key][i] + 1 # off by one error - negative one exists.
+                        mutable_matrix[key][index] += 1 # so we add one to the value that they voted for
+
+                # normalize AGAIN for fun.
+                for row in mutable_matrix:
+                    total = sum(row)
+                    if total > 0:
+                        for i in range(len(row)):
+                            row[i] /= total
+
 
                 # get the column sums
                 num_cols = len(mutable_matrix[0])
