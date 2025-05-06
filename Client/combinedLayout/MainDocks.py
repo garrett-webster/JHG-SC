@@ -217,6 +217,17 @@ class CornerContainer(QWidget):
                 background-color: #888;
                 border-radius: 5px;
             }
+            QScrollBar QComboBox {
+                color: white;
+            }
+            QComboBox {
+                color: white;
+            }
+            QComboBox QAbstractItemView {
+                background-color: #171717;   /* dropdown background */
+                selection-background-color: blue;
+                selection-color: white;
+            }
         """)
 
         return scroll_area
