@@ -46,6 +46,9 @@ class Social_Choice_Sim:
         self.results = {} # holds all of our results from long term simulations before graphing.
         self.cooperation_score = 0
         self.num_rounds = 0
+        self.all_votes = {} # yeah lets just keep track of all of em. requires passing the round through and resetting them.
+
+
 
     def create_bots(self):
         bots_array = []
@@ -136,6 +139,7 @@ class Social_Choice_Sim:
     def get_votes(self, previous_votes=None, round=0, cycle=0): # generic get votes for all bot types. Not optimized for a single chromosome
         self.round = round
         self.cycle = cycle
+
         bot_votes = {}
 
         final_votes = None
@@ -144,6 +148,7 @@ class Social_Choice_Sim:
                 bot_votes[i] = final_votes
 
         self.final_votes = bot_votes
+        self.all_votes[round] = bot_votes # that way we have it organized per round and we can see the final votes. also allows us to throw stuff in.
 
         return bot_votes
 
@@ -200,6 +205,80 @@ class Social_Choice_Sim:
                         except ValueError:
                             pass  # skip lines that don't have valid integers
         self.set_chromosome(chromosomes_list)
+
+    # default to groups being None,
+    def start_round(self, groups=None):
+        self.current_options_matrix = [
+            [6,9,-10],
+            [5,3,-1],
+            [4,1,-4],
+            [4,-2,-9],
+            [-5,-4,3],
+            [5,4,5],
+            [-4,-6,3],
+            [-3,2,8],
+            [10,4,1],
+            [-10,-10,5],
+            [-6,7,-4],
+        ]
+
+        self.options_matrix = self.current_options_matrix
+        #self.current_options_matrix = self.create_options_matrix(groups)
+        self.player_nodes = self.create_player_nodes()
+
+    def make_native_type(self, return_values):
+        new_dict = {}
+        for key, inner_dict in return_values.items():
+            new_key = key.item() if isinstance(key, np.integer) else key
+            new_inner_dict = {}
+            for item, value in inner_dict.items():
+                new_inner_dict[item] = value.item if isinstance(value, np.generic) else value
+            new_dict[new_key] = new_inner_dict
+        return new_dict
+
+    def compile_nodes(self):
+        player_nodes = self.get_player_nodes()
+        causes = self.get_causes()
+        all_nodes = causes + player_nodes
+        return all_nodes
+
+    def get_bot_votes(self, current_options_matrix):
+        votes = {}
+        for i, player in enumerate(self.players):
+            if player.getType() != "Human":
+                votes[str(i)] = player.getVote(current_options_matrix, i)
+        return votes
+
+    def get_bot_type(self):
+        return self.bot_type
+
+    def prepare_graph(self):
+        self.create_player_nodes()
+        current_nodes = self.compile_nodes()
+        current_node_json = []
+        for node in current_nodes:
+            current_node_json.append(node.to_json())
+
+        current_cooperation_score = copy.copy(self.cooperation_score)
+        winning_vote, _ = self.return_win(self.final_votes)
+        self.set_coop_score(current_cooperation_score)  # reset it bc the above does silly things.
+
+        return current_node_json, self.final_votes, winning_vote, self.current_options_matrix, self.bots
+
+    def set_rounds(self, num_rounds):
+        self.num_rounds = num_rounds
+
+    def add_coop_score(self):
+        self.cooperation_score = self.cooperation_score + 1
+
+    def set_coop_score(self, coop_score):
+        self.cooperation_score = coop_score
+
+    def set_results(self, results):
+        self.results = results
+
+    def get_results(self):
+        return self.results, self.cooperation_score, self.bot_type, self.num_rounds
 
 
 
@@ -317,103 +396,4 @@ class Social_Choice_Sim:
 
         return x_reflected, y_reflected
 
-    # default to groups being None,
-    def start_round(self, groups=None):
-        # options may change, but the causes themselves don't, so we can generate them in init functionality.
-        # self.current_options_matrix = [
-        #     [0,0,3],
-        #     [5,4,-9],
-        #     [2,-6,3],
-        #     [-7,6,2],
-        #     [10,4,3],
-        #     [-4,10,6],
-        #     [-1,-6,9],
-        #     [-6,-6,-5],
-        #     [-6,-2,2],
-        #     [-5,3,-4],
-        #     [2,6,-5],
-        # ]
-        # self.options_matrix = self.current_options_matrix
 
-        self.current_options_matrix = self.create_options_matrix(groups)
-        self.player_nodes = self.create_player_nodes()
-
-
-    # takes in the influence matrix, and then spits out the 3 strongest calculated relations for every player.
-
-
-    def make_native_type(self, return_values):
-        new_dict = {}
-        for key, inner_dict in return_values.items():
-            new_key = key.item() if isinstance(key, np.integer) else key
-            new_inner_dict = {}
-            for item, value in inner_dict.items():
-                new_inner_dict[item] = value.item if isinstance(value, np.generic) else value
-            new_dict[new_key] = new_inner_dict
-        return new_dict
-
-
-    def normalize(self, new_values):
-        normalized_matrix = np.array(new_values)
-        new_matrix = copy.deepcopy(normalized_matrix)
-
-        if normalized_matrix.min() < 0: # if we contain negative values.
-            for i, row in enumerate(normalized_matrix):
-                for j, element in enumerate(row):
-                    if element > 0:
-                        element = element / normalized_matrix.max()
-                    elif element < 0:
-                        element = element / normalized_matrix.min()
-                    new_matrix[i][j] = element
-
-        else: # all positive values, so we can normalize this the easy way.
-            new_matrix = (normalized_matrix - normalized_matrix.min()) / (normalized_matrix.max() - normalized_matrix.min())
-
-        new_matrix = np.round(new_matrix, decimals=2) # reduce size.
-        return new_matrix
-
-
-    def add_votes(self, round, votes):
-        # We have to put them all somewhere and here works as good as anywhere else. Not sure if we will need it.
-        self.all_votes[round] = votes
-
-
-    def compile_nodes(self):
-        player_nodes = self.get_player_nodes()
-        causes = self.get_causes()
-        all_nodes = causes + player_nodes
-        return all_nodes
-
-
-    def get_bot_votes(self, current_options_matrix):
-        votes = {}
-        for i, player in enumerate(self.players):
-            if player.getType() != "Human":
-                votes[str(i)] = player.getVote(current_options_matrix, i)
-        return votes
-
-    def get_bot_type(self):
-        return self.bot_type
-
-    def prepare_graph(self):
-        self.create_player_nodes()
-        current_nodes = self.compile_nodes()
-        current_node_json = []
-        for node in current_nodes:
-            current_node_json.append(node.to_json())
-
-        winning_vote, _ = self.return_win(self.final_votes)
-
-        return current_node_json, self.final_votes, winning_vote, self.current_options_matrix, self.bots
-
-    def set_rounds(self, num_rounds):
-        self.num_rounds=  num_rounds
-
-    def add_coop_score(self):
-        self.cooperation_score = self.cooperation_score + 1
-
-    def set_results(self, results):
-        self.results = results
-
-    def get_results(self):
-        return self.results, self.cooperation_score, self.bot_type, self.num_rounds
