@@ -14,12 +14,13 @@ from Server.SC_Bots.Random import RandomBot
 from Server.SC_Bots.limitedAwareGreedy import limitedAwarenessGreedy
 from Server.Node import Node
 from Server.SC_Bots.secondChoiceGreedy import secondChoiceGreedy
+from Server.SC_Bots.somewhatMoreAwareGreedy import somewhatMoreAwarenessGreedy
 
 NUM_CAUSES = 3
 
 
 class Social_Choice_Sim:
-    def __init__(self, total_players, num_causes, num_humans, bot_type, cycle=0, chromosomes="", scenario=""):
+    def __init__(self, total_players, num_causes, num_humans, cycle=0, round=0, chromosomes="", scenario=""):
         self.total_players = total_players
         self.num_humans = num_humans
         self.num_bots = total_players - num_humans
@@ -28,7 +29,6 @@ class Social_Choice_Sim:
         self.bot_type = self.set_bot_list(scenario)
         self.bots = self.create_bots()
         self.scenario = scenario
-        self.cycle = cycle
         self.set_chromosomes(chromosomes)
 
         self.players = self.create_players()
@@ -42,7 +42,10 @@ class Social_Choice_Sim:
         self.current_votes = [] # we need to add support for if anyone else has cast a vote. Right now it doesn't reall matter
         self.options_matrix = None
         self.cycle = cycle
-
+        self.round = round
+        self.results = {} # holds all of our results from long term simulations before graphing.
+        self.cooperation_score = 0
+        self.num_rounds = 0
 
     def create_bots(self):
         bots_array = []
@@ -71,6 +74,9 @@ class Social_Choice_Sim:
             new_bot = (limitedAwarenessGreedy(i))
         if bot_type == 5:
             new_bot = (secondChoiceGreedy(i))
+        if bot_type == 6:
+            new_bot = (somewhatMoreAwarenessGreedy(i))
+
 
         return new_bot # the matched bot that we were looking for.
 
@@ -127,7 +133,8 @@ class Social_Choice_Sim:
         return self.players
 
 
-    def get_votes(self, previous_votes=None, cycle=0): # generic get votes for all bot types. Not optimized for a single chromosome
+    def get_votes(self, previous_votes=None, round=0, cycle=0): # generic get votes for all bot types. Not optimized for a single chromosome
+        self.round = round
         self.cycle = cycle
         bot_votes = {}
 
@@ -152,9 +159,11 @@ class Social_Choice_Sim:
         if winning_vote != -1: # if its -1, then nothing happend. NOT the last entry in the fetcher. that was a big bug that flew under the radar.
             for i in range(len(total_votes)):
                 results.append(self.current_options_matrix[i][winning_vote])
+            self.add_coop_score()
         else:
             for i in range(len(total_votes)):
                 results.append(0)
+
 
         return winning_vote, results
 
@@ -171,6 +180,10 @@ class Social_Choice_Sim:
                         continue # skip the comment lines
                     bot_types = [int(x) for x in line.strip().split(",")]
                     break # stop when teh numbers are over.
+            return bot_types
+        else:
+            num_bots = self.total_players - self.num_humans
+            bot_types = [[2]] * num_bots
             return bot_types
 
     def set_chromosomes(self, current_file):
@@ -307,6 +320,21 @@ class Social_Choice_Sim:
     # default to groups being None,
     def start_round(self, groups=None):
         # options may change, but the causes themselves don't, so we can generate them in init functionality.
+        # self.current_options_matrix = [
+        #     [0,0,3],
+        #     [5,4,-9],
+        #     [2,-6,3],
+        #     [-7,6,2],
+        #     [10,4,3],
+        #     [-4,10,6],
+        #     [-1,-6,9],
+        #     [-6,-6,-5],
+        #     [-6,-2,2],
+        #     [-5,3,-4],
+        #     [2,6,-5],
+        # ]
+        # self.options_matrix = self.current_options_matrix
+
         self.current_options_matrix = self.create_options_matrix(groups)
         self.player_nodes = self.create_player_nodes()
 
@@ -377,3 +405,15 @@ class Social_Choice_Sim:
         winning_vote, _ = self.return_win(self.final_votes)
 
         return current_node_json, self.final_votes, winning_vote, self.current_options_matrix, self.bots
+
+    def set_rounds(self, num_rounds):
+        self.num_rounds=  num_rounds
+
+    def add_coop_score(self):
+        self.cooperation_score = self.cooperation_score + 1
+
+    def set_results(self, results):
+        self.results = results
+
+    def get_results(self):
+        return self.results, self.cooperation_score, self.bot_type, self.num_rounds

@@ -16,7 +16,9 @@ class SCManager:
         self.save_dict = {}
         self.big_dict = {}
         self.utilities = {i: 0 for i in range(num_humans)}
-        self.sc_sim = Social_Choice_Sim(num_players, num_humans, 1, 2)
+        # num_humans, bot_type
+        # so the arguments here are total_players, likely type bot and group option, if I had to guess.
+        self.sc_sim = Social_Choice_Sim(num_players, 3, num_humans, 3, 0, "", "")
         self.sc_groups = generate_two_plus_one_groups(num_players, sc_group_option)
         self.num_players = num_players
         self.num_bots = num_bots

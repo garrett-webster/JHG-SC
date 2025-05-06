@@ -127,7 +127,7 @@ class causeNodeGraphVisualizer:
         path = Path(current_sim.scenario)
         current_scenario = path.name
 
-        fig.suptitle(f"Round: {curr_round}   Situation: {current_scenario}   Cycle: {current_sim.cycle}",
+        fig.suptitle(f"Round: {curr_round+1}   Situation: {current_scenario}   Cycle: {current_sim.cycle}",
                      fontsize=16, fontweight='bold', y=0.98)
 
         # creates a legend that allows us to see which bot types are active, and which ones are what
@@ -148,6 +148,6 @@ class causeNodeGraphVisualizer:
 
         my_path = os.path.dirname(os.path.abspath(__file__))
         plt.savefig(my_path + "/individualRoundGraphs/ round " + str(curr_round) + str(" ") + str("cycle ") + str(cycle), dpi=300) # I want it to have the round, and cycle, and that shoudl do it
-        #plt.show()
+        plt.show()
 
 

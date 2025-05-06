@@ -19,9 +19,9 @@ class secondChoiceGreedy():
         current_row = current_options_matrix[self.self_id]
         temp_row = current_row[:] # make a copy for the fetcher
         first_vote = temp_row.index(max(temp_row)) # take the first vote
-        temp_row[first_vote] = float("inf") # make the first vote smallest so we don't use it again
+        temp_row[first_vote] = float("-inf") # make the first vote smallest so we don't use it again
         second_vote = temp_row.index(max(temp_row)) # grab the second vote
-        current_vote = second_vote if current_row[second_vote] >= 0 else 0 # grab the current vote, unless its less than zero, then do nothing.
-        return current_vote - 1 # return it and adjust for the one off error.
-
+        if current_row[second_vote] < 0:
+            second_vote = -1
+        return second_vote
 
