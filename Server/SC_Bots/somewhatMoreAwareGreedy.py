@@ -88,11 +88,15 @@ class somewhatMoreAwarenessGreedy:
                 for i in range(len(current_options_matrix[0])+1):
                     cause_sums[i] = 0 # off by one error
 
+                if self.self_id == 5: # getting player 6
+                    print("Stop here")
+
                 for key in player_dict: # just unfold the fetcher
                     for i in range(len(player_dict[key])): # i is the player number
                         index = player_dict[key][i] + 1 # off by one error - negative one exists.
                         mutable_matrix[key][index] += 1 # so we add one to the value that they voted for
-                        cause_sums[index] += 1
+                        if self.self_id != key:
+                            cause_sums[index] += 1
 
                 #if len(player_dict[next(iter(player_dict.keys()))]) > 1:
                     #print("aight stop here")
@@ -127,11 +131,16 @@ class somewhatMoreAwarenessGreedy:
                 our_row = current_options_matrix[self_id]
                 new_row = [0]  # offset column 0
                 risk_aversion = self.chromosome[0]
+                if self.self_id == 5: # getting player 6
+                    print("Stop here")
                 for i, val in enumerate(our_row):
                     if val > 0:
-                        # new_row.append(col_probs[i + 1] * val) # straight expected value.
                         new_prob = col_probs[i + 1] ** risk_aversion  # scalable risk stuff.
-                        new_row.append(new_prob * val)
+                        # this is trying to account for
+                        if cause_sums[i+1] + 1 > len(player_dict) // 2:
+                            new_row.append(new_prob * val  * 2)
+                        else:
+                            new_row.append(new_prob * val)
 
                     else:
                         new_row.append(0)

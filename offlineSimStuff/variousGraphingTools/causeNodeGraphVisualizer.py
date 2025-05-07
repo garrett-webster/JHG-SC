@@ -37,6 +37,8 @@ class causeNodeGraphVisualizer:
             "3": "betterGreedy",
             "4": "limitedAwareness",
             "5": "secondChoice",
+            "6": "somewhatMoreAwareness",
+            "7": "greedyWMDP",
         }
 
 
@@ -144,10 +146,10 @@ class causeNodeGraphVisualizer:
 
         # Reduce space between matrix and graph and the overall layout
         fig.subplots_adjust(wspace=0.01, left=0.05, right=0.95, top=0.95, bottom=0.15)  # Adjust bottom margin
-        print("This is the round at the end!! ", curr_round)
+        #print("This is the round at the end!! ", curr_round)
 
         my_path = os.path.dirname(os.path.abspath(__file__))
-        plt.savefig(my_path + "/individualRoundGraphs/ round " + str(curr_round) + str(" ") + str("cycle ") + str(cycle), dpi=300) # I want it to have the round, and cycle, and that shoudl do it
-        plt.show()
+        plt.savefig(my_path + "/individualRoundGraphs/ round " + str(curr_round+1) + str(" ") + str("cycle ") + str(cycle), dpi=300) # I want it to have the round, and cycle, and that shoudl do it
+        #plt.show()
 
 

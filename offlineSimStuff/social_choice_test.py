@@ -18,7 +18,7 @@ from offlineSimStuff.variousGraphingTools.longTermGrapher import longTermGrapher
 
 # starts the sim, could make this take command line arguments
 # takes in a bot type, a number of rounds, and then runs it and plots the results. plans for expansion coming soon.
-def run_trial(sim, num_rounds, num_cycles):
+def run_trial(sim, num_rounds, num_cycles, create_graphs):
     sim.set_rounds(num_rounds)
     start_time = time.time()
 
@@ -32,8 +32,8 @@ def run_trial(sim, num_rounds, num_cycles):
         bot_votes = {}
         for cycle in range(num_cycles):
             bot_votes[cycle] = sim.get_votes(bot_votes, curr_round, cycle)
-            #print("We have printed a grpah your honor :salute")
-            #graph_nodes(sim, curr_round, cycle) # only do this for specific rounds
+            if create_graphs:
+                graph_nodes(sim, curr_round, cycle) # only do this for specific rounds
 
         bot_votes = bot_votes[num_cycles-1] # grab just the last votes, they are the only ones that matter anyway.
         total_votes = len(bot_votes)
@@ -49,7 +49,7 @@ def run_trial(sim, num_rounds, num_cycles):
 
 
 def graph_nodes(sim, curr_round, cycle):
-    print("do we make it here, ")
+    #print("do we make it here, ")
     currVisualizer = causeNodeGraphVisualizer()
     currVisualizer.create_graph(sim, curr_round, cycle)
 
@@ -70,11 +70,13 @@ def create_sim():
 
 
 if __name__ == "__main__":
-    num_rounds = 1000
+    num_rounds = 1
     num_cycles = 3
+    create_graphs = True
 
     current_sim = create_sim()
-    current_sim = run_trial(current_sim, num_rounds, num_cycles)
+
+    current_sim = run_trial(current_sim, num_rounds, num_cycles, create_graphs)
     current_visualizer = longTermGrapher()
     current_visualizer.draw_graph(current_sim)
 
