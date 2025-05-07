@@ -1,8 +1,5 @@
-import copy
-from collections import Counter
-import numpy as np
-
-
+# Sean's Smartest Greedy Bot - for now. capable of switching and recognizing majorities. tiebreaksers still result in abstaining bc it doesn't have an idea of
+# social awareness. might be worth implmenenting in a later bot.
 class somewhatMoreAwarenessGreedy:
     def __init__(self, self_id):
         self.self_id = self_id

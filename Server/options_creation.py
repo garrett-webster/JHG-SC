@@ -1,11 +1,11 @@
 from random import randrange, shuffle, randint
 
-even_two_plus_one = {
+even_two_plus_one = { # two same sized groups plus whatever,
     5: [2, 2], 6: [0], 7: [3, 3], 8: [3, 3], 9: [4, 4], 10: [4, 4], 11: [4, 4], 12: [5, 5], 13: [5,5],
     14: [6, 6], 15: [6, 6], 16: [6, 6], 17: [7, 7], 18: [7, 7], 19: [7, 7], 20: [8, 8]
 }
 
-small_minority_two_plus_one = {
+small_minority_two_plus_one = { # either tie or have 1 larger group, like 543 or 443 or whatever. there should be a smaller minority.
     5: [2, 2], 6: [3, 2], 7: [3, 3], 8: [3, 3], 9: [4, 4], 10: [4, 4], 11: [5, 4], 12: [5, 5], 13: [5, 5], 14: [6, 6],
     15: [6, 6], 16: [7, 6], 17: [7, 7], 18: [8, 7], 19: [8, 8], 20: [9, 9]
 }
@@ -17,7 +17,7 @@ large_minority_two_plus_one = {
 
 group_size_options = {
     0: even_two_plus_one,
-    1: small_minority_two_plus_one,
+    1: small_minority_two_plus_one, # biggest majority here.
     2: large_minority_two_plus_one
 }
 

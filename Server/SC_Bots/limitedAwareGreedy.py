@@ -1,7 +1,4 @@
-import copy
-from collections import Counter
-import numpy as np
-
+# is more aware than greedy doesn't recognize majorities but can recognize when to jump ship.
 
 class limitedAwarenessGreedy:
     def __init__(self, self_id):

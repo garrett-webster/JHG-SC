@@ -1,14 +1,13 @@
+# takes in a social choice sim, and graphs the results (typically used for longger form things, like seeing how a certain bot / sitaution preforms over 1000 rounds)
+
 import matplotlib.pyplot as plt
 import numpy as np
 import os
-
+from pathlib import Path
 
 class longTermGrapher():
     def __init__(self):
         pass # don't do anything
-
-
-
 
     def draw_graph(self, sim):
         results, cooperation_score, bot_type, num_rounds = sim.get_results()
@@ -76,7 +75,7 @@ class longTermGrapher():
         # labels and a title
         plt.xlabel('Round')
         plt.ylabel('Score')
-        plt.title('Scores per Round for Each Player With Algorithm ' + str(bot_type))
+        plt.title('Scores per Round for Each Player With Algorithm ' + str(bot_type) + " and grouping " + str(sim.get_group()))
         plt.legend()
 
         # I would like to see the baby
@@ -85,7 +84,7 @@ class longTermGrapher():
 
         bot_name = ""
         if bot_type == 1:
-            bot_name = "Pareto"
+            bot_name = "SocialWelfare"
         if bot_type == 2:
             bot_name = "Greedy"
         if bot_type == 3:
@@ -94,16 +93,18 @@ class longTermGrapher():
             bot_name = "betterGreedy"
         if bot_type == 5:
             bot_name = "limitedAwarenessGreedy"
+        if bot_type == 6:
+            bot_name = "somewhatMoreAwareGreedy"
 
         # what we are naming this new graph
-        file_name = str(bot_name)
-        # where do we put him.
-        directory = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\offlineSimStuff\Graphs"
-        # directory = r"C:\Users\Sean\Documents\GitHub\IJCAI2024_SM\Code\GeneSimulation_py\Server\Graphs"
+        group_title = sim.get_group()
+        if group_title == "":
+            group_title = "No group"
+        scenario = Path(sim.get_scenario()).name
 
-        if not os.path.exists(directory):
-            os.makedirs(directory)
-        file_path = os.path.join(directory, f"{file_name}.png")
+        file_name = "Scenario " + scenario + " Group " + str(group_title) + ".png"
 
-        plt.savefig(file_path, dpi=300, bbox_inches='tight')  # save the fetcher
-        #plt.show()
+        my_path = os.path.dirname(os.path.abspath(__file__))
+        plt.savefig(my_path + "/longTermGrapherFolder/" + file_name, dpi=300)
+
+        plt.show()

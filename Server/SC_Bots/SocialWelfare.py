@@ -1,7 +1,6 @@
-import math
+# social welfare bot - always picks whats best for everyone.
 
-
-class ParetoBot:
+class SocialWelfareBot:
     def __init__(self, self_id):
         self.self_id = self_id
         self.type = "P"

@@ -1,6 +1,4 @@
-# this brother doesn't even think, he just votes greedy. haven't implemented him yet though, at least in here. THere is a basic implementation under
-# the SOcial choice sim under get vote. just repurpose the code under this umbrella and go from there.
-import math
+# this brother doesn't even think, he just votes greedy, then takes his second option. testing / edgecases, not really for actual use.
 
 
 class secondChoiceGreedy():

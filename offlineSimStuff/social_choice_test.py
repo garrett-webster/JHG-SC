@@ -1,16 +1,8 @@
-# testbed to test genes and display results in a human readable format.
+# so this allows me to run the fetcher and create visualizations based off of scenarios and whatnot.
 import time
 from Server.social_choice_sim import Social_Choice_Sim
-
-from collections import Counter
-import statistics
-import random
-import numpy as np
 import os
-from pathlib import Path
 from tqdm import tqdm
-import pandas as pd
-from Server.Node import Node
 
 from offlineSimStuff.variousGraphingTools.causeNodeGraphVisualizer import causeNodeGraphVisualizer
 from offlineSimStuff.variousGraphingTools.longTermGrapher import longTermGrapher
@@ -18,16 +10,18 @@ from offlineSimStuff.variousGraphingTools.longTermGrapher import longTermGrapher
 
 # starts the sim, could make this take command line arguments
 # takes in a bot type, a number of rounds, and then runs it and plots the results. plans for expansion coming soon.
-def run_trial(sim, num_rounds, num_cycles, create_graphs):
-    sim.set_rounds(num_rounds)
-    start_time = time.time()
+def run_trial(sim, num_rounds, num_cycles, create_graphs, group):
+    # we need to get the groups, where we can have no groups or a variety of groups.
 
-    results = {}
-    for i in range(11): # total_players
+    sim.set_rounds(num_rounds) # for graphing purposes
+    start_time = time.time() # so we can calculate total time. not entirely necessary.
+
+    results = {} # for graphing purposes, kind of.
+    for i in range(len(sim.bots)): # total_players
         results[i] = [] # just throw in all the utilites
 
-    for curr_round in tqdm(range(num_rounds)): # just a ridicuously large number
-
+    for curr_round in tqdm(range(num_rounds)): # do this outside the sim, could make it inside but I like it outside.
+        sim.set_group(group)
         sim.start_round() # creates the current current options matrix, makes da player nodes, sets up causes, etc.
         bot_votes = {}
         for cycle in range(num_cycles):
@@ -54,12 +48,10 @@ def graph_nodes(sim, curr_round, cycle):
     currVisualizer.create_graph(sim, curr_round, cycle)
 
 
-def create_sim():
-    bot_type = 4 # 0 is random, 1 is pareto, 2 is greedy, 3 is betterGreedy, 4 is limitedAwareness, 5 is secondChoiceGreedy
-
+def create_sim(scenario):
     chromosomes = r"C:/Users/Sean/Documents/GitHub/OtherGarrettStuff/JHG-SC/offlineSimStuff/chromosomes/bGStandard.csv"
     # SUM: this sets the bot list type, so we can have siutaions set up
-    scenario = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\offlineSimStuff\scenarioIndicator\limitedAwareGreedy+secondChoice"
+    #scenario = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\offlineSimStuff\scenarioIndicator\somewhatMoreAwareGreedy"
     cycle = -1 # a negative cycle indicates to me that this is a test - that, or something is really really wrong.
     curr_round = -1
 
@@ -70,20 +62,24 @@ def create_sim():
 
 
 if __name__ == "__main__":
-    num_rounds = 100
+    num_rounds = 10
     num_cycles = 3
     create_graphs = True
+    total_groups = ["",0,1,2]
+    scenario_directory = "scenarioIndicator"
 
-    current_sim = create_sim()
-
-    current_sim = run_trial(current_sim, num_rounds, num_cycles, create_graphs)
-    current_visualizer = longTermGrapher()
-    current_visualizer.draw_graph(current_sim)
+    for scenario_path in os.listdir(scenario_directory):
+        scenario = os.path.join(scenario_directory, scenario_path)
+        for group in total_groups:
+            current_sim = create_sim(scenario)
+            current_sim = run_trial(current_sim, num_rounds, num_cycles, create_graphs, group)
+            current_visualizer = longTermGrapher()
+            current_visualizer.draw_graph(current_sim)
 
 
     # set up a fake round and then graph it
-    current_sim.start_round()
-    current_sim.get_votes() # literally just to place votes somewhere, yeah?
+    #current_sim.start_round()
+    #current_sim.get_votes() # literally just to place votes somewhere, yeah?
     #graph_nodes(current_sim)
 
 

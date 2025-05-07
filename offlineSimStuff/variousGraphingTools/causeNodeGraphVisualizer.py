@@ -19,7 +19,7 @@ class causeNodeGraphVisualizer:
         all_nodes, all_votes, winning_vote, current_options_matrix, bot_list = current_sim.prepare_graph()
 
         bot_color_map = {
-            # 0 is random, 1 is pareto, 2 is greedy, 3 is betterGreedy, 4 is limitedAwareness, 5 is secondChoice
+            # 0 is random, 1 is socialWelfare, 2 is greedy, 3 is betterGreedy, 4 is limitedAwareness, 5 is secondChoice
             "0": "purple",
             "1": "lightgreen",
             "2": "darkgreen",
@@ -31,8 +31,8 @@ class causeNodeGraphVisualizer:
         }
 
         bot_name_map = {
-            "0": "Random",
-            "1": "Pareto",
+            "0": "random",
+            "1": "socialWelfare",
             "2": "Greedy",
             "3": "betterGreedy",
             "4": "limitedAwareness",
@@ -128,8 +128,11 @@ class causeNodeGraphVisualizer:
 
         path = Path(current_sim.scenario)
         current_scenario = path.name
+        group = current_sim.get_group()
+        scenario = Path(current_sim.get_scenario()).name
 
-        fig.suptitle(f"Round: {curr_round+1}   Situation: {current_scenario}   Cycle: {current_sim.cycle}",
+
+        fig.suptitle(f"Round: {curr_round+1}   Situation: {current_scenario}   Cycle: {current_sim.cycle}    Group: {group}     Scenario: {scenario}",
                      fontsize=16, fontweight='bold', y=0.98)
 
         # creates a legend that allows us to see which bot types are active, and which ones are what
@@ -149,7 +152,7 @@ class causeNodeGraphVisualizer:
         #print("This is the round at the end!! ", curr_round)
 
         my_path = os.path.dirname(os.path.abspath(__file__))
-        plt.savefig(my_path + "/individualRoundGraphs/ round " + str(curr_round+1) + str(" ") + str("cycle ") + str(cycle), dpi=300) # I want it to have the round, and cycle, and that shoudl do it
+        plt.savefig(my_path + "/individualRoundGraphs/ round " + str(curr_round+1) + str(" ") + str("cycle ") + str(cycle) + str(" group ") + str(group) + str(" scenario ") + str(scenario), dpi=300) # I want it to have the round, and cycle, and that shoudl do it
         #plt.show()
 
 

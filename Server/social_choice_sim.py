@@ -6,10 +6,10 @@ from collections import Counter
 import numpy as np
 
 
-from Server.options_creation import generate_two_plus_one_groups_options_best_of_three
+from Server.options_creation import generate_two_plus_one_groups_options_best_of_three, generate_two_plus_one_groups
 from Server.SC_Bots.Greedy import GreedyBot
 from Server.SC_Bots.betterGreedy import betterGreedy
-from Server.SC_Bots.Pareto import ParetoBot
+from Server.SC_Bots.SocialWelfare import SocialWelfareBot
 from Server.SC_Bots.Random import RandomBot
 from Server.SC_Bots.limitedAwareGreedy import limitedAwarenessGreedy
 from Server.Node import Node
@@ -47,7 +47,16 @@ class Social_Choice_Sim:
         self.cooperation_score = 0
         self.num_rounds = 0
         self.all_votes = {} # yeah lets just keep track of all of em. requires passing the round through and resetting them.
+        self.group = -1 # doesn't exist, let me know it hasn't been set.
+        self.sc_groups = -1 # no group exists, can ignore.
 
+    def set_group(self, group_option):
+        if group_option == "":
+            self.group = -1
+            self.sc_groups = -1
+        else:
+            self.group = group_option
+            self.sc_groups = generate_two_plus_one_groups(self.total_players, group_option)
 
 
     def create_bots(self):
@@ -67,8 +76,8 @@ class Social_Choice_Sim:
         new_bot = None
         if bot_type == 0:
             new_bot = (RandomBot(i))
-        if bot_type == 1:  # pareto optimal bots for now
-            new_bot = (ParetoBot(i))
+        if bot_type == 1:
+            new_bot = (SocialWelfareBot(i))
         if bot_type == 2:
             new_bot = (GreedyBot(i))
         if bot_type == 3:
@@ -103,9 +112,9 @@ class Social_Choice_Sim:
             self.players[str(i)] += self.options_matrix[i][int(winning_vote)]
 
 
-    def create_options_matrix(self, groups):
-        if groups:
-            self.options_matrix = generate_two_plus_one_groups_options_best_of_three(groups)
+    def create_options_matrix(self):
+        if self.sc_groups != -1:
+            self.options_matrix = generate_two_plus_one_groups_options_best_of_three(self.sc_groups)
         else: # so we have to generate noise to try and "mimic" the other stuff.
             self.options_matrix = [[random.randint(-8, 8) for _ in range(self.num_causes)] for _ in range(self.total_players)]
             noise_matrix = [[random.choice([-2, 2]) for _ in range(self.num_causes)] for _ in range(self.total_players)]
@@ -207,8 +216,8 @@ class Social_Choice_Sim:
         self.set_chromosome(chromosomes_list)
 
     # default to groups being None,
-    def start_round(self, groups=None):
-        self.current_options_matrix = self.create_options_matrix(groups)
+    def start_round(self):
+        self.current_options_matrix = self.create_options_matrix()
         self.player_nodes = self.create_player_nodes()
 
     def make_native_type(self, return_values):
@@ -265,6 +274,11 @@ class Social_Choice_Sim:
     def get_results(self):
         return self.results, self.cooperation_score, self.bot_type, self.num_rounds
 
+    def get_group(self):
+        return self.group
+
+    def get_scenario(self):
+        return self.scenario
 
 
 
