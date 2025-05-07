@@ -106,4 +106,4 @@ class longTermGrapher():
         file_path = os.path.join(directory, f"{file_name}.png")
 
         plt.savefig(file_path, dpi=300, bbox_inches='tight')  # save the fetcher
-        plt.show()
+        #plt.show()

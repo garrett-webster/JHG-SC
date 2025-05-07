@@ -208,22 +208,7 @@ class Social_Choice_Sim:
 
     # default to groups being None,
     def start_round(self, groups=None):
-        self.current_options_matrix = [
-            [6,9,-10],
-            [5,3,-1],
-            [4,1,-4],
-            [4,-2,-9],
-            [-5,-4,3],
-            [5,4,5],
-            [-4,-6,3],
-            [-3,2,8],
-            [10,4,1],
-            [-10,-10,5],
-            [-6,7,-4],
-        ]
-
-        self.options_matrix = self.current_options_matrix
-        #self.current_options_matrix = self.create_options_matrix(groups)
+        self.current_options_matrix = self.create_options_matrix(groups)
         self.player_nodes = self.create_player_nodes()
 
     def make_native_type(self, return_values):

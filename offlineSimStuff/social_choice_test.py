@@ -70,7 +70,7 @@ def create_sim():
 
 
 if __name__ == "__main__":
-    num_rounds = 1
+    num_rounds = 100
     num_cycles = 3
     create_graphs = True
 
