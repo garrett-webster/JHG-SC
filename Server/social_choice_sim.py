@@ -49,6 +49,11 @@ class Social_Choice_Sim:
         self.all_votes = {} # yeah lets just keep track of all of em. requires passing the round through and resetting them.
         self.group = -1 # doesn't exist, let me know it hasn't been set.
         self.sc_groups = -1 # no group exists, can ignore.
+        self.current_results = [] # holds the results from the last "return win" call, which we can access later.
+
+        self.results = {}  # for graphing purposes, kind of.
+        for i in range(len(self.bots)):  # total_players
+            self.results[i] = []  # just throw in all the utilites
 
     def set_group(self, group_option):
         if group_option == "":
@@ -163,7 +168,7 @@ class Social_Choice_Sim:
 
 
     def return_win(self, all_votes):
-        results = []
+        self.current_results = []
         total_votes = all_votes
         winning_vote_count = Counter(total_votes.values()).most_common(1)[0][1]
         winning_vote = Counter(total_votes.values()).most_common(1)[0][0]
@@ -172,14 +177,17 @@ class Social_Choice_Sim:
 
         if winning_vote != -1: # if its -1, then nothing happend. NOT the last entry in the fetcher. that was a big bug that flew under the radar.
             for i in range(len(total_votes)):
-                results.append(self.current_options_matrix[i][winning_vote])
+                self.current_results.append(self.current_options_matrix[i][winning_vote])
             self.add_coop_score()
         else:
             for i in range(len(total_votes)):
-                results.append(0)
+                self.current_results.append(0)
 
+        return winning_vote, self.current_results
 
-        return winning_vote, results
+    def save_results(self):
+        for bot in range(len(self.current_results)):
+            self.results[bot].append(self.current_results[bot])
 
 
     def get_cycle(self):
@@ -259,6 +267,23 @@ class Social_Choice_Sim:
 
         return current_node_json, self.final_votes, winning_vote, self.current_options_matrix, self.bots
 
+    def get_results(self):
+        cooperation_score = self.cooperation_score / self.num_rounds  # as a percent, how often we cooperated. (had a non negative cause pass)
+        return self.results, cooperation_score, self.bot_type, self.num_rounds
+
+    def get_everything_for_logger(self):
+        self.create_player_nodes()
+        current_nodes = self.compile_nodes()
+        current_node_json = []
+        for node in current_nodes:
+            current_node_json.append(node.to_json())
+
+        current_cooperation_score = copy.copy(self.cooperation_score)
+        winning_vote, _ = self.return_win(self.final_votes)
+        self.set_coop_score(current_cooperation_score)  # reset it bc the above does silly things.
+        cooperation_score = self.cooperation_score / self.num_rounds  # as a percent, how often we cooperated. (had a non negative cause pass)
+        return current_node_json, self.final_votes, winning_vote, self.current_options_matrix, self.bots, self.results, cooperation_score, self.bot_type, self.num_rounds
+
     def set_rounds(self, num_rounds):
         self.num_rounds = num_rounds
 
@@ -268,11 +293,10 @@ class Social_Choice_Sim:
     def set_coop_score(self, coop_score):
         self.cooperation_score = coop_score
 
-    def set_results(self, results):
-        self.results = results
+    # def set_results(self, results):
+    #     self.results = results
 
-    def get_results(self):
-        return self.results, self.cooperation_score, self.bot_type, self.num_rounds
+
 
     def get_group(self):
         return self.group

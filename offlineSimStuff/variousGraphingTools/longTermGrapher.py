@@ -27,7 +27,7 @@ class longTermGrapher():
         mean = np.mean(new_list)
         cv = std / abs(mean)  # measures distribution bet  ter than, say, std or mean on their own.
 
-        cooperation_score = cooperation_score / num_rounds  # as a percent, how often we cooperated. (had a non negative cause pass)
+
 
         # Prepare the x-axis (rounds)
         rounds = range(num_rounds)  # just generates a list so we can zip with it later

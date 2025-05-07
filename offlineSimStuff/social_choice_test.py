@@ -16,9 +16,6 @@ def run_trial(sim, num_rounds, num_cycles, create_graphs, group):
     sim.set_rounds(num_rounds) # for graphing purposes
     start_time = time.time() # so we can calculate total time. not entirely necessary.
 
-    results = {} # for graphing purposes, kind of.
-    for i in range(len(sim.bots)): # total_players
-        results[i] = [] # just throw in all the utilites
 
     for curr_round in tqdm(range(num_rounds)): # do this outside the sim, could make it inside but I like it outside.
         sim.set_group(group)
@@ -31,27 +28,25 @@ def run_trial(sim, num_rounds, num_cycles, create_graphs, group):
 
         bot_votes = bot_votes[num_cycles-1] # grab just the last votes, they are the only ones that matter anyway.
         total_votes = len(bot_votes)
+        # keep this out just in case.
         winning_vote, round_results = sim.return_win(bot_votes)  # is all votes, works here
-
-        for bot in range(total_votes):
-            results[bot].append(round_results[bot]) # this should work? I should have saved a stable version before hand.
+        # this saves everything to the JSON that we need. I mean it saves it to the sim, I can change that so we can log it instead.
+        sim.save_results()
 
     end_time = time.time()
     print("This was the total time ", end_time - start_time)
-    sim.set_results(results)
     return sim
 
 
 def graph_nodes(sim, curr_round, cycle):
-    #print("do we make it here, ")
     currVisualizer = causeNodeGraphVisualizer()
     currVisualizer.create_graph(sim, curr_round, cycle)
 
 
-def create_sim(scenario):
+def create_sim():
     chromosomes = r"C:/Users/Sean/Documents/GitHub/OtherGarrettStuff/JHG-SC/offlineSimStuff/chromosomes/bGStandard.csv"
     # SUM: this sets the bot list type, so we can have siutaions set up
-    #scenario = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\offlineSimStuff\scenarioIndicator\somewhatMoreAwareGreedy"
+    scenario = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\offlineSimStuff\scenarioIndicator\somewhatMoreAwareGreedy"
     cycle = -1 # a negative cycle indicates to me that this is a test - that, or something is really really wrong.
     curr_round = -1
 
@@ -62,19 +57,21 @@ def create_sim(scenario):
 
 
 if __name__ == "__main__":
-    num_rounds = 10
+    num_rounds = 10000
     num_cycles = 3
-    create_graphs = True
+    create_graphs = False
     total_groups = ["",0,1,2]
     scenario_directory = "scenarioIndicator"
 
-    for scenario_path in os.listdir(scenario_directory):
-        scenario = os.path.join(scenario_directory, scenario_path)
-        for group in total_groups:
-            current_sim = create_sim(scenario)
-            current_sim = run_trial(current_sim, num_rounds, num_cycles, create_graphs, group)
-            current_visualizer = longTermGrapher()
-            current_visualizer.draw_graph(current_sim)
+    # for scenario_path in os.listdir(scenario_directory):
+    #     scenario = os.path.join(scenario_directory, scenario_path)
+    #     for group in total_groups:
+
+    # current_sim = create_sim(scenario)
+    current_sim = create_sim()
+    current_sim = run_trial(current_sim, num_rounds, num_cycles, create_graphs, "")
+    current_visualizer = longTermGrapher()
+    current_visualizer.draw_graph(current_sim)
 
 
     # set up a fake round and then graph it
