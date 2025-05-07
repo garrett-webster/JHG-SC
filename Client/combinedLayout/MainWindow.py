@@ -127,8 +127,10 @@ class MainWindow(QMainWindow):
         self.SC_panel.addTab(self.sc_history_grid, "History")
         self.SC_panel.currentChanged.connect(self.SC_tab_changed)
 
+        self.dockWidget = CornerContainer(self.JHG_panel, plots_panel, self.SC_panel, sc_graph_tabs)
+
         self.setWindowTitle("JHG: Round 1")
-        self.setCentralWidget(CornerContainer(self.JHG_panel, plots_panel, self.SC_panel, sc_graph_tabs))
+        self.setCentralWidget(self.dockWidget)
 
     # /4#
 
@@ -155,6 +157,8 @@ class MainWindow(QMainWindow):
 
         if not is_last_cycle:
             self.SC_voting_grid.submit_button.setText("Submit")
+            self.dockWidget.bottom_left.start_flashing(4)
+
 
     def update_sc_utilities_labels(self, round_num, new_utilities, winning_vote, last_round_votes,
                                    last_round_utilities):
@@ -163,8 +167,7 @@ class MainWindow(QMainWindow):
     def update_tornado_graph(self, tornado_ax, positive_vote_effects, negative_vote_effects):
         update_tornado_graph(self, tornado_ax, positive_vote_effects, negative_vote_effects)
 
-    def update_sc_nodes_graph(self, winning_vote):
-        self.SC_cause_graph.update_sc_nodes_graph(self.round_state.sc_round_num, winning_vote)
+    def update_sc_nodes_graph(self):
         self.SC_cause_graph.update_arrows(self.round_state.current_votes)
         self.round_state.current_votes = {i: -1 for i in range(self.round_state.num_players)}
 

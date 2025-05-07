@@ -102,14 +102,16 @@ def jhg_over(main_window):
     main_window.round_state.sc_cycle = 1
     main_window.SC_cause_graph.update_cycle_label(1, True)
 
-    main_window.SC_panel.setStyleSheet("#SC_Panel { border: 2px solid #FFFDD0; border-radius: 5px; }")
-    main_window.JHG_panel.setStyleSheet("#JHG_Panel { border: none; }")
+    main_window.dockWidget.bottom_left.start_flashing()
+    main_window.dockWidget.top_left.disable_highlight()
     main_window.SC_panel.setTabText(0, "Current Round")
 
 
 def enable_jhg_buttons(main_window):
-    main_window.JHG_panel.setStyleSheet("#JHG_Panel { border: 2px solid #FFFDD0; border-radius: 5px; }")
-    main_window.SC_panel.setStyleSheet("#SC_Panel { border: none; }")
+    main_window.dockWidget.top_left.start_flashing()
+    main_window.dockWidget.bottom_left.disable_highlight()
+
+
     for button in main_window.jhg_buttons:
         if button.objectName() == "JHGSubmitButton":
             button.setText("Submit")

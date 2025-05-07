@@ -79,8 +79,66 @@ QToolTip {
     /*border: 1px solid gray;*/
 }
 
+
+/* Borders for the draggable panels (including flashing) */
 QFrame#panelFrame {
     border: 2px solid #888;
     border-radius: 6px;
     background-color: #1c1c1c;
+}
+QFrame#panelFrame[flashing="true"] {
+    border: 2px solid red;
+}
+QFrame#panelFrame[active="true"] {
+    border: 2px solid #FFFDD0;
+}
+
+/* QScrollArea (inside draggable panels) */
+
+QScrollArea {
+    background-color: #171717;
+}
+QScrollArea QWidget {
+    background-color: transparent;
+}
+QScrollArea QPushButton {
+    background-color: #3a414a;
+    border: solid 2px black;
+    border-radius: 5px;
+    color: white;
+    min-height: 2em;
+}
+QScrollArea QPushButton:disabled {
+    background-color: #2a2f35;
+    color: #777;
+    border: solid 2px #444;
+}
+QScrollArea QPushButton:hover {
+    background-color: #2c353f;
+    border: solid 2px #2980b9;
+    color: #ecf0f1;
+}
+QScrollBar:horizontal, QScrollBar:vertical {
+    background-color: #171717;
+    border: none;
+}
+QScrollArea QPushButton[btnState="checked"] {
+    background-color: #2980b9;
+    color: #ecf0f1;
+    border: solid 2px #2980b9;
+}
+QScrollBar::handle:horizontal, QScrollBar::handle:vertical {
+    background-color: #888;
+    border-radius: 5px;
+}
+QScrollBar QComboBox {
+    color: white;
+}
+QComboBox {
+    color: white;
+}
+QComboBox QAbstractItemView {
+    background-color: #171717;   /* dropdown background */
+    selection-background-color: blue;
+    selection-color: white;
 }
