@@ -57,9 +57,8 @@ def tab_changed(main_window, index):
         sc_history_tab = main_window.sc_history_grid
         selected_round = sc_history_tab.round_drop_down.currentIndex() + 1
         votes = sc_history_tab.sc_history[str(selected_round)]["votes"]
-        winning_vote = get_winning_vote(votes)
 
-        cause_graph.update_sc_nodes_graph(selected_round, winning_vote)
+        cause_graph.update_sc_nodes_graph(selected_round)
         cause_graph.update_arrows(votes)
 
 
