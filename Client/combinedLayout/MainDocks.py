@@ -1,4 +1,4 @@
-from PyQt6.QtCore import Qt, QMimeData
+from PyQt6.QtCore import Qt, QMimeData, QTimer
 from PyQt6.QtGui import QDrag
 from PyQt6.QtWidgets import QLabel, QWidget, QSizePolicy, QVBoxLayout, QSplitter, QFrame, QScrollArea
 
@@ -16,13 +16,6 @@ class DraggablePanel(QWidget):
         # Create the frame that will include both title and content
         self.frame = QFrame()
         self.frame.setObjectName("panelFrame")
-        self.frame.setStyleSheet("""
-            QFrame#panelFrame {
-                border: 2px solid #888;
-                border-radius: 6px;
-                background-color: #1c1c1c;
-            }
-        """)
 
         # Inner layout inside the frame
         frame_layout = QVBoxLayout()
@@ -57,6 +50,43 @@ class DraggablePanel(QWidget):
         self.setAcceptDrops(True)
         self.setMinimumSize(450, 400)
         self.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+
+    def start_flashing(self, num_flashes=6):
+        self.disable_highlight()
+        self.flash_on = False
+        self.flashes = 0
+        self.num_flashes = num_flashes
+
+        if not hasattr(self, "flash_timer"):
+            self.flash_timer = QTimer(self)
+            self.flash_timer.timeout.connect(self.flash_border)
+
+        self.flash_border()
+        self.flash_timer.start(500)
+
+    def flash_border(self):
+        self.frame.setProperty("flashing", self.flash_on)
+        self.frame.style().unpolish(self.frame)
+        self.frame.style().polish(self.frame)
+        self.flash_on = not self.flash_on
+
+        self.flashes += 1
+        if self.flashes == self.num_flashes:
+            self.flash_timer.stop()
+            self.frame.setProperty("flashing", False)
+            self.enable_highlight()
+            self.flash_on = False
+
+
+    def disable_highlight(self):
+        self.frame.setProperty("active", False)
+        self.frame.style().unpolish(self.frame)
+        self.frame.style().polish(self.frame)
+
+    def enable_highlight(self):
+        self.frame.setProperty("active", True)
+        self.frame.style().unpolish(self.frame)
+        self.frame.style().polish(self.frame)
 
 
 
@@ -121,24 +151,24 @@ class CornerContainer(QWidget):
         scrollable_bottom_left = self.make_scrollable(bottom_left_widget, min_height=bottom_left_widget.property("min-height"))
 
         # Create draggable panels
-        top_left = DraggablePanel(scrollable_top_left, "Junior High Game")
-        top_left.setMinimumHeight(400)
-        top_right = DraggablePanel(top_right_widget, "JHG Graphs")
-        bottom_left = DraggablePanel(scrollable_bottom_left, "Social Choice Voting")
-        bottom_right = DraggablePanel(bottom_right_widget, "Social Choice Graphs")
+        self.top_left = DraggablePanel(scrollable_top_left, "Junior High Game")
+        self.top_left.setMinimumHeight(400)
+        self.top_right = DraggablePanel(top_right_widget, "JHG Graphs")
+        self.bottom_left = DraggablePanel(scrollable_bottom_left, "Social Choice Voting")
+        self.bottom_right = DraggablePanel(bottom_right_widget, "Social Choice Graphs")
 
 
         # Splitter for top row
         top_splitter = QSplitter(Qt.Orientation.Horizontal)
-        top_splitter.addWidget(top_left)
-        top_splitter.addWidget(top_right)
+        top_splitter.addWidget(self.top_left)
+        top_splitter.addWidget(self.top_right)
         top_splitter.setCollapsible(0, False)
         top_splitter.setCollapsible(1, False)
 
         # Splitter for bottom row
         bottom_splitter = QSplitter(Qt.Orientation.Horizontal)
-        bottom_splitter.addWidget(bottom_left)
-        bottom_splitter.addWidget(bottom_right)
+        bottom_splitter.addWidget(self.bottom_left)
+        bottom_splitter.addWidget(self.bottom_right)
         bottom_splitter.setCollapsible(0, False)
         bottom_splitter.setCollapsible(1, False)
 
@@ -179,55 +209,5 @@ class CornerContainer(QWidget):
         scroll_area.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
         scroll_area.setMinimumSize(0, 0)
         scroll_area.setMaximumHeight(10000000)
-
-        scroll_area.setStyleSheet(""" 
-            QScrollArea {
-                background-color: #171717;
-            }
-            QScrollArea QWidget {
-                background-color: transparent;
-            }
-            QScrollArea QPushButton {
-                background-color: #3a414a;
-                border: solid 2px black;
-                border-radius: 5px;
-                color: white;
-                min-height: 2em;
-            }
-            QScrollArea QPushButton:disabled {
-                background-color: #2a2f35;
-                color: #777;
-                border: solid 2px #444;
-            }
-            QScrollArea QPushButton:hover {
-                background-color: #2c353f;
-                border: solid 2px #2980b9;
-                color: #ecf0f1;
-            }
-            QScrollBar:horizontal, QScrollBar:vertical {
-                background-color: #171717;
-                border: none;
-            }
-            QScrollArea QPushButton[btnState="checked"] {
-                background-color: #2980b9;
-                color: #ecf0f1;
-                border: solid 2px #2980b9;
-            }
-            QScrollBar::handle:horizontal, QScrollBar::handle:vertical {
-                background-color: #888;
-                border-radius: 5px;
-            }
-            QScrollBar QComboBox {
-                color: white;
-            }
-            QComboBox {
-                color: white;
-            }
-            QComboBox QAbstractItemView {
-                background-color: #171717;   /* dropdown background */
-                selection-background-color: blue;
-                selection-color: white;
-            }
-        """)
 
         return scroll_area
