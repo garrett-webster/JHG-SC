@@ -228,7 +228,9 @@ class Social_Choice_Sim:
         self.set_chromosome(chromosomes_list)
 
     # default to groups being None,
-    def start_round(self):
+    def start_round(self, sc_groups=None):
+        if sc_groups != None:
+            self.sc_groups = sc_groups
         self.current_options_matrix = self.create_options_matrix()
         self.player_nodes = self.create_player_nodes()
 
