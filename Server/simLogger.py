@@ -35,6 +35,8 @@ class simLogger:
         total_data["cooperation_score"] = cooperation_score
         total_data["bot_type"] = bot_type
         total_data["num_rounds"] = num_rounds
+        total_data["scenario"] = scenario
+        total_data["group"] = group
         my_path = os.path.dirname(os.path.abspath(__file__))
         filename = "logs_repo/big_picture/" + " scenario" + str(scenario) + "groups" + str(group) + ".json"
         file_path = os.path.join(my_path, filename)

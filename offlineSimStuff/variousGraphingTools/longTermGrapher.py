@@ -9,9 +9,24 @@ class longTermGrapher():
     def __init__(self):
         pass # don't do anything
 
-    def draw_graph(self, sim):
-        results, cooperation_score, bot_type, num_rounds, scenario, group = sim.get_results()
 
+
+    def draw_graph_from_sim(self, sim):
+        results, cooperation_score, bot_type, num_rounds, scenario, group = sim.get_results()
+        self.draw_graph(results, cooperation_score, bot_type, num_rounds, scenario, group)
+
+    def draw_graph_from_file(self, new_data):
+        results = new_data["results"]
+        cooperation_score = new_data["cooperation_score"]
+        bot_type = new_data["bot_type"]
+        num_rounds = new_data["num_rounds"]
+        scenario = new_data["scenario"]
+        group = new_data["group"]
+        self.draw_graph(results, cooperation_score, bot_type, num_rounds, scenario, group)
+
+
+
+    def draw_graph(self, results, cooperation_score, bot_type, num_rounds, scenario, group):
         sums_per_round = {}
         for bot in results:
             sums_per_round[bot] = []
@@ -75,7 +90,7 @@ class longTermGrapher():
         # labels and a title
         plt.xlabel('Round')
         plt.ylabel('Score')
-        plt.title('Scores per Round for Each Player With Algorithm ' + str(bot_type) + " and grouping " + str(sim.get_group()))
+        plt.title('Scores per Round for Each Player With Algorithm ' + str(bot_type) + " and grouping " + str(group))
         plt.legend()
 
         # I would like to see the baby
@@ -97,7 +112,7 @@ class longTermGrapher():
             bot_name = "somewhatMoreAwareGreedy"
 
         # what we are naming this new graph
-        group_title = sim.get_group()
+        group_title = group
         if group_title == "":
             group_title = "No group"
 

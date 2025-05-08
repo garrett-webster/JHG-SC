@@ -62,7 +62,7 @@ def create_sim():
 if __name__ == "__main__":
     num_rounds = 10
     num_cycles = 3
-    create_graphs = True
+    create_graphs = False
     total_groups = ["",0,1,2]
     scenario_directory = "scenarioIndicator"
 
@@ -74,7 +74,7 @@ if __name__ == "__main__":
     current_sim = create_sim()
     current_sim = run_trial(current_sim, num_rounds, num_cycles, create_graphs, "")
     current_visualizer = longTermGrapher()
-    current_visualizer.draw_graph(current_sim)
+    current_visualizer.draw_graph_from_sim(current_sim)
 
 
     # set up a fake round and then graph it
