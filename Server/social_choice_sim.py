@@ -21,7 +21,7 @@ NUM_CAUSES = 3
 
 
 class Social_Choice_Sim:
-    def __init__(self, total_players, num_causes, num_humans, cycle=0, round=0, chromosomes="", scenario=""):
+    def __init__(self, total_players, num_causes, num_humans, cycle=0, round=0, chromosomes="", scenario="", group=""):
         self.total_players = total_players
         self.num_humans = num_humans
         self.num_bots = total_players - num_humans
@@ -53,7 +53,7 @@ class Social_Choice_Sim:
         self.current_results = [] # holds the results from the last "return win" call, which we can access later.
         self.scenario_string = Path(self.get_scenario()).name
         self.bot_list_as_string = self.create_bot_list_as_string(self.bots)
-
+        self.group_option = group
         self.results = {}  # for graphing purposes, kind of.
         for i in range(len(self.bots)):  # total_players
             self.results[i] = []  # just throw in all the utilites

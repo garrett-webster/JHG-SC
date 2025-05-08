@@ -54,7 +54,7 @@ def create_sim(scenario=None, group=""):
     cycle = -1 # a negative cycle indicates to me that this is a test - that, or something is really really wrong.
     curr_round = -1
 
-    sim = Social_Choice_Sim(11, 3, 0, cycle, curr_round, chromosomes, scenario)
+    sim = Social_Choice_Sim(11, 3, 0, cycle, curr_round, chromosomes, scenario, group)
 
     return sim
 
@@ -72,16 +72,9 @@ if __name__ == "__main__":
         for group in total_groups:
 
             current_sim = create_sim(scenario)
-            #current_sim = create_sim()
+            #current_sim = create_sim() # if no sim
             current_sim = run_trial(current_sim, num_rounds, num_cycles, create_graphs, group)
             current_visualizer = longTermGrapher()
             current_visualizer.draw_graph_from_sim(current_sim)
-
-
-    # set up a fake round and then graph it
-    #current_sim.start_round()
-    #current_sim.get_votes() # literally just to place votes somewhere, yeah?
-    #graph_nodes(current_sim)
-
 
 
