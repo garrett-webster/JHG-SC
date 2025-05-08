@@ -14,10 +14,27 @@ class causeNodeGraphVisualizer:
         pass
 
     #def create_graph(self, all_nodes, all_votes, winning_vote, current_options_matrix):
-    def create_graph(self, current_sim, curr_round, cycle): # for right now, pass the cycle in. I might add him in later.
+    def create_graph_with_sim(self, current_sim): # for right now, pass the cycle in. I might add him in later.
+        all_nodes, all_votes, winning_vote, current_options_matrix, bot_list, scenario, group, round, cycle = current_sim.prepare_graph()
+        self.create_graph(all_nodes, all_votes, winning_vote, current_options_matrix, bot_list, scenario, group, round, cycle)
 
-        all_nodes, all_votes, winning_vote, current_options_matrix, bot_list = current_sim.prepare_graph()
 
+
+
+    def create_graph_given_file(self, dict):
+        all_votes = dict["all_votes"]
+        all_nodes = dict["all_nodes"]
+        winning_vote = dict["winning_vote"]
+        current_options_matrix = dict["current_options_matrix"]
+        scenario = dict["scenario"]
+        group = dict["group"]
+        curr_round = dict["curr_round"]
+        cycle = dict["cycle"]
+        bot_list = dict["bot_list"]
+        self.create_graph(all_nodes, all_votes, winning_vote, current_options_matrix, bot_list, scenario, group, curr_round, cycle)
+
+
+    def create_graph(self, all_nodes, all_votes, winning_vote, current_options_matrix, bot_list, scenario, group, curr_round, cycle):
         bot_color_map = {
             # 0 is random, 1 is socialWelfare, 2 is greedy, 3 is betterGreedy, 4 is limitedAwareness, 5 is secondChoice
             "0": "purple",
@@ -41,7 +58,6 @@ class causeNodeGraphVisualizer:
             "7": "greedyWMDP",
         }
 
-
         fig = plt.figure(figsize=(13, 6))  # Compact figure size
         gs = gridspec.GridSpec(1, 2, width_ratios=[0.8, 3.2])  # tighter left:right ratio
 
@@ -59,7 +75,7 @@ class causeNodeGraphVisualizer:
 
             # Use fixed-width formatting for alignment
             formatted_options = " ".join(f"{opt:>2}" for opt in options)
-            row_text = f"{player_id:>2} | {formatted_options} | {vote + 1:>2}"
+            row_text = f"{player_id:>2} | {formatted_options} | {int(vote) + 1:>2}"
 
             # Display as one boxed row with monospaced font
             ax_matrix.text(0, -i, row_text, ha='left', va='center', fontsize=12,
@@ -70,7 +86,7 @@ class causeNodeGraphVisualizer:
         ax_matrix.set_ylim(-num_rows, 1)
 
         # --- Add Winning Vote Text Below Matrix ---
-        ax_matrix.text(1, -num_rows - 1, f"Winning vote: {winning_vote+1}", ha='left', va='center',
+        ax_matrix.text(1, -num_rows - 1, f"Winning vote: {winning_vote + 1}", ha='left', va='center',
                        fontsize=12, color='red')
 
         # --- RIGHT PANEL: Graph ---
@@ -95,18 +111,17 @@ class causeNodeGraphVisualizer:
                 number = label
 
             if node_type == "CAUSE":
-                color = 'red' if label == "Cause " + str(winning_vote+1) else 'darkgrey'
+                color = 'red' if label == "Cause " + str(winning_vote + 1) else 'darkgrey'
                 shape = patches.RegularPolygon((x, y), numVertices=3, radius=1.0, orientation=0,
                                                color=color, ec='black', zorder=2)
                 ax.add_patch(shape)
             elif node_type == "PLAYER":
                 string = node["text"].split(" ")
-                id = bot_list[int(string[1])-1].get_number_type()
+                id = bot_list[int(string[1]) - 1].get_number_type()
                 used_bot_types.add(str(id))
                 color = bot_color_map[str(id)]
                 shape = plt.Circle((x, y), 0.7, color=color, ec='black', zorder=2)
                 ax.add_patch(shape)
-
 
             ax.text(x, y, str(number), ha='center', va='center', fontsize=14, weight='bold', zorder=3)
 
@@ -126,14 +141,9 @@ class causeNodeGraphVisualizer:
                                         mutation_scale=15, lw=2, zorder=1)
                 ax.add_patch(arrow)
 
-        path = Path(current_sim.scenario)
-        current_scenario = path.name
-        group = current_sim.get_group()
-        scenario = Path(current_sim.get_scenario()).name
-
-
-        fig.suptitle(f"Round: {curr_round+1}   Situation: {current_scenario}   Cycle: {current_sim.cycle}    Group: {group}     Scenario: {scenario}",
-                     fontsize=16, fontweight='bold', y=0.98)
+        fig.suptitle(
+            f"Round: {curr_round + 1}   Situation: {scenario}   Cycle: {cycle}    Group: {group}",
+            fontsize=16, fontweight='bold', y=0.98)
 
         # creates a legend that allows us to see which bot types are active, and which ones are what
         legend_elements = []
@@ -149,10 +159,12 @@ class causeNodeGraphVisualizer:
 
         # Reduce space between matrix and graph and the overall layout
         fig.subplots_adjust(wspace=0.01, left=0.05, right=0.95, top=0.95, bottom=0.15)  # Adjust bottom margin
-        #print("This is the round at the end!! ", curr_round)
+        # print("This is the round at the end!! ", curr_round)
 
         my_path = os.path.dirname(os.path.abspath(__file__))
-        plt.savefig(my_path + "/individualRoundGraphs/ round " + str(curr_round+1) + str(" ") + str("cycle ") + str(cycle) + str(" group ") + str(group) + str(" scenario ") + str(scenario), dpi=300) # I want it to have the round, and cycle, and that shoudl do it
-        #plt.show()
+        plt.savefig(my_path + "/individualRoundGraphs/ round " + str(curr_round + 1) + str(" ") + str("cycle ") + str(
+            cycle) + str(" group ") + str(group) + str(" scenario ") + str(scenario),
+                    dpi=300)  # I want it to have the round, and cycle, and that shoudl do it
+        # plt.show()
 
 

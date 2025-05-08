@@ -2,6 +2,7 @@ import copy
 import math
 import random
 from collections import Counter
+from pathlib import Path
 
 import numpy as np
 
@@ -50,6 +51,8 @@ class Social_Choice_Sim:
         self.group = -1 # doesn't exist, let me know it hasn't been set.
         self.sc_groups = -1 # no group exists, can ignore.
         self.current_results = [] # holds the results from the last "return win" call, which we can access later.
+        self.scenario_string = Path(self.get_scenario()).name
+        self.bot_list_as_string = self.create_bot_list_as_string(self.bots)
 
         self.results = {}  # for graphing purposes, kind of.
         for i in range(len(self.bots)):  # total_players
@@ -265,11 +268,14 @@ class Social_Choice_Sim:
         winning_vote, _ = self.return_win(self.final_votes)
         self.set_coop_score(current_cooperation_score)  # reset it bc the above does silly things.
 
-        return current_node_json, self.final_votes, winning_vote, self.current_options_matrix, self.bots
+        group = self.get_group()
+
+        return current_node_json, self.final_votes, winning_vote, self.current_options_matrix, self.bot_list_as_string, self.scenario_string, group, self.round, self.cycle
 
     def get_results(self):
         cooperation_score = self.cooperation_score / self.num_rounds  # as a percent, how often we cooperated. (had a non negative cause pass)
-        return self.results, cooperation_score, self.bot_type, self.num_rounds
+
+        return self.results, cooperation_score, self.bot_type, self.num_rounds, self.scenario_string, self.group
 
     def get_everything_for_logger(self):
         self.create_player_nodes()
@@ -282,7 +288,9 @@ class Social_Choice_Sim:
         winning_vote, _ = self.return_win(self.final_votes)
         self.set_coop_score(current_cooperation_score)  # reset it bc the above does silly things.
         cooperation_score = self.cooperation_score / self.num_rounds  # as a percent, how often we cooperated. (had a non negative cause pass)
-        return current_node_json, self.final_votes, winning_vote, self.current_options_matrix, self.bots, self.results, cooperation_score, self.bot_type, self.num_rounds
+
+
+        return current_node_json, self.final_votes, winning_vote, self.current_options_matrix, self.results, cooperation_score, self.bot_type, self.num_rounds, self.scenario_string, self.group, self.cycle, self.round
 
     def set_rounds(self, num_rounds):
         self.num_rounds = num_rounds
@@ -304,6 +312,12 @@ class Social_Choice_Sim:
     def get_scenario(self):
         return self.scenario
 
+
+    def create_bot_list_as_string(self, bots_list):
+        bots_as_string = []
+        for bot in bots_list:
+            bots_as_string.append(str(bot.get_number_type()))
+        return bots_as_string
 
 
     ###--- NODE CREATION FOR FRONT END. NOT USEFUL FOR GENETIC STUFF. ---###

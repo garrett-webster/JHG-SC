@@ -10,7 +10,7 @@ class longTermGrapher():
         pass # don't do anything
 
     def draw_graph(self, sim):
-        results, cooperation_score, bot_type, num_rounds = sim.get_results()
+        results, cooperation_score, bot_type, num_rounds, scenario, group = sim.get_results()
 
         sums_per_round = {}
         for bot in results:
@@ -100,7 +100,7 @@ class longTermGrapher():
         group_title = sim.get_group()
         if group_title == "":
             group_title = "No group"
-        scenario = Path(sim.get_scenario()).name
+
 
         file_name = "Scenario " + scenario + " Group " + str(group_title) + ".png"
 

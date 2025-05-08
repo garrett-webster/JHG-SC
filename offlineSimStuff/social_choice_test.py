@@ -6,13 +6,14 @@ from tqdm import tqdm
 
 from offlineSimStuff.variousGraphingTools.causeNodeGraphVisualizer import causeNodeGraphVisualizer
 from offlineSimStuff.variousGraphingTools.longTermGrapher import longTermGrapher
+from Server.simLogger import simLogger
 
 
 # starts the sim, could make this take command line arguments
 # takes in a bot type, a number of rounds, and then runs it and plots the results. plans for expansion coming soon.
 def run_trial(sim, num_rounds, num_cycles, create_graphs, group):
     # we need to get the groups, where we can have no groups or a variety of groups.
-
+    current_logger = simLogger(sim)
     sim.set_rounds(num_rounds) # for graphing purposes
     start_time = time.time() # so we can calculate total time. not entirely necessary.
 
@@ -24,7 +25,7 @@ def run_trial(sim, num_rounds, num_cycles, create_graphs, group):
         for cycle in range(num_cycles):
             bot_votes[cycle] = sim.get_votes(bot_votes, curr_round, cycle)
             if create_graphs:
-                graph_nodes(sim, curr_round, cycle) # only do this for specific rounds
+                graph_nodes(sim) # only do this for specific rounds
 
         bot_votes = bot_votes[num_cycles-1] # grab just the last votes, they are the only ones that matter anyway.
         total_votes = len(bot_votes)
@@ -32,15 +33,17 @@ def run_trial(sim, num_rounds, num_cycles, create_graphs, group):
         winning_vote, round_results = sim.return_win(bot_votes)  # is all votes, works here
         # this saves everything to the JSON that we need. I mean it saves it to the sim, I can change that so we can log it instead.
         sim.save_results()
+        current_logger.record_individual_round()
 
     end_time = time.time()
+    current_logger.record_big_picture()
     print("This was the total time ", end_time - start_time)
     return sim
 
 
-def graph_nodes(sim, curr_round, cycle):
+def graph_nodes(sim):
     currVisualizer = causeNodeGraphVisualizer()
-    currVisualizer.create_graph(sim, curr_round, cycle)
+    currVisualizer.create_graph_with_sim(sim)
 
 
 def create_sim():
@@ -57,7 +60,7 @@ def create_sim():
 
 
 if __name__ == "__main__":
-    num_rounds = 10000
+    num_rounds = 10
     num_cycles = 3
     create_graphs = False
     total_groups = ["",0,1,2]
