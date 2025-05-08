@@ -27,6 +27,20 @@ class longTermGrapher():
 
 
     def draw_graph(self, results, cooperation_score, bot_type, num_rounds, scenario, group):
+
+        bot_name_map = {
+            "0": "random",
+            "1": "sW",
+            "2": "G",
+            "3": "bG",
+            "4": "lA",
+            "5": "sC",
+            "6": "sMA",
+            "7": "gMDP",
+        }
+
+
+
         sums_per_round = {}
         for bot in results:
             sums_per_round[bot] = []
@@ -67,8 +81,11 @@ class longTermGrapher():
         plt.figure(figsize=(10, 6))
 
         # goes through that big ol fetcher and plots all the polayer socres per round
-        for player, scores_list in sums_per_round.items():
-            plt.plot(rounds, scores_list, marker='o', label=f'Player {player}')
+        for i, (player, scores_list) in enumerate(sums_per_round.items()):
+            bot_type_id = bot_type[int(player)]  # player is likely a string, ensure int
+            bot_type_name = bot_name_map.get(bot_type_id, f"Bot {bot_name_map[str(bot_type_id)]}")
+            label = f'Player {int(player) + 1} ({bot_type_name})'
+            plt.plot(rounds, scores_list, marker='o', label=label)
 
         plt.plot(rounds, cumulative_average_score, marker='x', label='Cumulative Total Score', linewidth=3,
                  color='black')
@@ -117,9 +134,21 @@ class longTermGrapher():
             group_title = "No group"
 
 
-        file_name = "Scenario " + scenario + " Group " + str(group_title) + ".png"
 
         my_path = os.path.dirname(os.path.abspath(__file__))
-        plt.savefig(my_path + "/longTermGrapherFolder/" + file_name, dpi=300)
+        scenario_str = f"scenario_{scenario}"
+        group_str = f"group_{group}"
+        dir_path = os.path.join(my_path, "individualRoundGraphs", scenario_str, group_str)
+        os.makedirs(dir_path, exist_ok=True)
+
+        file_name = f"Scenario {scenario} Group {group_title}.png"
+
+        # Save to longTermGrapherFolder
+        long_term_path = os.path.join(my_path, "longTermGrapherFolder", file_name)
+        plt.savefig(long_term_path, dpi=300)
+
+        # Save to individualRoundGraphs folder
+        full_path = os.path.join(dir_path, file_name)
+        plt.savefig(full_path, dpi=300)
 
         plt.show()

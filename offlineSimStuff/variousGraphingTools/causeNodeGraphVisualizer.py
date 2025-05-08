@@ -8,6 +8,7 @@ import matplotlib.gridspec as gridspec
 from pathlib import Path
 from matplotlib.patches import Patch
 import os
+import numpy as np # for col sums
 
 class causeNodeGraphVisualizer:
     def __init__(self):
@@ -66,7 +67,9 @@ class causeNodeGraphVisualizer:
         ax_matrix.axis('off')
 
         num_rows = len(current_options_matrix)
-        max_cols = max(len(row) for row in current_options_matrix) if current_options_matrix else 0
+        matrix_array = np.array(current_options_matrix)
+        col_sums = matrix_array.sum(axis=0)
+        best_option = int(np.argmax(col_sums)) + 1  # gets the index of the best option and adds one to it
 
         for i in range(num_rows):
             vote = all_votes.get(i) # tries to get it through an int first, from real time execution
@@ -85,8 +88,18 @@ class causeNodeGraphVisualizer:
                            fontfamily='monospace',
                            bbox=dict(boxstyle='round,pad=0.2', facecolor='whitesmoke', edgecolor='gray'))
 
+        # code to add teh column sums
+        best_option = int(np.argmax(col_sums)) + 1  # +1 to match display indexing
+        formatted_sums = " ".join(f"{val:>2}" for val in col_sums)
+        sum_text = f"Σ  | {formatted_sums} | {best_option:>2}"
+
+        ax_matrix.text(0, -num_rows, sum_text, ha='left', va='center', fontsize=12,
+                       fontfamily='monospace',
+                       bbox=dict(boxstyle='round,pad=0.2', facecolor='#e6f2ff', edgecolor='gray'))
+
+        # Update the plot limits to make space for the sum row + winning vote
         ax_matrix.set_xlim(-1, 10)
-        ax_matrix.set_ylim(-num_rows, 1)
+        ax_matrix.set_ylim(-num_rows - 3, 1)
 
         # --- Add Winning Vote Text Below Matrix ---
         ax_matrix.text(1, -num_rows - 1, f"Winning vote: {winning_vote + 1}", ha='left', va='center',
@@ -164,10 +177,17 @@ class causeNodeGraphVisualizer:
         fig.subplots_adjust(wspace=0.01, left=0.05, right=0.95, top=0.95, bottom=0.15)  # Adjust bottom margin
         # print("This is the round at the end!! ", curr_round)
 
+
+
         my_path = os.path.dirname(os.path.abspath(__file__))
-        plt.savefig(my_path + "/individualRoundGraphs/ round " + str(curr_round + 1) + str(" ") + str("cycle ") + str(
-            cycle) + str(" group ") + str(group) + str(" scenario ") + str(scenario),
-                    dpi=300)  # I want it to have the round, and cycle, and that shoudl do it
-        plt.show()
+        scenario_str = f"scenario_{scenario}"
+        group_str = f"group_{group}"
+        file_name = f"round_{curr_round+1}_cycle_{cycle}.png"
+        dir_path = os.path.join(my_path, "individualRoundGraphs", scenario_str, group_str)
+        os.makedirs(dir_path, exist_ok=True)
+        full_path = os.path.join(dir_path, file_name)
+
+        plt.savefig(full_path, dpi=300)  # I want it to have the round, and cycle, and that shoudl do it
+        #plt.show()
 
 

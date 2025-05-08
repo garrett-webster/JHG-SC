@@ -30,8 +30,9 @@ if __name__ == "__main__":
     app = QApplication(sys.argv)
     app.setStyleSheet(load_stylesheet("combinedLayout/style.qss"))
 
-    host = '127.0.0.1'
-    port = 12345
+    host = '10.55.10.49'
+    #host = '127.0.0.1'
+    port = 12346
 
     connection_manager = ClientConnectionManager(host, port)
 

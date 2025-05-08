@@ -46,10 +46,11 @@ def graph_nodes(sim):
     currVisualizer.create_graph_with_sim(sim)
 
 
-def create_sim():
+def create_sim(scenario=None, group=""):
     chromosomes = r"C:/Users/Sean/Documents/GitHub/OtherGarrettStuff/JHG-SC/offlineSimStuff/chromosomes/bGStandard.csv"
     # SUM: this sets the bot list type, so we can have siutaions set up
-    scenario = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\offlineSimStuff\scenarioIndicator\somewhatMoreAwareGreedy"
+    if scenario is None:
+        scenario = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\offlineSimStuff\scenarioIndicator\somewhatMoreAwareGreedy"
     cycle = -1 # a negative cycle indicates to me that this is a test - that, or something is really really wrong.
     curr_round = -1
 
@@ -62,19 +63,19 @@ def create_sim():
 if __name__ == "__main__":
     num_rounds = 10
     num_cycles = 3
-    create_graphs = False
+    create_graphs = True
     total_groups = ["",0,1,2]
     scenario_directory = "scenarioIndicator"
 
-    # for scenario_path in os.listdir(scenario_directory):
-    #     scenario = os.path.join(scenario_directory, scenario_path)
-    #     for group in total_groups:
+    for scenario_path in os.listdir(scenario_directory):
+        scenario = os.path.join(scenario_directory, scenario_path)
+        for group in total_groups:
 
-    # current_sim = create_sim(scenario)
-    current_sim = create_sim()
-    current_sim = run_trial(current_sim, num_rounds, num_cycles, create_graphs, "")
-    current_visualizer = longTermGrapher()
-    current_visualizer.draw_graph_from_sim(current_sim)
+            current_sim = create_sim(scenario)
+            #current_sim = create_sim()
+            current_sim = run_trial(current_sim, num_rounds, num_cycles, create_graphs, group)
+            current_visualizer = longTermGrapher()
+            current_visualizer.draw_graph_from_sim(current_sim)
 
 
     # set up a fake round and then graph it
