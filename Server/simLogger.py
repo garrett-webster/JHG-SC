@@ -1,6 +1,7 @@
 import json
 import os
 from pathlib import Path
+import copy
 
 class simLogger:
     def __init__(self, current_sim):
@@ -11,7 +12,8 @@ class simLogger:
         total_data = {}
         total_data["bot_list"] = bot_list
         total_data["all_nodes"] = all_nodes
-        total_data["all_votes"] = all_votes
+        new_votes = copy.deepcopy(all_votes)
+        total_data["all_votes"] = new_votes
         total_data["winning_vote"] = winning_vote
         total_data["current_options_matrix"] = current_options_matrix
         total_data["scenario"] = scenario

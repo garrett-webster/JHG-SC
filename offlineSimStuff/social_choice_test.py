@@ -62,7 +62,7 @@ def create_sim():
 if __name__ == "__main__":
     num_rounds = 10
     num_cycles = 3
-    create_graphs = False
+    create_graphs = True
     total_groups = ["",0,1,2]
     scenario_directory = "scenarioIndicator"
 

@@ -69,9 +69,12 @@ class causeNodeGraphVisualizer:
         max_cols = max(len(row) for row in current_options_matrix) if current_options_matrix else 0
 
         for i in range(num_rows):
+            vote = all_votes.get(i) # tries to get it through an int first, from real time execution
+            if vote is None: # if that fails, might be string
+                vote = all_votes.get(str(i), "?") # if the string fails, we're fetched.
+
             player_id = i + 1
             options = current_options_matrix[i]
-            vote = all_votes.get(i, "?")
 
             # Use fixed-width formatting for alignment
             formatted_options = " ".join(f"{opt:>2}" for opt in options)
@@ -117,7 +120,7 @@ class causeNodeGraphVisualizer:
                 ax.add_patch(shape)
             elif node_type == "PLAYER":
                 string = node["text"].split(" ")
-                id = bot_list[int(string[1]) - 1].get_number_type()
+                id = bot_list[int(string[1]) - 1]
                 used_bot_types.add(str(id))
                 color = bot_color_map[str(id)]
                 shape = plt.Circle((x, y), 0.7, color=color, ec='black', zorder=2)
@@ -126,7 +129,7 @@ class causeNodeGraphVisualizer:
             ax.text(x, y, str(number), ha='center', va='center', fontsize=14, weight='bold', zorder=3)
 
         for player_index, vote in all_votes.items():
-            player_label = f"Player {player_index + 1}"
+            player_label = f"Player {int(player_index) + 1}"
             cause_label = f"Cause {vote + 1}"  # for the off-by-one issue present in the votes.
 
             if player_label in node_positions and cause_label in node_positions:
@@ -165,6 +168,6 @@ class causeNodeGraphVisualizer:
         plt.savefig(my_path + "/individualRoundGraphs/ round " + str(curr_round + 1) + str(" ") + str("cycle ") + str(
             cycle) + str(" group ") + str(group) + str(" scenario ") + str(scenario),
                     dpi=300)  # I want it to have the round, and cycle, and that shoudl do it
-        # plt.show()
+        plt.show()
 
 
