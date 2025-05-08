@@ -82,6 +82,7 @@ class Social_Choice_Sim:
 
     def match_bot_type(self, bot_type, i):
         new_bot = None
+        bot_type = int(bot_type)
         if bot_type == 0:
             new_bot = (RandomBot(i))
         if bot_type == 1:
@@ -208,7 +209,7 @@ class Social_Choice_Sim:
             return bot_types
         else:
             num_bots = self.total_players - self.num_humans
-            bot_types = [[2]] * num_bots
+            bot_types = [2] * num_bots
             return bot_types
 
     def set_chromosomes(self, current_file):
