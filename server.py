@@ -7,7 +7,7 @@ OPTIONS = {
     #General settings
     "NUM_HUMANS": 1,
     "TOTAL_PLAYERS": 5,
-    "JHG_ROUNDS_PER_SC_ROUND" : 1,
+    "JHG_ROUNDS_PER_SC_ROUND" : 2,
     "MAX_ROUNDS": 1000,
     "SC_GROUP_OPTION": 2, # See options_creation.py -> group_size_options to understand what this means
     "SC_VOTE_CYCLES": 3,
@@ -42,8 +42,10 @@ class Server():
         # Main game loop -- Play as many rounds as specified in OPTIONS
         self.SC_manager.init_next_round()
         while self.JHG_manager.current_round <= self.max_rounds:
+            is_last_jhg_round = False
             for i in range(self.jhg_rounds_per_sc_round): # This range says how many jhg rounds to play between sc rounds
-                self.JHG_manager.play_jhg_round(self.JHG_manager.current_round)
+                if i == self.jhg_rounds_per_sc_round - 1: is_last_jhg_round = True
+                self.JHG_manager.play_jhg_round(self.JHG_manager.current_round, is_last_jhg_round)
             self.SC_manager.play_social_choice_round()
             print("New round")
 

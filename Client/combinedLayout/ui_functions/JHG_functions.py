@@ -3,8 +3,8 @@ from PyQt6.QtCore import QPoint
 from PyQt6.QtWidgets import QToolTip
 from PyQt6.QtGui import QCursor
 
-from combinedLayout.ui_functions.jhg_network_graph import update_jhg_network_graph
-from combinedLayout.colors import COLORS
+from Client.combinedLayout.ui_functions.jhg_network_graph import update_jhg_network_graph
+from Client.combinedLayout.colors import COLORS
 
 
 # Custom ScatterPlotItem that supports tooltips
@@ -88,29 +88,29 @@ def update_jhg_popularity_graph(round_state, jhg_popularity_graph):
     jhg_popularity_graph.setYRange(0, max_popularity + 10, padding=0)
 
 
-def jhg_over(main_window):
-    for button in main_window.jhg_buttons:
-        button.setEnabled(False)
-
+def jhg_over(main_window, is_last):
     update_jhg_network_graph(main_window)
 
-    for button in main_window.SC_voting_grid.buttons:
-        if button.objectName() != "clear_button":
-            button.setEnabled(True)
+    if not is_last:
+        start_jhg_round(main_window)
+    else:
+        for button in main_window.jhg_buttons:
+            button.setEnabled(False)
 
-    main_window.SC_panel.setCurrentIndex(0)
-    main_window.round_state.sc_cycle = 1
-    main_window.SC_cause_graph.update_cycle_label(1, True)
+        for button in main_window.SC_voting_grid.buttons:
+            if button.objectName() != "clear_button":
+                button.setEnabled(True)
 
-    main_window.dockWidget.bottom_left.start_flashing()
-    main_window.dockWidget.top_left.disable_highlight()
-    main_window.SC_panel.setTabText(0, "Current Round")
+        main_window.round_state.sc_cycle = 1
+        main_window.SC_cause_graph.update_cycle_label(1, True)
 
+        main_window.dockWidget.bottom_left.start_flashing()
+        main_window.dockWidget.top_left.disable_highlight()
+        main_window.SC_panel.setTabText(0, "Current Round")
 
-def enable_jhg_buttons(main_window):
+def start_jhg_round(main_window):
     main_window.dockWidget.top_left.start_flashing()
     main_window.dockWidget.bottom_left.disable_highlight()
-
 
     for button in main_window.jhg_buttons:
         if button.objectName() == "JHGSubmitButton":

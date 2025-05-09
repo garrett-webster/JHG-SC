@@ -1,28 +1,23 @@
-import sys
-import os
-
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-
 from functools import partial
 
 import numpy as np
 from PyQt6.QtCore import QThread
 from PyQt6.QtGui import QFont
 from PyQt6.QtWidgets import QMainWindow, QHBoxLayout, QLabel, QWidget
-from RoundState import RoundState
-from ServerListener import ServerListener
+from Client.RoundState import RoundState
+from Client.ServerListener import ServerListener
 from matplotlib.figure import Figure
 
-from combinedLayout.JhgPanel import JhgPanel
+from Client.combinedLayout.JhgPanel import JhgPanel
 
-from combinedLayout.SCHistoryGrid import SCHistoryGrid
+from Client.combinedLayout.SCHistoryGrid import SCHistoryGrid
 
-from combinedLayout.MainDocks import CornerContainer
-from combinedLayout.SCCausesGraph import SCCausesGraph
-from combinedLayout.ui_functions.SC_functions import *
-from combinedLayout.ui_functions.JHG_functions import *
+from Client.combinedLayout.MainDocks import CornerContainer
+from Client.combinedLayout.SCCausesGraph import SCCausesGraph
+from Client.combinedLayout.ui_functions.SC_functions import *
+from Client.combinedLayout.ui_functions.JHG_functions import *
 
-from combinedLayout.tornado_graph import update_tornado_graph
+from Client.combinedLayout.tornado_graph import update_tornado_graph
 
 
 class MainWindow(QMainWindow):
@@ -144,9 +139,9 @@ class MainWindow(QMainWindow):
         self.ServerListener.update_sc_utilities_labels_signal.connect(self.update_sc_utilities_labels)
         self.ServerListener.update_tornado_graph_signal.connect(self.update_tornado_graph)
         self.ServerListener.jhg_over_signal.connect(partial(jhg_over, self))
-        self.ServerListener.enable_jhg_buttons_signal.connect(partial(enable_jhg_buttons, self))
         self.ServerListener.update_sc_votes_signal.connect(self.update_sc_votes)
         self.ServerListener.update_sc_nodes_graph_signal.connect(self.update_sc_nodes_graph)
+        self.ServerListener.switch_to_jhg_signal.connect(self.start_jhg_round)
         self.ServerListener_thread.started.connect(self.ServerListener.start_listening)
 
     def update_sc_votes(self, votes, cycle, is_last_cycle):
@@ -173,3 +168,7 @@ class MainWindow(QMainWindow):
 
     def SC_tab_changed(self, index):
         tab_changed(self, index)
+
+    def start_jhg_round(self):
+        start_jhg_round(self)
+
