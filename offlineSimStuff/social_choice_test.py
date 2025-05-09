@@ -63,30 +63,37 @@ def create_sim(scenario=None, chromosomes=None, group=""):
 
 
 if __name__ == "__main__":
-    num_rounds = 10
+    num_rounds = 10000
     num_cycles = 3
     create_graphs = False
     total_groups = ["", 0, 1, 2]
     chromosomes_directory = "testChromosome"
     group = ""
     scenario = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\offlineSimStuff\scenarioIndicator\somewhatMoreAwareGreedy"
-    #chromosome = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\offlineSimStuff\chromosomes\bgStandardBiggest"
+    chromosome = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\offlineSimStuff\chromosomes\highestFromTesting"
+    current_sim = create_sim(scenario, chromosome, group)
+    updated_sim = run_trial(current_sim, num_rounds, num_cycles, False, group)
+    current_visualizer = longTermGrapher()
+    current_visualizer.draw_graph_from_sim(updated_sim)
 
     big_boy_json = {}
 
-    for chromosome_path in os.listdir(chromosomes_directory):
-        chromosome = os.path.join(chromosomes_directory, chromosome_path)
-        current_sim = create_sim(scenario, chromosome, group)
 
-        updated_sim = run_trial(current_sim, num_rounds, num_cycles, create_graphs, group)
-        current_visualizer = longTermGrapher()
-        current_visualizer.draw_graph_from_sim(updated_sim)
-        current_logger = simLogger(updated_sim)
-        current_logger.log_stuff_for_chromosome(big_boy_json)
 
-    final_logger = simLogger()
-    final_logger.write_a_json_to_file(big_boy_json)
 
+# legacy code for testing every chromosome that I generated in the chromsome repo. Don't worry about it too much.
+# for chromosome_path in os.listdir(chromosomes_directory):
+#     chromosome = os.path.join(chromosomes_directory, chromosome_path)
+#     current_sim = create_sim(scenario, chromosome, group)
+#
+#     updated_sim = run_trial(current_sim, num_rounds, num_cycles, create_graphs, group)
+#     current_visualizer = longTermGrapher()
+#     current_visualizer.draw_graph_from_sim(updated_sim)
+#     current_logger = simLogger(updated_sim)
+#     current_logger.log_stuff_for_chromosome(big_boy_json)
+#
+# final_logger = simLogger()
+# final_logger.write_a_json_to_file(big_boy_json)
 
 
 
