@@ -1,5 +1,8 @@
 # Sean's Smartest Greedy Bot - for now. capable of switching and recognizing majorities. tiebreaksers still result in abstaining bc it doesn't have an idea of
 # social awareness. might be worth implmenenting in a later bot.
+from PyQt6.uic import compileUiDir
+
+
 class somewhatMoreAwarenessGreedy:
     def __init__(self, self_id):
         self.self_id = self_id
@@ -45,7 +48,7 @@ class somewhatMoreAwarenessGreedy:
             risk_aversion = self.chromosome[0]
             for i, val in enumerate(our_row):
                 if val > 0:
-                    #new_row.append(col_probs[i + 1] * val) # straight expected value.
+
                     new_prob = col_probs[i + 1] ** risk_aversion # scalable risk stuff.
                     new_row.append(new_prob * val)
 
@@ -83,10 +86,7 @@ class somewhatMoreAwarenessGreedy:
 
                 cause_sums = {} # normalise this
                 for i in range(len(current_options_matrix[0])+1):
-                    cause_sums[i] = 0 # off by one error
-
-                # if self.self_id == 5: # getting player 6
-                #     print("Stop here")
+                    cause_sums[i] = 0
 
                 for key in player_dict: # just unfold the fetcher
                     for i in range(len(player_dict[key])): # i is the player number
@@ -95,18 +95,9 @@ class somewhatMoreAwarenessGreedy:
                         if self.self_id != key:
                             cause_sums[index] += 1
 
-                #if len(player_dict[next(iter(player_dict.keys()))]) > 1:
-                    #print("aight stop here")
 
                 for key in cause_sums:
                     cause_sums[key] = cause_sums[key] / len(player_dict[next(iter(player_dict.keys()))]) # does this work? noramlize the normal votes
-
-                # where anything over
-
-                # so now we SHOULD have the average number of votes per cause, but I might want to consider just the smaller ones.
-                #if (self.self_id == 5 or self.self_id == 6 or self.self_id == 4):
-                    #print("here are the cuase sums, ", cause_sums, " for agent ", self.self_id)
-
 
                 # normalize AGAIN for fun.
                 for row in mutable_matrix:
@@ -143,8 +134,6 @@ class somewhatMoreAwarenessGreedy:
                     else:
                         new_row.append(0)
 
-                #if (self.self_id == 5 or self.self_id == 6 or self.self_id == 4):
-                    #print("here are the row probabilites, ", new_row, " for agent ", self.self_id)
 
                 new_probability_sums = []
                 for i in range(len(new_row)):
@@ -153,8 +142,63 @@ class somewhatMoreAwarenessGreedy:
 
                 new_vote = new_probability_sums.index(max(new_probability_sums)) - 1
 
-                #if (self.self_id == 5 or self.self_id == 6 or self.self_id == 4):
-                    #print("here are the overall estimates, ", new_probability_sums, " for agent ", self.self_id, " and our vote is ", new_vote)
-
 
                 return new_vote
+
+
+
+
+    def initialize_matrix(self, current_options_matrix): # creates padding and allows for 0 to be an option
+        return [[max(val+1, 0) for val in [0] + row] for row in current_options_matrix]
+
+    def normalize_rows(self, matrix):
+        for row in matrix:
+            total = sum(row)
+            if total > 0:
+                for i in range(len(row)):
+                    row[i] /= total
+
+    def get_column_probabilities(self, matrix):
+        num_cols = len(matrix[0])
+        col_sums = [sum(matrix[row][col] for row in range(len(matrix))) for col in range(num_cols)]
+        total = sum(col_sums)
+        return [val / total for val in col_sums]
+
+    def apply_previous_votes(self, matrix, previous_votes):
+        player_dict = {player: [] for player in previous_votes[next(iter(previous_votes))]}
+        for key in previous_votes:
+            for player in previous_votes[key]:
+                player_dict[player].append(previous_votes[key][player])
+
+        cause_sums = {i : 0.0 for i in range(len(matrix[0]))} # make sure it starts as a float, not an int.
+        for key in player_dict:
+            for i, vote in enumerate(player_dict[key]):
+                index = vote + 1
+                matrix[key][index] += 1
+                if key != self.self_id:
+                    cause_sums[index] += 1
+
+        length = len(player_dict[next(iter(player_dict))])
+        for key in cause_sums:
+            cause_sums[key] = cause_sums[key] / length
+        return cause_sums
+
+    def calculate_vote_row(self, our_row, col_probs, cause_sums, risk_aversion, majority_factor):
+        new_row = [0]
+        for i, val in enumerate(our_row):
+            if val > 0:
+                new_prob = col_probs[i + 1] ** risk_aversion
+                if cause_sums[i + 1] + 1 > len(our_row) // 2:
+                    new_row.append(new_prob * val * majority_factor)
+                else:
+                    new_row.append(new_prob * val)
+            else:
+                new_row.append(0)
+        return new_row
+
+    def choose_best_vote(self, new_row, cause_sums=None):
+        if cause_sums:
+            expected_values = [new_row[i] * cause_sums.get(i, 0) for i in range(len(new_row))]
+            return expected_values.index(max(expected_values)) - 1
+        else:
+            return new_row.index(max(new_row)) - 1

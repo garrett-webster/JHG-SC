@@ -63,7 +63,7 @@ def create_sim(scenario=None, chromosomes=None, group=""):
 
 
 if __name__ == "__main__":
-    num_rounds = 10000
+    num_rounds = 10
     num_cycles = 3
     create_graphs = False
     total_groups = ["", 0, 1, 2]
