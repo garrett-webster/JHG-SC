@@ -12,8 +12,8 @@ class longTermGrapher():
 
 
     def draw_graph_from_sim(self, sim):
-        results, cooperation_score, bot_type, num_rounds, scenario, group = sim.get_results()
-        self.draw_graph(results, cooperation_score, bot_type, num_rounds, scenario, group)
+        results, cooperation_score, bot_type, num_rounds, scenario, group, chromosome = sim.get_results()
+        self.draw_graph(results, cooperation_score, bot_type, num_rounds, scenario, group, chromosome)
 
     def draw_graph_from_file(self, new_data):
         results = new_data["results"]
@@ -22,13 +22,15 @@ class longTermGrapher():
         num_rounds = new_data["num_rounds"]
         scenario = new_data["scenario"]
         group = new_data["group"]
-        self.draw_graph(results, cooperation_score, bot_type, num_rounds, scenario, group)
+        chromosome = new_data["chromosome"]
+        self.draw_graph(results, cooperation_score, bot_type, num_rounds, scenario, group, chromosome)
 
 
 
-    def draw_graph(self, results, cooperation_score, bot_type, num_rounds, scenario, group):
+    def draw_graph(self, results, cooperation_score, bot_type, num_rounds, scenario, group, chromosome):
 
         bot_name_map = {
+            "-1": "player",
             "0": "random",
             "1": "sW",
             "2": "G",
@@ -73,9 +75,9 @@ class longTermGrapher():
         total_average_increase = cumulative_average_score[-1] / num_rounds
 
         # print statements go here.
-        print("this was the total average increase ", total_average_increase)
-        print("this was the cooperatino score ", cooperation_score)
-        print("this was the cv ", cv)
+        print("total average increased ", total_average_increase, "this was the cooperation score ", cooperation_score)
+        print("this was the cv ", cv, 'this was the scenario ', scenario)
+        print('this was the chromosome ', chromosome, " and this was the group ", group)
 
         # create da plot
         plt.figure(figsize=(10, 6))
@@ -107,7 +109,7 @@ class longTermGrapher():
         # labels and a title
         plt.xlabel('Round')
         plt.ylabel('Score')
-        plt.title('Scores per Round for Each Player With Algorithm ' + str(bot_type) + " and grouping " + str(group))
+        plt.title('Big Graph for ' + str(scenario) + " group " + str(group) + " chromosome " + str(chromosome))
         plt.legend()
 
         # I would like to see the baby
@@ -141,14 +143,15 @@ class longTermGrapher():
         dir_path = os.path.join(my_path, "individualRoundGraphs", scenario_str, group_str)
         os.makedirs(dir_path, exist_ok=True)
 
-        file_name = f"Scenario {scenario} Group {group_title}.png"
+        #file_name = f"Scenario {scenario} Group {group_title}. Chromosome {chromosome}.png"
+        file_name = f"Chromosome {chromosome}.png"
 
-        # Save to longTermGrapherFolder
+        #Save to longTermGrapherFolder
         long_term_path = os.path.join(my_path, "longTermGrapherFolder", file_name)
         plt.savefig(long_term_path, dpi=300)
 
         # Save to individualRoundGraphs folder
-        full_path = os.path.join(dir_path, file_name)
-        plt.savefig(full_path, dpi=300)
+        #full_path = os.path.join(dir_path, file_name)
+        #plt.savefig(full_path, dpi=300)
 
         plt.show()

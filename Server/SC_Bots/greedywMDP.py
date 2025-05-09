@@ -33,13 +33,8 @@ class greeddywMDP:
 
                 if len(player_dict[next(iter(player_dict.keys()))]) == 1:
                     new_vote = self.basic_but_better_vote(mutable_matrix, player_dict, cause_sums, current_options_matrix)
-                else:
-                    new_vote = self.markov_decision(previous_votes, mutable_matrix, player_dict, cause_sums)
 
             return new_vote # gotta return this sooner or later
-
-    def markov_decision(self, previous_votes, mutable_matrix, player_dict, cause_sums):
-        pass
 
     def standard_guess(self, current_options_matrix):
         self_id = self.self_id

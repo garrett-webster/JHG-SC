@@ -128,6 +128,7 @@ class somewhatMoreAwarenessGreedy:
                 our_row = current_options_matrix[self_id]
                 new_row = [0]  # offset column 0
                 risk_aversion = self.chromosome[0]
+                majority_factor = self.chromosome[1]
                 # if self.self_id == 5: # getting player 6
                 #     print("Stop here")
                 for i, val in enumerate(our_row):
@@ -135,7 +136,7 @@ class somewhatMoreAwarenessGreedy:
                         new_prob = col_probs[i + 1] ** risk_aversion  # scalable risk stuff.
                         # this is trying to account for
                         if cause_sums[i+1] + 1 > len(player_dict) // 2:
-                            new_row.append(new_prob * val  * 2)
+                            new_row.append(new_prob * val  * majority_factor)
                         else:
                             new_row.append(new_prob * val)
 

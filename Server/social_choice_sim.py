@@ -25,6 +25,7 @@ class Social_Choice_Sim:
         self.total_players = total_players
         self.num_humans = num_humans
         self.num_bots = total_players - num_humans
+        self.chromosomes = chromosomes
         # the next two lines only exist to work with default architecture.
         # updated bot creation thing
         self.bot_type = self.set_bot_list(scenario)
@@ -52,11 +53,17 @@ class Social_Choice_Sim:
         self.sc_groups = -1 # no group exists, can ignore.
         self.current_results = [] # holds the results from the last "return win" call, which we can access later.
         self.scenario_string = Path(self.get_scenario()).name
+        # sometimes I just be putting in the actual chromosome instead of reading it from files. sue me.
+        if isinstance(self.get_chromosome(), str):
+            self.chromosome_string = Path(self.get_chromosome()).name
+        else:
+            self.chromosome_string = str(self.get_chromosome())
         self.bot_list_as_string = self.create_bot_list_as_string(self.bots)
         self.group_option = group
         self.results = {}  # for graphing purposes, kind of.
-        for i in range(len(self.bots)):  # total_players
+        for i in range(self.total_players):  # total_players
             self.results[i] = []  # just throw in all the utilites
+        self.total_bots = 0
 
     def set_group(self, group_option):
         if group_option == "":
@@ -67,11 +74,17 @@ class Social_Choice_Sim:
             self.sc_groups = generate_two_plus_one_groups(self.total_players, group_option)
 
 
+    def get_chromosome(self):
+        return self.chromosomes
+
     def create_bots(self):
         bots_array = []
+        self.total_bots = 0
+        for bot in self.bot_type:
+            if bot > 0:
+                self.total_bots += 1
 
-
-        if len(self.bot_type) != self.num_bots:
+        if self.total_bots != self.num_bots:
             print("THERE HAS BEEN AN ERROR!! WAAAH")
             return # early return, blow everything up.
         else:
@@ -109,7 +122,7 @@ class Social_Choice_Sim:
 
 
     def set_chromosome(self, chromosomes):
-        if len(chromosomes) != len(self.bots):
+        if len(chromosomes) != self.total_bots:
             print("WRONG WRONG WRONG")
         else:
             for i in range(len(self.bots)):
@@ -206,26 +219,39 @@ class Social_Choice_Sim:
                         continue # skip the comment lines
                     bot_types = [int(x) for x in line.strip().split(",")]
                     break # stop when teh numbers are over.
-            return bot_types
+
         else:
             num_bots = self.total_players - self.num_humans
             bot_types = [2] * num_bots
-            return bot_types
+
+        self.scenario = current_file
+        return bot_types
 
     def set_chromosomes(self, current_file):
         chromosomes_list = []
-        if current_file != "":
-            with open(current_file, "r") as file:
-                for line in file:
-                    if line.startswith("#"):
-                        continue
-                    parts = line.strip().split(",")
-                    if parts:  # make sure the line isn't empty
-                        try:
-                            chromosomes_list.append([float(parts[1])])
-                        except ValueError:
-                            pass  # skip lines that don't have valid integers
+        if isinstance(current_file, str):
+
+            if current_file != "":
+                with open(current_file, "r") as file:
+                    for line in file:
+                        if line.startswith("#"):
+                            continue
+                        parts = line.strip().split(",")
+                        if parts:  # make sure the line isn't empty
+                            try:
+                                parts_list = []
+                                for i in range(1, len(parts)):
+                                    parts_list.append(float(parts[i]))
+                                chromosomes_list.append(parts_list)
+                            except ValueError:
+                                pass  # skip lines that don't have valid integers
+            else:
+                    chromosomes_list = [[1]] * self.num_bots
+
+        else:
+            chromosomes_list = current_file
         self.set_chromosome(chromosomes_list)
+        return chromosomes_list
 
     # default to groups being None,
     def start_round(self, sc_groups=None):
@@ -273,12 +299,12 @@ class Social_Choice_Sim:
 
         group = self.get_group()
 
-        return current_node_json, self.final_votes, winning_vote, self.current_options_matrix, self.bot_list_as_string, self.scenario_string, group, self.round, self.cycle
+        return current_node_json, self.final_votes, winning_vote, self.current_options_matrix, self.bot_list_as_string, self.scenario_string, group, self.round, self.cycle, self.chromosome_string
 
     def get_results(self):
         cooperation_score = self.cooperation_score / self.num_rounds  # as a percent, how often we cooperated. (had a non negative cause pass)
 
-        return self.results, cooperation_score, self.bot_type, self.num_rounds, self.scenario_string, self.group
+        return self.results, cooperation_score, self.bot_type, self.num_rounds, self.scenario_string, self.group, self.chromosome_string
 
     def get_everything_for_logger(self):
         self.create_player_nodes()

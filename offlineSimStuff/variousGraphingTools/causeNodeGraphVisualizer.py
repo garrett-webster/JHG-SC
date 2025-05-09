@@ -16,10 +16,8 @@ class causeNodeGraphVisualizer:
 
     #def create_graph(self, all_nodes, all_votes, winning_vote, current_options_matrix):
     def create_graph_with_sim(self, current_sim): # for right now, pass the cycle in. I might add him in later.
-        all_nodes, all_votes, winning_vote, current_options_matrix, bot_list, scenario, group, round, cycle = current_sim.prepare_graph()
-        self.create_graph(all_nodes, all_votes, winning_vote, current_options_matrix, bot_list, scenario, group, round, cycle)
-
-
+        all_nodes, all_votes, winning_vote, current_options_matrix, bot_list, scenario, group, round, cycle, chromosome = current_sim.prepare_graph()
+        self.create_graph(all_nodes, all_votes, winning_vote, current_options_matrix, bot_list, scenario, group, round, cycle, chromosome)
 
 
     def create_graph_given_file(self, dict):
@@ -35,9 +33,10 @@ class causeNodeGraphVisualizer:
         self.create_graph(all_nodes, all_votes, winning_vote, current_options_matrix, bot_list, scenario, group, curr_round, cycle)
 
 
-    def create_graph(self, all_nodes, all_votes, winning_vote, current_options_matrix, bot_list, scenario, group, curr_round, cycle):
+    def create_graph(self, all_nodes, all_votes, winning_vote, current_options_matrix, bot_list, scenario, group, curr_round, cycle, chromosome):
         bot_color_map = {
-            # 0 is random, 1 is socialWelfare, 2 is greedy, 3 is betterGreedy, 4 is limitedAwareness, 5 is secondChoice
+            # -1 is player, 0 is random, 1 is socialWelfare, 2 is greedy, 3 is betterGreedy, 4 is limitedAwareness, 5 is secondChoice
+            "-1": "black",
             "0": "purple",
             "1": "lightgreen",
             "2": "darkgreen",
@@ -49,6 +48,7 @@ class causeNodeGraphVisualizer:
         }
 
         bot_name_map = {
+            "-1": "player",
             "0": "random",
             "1": "socialWelfare",
             "2": "Greedy",
@@ -188,6 +188,6 @@ class causeNodeGraphVisualizer:
         full_path = os.path.join(dir_path, file_name)
 
         plt.savefig(full_path, dpi=300)  # I want it to have the round, and cycle, and that shoudl do it
-        #plt.show()
+        plt.show()
 
 

@@ -1,9 +1,8 @@
 import time
-from collections import Counter
 
 from Server.social_choice_sim import Social_Choice_Sim
 from Server.options_creation import generate_two_plus_one_groups
-
+from offlineSimStuff.variousGraphingTools.causeNodeGraphVisualizer import causeNodeGraphVisualizer
 
 def create_empty_vote_matrix(num_players):
     return [[0 for _ in range(num_players)] for _ in range(num_players)]
@@ -49,24 +48,19 @@ class SCManager:
     def play_social_choice_round(self):
         # Run the voting and collect the votes
         player_votes = self.run_sc_voting()
-        zero_idx_votes, one_idx_votes = self.compile_sc_votes(player_votes, self.current_options_matrix, self.round_num)
+        # this is the line where we get the bot votes as well.
+        previous_votes = {}
+        zero_idx_votes, one_idx_votes = self.compile_sc_votes(player_votes, self.round_num, self.vote_cycles, previous_votes) # no clue what cycle this is or why this runs.
+        self.sc_sim.set_final_votes(zero_idx_votes)
+        # this is weird garrett stuff Imma not touch it.
         self.update_vote_effects(zero_idx_votes, self.current_options_matrix,
                                  self.round_num)  # Tracks the effects of each player's vote on everyone else
 
+
         # Calculate the winning vote
-        total_votes = len(zero_idx_votes)
-        winning_vote_count = Counter(zero_idx_votes.values()).most_common(1)[0][1]
-        winning_vote = Counter(zero_idx_votes.values()).most_common(1)[0][0]
-
-        if not (winning_vote_count > total_votes // 2):
-            winning_vote = -1
-
-        # Apply the vote and send out the after round info
-        if winning_vote == -1:
-            new_utilities = {i: 0 for i in range(self.num_players)}
-        else:
-            self.sc_sim.apply_vote(winning_vote)
-            new_utilities = self.sc_sim.get_player_utility()
+        winning_vote, new_utilities = self.sc_sim.return_win(zero_idx_votes)
+        new_utilities = {i: new_utilities[i] for i in range(self.num_players)}
+        self.sc_sim.save_results()
 
         self.connection_manager.distribute_message("SC_OVER", self.round_num, winning_vote, new_utilities,
                                                    self.positive_vote_effects_history,
@@ -74,12 +68,15 @@ class SCManager:
                                                    self.current_options_matrix)
 
         time.sleep(.5)  # Without this, messages get sent out of order, and the sc_history gets screwed up.
+        current_visualizer = causeNodeGraphVisualizer()
+        current_visualizer.create_graph_with_sim(self.sc_sim)
         self.round_num += 1
         self.init_next_round()
 
     def run_sc_voting(self):
         player_votes = {}
         is_last_cycle = False
+        previous_votes = {}
 
         for cycle in range(self.vote_cycles):
             player_votes.clear()
@@ -89,15 +86,16 @@ class SCManager:
                 for response in responses.values():
                     player_votes[response["CLIENT_ID"]] = response["FINAL_VOTE"]
 
-            zero_idx_votes, one_idx_votes = self.compile_sc_votes(player_votes, self.current_options_matrix,
-                                                                  self.round_num)
+            zero_idx_votes, one_idx_votes = self.compile_sc_votes(player_votes,
+                                                                  self.round_num, cycle, previous_votes)
+            previous_votes = zero_idx_votes
             if cycle == self.vote_cycles - 1: is_last_cycle = True
             self.connection_manager.distribute_message("SC_VOTES", zero_idx_votes, cycle + 1, is_last_cycle)
 
         return player_votes
 
-    def compile_sc_votes(self, player_votes, current_options_matrix, round_num):
-        bot_votes = self.get_bot_votes(current_options_matrix)
+    def compile_sc_votes(self, player_votes, round_num, cycle, previous_votes):
+        bot_votes = self.sc_sim.get_votes(previous_votes, round_num, cycle)
 
         all_votes = {**bot_votes, **player_votes}
         all_votes_list = [option_num + 1 if option_num != -1 else -1 for option_num in
@@ -122,10 +120,5 @@ class SCManager:
                         self.negative_vote_effects_history[i][j] += vote_effect
         self.vote_effects_history[str(round_num)] = round_vote_effects
 
-    def get_bot_votes(self, current_options_matrix):
-        bot_options = current_options_matrix[:self.num_bots]
-        votes = {}
-        for bot_id, options in enumerate(bot_options):
-            votes[bot_id] = options.index(max(options))
-
-        return votes
+    def get_bot_votes(self):
+        self.sc_sim.get_votes()
