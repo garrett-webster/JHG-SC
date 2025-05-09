@@ -11,11 +11,12 @@ class ServerListener(QObject):
     update_sc_round_signal = pyqtSignal()
     disable_sc_buttons_signal = pyqtSignal()
     enable_jhg_buttons_signal = pyqtSignal()
-    jhg_over_signal = pyqtSignal()
+    jhg_over_signal = pyqtSignal(bool)
     update_sc_votes_signal = pyqtSignal(dict, int, bool)
     update_sc_utilities_labels_signal = pyqtSignal(int, dict, int, dict, list)
     update_tornado_graph_signal = pyqtSignal(Axes, list, list)
     update_sc_nodes_graph_signal = pyqtSignal(int)
+    switch_to_jhg_signal = pyqtSignal()
 
 
     def __init__(self, main_window, connection_manager, round_state, round_counter, token_label, jhg_popularity_graph, tabs, utility_qlabels):
@@ -56,9 +57,8 @@ class ServerListener(QObject):
 
     def JHG_OVER(self, message):
         self.round_state.influence_mat = np.array(message["INFLUENCE_MAT"])
-        self.tabs.setCurrentIndex(0)
         self.update_jhg_state(message)
-        self.jhg_over_signal.emit()
+        self.jhg_over_signal.emit(message["IS_LAST"])
 
 
     def SC_INIT(self, message):
@@ -91,7 +91,7 @@ class ServerListener(QObject):
         self.update_sc_nodes_graph_signal.emit(message["WINNING_VOTE"])
 
         # Switch to JHG
-        self.enable_jhg_buttons_signal.emit()
+        self.switch_to_jhg_signal.emit()
 
 
     def unknown_message_type_handler(self, message):

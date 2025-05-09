@@ -9,7 +9,7 @@ class JHGManager:
         self.jhg_sim = JHG_simulator(num_humans, num_players)
         self.num_bots = num_bots
 
-    def play_jhg_round(self, round_num):
+    def play_jhg_round(self, round_num, is_last_jhg_round):
         # Occasionally if the JHG round was played to quickly after the SC round, this would catch the SC vote and brick the server.
         # UPDATE: It appears that if the SC submit vote button is spammed quick enough, it would send an additional,
         # unexpected vote. That's the root cause that should get fixed, but this seems to stop it from breaking for now
@@ -30,7 +30,8 @@ class JHGManager:
         sent_dict, received_dict = self.get_sent_and_received(allocations_matrix)
         unique_messages = [received_dict, sent_dict]
         self.connection_manager.distribute_message("JHG_OVER", round_num, list(current_popularity),
-                                                   self.jhg_sim.get_influence().tolist(), unique_messages=unique_messages)
+                                                   self.jhg_sim.get_influence().tolist(), is_last_jhg_round,
+                                                   unique_messages=unique_messages)
 
         self.current_round += 1
 
