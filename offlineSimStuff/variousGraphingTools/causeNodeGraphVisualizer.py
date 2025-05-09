@@ -16,8 +16,8 @@ class causeNodeGraphVisualizer:
 
     #def create_graph(self, all_nodes, all_votes, winning_vote, current_options_matrix):
     def create_graph_with_sim(self, current_sim): # for right now, pass the cycle in. I might add him in later.
-        all_nodes, all_votes, winning_vote, current_options_matrix, bot_list, scenario, group, round, cycle, chromosome = current_sim.prepare_graph()
-        self.create_graph(all_nodes, all_votes, winning_vote, current_options_matrix, bot_list, scenario, group, round, cycle, chromosome)
+        all_nodes, all_votes, winning_vote, current_options_matrix, types_list, scenario, group, round, cycle, chromosome = current_sim.prepare_graph()
+        self.create_graph(all_nodes, all_votes, winning_vote, current_options_matrix, types_list, scenario, group, round, cycle, chromosome)
 
 
     def create_graph_given_file(self, dict):
@@ -29,11 +29,11 @@ class causeNodeGraphVisualizer:
         group = dict["group"]
         curr_round = dict["curr_round"]
         cycle = dict["cycle"]
-        bot_list = dict["bot_list"]
-        self.create_graph(all_nodes, all_votes, winning_vote, current_options_matrix, bot_list, scenario, group, curr_round, cycle)
+        types_list = dict["types_list"]
+        self.create_graph(all_nodes, all_votes, winning_vote, current_options_matrix, types_list, scenario, group, curr_round, cycle)
 
 
-    def create_graph(self, all_nodes, all_votes, winning_vote, current_options_matrix, bot_list, scenario, group, curr_round, cycle, chromosome):
+    def create_graph(self, all_nodes, all_votes, winning_vote, current_options_matrix, types_list, scenario, group, curr_round, cycle, chromosome):
         bot_color_map = {
             # -1 is player, 0 is random, 1 is socialWelfare, 2 is greedy, 3 is betterGreedy, 4 is limitedAwareness, 5 is secondChoice
             "-1": "black",
@@ -133,7 +133,7 @@ class causeNodeGraphVisualizer:
                 ax.add_patch(shape)
             elif node_type == "PLAYER":
                 string = node["text"].split(" ")
-                id = bot_list[int(string[1]) - 1]
+                id = types_list[int(string[1]) - 1]
                 used_bot_types.add(str(id))
                 color = bot_color_map[str(id)]
                 shape = plt.Circle((x, y), 0.7, color=color, ec='black', zorder=2)

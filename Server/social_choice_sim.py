@@ -22,58 +22,67 @@ NUM_CAUSES = 3
 
 class Social_Choice_Sim:
     def __init__(self, total_players, num_causes, num_humans, cycle=0, round=0, chromosomes="", scenario="", group=""):
+        # just a bunch of base setters.
         self.total_players = total_players
         self.num_humans = num_humans
         self.num_bots = total_players - num_humans
-        self.chromosomes = chromosomes
+        self.num_causes = num_causes
+        self.cycle = cycle # set these for graphing and logging purposes, we usually set these round by round and cycle by cycle for logging purposes.
+        self.round = round
+        self.rad = 5  # used for graphing the dots on the board.
+
+
+        self.players = self.create_players() # ??? This might be used for multiplayer functionality.
+        self.causes = self.create_cause_nodes() # graphing stuff.
+        self.player_nodes = [] # also graphing stuff.
+
+        self.chromosome_string = "" # holds the file name of the chromosome baering file.
+        self.chromosomes = self.set_chromosomes(chromosomes) # self.chromosomes contains the full list of all chromosomes.
+
+        # sets the scenario
+        self.scenario_string = Path(scenario).name
+
+        # create the bots, first getting number and type from scenario and then setting the chromosomes from the chromsomes.
         self.bot_type = self.set_bot_list(scenario)
         self.bots = self.create_bots()
-        self.scenario = scenario
-        self.set_chromosomes(chromosomes)
+        self.bot_list_as_string = self.create_bot_list_as_string(self.bots)
+        self.set_bot_chromosomes(self.chromosomes)
 
-        self.players = self.create_players()
-        self.num_causes = num_causes
-        self.rad = 5  # hardcoded just work with me here
-        self.causes = self.create_cause_nodes()
-        self.current_options_matrix = {}
-        self.player_nodes = []
-        self.all_votes = {}
-
-        self.current_votes = [] # we need to add support for if anyone else has cast a vote. Right now it doesn't reall matter
-        self.options_matrix = None
-        self.cycle = cycle
-        self.round = round
-        self.results = {} # holds all of our results from long term simulations before graphing.
-        self.cooperation_score = 0
-        self.num_rounds = 0
-        self.all_votes = {} # yeah lets just keep track of all of em. requires passing the round through and resetting them.
+        # group stuff - all used under set group, and then there are defualts just in case.
         self.group = -1 # doesn't exist, let me know it hasn't been set.
         self.sc_groups = -1 # no group exists, can ignore.
-        self.current_results = [] # holds the results from the last "return win" call, which we can access later.
-        self.scenario_string = Path(self.get_scenario()).name
-        # sometimes I just be putting in the actual chromosome instead of reading it from files. sue me.
-        self.chromosome_string = self.set_chromosome(chromosomes)
-        self.bot_list_as_string = self.create_bot_list_as_string(self.bots)
         self.group_option = group
-        self.results = {}  # for graphing purposes, kind of.
-        for i in range(self.total_players):  # total_players
-            self.results[i] = []  # just throw in all the utilites
-        self.total_bots = 0
 
+        # the bread and butter of the sim. set under start round.
+        self.current_options_matrix = {}
+
+        # holds all the results from all the games we have played with this current sim
+        self.results = {} # holds all of our results from long term simulations before graphing.
+        self.cooperation_score = 0
+        self.num_rounds = 0 # used in various spots for graphing and whatnot. not terribly important.
+        self.current_results = [] # holds the results from the last "return win" call, which we can access later.
+        self.results = self.create_results()  # dict key: player id, attribute: list of all utility changes per round.
         self.total_types = self.create_total_types() # holds EVERYONE. now we gotta do a significant amount of refactoring.
 
+
+
+
+    def create_results(self):
+        self.results = {}
+        for i in range(self.total_players):  # total_players
+            self.results[i] = []  # just throw in all the utilites
+        return self.results
+
+
     def set_chromosome(self, chromosomes):
-        if isinstance(self.get_chromosome(), str):
-            self.chromosome_string = Path(self.get_chromosome()).name
-        else:
-            self.chromosome_string = str(self.get_chromosome())
+        self.chromosome_string = Path(chromosomes).name
         return self.chromosome_string
 
 
     def create_total_types(self):
         self.total_types = self.bot_type
         if self.total_players != self.num_humans or self.total_players != self.num_bots: # if there is a mistmatch
-            for player in range(self.total_players):
+            for player in range(self.total_players - self.num_bots):
                 self.total_types.insert(0, -1)
         return self.total_types
 
@@ -90,12 +99,8 @@ class Social_Choice_Sim:
 
     def create_bots(self):
         bots_array = []
-        self.total_bots = 0
-        for bot in self.bot_type:
-            if bot > 0:
-                self.total_bots += 1
 
-        if self.total_bots != self.num_bots:
+        if len(self.bot_type) != self.num_bots:
             print("THERE HAS BEEN AN ERROR!! WAAAH")
             return # early return, blow everything up.
         else:
@@ -132,8 +137,8 @@ class Social_Choice_Sim:
         return players
 
 
-    def set_chromosome(self, chromosomes):
-        if len(chromosomes) != self.total_bots:
+    def set_bot_chromosomes(self, chromosomes):
+        if len(chromosomes) != len(self.bot_type):
             print("WRONG WRONG WRONG")
         else:
             for i in range(len(self.bots)):
@@ -142,22 +147,23 @@ class Social_Choice_Sim:
 
     def apply_vote(self, winning_vote):
         for i in range(self.total_players):
-            self.players[str(i)] += self.options_matrix[i][int(winning_vote)]
+            self.players[str(i)] += self.current_options_matrix[i][int(winning_vote)]
 
 
     def create_options_matrix(self):
         if self.sc_groups != -1:
-            self.options_matrix = generate_two_plus_one_groups_options_best_of_three(self.sc_groups)
+            self.current_options_matrix = generate_two_plus_one_groups_options_best_of_three(self.sc_groups)
         else: # so we have to generate noise to try and "mimic" the other stuff.
-            self.options_matrix = [[random.randint(-8, 8) for _ in range(self.num_causes)] for _ in range(self.total_players)]
+            self.current_options_matrix = [[random.randint(-8, 8) for _ in range(self.num_causes)] for _ in range(self.total_players)]
             noise_matrix = [[random.choice([-2, 2]) for _ in range(self.num_causes)] for _ in range(self.total_players)]
-            self.options_matrix = [
+            self.current_options_matrix = [
                 [original + noise for original, noise in zip(row, noise_row)]
-                for row, noise_row in zip(self.options_matrix, noise_matrix)
+                for row, noise_row in zip(self.current_options_matrix, noise_matrix)
             ]
-        return self.options_matrix # because why not
+        return self.current_options_matrix # because why not
 
-
+    def get_scenario(self):
+        return self.scenario_string
 
     def get_chromosome(self):
         return self.chromosomes
@@ -205,9 +211,6 @@ class Social_Choice_Sim:
     def get_group(self):
         return self.group
 
-    def get_scenario(self):
-        return self.scenario
-
 
     def get_votes(self, previous_votes=None, round=0, cycle=0): # generic get votes for all bot types. Not optimized for a single chromosome
         self.round = round
@@ -221,7 +224,6 @@ class Social_Choice_Sim:
                 bot_votes[i] = final_votes
 
         self.final_votes = bot_votes
-        self.all_votes[round] = bot_votes # that way we have it organized per round and we can see the final votes. also allows us to throw stuff in.
 
         return bot_votes
 
@@ -265,7 +267,6 @@ class Social_Choice_Sim:
             num_bots = self.total_players - self.num_humans
             bot_types = [2] * num_bots
 
-        self.scenario = current_file
         return bot_types
 
     def set_chromosomes(self, current_file):
@@ -291,7 +292,7 @@ class Social_Choice_Sim:
 
         else:
             chromosomes_list = current_file
-        self.set_chromosome(chromosomes_list)
+        self.chromosome_string = Path(current_file).name
         return chromosomes_list
 
     # default to groups being None,
@@ -339,11 +340,11 @@ class Social_Choice_Sim:
 
         group = self.get_group()
 
-        return current_node_json, self.final_votes, winning_vote, self.current_options_matrix, self.bot_list_as_string, self.scenario_string, group, self.round, self.cycle, self.chromosome_string
+        return current_node_json, self.final_votes, winning_vote, self.current_options_matrix, self.total_types, self.scenario_string, group, self.round, self.cycle, self.chromosome_string
 
     def get_results(self):
         cooperation_score = self.cooperation_score / self.num_rounds  # as a percent, how often we cooperated. (had a non negative cause pass)
-        return self.results, cooperation_score, self.bot_type, self.num_rounds, self.scenario_string, self.group, self.chromosome_string
+        return self.results, cooperation_score, self.total_types, self.num_rounds, self.scenario_string, self.group, self.chromosome_string
 
     def get_everything_for_logger(self):
         self.create_player_nodes()
@@ -358,7 +359,7 @@ class Social_Choice_Sim:
         cooperation_score = self.cooperation_score / self.num_rounds  # as a percent, how often we cooperated. (had a non negative cause pass)
 
 
-        return current_node_json, self.final_votes, winning_vote, self.current_options_matrix, self.results, cooperation_score, self.bot_type, self.num_rounds, self.scenario_string, self.group, self.cycle, self.round
+        return current_node_json, self.final_votes, winning_vote, self.current_options_matrix, self.results, cooperation_score, self.total_types, self.num_rounds, self.scenario_string, self.group, self.cycle, self.round
 
     def create_bot_list_as_string(self, bots_list):
         bots_as_string = []
@@ -393,7 +394,7 @@ class Social_Choice_Sim:
             curr_negatives = []
             for cause_index in range(NUM_CAUSES):  # completely populate this fetcher first.
                 # keep track of negatives
-                if (self.options_matrix[i][cause_index]) < 0:
+                if (self.current_options_matrix[i][cause_index]) < 0:
                     curr_negatives.append(1)
                 else:
                     curr_negatives.append(0)

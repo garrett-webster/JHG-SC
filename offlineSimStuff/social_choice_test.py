@@ -63,16 +63,16 @@ def create_sim(scenario=None, chromosomes=None, group=""):
 
 
 if __name__ == "__main__":
-    num_rounds = 10000
+    num_rounds = 10
     num_cycles = 3
-    create_graphs = False
+    create_graphs = True
     total_groups = ["", 0, 1, 2]
     chromosomes_directory = "testChromosome"
     group = ""
     scenario = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\offlineSimStuff\scenarioIndicator\somewhatMoreAwareGreedy"
     chromosome = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\offlineSimStuff\chromosomes\highestFromTesting"
     current_sim = create_sim(scenario, chromosome, group)
-    updated_sim = run_trial(current_sim, num_rounds, num_cycles, False, group)
+    updated_sim = run_trial(current_sim, num_rounds, num_cycles, create_graphs, group)
     current_visualizer = longTermGrapher()
     current_visualizer.draw_graph_from_sim(updated_sim)
 

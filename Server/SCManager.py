@@ -17,7 +17,9 @@ class SCManager:
         self.utilities = {i: 0 for i in range(num_humans)}
         # num_humans, bot_type
         # so the arguments here are total_players, likely type bot and group option, if I had to guess.
-        self.sc_sim = Social_Choice_Sim(num_players, 3, num_humans, 3, 0, "", "", "")
+        scenario = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\offlineSimStuff\scenarioIndicator\somewhatMoreAwareGreedy"
+        chromosomes = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\offlineSimStuff\chromosomes\highestFromTesting"
+        self.sc_sim = Social_Choice_Sim(num_players, 3, num_humans, 3, 0, chromosomes, scenario, "")
         self.sc_groups = generate_two_plus_one_groups(num_players, sc_group_option)
         self.num_players = num_players
         self.num_bots = num_bots
@@ -62,6 +64,8 @@ class SCManager:
         new_utilities = {i: new_utilities[i] for i in range(self.num_players)}
         self.sc_sim.save_results()
 
+
+
         self.connection_manager.distribute_message("SC_OVER", self.round_num, winning_vote, new_utilities,
                                                    self.positive_vote_effects_history,
                                                    self.negative_vote_effects_history, zero_idx_votes,
@@ -88,7 +92,7 @@ class SCManager:
 
             zero_idx_votes, one_idx_votes = self.compile_sc_votes(player_votes,
                                                                   self.round_num, cycle, previous_votes)
-            previous_votes = zero_idx_votes
+            previous_votes[cycle] = zero_idx_votes
             if cycle == self.vote_cycles - 1: is_last_cycle = True
             self.connection_manager.distribute_message("SC_VOTES", zero_idx_votes, cycle + 1, is_last_cycle)
 

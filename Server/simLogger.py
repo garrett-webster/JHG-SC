@@ -9,9 +9,9 @@ class simLogger:
         self.sim = current_sim
 
     def record_individual_round(self):
-        all_nodes, all_votes, winning_vote, current_options_matrix, bot_list, scenario, group, curr_round, cycle, chromosome = self.sim.prepare_graph()
+        all_nodes, all_votes, winning_vote, current_options_matrix, types_list, scenario, group, curr_round, cycle, chromosome = self.sim.prepare_graph()
         total_data = {}
-        total_data["bot_list"] = bot_list
+        total_data["types_list"] = types_list
         total_data["all_nodes"] = all_nodes
         new_votes = copy.deepcopy(all_votes)
         total_data["all_votes"] = new_votes
