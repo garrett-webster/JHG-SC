@@ -11,7 +11,7 @@ OPTIONS = {
     "MAX_ROUNDS": 2,
     "SC_GROUP_OPTION": 2, # See options_creation.py -> group_size_options to understand what this means
     "SC_VOTE_CYCLES": 3,
-    "JHG_LOGGING": True,
+    "JHG_LOGGING": False,
     "SC_LOGGING": False,
 }
 OPTIONS["NUM_BOTS"] =  OPTIONS["TOTAL_PLAYERS"] - OPTIONS["NUM_HUMANS"]
@@ -35,7 +35,7 @@ class Server():
         self.connection_manager = ServerConnectionManager(host, port, OPTIONS["TOTAL_PLAYERS"], OPTIONS["NUM_BOTS"])
         self.JHG_manager = JHGManager(self.connection_manager, self.num_humans, self.num_players, self.num_bots, self.JHG_logging)
         self.SC_manager = SCManager(self.connection_manager, self.num_humans, self.num_players, self.num_bots,
-                                    self.sc_group_option, self.sc_vote_cycles)
+                                    self.sc_group_option, self.sc_vote_cycles, self.SC_logging)
         print("Server started")
 
         # Halts execution until enough players have joined

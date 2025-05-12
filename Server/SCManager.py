@@ -10,7 +10,7 @@ def create_empty_vote_matrix(num_players):
 
 
 class SCManager:
-    def __init__(self, connection_manager, num_humans, num_players, num_bots, sc_group_option, vote_cycles):
+    def __init__(self, connection_manager, num_humans, num_players, num_bots, sc_group_option, vote_cycles, sc_logging):
         self.connection_manager = connection_manager
         self.round_num = 1
         self.save_dict = {}
@@ -34,6 +34,8 @@ class SCManager:
         self.vote_effects_history = {}
         self.positive_vote_effects_history = create_empty_vote_matrix(num_players)
         self.negative_vote_effects_history = create_empty_vote_matrix(num_players)
+
+        self.sc_logger = sc_logging
 
     def init_next_round(self):
         # Initialize the round
@@ -73,8 +75,9 @@ class SCManager:
                                                    self.current_options_matrix)
 
         time.sleep(.5)  # Without this, messages get sent out of order, and the sc_history gets screwed up.
-        current_visualizer = causeNodeGraphVisualizer()
-        current_visualizer.create_graph_with_sim(self.sc_sim)
+        if self.sc_logger:
+            current_visualizer = causeNodeGraphVisualizer()
+            current_visualizer.create_graph_with_sim(self.sc_sim)
         self.round_num += 1
         self.init_next_round()
 
