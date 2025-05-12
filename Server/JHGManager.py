@@ -28,7 +28,7 @@ class JHGManager:
 
         # Creates a 2d array where each row corresponds to the allocation list of the player with the associated id
         allocations_matrix = self.jhg_sim.get_T()
-        self.currentLogger.record_individual_round()
+        self.currentLogger.add_round_to_overview(round_num) # just throw the round num in, the sim is already in there
 
 
         sent_dict, received_dict = self.get_sent_and_received(allocations_matrix)
@@ -57,3 +57,6 @@ class JHGManager:
             received_dict[client_id] = received
 
         return sent_dict, received_dict
+
+    def log_jhg_overview(self):
+        self.currentLogger.conclude_overview()

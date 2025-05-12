@@ -8,7 +8,7 @@ OPTIONS = {
     "NUM_HUMANS": 1,
     "TOTAL_PLAYERS": 12,
     "JHG_ROUNDS_PER_SC_ROUND" : 1,
-    "MAX_ROUNDS": 1000,
+    "MAX_ROUNDS": 5,
     "SC_GROUP_OPTION": 2, # See options_creation.py -> group_size_options to understand what this means
     "SC_VOTE_CYCLES": 3,
 }
@@ -48,6 +48,7 @@ class Server():
                 self.JHG_manager.play_jhg_round(self.JHG_manager.current_round, is_last_jhg_round)
             self.SC_manager.play_social_choice_round()
             print("New round")
+        self.JHG_manager.log_jhg_overview()
 
         print("game over")
 
