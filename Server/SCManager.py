@@ -3,6 +3,7 @@ import time
 from Server.social_choice_sim import Social_Choice_Sim
 from Server.options_creation import generate_two_plus_one_groups
 from offlineSimStuff.variousGraphingTools.causeNodeGraphVisualizer import causeNodeGraphVisualizer
+import os
 
 def create_empty_vote_matrix(num_players):
     return [[0 for _ in range(num_players)] for _ in range(num_players)]
@@ -17,8 +18,8 @@ class SCManager:
         self.utilities = {i: 0 for i in range(num_humans)}
         # num_humans, bot_type
         # so the arguments here are total_players, likely type bot and group option, if I had to guess.
-        scenario = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\offlineSimStuff\scenarioIndicator\somewhatMoreAwareGreedy"
-        chromosomes = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\offlineSimStuff\chromosomes\highestFromTesting"
+        scenario = "../JHG-SC/offlineSimStuff/scenarioIndicator/somewhatMoreAwareGreedy"
+        chromosomes = "../JHG-SC/offlineSimStuff/chromosomes/highestFromTesting"
         self.sc_sim = Social_Choice_Sim(num_players, 3, num_humans, 3, 0, chromosomes, scenario, "")
         self.sc_groups = generate_two_plus_one_groups(num_players, sc_group_option)
         self.num_players = num_players
