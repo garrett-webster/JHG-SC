@@ -150,7 +150,13 @@ class GeneAgent3(AbstractAgent):
         self.theTracked = self.getTracked()
         self.played_genes = True
 
-        fp = open("Server/Engine/rnums.txt", "r")
+        try:
+            fp = open("Server/Engine/rnums.txt", "r")
+        except FileNotFoundError:
+            try:
+                fp = open("C:/Users/Sean/Documents/GitHub/OtherGarrettStuff/JHG-SC/Server/Engine/rnums.txt")
+            except FileNotFoundError:
+                return "man you stupid"
 
         self.randNums = []
         for i in range(0,10000):
@@ -169,7 +175,11 @@ class GeneAgent3(AbstractAgent):
 
 
     def getTracked(self):
-        f = open("Server/Engine/theTracked.txt", "r")
+        try:
+            f = open("Server/Engine/theTracked.txt", "r")
+        except FileNotFoundError:
+            f = open("C:/Users/Sean/Documents/GitHub/OtherGarrettStuff/JHG-SC/Server/Engine/theTracked.txt")
+
         val = int(f.readline())
         f.close()
 

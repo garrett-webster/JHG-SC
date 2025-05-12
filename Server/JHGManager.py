@@ -1,4 +1,5 @@
 from Server.sim_interface import JHG_simulator
+from Server.jhgLogger import JHGLogger
 
 
 class JHGManager:
@@ -8,6 +9,7 @@ class JHGManager:
         self.num_players = num_players
         self.jhg_sim = JHG_simulator(num_humans, num_players)
         self.num_bots = num_bots
+        self.currentLogger : JHGLogger = JHGLogger(self.jhg_sim)
 
     def play_jhg_round(self, round_num, is_last_jhg_round):
         # Occasionally if the JHG round was played to quickly after the SC round, this would catch the SC vote and brick the server.
@@ -26,6 +28,8 @@ class JHGManager:
 
         # Creates a 2d array where each row corresponds to the allocation list of the player with the associated id
         allocations_matrix = self.jhg_sim.get_T()
+        self.currentLogger.record_individual_round()
+
 
         sent_dict, received_dict = self.get_sent_and_received(allocations_matrix)
         unique_messages = [received_dict, sent_dict]

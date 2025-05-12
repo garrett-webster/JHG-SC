@@ -114,6 +114,7 @@ class JHG_simulator():
         return self.sim.get_popularity() # I think this is all we need? maybe?
 
 
+
     def define_initial_pops(self, init_pop, num_players):
         base_pop = 100
 
@@ -166,13 +167,22 @@ class JHG_simulator():
     def get_influence(self):
         return self.sim.get_influence()
 
+    def individual_round_deets_for_logger(self):
+        return self.sim.get_transaction(), self.sim.get_popularity(), self.sim.get_influence()
+
 
 def loadPopulationFromFile(popSize, generationFolder, startIndex, num_gene_pools):
-    fnombre = generationFolder + "/gen_" + str(startIndex) + ".csv"
-    fp = open(fnombre, "r")
-    if fp.closed:
-        print(fnombre + " not found")
-        quit()
+    fnombre = "Kill me"
+    try:
+        fnombre = generationFolder + "/gen_" + str(startIndex) + ".csv"
+        fp = open(fnombre, "r")
+    except FileNotFoundError:
+        try:
+            fnombre = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\Server\Engine\gen_199.csv"
+            fp = open(fnombre, "r")
+        except FileNotFoundError:
+            print(fnombre + " not found")
+            quit()
 
     thePopulation = []
 

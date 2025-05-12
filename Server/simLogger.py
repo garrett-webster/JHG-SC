@@ -23,7 +23,7 @@ class simLogger:
         total_data["cycle"] = cycle
         total_data["chromosome"] = chromosome
         my_path = os.path.dirname(os.path.abspath(__file__))
-        filename = "logs_repo/individual_round/" + " scenario" + str(scenario) + "groups" + str(group) + "round" + str(
+        filename = "sc_logs_repo/individual_round/" + " scenario" + str(scenario) + "groups" + str(group) + "round" + str(
             curr_round) + "cycle" + str(cycle) + "chromosome" + str(chromosome) + ".json"
         file_path = os.path.join(my_path, filename)
 
@@ -41,7 +41,7 @@ class simLogger:
         total_data["group"] = group
         total_data["chromosome"] = chromosome
         my_path = os.path.dirname(os.path.abspath(__file__))
-        filename = "logs_repo/big_picture/" + " scenario" + str(scenario) + "groups" + str(group) + "chromosome" + str(chromosome) + ".json"
+        filename = "sc_logs_repo/big_picture/" + " scenario" + str(scenario) + "groups" + str(group) + "chromosome" + str(chromosome) + ".json"
         file_path = os.path.join(my_path, filename)
 
         with open(file_path, "w") as file:
@@ -68,7 +68,7 @@ class simLogger:
         total_data["results"] = results
 
         my_path = os.path.dirname(os.path.abspath(__file__))
-        filename = "logs_repo/test/" + " scenario" + str(scenario) + "groups" + str(group) + "round" + str(curr_round) + "cycle" + str(cycle) + ".json"
+        filename = "sc_logs_repo/test/" + " scenario" + str(scenario) + "groups" + str(group) + "round" + str(curr_round) + "cycle" + str(cycle) + ".json"
         file_path = os.path.join(my_path, filename)
 
         with open(file_path, "w") as file:

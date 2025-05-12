@@ -19,6 +19,11 @@ class causeNodeGraphVisualizer:
         all_nodes, all_votes, winning_vote, current_options_matrix, types_list, scenario, group, round, cycle, chromosome = current_sim.prepare_graph()
         self.create_graph(all_nodes, all_votes, winning_vote, current_options_matrix, types_list, scenario, group, round, cycle, chromosome)
 
+    def create_graph_with_sim_vote_ovverride(self, current_sim, new_votes):
+        all_nodes, all_votes, winning_vote, current_options_matrix, types_list, scenario, group, round, cycle, chromosome = current_sim.prepare_graph()
+        self.create_graph(all_nodes, new_votes, winning_vote, current_options_matrix, types_list, scenario, group,
+                          round, cycle, chromosome)
+
 
     def create_graph_given_file(self, dict):
         all_votes = dict["all_votes"]
