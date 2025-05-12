@@ -15,15 +15,16 @@ def run_trial(sim, num_rounds, create_graphs):
         print("this is the current popularity ", current_popularity)
         currentLogger.add_round_to_overview(round)
 
-        time.sleep(1)
+        #time.sleep(1)
         # problem is I can't control the allocations here, which is a bust.
+    currentLogger.write_official_version()
 
 
 if __name__ == '__main__':
     num_players = 12
     num_humans = 0 # I Don't want any players. does that make this harder? Yes! I am gonna ignore that for now.
     create_graphs = True
-    num_rounds = 10
+    num_rounds = 2
     current_sim = create_sim(num_players, num_humans)
 
 

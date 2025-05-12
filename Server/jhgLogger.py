@@ -2,6 +2,9 @@ import json
 import os
 from datetime import datetime
 from operator import truediv
+
+from fontTools.pens.basePen import NullPen
+
 from Client.combinedLayout.colors import COLORS
 
 
@@ -10,9 +13,10 @@ class JHGLogger():
     def __init__(self, jhg_sim):
         self.jhg_sim = jhg_sim
         self.big_boy_data = {}
-        self.big_boy_data["Popularity"] = {}
-        self.big_boy_data["Influence"] = {}
-        self.big_boy_data["T"] = {}
+        # self.big_boy_data["Popularity"] = {}
+        # self.big_boy_data["Influence"] = {}
+        # self.big_boy_data["T"] = {}
+        self.start_time = datetime.now()
 
 
     def record_individual_round(self):
@@ -34,9 +38,9 @@ class JHGLogger():
         # gonna keep with with round first, then key. just becuase, why not.
         T, popularity, influence = self.jhg_sim.individual_round_deets_for_logger()
         self.big_boy_data[round_num] = {}
-        self.big_boy_data[round_num]["Popularity"] = popularity
-        self.big_boy_data[round_num]["Influence"] = influence
-        self.big_boy_data[round_num]["T"] = T
+        self.big_boy_data[round_num]["Popularity"] = popularity.tolist()
+        self.big_boy_data[round_num]["Influence"] = influence.tolist()
+        self.big_boy_data[round_num]["T"] = T.tolist()
         # self.big_boy_data["Popularity"][round_num] = popularity.tolist()
         # self.big_boy_data["Influence"][round_num] = influence.tolist()
         # self.big_boy_data["T"][round_num] = T.tolist()
@@ -150,7 +154,7 @@ class JHGLogger():
 
         # player time. this is where stuff gets real.
         player_list = []
-        for i, in range(len(self.jhg_sim.num_players)):
+        for i in range(self.jhg_sim.num_players):
             new_player = {}
             new_player["name"] = str(i) # we don't technically have support for this
             new_player["permissionLevel"] = "regular"
@@ -170,14 +174,70 @@ class JHGLogger():
         # so row 10 spot 0 is from player 10 to player 0. this will be useful.
         num_tokens = self.jhg_sim.num_players * 2
 
-        for round in self.big_boy_data:
-            current_transaction_matrix = self.big_boy_data[round]["T"]
+        # literally zero clue if this works.
+        all_rounds = {}
+        for round in range(len(self.big_boy_data[next(iter(self.big_boy_data))])-1):
+            current_transaction_matrix = self.big_boy_data[int(round)]["T"]
             current_round = {}
-            for i in range(len(self.jhg_sim.num_players)):
-                current_name = str(i)
-                allocations = []
-                for allocation in range(len(current_transaction_matrix[i])):
-                    allocations.append() # tuple here. kill me.
+            for i in range(self.jhg_sim.num_players):
+                allocations = {}
+                for j in range(len(current_transaction_matrix[i])):
+                    allocations[str(j)] = current_transaction_matrix[i][j] * num_tokens
+                current_round[i] = allocations
+            all_rounds[round] = current_round
+
+        total_data["transactions"] = all_rounds
+
+        total_data["voteData"] = None
+
+        player_round_info = {} # literally no clue what this is supposed to do or how to populate it
+
+        total_data["playerRoundInfo"] = player_round_info
+
+        total_data["influences"] = {} # not sure how to populate this either actually.
+
+        # lots of problems within this particualr loop.
+        popularities = {}
+        for round in range(len(self.big_boy_data[next(iter(self.big_boy_data))])-1):
+            current_round = {}
+            for i, player in enumerate(self.big_boy_data[int(round)]["Popularity"]):
+                current_round[str(i)] = self.big_boy_data[int(round)]["Popularity"]
+
+            popularities[str(round)] = current_round
+
+
+        total_data["popularities"] = popularities
+
+        total_data["groups"] = {} # we don't support that feature in this version. its just not there.
+
+        total_data["start_date_time"] = self.start_time.strftime("%Y%m%d_%H%M%S")
+
+
+        chat_info = {}
+        chat_info["global"] = {} # nothing in there
+        total_data["chatInfo"] = chat_info
+
+
+        government_round_info = {}
+        government_round_info["governmentPlayerNames"] = None
+        government_round_info["round"] = 0
+        government_round_info["playerVoteBallots"] = None
+        government_round_info["customRoundInfo"] = {}
+
+        total_data["governmentRoundInfo"] = government_round_info
+
+        total_data["colorGroups"] = []
+
+        my_path = os.path.dirname(os.path.abspath(__file__))
+        file_name = "formalStyleConclusion.json"
+        file_path = os.path.join(my_path, file_name)
+        with open(file_path, "w") as outfile:
+            json.dump(total_data, outfile, indent=4)
+
+
+
+
+
 
 
 
