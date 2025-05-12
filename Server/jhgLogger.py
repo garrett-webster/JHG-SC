@@ -2,6 +2,8 @@ import json
 import os
 from datetime import datetime
 from operator import truediv
+from Client.combinedLayout.colors import COLORS
+
 
 
 class JHGLogger():
@@ -29,10 +31,15 @@ class JHGLogger():
             json.dump(total_data, file, indent=4)
 
     def add_round_to_overview(self, round_num):
+        # gonna keep with with round first, then key. just becuase, why not.
         T, popularity, influence = self.jhg_sim.individual_round_deets_for_logger()
-        self.big_boy_data["Popularity"][round_num] = popularity.tolist()
-        self.big_boy_data["Influence"][round_num] = influence.tolist()
-        self.big_boy_data["T"][round_num] = T.tolist()
+        self.big_boy_data[round_num] = {}
+        self.big_boy_data[round_num]["Popularity"] = popularity.tolist()
+        self.big_boy_data[round_num]["Influence"] = influence.tolist()
+        self.big_boy_data[round_num]["T"] = T.tolist()
+        # self.big_boy_data["Popularity"][round_num] = popularity.tolist()
+        # self.big_boy_data["Influence"][round_num] = influence.tolist()
+        # self.big_boy_data["T"][round_num] = T.tolist()
 
     def conclude_overview(self):
         my_path = os.path.dirname(os.path.abspath(__file__))
@@ -57,6 +64,8 @@ class JHGLogger():
 
 
     def write_official_version(self):
+
+
         total_data = {}
         total_data["status"] = "started"
         # set up the lobby dict
@@ -140,7 +149,29 @@ class JHGLogger():
         total_data["end_condition"] = end_condition
 
         # player time. this is where stuff gets real.
+        player_list = []
+        for i, in range(len(self.jhg_sim.num_players)):
+            new_player = {}
+            new_player["name"] = str(i) # we don't technically have support for this
+            new_player["permissionLevel"] = "regular"
+            new_player["game_name"] = str(i)
+            new_player["color"] = COLORS[i]
+            new_player["hue"] = None
+            new_player["avatar"] = None
+            new_player["Icon"] = None
+            player_list.append(new_player)
 
-        # fetch it I don't like it. you know where to find it if you need it.
+
+        total_data["players"] = player_list
+        total_data["observers"] = [] # we don't even ahve this functionality built in yet.
+        total_data["Transactions"] = {}
+
+        # so after doing some play tests, I can conclude that its written from to
+        # so row 10 spot 0 is from player 10 to player 0. this will be useful.
+        num_tokens = self.jhg_sim.num_players * 2
+
+        for round in self.big_boy_data:
+            current_transaction_matrix = self.big_boy_data[round]["T"]
+            
 
 

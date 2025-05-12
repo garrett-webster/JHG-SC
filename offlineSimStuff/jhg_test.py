@@ -7,17 +7,17 @@ def create_sim(num_players, num_humans):
     return current_sim
 
 def run_trial(sim, num_rounds, create_graphs):
-    big_boy_kush = {}
+
     currentLogger: JHGLogger = JHGLogger(current_sim)
     current_sim.start_game(num_humans, num_players)
     for round in range(num_rounds):
-        big_boy_kush[round] = {}
         current_popularity = current_sim.execute_round(None, round)
         print("this is the current popularity ", current_popularity)
-        currentLogger.record_individual_round()
-        big_boy_kush[round]["Popularity"] = current_popularity
+        currentLogger.add_round_to_overview(round)
+
         time.sleep(1)
-    currentLogger.record_longer_vision(big_boy_kush)
+        # problem is I can't control the allocations here, which is a bust.
+
 
 if __name__ == '__main__':
     num_players = 12
