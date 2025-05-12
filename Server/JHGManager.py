@@ -3,13 +3,14 @@ from Server.jhgLogger import JHGLogger
 
 
 class JHGManager:
-    def __init__(self, connection_manager, num_humans, num_players, num_bots):
+    def __init__(self, connection_manager, num_humans, num_players, num_bots, jhg_logging):
         self.current_round = 1
         self.connection_manager = connection_manager
         self.num_players = num_players
         self.jhg_sim = JHG_simulator(num_humans, num_players)
         self.num_bots = num_bots
         self.currentLogger : JHGLogger = JHGLogger(self.jhg_sim)
+        self.jhg_logging = jhg_logging
 
     def play_jhg_round(self, round_num, is_last_jhg_round):
         # Occasionally if the JHG round was played to quickly after the SC round, this would catch the SC vote and brick the server.
@@ -28,7 +29,8 @@ class JHGManager:
 
         # Creates a 2d array where each row corresponds to the allocation list of the player with the associated id
         allocations_matrix = self.jhg_sim.get_T()
-        self.currentLogger.add_round_to_overview(round_num) # just throw the round num in, the sim is already in there
+        if self.jhg_logging:
+            self.currentLogger.add_round_to_overview(round_num) # just throw the round num in, the sim is already in there
 
 
         sent_dict, received_dict = self.get_sent_and_received(allocations_matrix)
@@ -59,4 +61,5 @@ class JHGManager:
         return sent_dict, received_dict
 
     def log_jhg_overview(self):
-        self.currentLogger.conclude_overview()
+        if self.jhg_logging:
+            self.currentLogger.conclude_overview()

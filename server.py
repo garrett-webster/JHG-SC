@@ -8,9 +8,11 @@ OPTIONS = {
     "NUM_HUMANS": 1,
     "TOTAL_PLAYERS": 12,
     "JHG_ROUNDS_PER_SC_ROUND" : 1,
-    "MAX_ROUNDS": 5,
+    "MAX_ROUNDS": 2,
     "SC_GROUP_OPTION": 2, # See options_creation.py -> group_size_options to understand what this means
     "SC_VOTE_CYCLES": 3,
+    "JHG_LOGGING": True,
+    "SC_LOGGING": False,
 }
 OPTIONS["NUM_BOTS"] =  OPTIONS["TOTAL_PLAYERS"] - OPTIONS["NUM_HUMANS"]
 
@@ -25,11 +27,13 @@ class Server():
         self.jhg_rounds_per_sc_round = options["JHG_ROUNDS_PER_SC_ROUND"]
         self.max_rounds = options["MAX_ROUNDS"]
         self.sc_vote_cycles = options["SC_VOTE_CYCLES"]
+        self.SC_logging = options["SC_LOGGING"]
+        self.JHG_logging = options["JHG_LOGGING"]
 
 
     def start_server(self, host='0.0.0.0', port=12345):
         self.connection_manager = ServerConnectionManager(host, port, OPTIONS["TOTAL_PLAYERS"], OPTIONS["NUM_BOTS"])
-        self.JHG_manager = JHGManager(self.connection_manager, self.num_humans, self.num_players, self.num_bots)
+        self.JHG_manager = JHGManager(self.connection_manager, self.num_humans, self.num_players, self.num_bots, self.JHG_logging)
         self.SC_manager = SCManager(self.connection_manager, self.num_humans, self.num_players, self.num_bots,
                                     self.sc_group_option, self.sc_vote_cycles)
         print("Server started")
