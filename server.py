@@ -45,14 +45,17 @@ class Server():
     def play_game(self):
         # Main game loop -- Play as many rounds as specified in OPTIONS
         self.SC_manager.init_next_round()
-        while self.JHG_manager.current_round <= self.max_rounds:
-            is_last_jhg_round = False
-            for i in range(self.jhg_rounds_per_sc_round): # This range says how many jhg rounds to play between sc rounds
-                if i == self.jhg_rounds_per_sc_round - 1: is_last_jhg_round = True
-                self.JHG_manager.play_jhg_round(self.JHG_manager.current_round, is_last_jhg_round)
+        for round_num in range(100):
             self.SC_manager.play_social_choice_round()
-            print("New round")
-        self.JHG_manager.log_jhg_overview()
+
+        # while self.JHG_manager.current_round <= self.max_rounds:
+        #     is_last_jhg_round = False
+        #     for i in range(self.jhg_rounds_per_sc_round): # This range says how many jhg rounds to play between sc rounds
+        #         if i == self.jhg_rounds_per_sc_round - 1: is_last_jhg_round = True
+        #         self.JHG_manager.play_jhg_round(self.JHG_manager.current_round, is_last_jhg_round)
+        #     self.SC_manager.play_social_choice_round()
+        #     print("New round")
+        # self.JHG_manager.log_jhg_overview()
 
         print("game over")
 

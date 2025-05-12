@@ -122,7 +122,7 @@ class MainWindow(QMainWindow):
         self.SC_panel.addTab(self.sc_history_grid, "History")
         self.SC_panel.currentChanged.connect(self.SC_tab_changed)
 
-        self.dockWidget = CornerContainer(self.JHG_panel, plots_panel, self.SC_panel, sc_graph_tabs)
+        self.dockWidget = CornerContainer(self.SC_panel, sc_graph_tabs)
 
         self.setWindowTitle("JHG: Round 1")
         self.setCentralWidget(self.dockWidget)

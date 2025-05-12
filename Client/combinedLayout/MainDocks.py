@@ -143,27 +143,27 @@ class DraggablePanel(QWidget):
 
 # The container that holds the four corners
 class CornerContainer(QWidget):
-    def __init__(self, top_left_widget, top_right_widget, bottom_left_widget, bottom_right_widget):
+    def __init__(self, bottom_left_widget, bottom_right_widget):
         super().__init__()
 
         # Create draggable panels
-        scrollable_top_left = self.make_scrollable(top_left_widget, min_height=top_left_widget.property("min-height"))
+        # scrollable_top_left = self.make_scrollable(top_left_widget, min_height=top_left_widget.property("min-height"))
         scrollable_bottom_left = self.make_scrollable(bottom_left_widget, min_height=bottom_left_widget.property("min-height"))
 
         # Create draggable panels
-        self.top_left = DraggablePanel(scrollable_top_left, "Junior High Game")
-        self.top_left.setMinimumHeight(400)
-        self.top_right = DraggablePanel(top_right_widget, "JHG Graphs")
+        # self.top_left = DraggablePanel(scrollable_top_left, "Junior High Game")
+        # self.top_left.setMinimumHeight(400)
+        # self.top_right = DraggablePanel(top_right_widget, "JHG Graphs")
         self.bottom_left = DraggablePanel(scrollable_bottom_left, "Social Choice Voting")
         self.bottom_right = DraggablePanel(bottom_right_widget, "Social Choice Graphs")
 
 
-        # Splitter for top row
-        top_splitter = QSplitter(Qt.Orientation.Horizontal)
-        top_splitter.addWidget(self.top_left)
-        top_splitter.addWidget(self.top_right)
-        top_splitter.setCollapsible(0, False)
-        top_splitter.setCollapsible(1, False)
+        # # Splitter for top row
+        # top_splitter = QSplitter(Qt.Orientation.Horizontal)
+        # top_splitter.addWidget(self.top_left)
+        # top_splitter.addWidget(self.top_right)
+        # top_splitter.setCollapsible(0, False)
+        # top_splitter.setCollapsible(1, False)
 
         # Splitter for bottom row
         bottom_splitter = QSplitter(Qt.Orientation.Horizontal)
@@ -173,22 +173,22 @@ class CornerContainer(QWidget):
         bottom_splitter.setCollapsible(1, False)
 
         # Main vertical splitter
-        main_splitter = QSplitter(Qt.Orientation.Vertical)
-        main_splitter.addWidget(top_splitter)
-        main_splitter.addWidget(bottom_splitter)
-        main_splitter.setCollapsible(0, False)
-        main_splitter.setCollapsible(1, False)
+        # main_splitter = QSplitter(Qt.Orientation.Vertical)
+        # main_splitter.addWidget(top_splitter)
+        # main_splitter.addWidget(bottom_splitter)
+        # main_splitter.setCollapsible(0, False)
+        # main_splitter.setCollapsible(1, False)
 
         # Set initial sizes (ratios)
-        main_splitter.setSizes([1, 1])
-        top_splitter.setSizes([1, 1])
+        # main_splitter.setSizes([1, 1])
+        # top_splitter.setSizes([1, 1])
         bottom_splitter.setSizes([1, 1])
 
         # Layout for the container
         layout = QVBoxLayout(self)
         layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(0)
-        layout.addWidget(main_splitter)
+        layout.addWidget(bottom_splitter)
 
         self.setLayout(layout)
 

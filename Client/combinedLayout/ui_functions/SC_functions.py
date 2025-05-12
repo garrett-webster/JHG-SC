@@ -1,7 +1,7 @@
 from PyQt6.QtWidgets import QVBoxLayout, QTabWidget
 
-from combinedLayout.tornado_graph import create_tornado_graph
-from combinedLayout.SCVotingGrid import SCVotingGrid
+from Client.combinedLayout.tornado_graph import create_tornado_graph
+from Client.combinedLayout.SCVotingGrid import SCVotingGrid
 
 
 def create_sc_ui_elements(main_window):

@@ -81,7 +81,7 @@ class ServerListener(QObject):
         if self.round_state.jhg_round_num == 1:
             self.main_window.sc_history_grid.update_grid(message["VOTES"], message["UTILITIES"], self.round_state.sc_round_num)
 
-        self.disable_sc_buttons_signal.emit()
+        # self.disable_sc_buttons_signal.emit()
         new_utilities = message["NEW_UTILITIES"]
 
         self.update_sc_utilities_labels_signal.emit(message["ROUND_NUM"], new_utilities, message["WINNING_VOTE"], message["VOTES"], message["UTILITIES"])
@@ -91,7 +91,7 @@ class ServerListener(QObject):
         self.update_sc_nodes_graph_signal.emit(message["WINNING_VOTE"])
 
         # Switch to JHG
-        self.switch_to_jhg_signal.emit()
+        # self.switch_to_jhg_signal.emit()
 
 
     def unknown_message_type_handler(self, message):

@@ -3,7 +3,7 @@ from functools import partial
 from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import QPushButton, QHBoxLayout, QWidget
 
-from combinedLayout.SCGrid import SCGrid
+from Client.combinedLayout.SCGrid import SCGrid
 
 
 NUM_CAUSES = 3
@@ -21,13 +21,11 @@ class SCVotingGrid(SCGrid):
         # Set up the clear button
         self.clear_button = QPushButton("Clear Vote")
         self.clear_button.setObjectName("clear_button")
-        self.clear_button.setEnabled(False)
         self.clear_button.clicked.connect(partial(sc_vote, main_window, -1))
         self.clear_button.clicked.connect(partial(self.select_button, None))
 
         # Set up the submit button
         self.submit_button = QPushButton("Submit Vote")
-        self.submit_button.setEnabled(False)
         self.submit_button.clicked.connect(partial(self.submit_clicked, main_window, self.submit_button))
         self.submit_button.setObjectName("SCSubmitButton")
 
@@ -43,7 +41,6 @@ class SCVotingGrid(SCGrid):
             button = self.vote_buttons[col]
             button.setMinimumWidth(70)
             button.setMaximumWidth(100)
-            button.setEnabled(False)
 
             # Wrap the button in a container widget that expands
             wrapper = QWidget()
