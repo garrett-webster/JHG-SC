@@ -34,9 +34,9 @@ class JHGLogger():
         # gonna keep with with round first, then key. just becuase, why not.
         T, popularity, influence = self.jhg_sim.individual_round_deets_for_logger()
         self.big_boy_data[round_num] = {}
-        self.big_boy_data[round_num]["Popularity"] = popularity.tolist()
-        self.big_boy_data[round_num]["Influence"] = influence.tolist()
-        self.big_boy_data[round_num]["T"] = T.tolist()
+        self.big_boy_data[round_num]["Popularity"] = popularity
+        self.big_boy_data[round_num]["Influence"] = influence
+        self.big_boy_data[round_num]["T"] = T
         # self.big_boy_data["Popularity"][round_num] = popularity.tolist()
         # self.big_boy_data["Influence"][round_num] = influence.tolist()
         # self.big_boy_data["T"][round_num] = T.tolist()
@@ -172,6 +172,14 @@ class JHGLogger():
 
         for round in self.big_boy_data:
             current_transaction_matrix = self.big_boy_data[round]["T"]
-            
+            current_round = {}
+            for i in range(len(self.jhg_sim.num_players)):
+                current_name = str(i)
+                allocations = []
+                for allocation in range(len(current_transaction_matrix[i])):
+                    allocations.append() # tuple here. kill me.
+
+
+
 
 
