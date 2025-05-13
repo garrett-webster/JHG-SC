@@ -107,6 +107,7 @@ def jhg_over(main_window, is_last):
         main_window.dockWidget.bottom_left.start_flashing()
         main_window.dockWidget.top_left.disable_highlight()
         main_window.SC_panel.setTabText(0, "Current Round")
+        main_window.SC_panel.setCurrentIndex(0)
 
 def start_jhg_round(main_window):
     main_window.dockWidget.top_left.start_flashing()
