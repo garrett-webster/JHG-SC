@@ -86,12 +86,13 @@ class JHGLogger():
         game_params = {}
         game_params["length_of_round" ] = "125" # no clue what this is supposed to mean
         end_game_params = {}
-        end_game_params["low"] = 10
-        end_game_params["high"] = 30
+        end_game_params["low"] = "Na"
+        end_game_params["high"] = "Na"
         end_game_params["runtimeType"]  = "time"
         game_params["end_game_criteria"] = end_game_params
         total_data["gameParams"] = game_params
         # popularity function params:
+        # ok SO these are set under the engine. these are the defualt values. as far as I am aware we never touch these in this version.
         popularity_function_params = {}
         popularity_function_params["alpha"] = 0.2
         popularity_function_params["beta"] = 0.5
