@@ -53,8 +53,11 @@ class SCGrid(QTabWidget):
 
 
     def update_col_2(self, col_2_vals):
+        print("here are the pre sort col 2 vals ", col_2_vals)
         if type(col_2_vals) == dict:
-            col_2_vals = [value for key, value in sorted(col_2_vals.items())]
+            col_2_vals = [value for key, value in sorted(col_2_vals.items(), key=lambda item: int(item[0]))]
+            # col_2_vals = [value for key, value in sorted(col_2_vals.items())]
+        print("here are the post sort col 2 vals ", col_2_vals)
         for i, label in enumerate(self.col_2_labels):
             label.setText(str(col_2_vals[i]))
 

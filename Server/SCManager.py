@@ -4,6 +4,7 @@ from Server.social_choice_sim import Social_Choice_Sim
 from Server.options_creation import generate_two_plus_one_groups
 from offlineSimStuff.variousGraphingTools.causeNodeGraphVisualizer import causeNodeGraphVisualizer
 import os
+import copy
 
 def create_empty_vote_matrix(num_players):
     return [[0 for _ in range(num_players)] for _ in range(num_players)]
@@ -64,9 +65,16 @@ class SCManager:
 
         # Calculate the winning vote
         winning_vote, new_utilities = self.sc_sim.return_win(zero_idx_votes)
-        new_utilities = {i: new_utilities[i] for i in range(self.num_players)}
-        self.sc_sim.save_results()
+        print("did we have a winning vote ?", winning_vote)
+        print("These are the utilities ", new_utilities)
+        #new_utilities = {i: new_utilities[i] for i in range(self.num_players)}
 
+        # new_utilities = {i: 1 for i in range(self.num_players)}
+
+        self.sc_sim.save_results()
+        new_utilities = copy.copy(self.sc_sim.get_new_utilities())
+        new_utilities = {str(k): sum(v) for k,v in new_utilities.items()}
+        print("here are the new utilities ", new_utilities)
 
 
         self.connection_manager.distribute_message("SC_OVER", self.round_num, winning_vote, new_utilities,

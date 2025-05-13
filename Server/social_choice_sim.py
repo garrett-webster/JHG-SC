@@ -251,6 +251,9 @@ class Social_Choice_Sim:
         for player in range(len(self.current_results)):
             self.results[player].append(self.current_results[player])
 
+    def get_new_utilities(self):
+        return self.results
+
 
 
     # SUM: sets up the bot list with a current file. Will override any potential single types as those seem to be more important. will likely be refactored.
