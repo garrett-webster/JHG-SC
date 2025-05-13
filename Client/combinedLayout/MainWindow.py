@@ -9,6 +9,7 @@ from Client.ServerListener import ServerListener
 from matplotlib.figure import Figure
 
 from Client.combinedLayout.JhgPanel import JhgPanel
+from Client.combinedLayout.JhgTornadoGraph import JhgTornadoGraph
 
 from Client.combinedLayout.SCHistoryGrid import SCHistoryGrid
 
@@ -17,7 +18,7 @@ from Client.combinedLayout.SCCausesGraph import SCCausesGraph
 from Client.combinedLayout.ui_functions.SC_functions import *
 from Client.combinedLayout.ui_functions.JHG_functions import *
 
-from Client.combinedLayout.tornado_graph import update_tornado_graph
+from Client.combinedLayout.sc_tornado_graph import update_sc_tornado_graph
 
 
 class MainWindow(QMainWindow):
@@ -101,10 +102,13 @@ class MainWindow(QMainWindow):
         self.SC_panel.setProperty("min-height", 200 + 20 * self.round_state.num_players)
         self.SC_panel.setLayout(QVBoxLayout())
 
+        self.JHG_tornado_graph = JhgTornadoGraph(num_players)
+
         plots_panel = QTabWidget()
         plots_panel.tabBar().setExpanding(True)
         plots_panel.addTab(self.jhg_popularity_graph, "Popularity over time")
         plots_panel.addTab(self.jhg_network, "Network graph")
+        plots_panel.addTab(self.JHG_tornado_graph, "Tornado Graph")
 
         create_sc_ui_elements(self)
         self.SC_cause_graph.init_sc_nodes_graph(self.round_state)
@@ -138,7 +142,7 @@ class MainWindow(QMainWindow):
         self.ServerListener.disable_sc_buttons_signal.connect(partial(disable_sc_buttons, self))
         self.ServerListener.update_sc_utilities_labels_signal.connect(self.update_sc_utilities_labels)
         self.ServerListener.update_tornado_graph_signal.connect(self.update_tornado_graph)
-        self.ServerListener.jhg_over_signal.connect(partial(jhg_over, self))
+        self.ServerListener.jhg_over_signal.connect(self.jhg_over)
         self.ServerListener.update_sc_votes_signal.connect(self.update_sc_votes)
         self.ServerListener.update_sc_nodes_graph_signal.connect(self.update_sc_nodes_graph)
         self.ServerListener.switch_to_jhg_signal.connect(self.start_jhg_round)
@@ -160,7 +164,7 @@ class MainWindow(QMainWindow):
         update_sc_utilities_labels(self, round_num, new_utilities, winning_vote, last_round_votes, last_round_utilities)
 
     def update_tornado_graph(self, tornado_ax, positive_vote_effects, negative_vote_effects):
-        update_tornado_graph(self, tornado_ax, positive_vote_effects, negative_vote_effects)
+        update_sc_tornado_graph(self, tornado_ax, positive_vote_effects, negative_vote_effects)
 
     def update_sc_nodes_graph(self):
         self.SC_cause_graph.update_arrows(self.round_state.current_votes)
@@ -171,4 +175,7 @@ class MainWindow(QMainWindow):
 
     def start_jhg_round(self):
         start_jhg_round(self)
+
+    def jhg_over(self, is_last, init_pop_influence):
+        jhg_over(self, is_last, init_pop_influence)
 

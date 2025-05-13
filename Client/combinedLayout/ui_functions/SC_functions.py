@@ -1,13 +1,13 @@
 from PyQt6.QtWidgets import QVBoxLayout, QTabWidget
 
-from combinedLayout.tornado_graph import create_tornado_graph
-from combinedLayout.SCVotingGrid import SCVotingGrid
+from Client.combinedLayout.sc_tornado_graph import sc_create_tornado_graph
+from Client.combinedLayout.SCVotingGrid import SCVotingGrid
 
 
 def create_sc_ui_elements(main_window):
     client_id = main_window.round_state.client_id
     graphs_layout = QVBoxLayout()
-    main_window.tornado_canvas = create_tornado_graph(main_window, main_window.tornado_fig, main_window.tornado_ax, main_window.tornado_y)
+    main_window.tornado_canvas = sc_create_tornado_graph(main_window, main_window.tornado_fig, main_window.tornado_ax, main_window.tornado_y)
 
     sc_graph_tabs = QTabWidget()
     sc_graph_tabs.addTab(main_window.SC_cause_graph, "Causes Graph")

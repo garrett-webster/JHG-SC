@@ -1,16 +1,15 @@
 import numpy as np
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 
-from combinedLayout.colors import COLORS
+from Client.combinedLayout.colors import COLORS
 
 
-def create_tornado_graph(main_window, fig, ax, y):
+def sc_create_tornado_graph(main_window, fig, ax, y):
     ax.barh(y, [0 for _ in range(main_window.round_state.num_players)], color='red', label='Decrease Impact')
     ax.barh(y, [0 for _ in range(main_window.round_state.num_players)], color='green', label='Increase Impact')
 
     fig.patch.set_facecolor("#282828ff")
     ax.set_facecolor("#282828ff")
-    ax.tick_params(color="#EBEBEB")
     ax.tick_params(color="#EBEBEB")
     ax.xaxis.set_tick_params(labelcolor="white")  # Set x-axis tick labels to white
     ax.yaxis.set_tick_params(labelcolor="white")  # (Optional) Set y-axis tick labels to white
@@ -19,7 +18,7 @@ def create_tornado_graph(main_window, fig, ax, y):
 
     return FigureCanvas(fig)
 
-def update_tornado_graph(main_window, ax, positive_vote_effects, negative_vote_effects):
+def update_sc_tornado_graph(main_window, ax, positive_vote_effects, negative_vote_effects):
     ax.cla()  # Clear the axes
 
     num_players = main_window.round_state.num_players
@@ -57,8 +56,7 @@ def update_tornado_graph(main_window, ax, positive_vote_effects, negative_vote_e
     # Set labels and title
     ax.set_yticklabels([])
     for i, y_pos in enumerate(y_positions):
-        ax.text(-max_extent * 1.05, y_pos, f"Player {i + 1}",
-                             va='center', ha='right', fontsize=10, color=COLORS[i])
+        ax.text(-max_extent * 1.05, y_pos, f"Player {i + 1}", va='center', ha='right', fontsize=10, color=COLORS[i])
 
     ax.axvline(0, color='#EBEBEB', linewidth=2, linestyle='-')
     ax.figure.canvas.draw_idle()  # Redraw the figure

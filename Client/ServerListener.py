@@ -11,7 +11,7 @@ class ServerListener(QObject):
     update_sc_round_signal = pyqtSignal()
     disable_sc_buttons_signal = pyqtSignal()
     enable_jhg_buttons_signal = pyqtSignal()
-    jhg_over_signal = pyqtSignal(bool)
+    jhg_over_signal = pyqtSignal(bool, float)
     update_sc_votes_signal = pyqtSignal(dict, int, bool)
     update_sc_utilities_labels_signal = pyqtSignal(int, dict, int, dict, list)
     update_tornado_graph_signal = pyqtSignal(Axes, list, list)
@@ -58,7 +58,7 @@ class ServerListener(QObject):
     def JHG_OVER(self, message):
         self.round_state.influence_mat = np.array(message["INFLUENCE_MAT"])
         self.update_jhg_state(message)
-        self.jhg_over_signal.emit(message["IS_LAST"])
+        self.jhg_over_signal.emit(message["IS_LAST"], message["INIT_POP_INFLUENCE"])
 
 
     def SC_INIT(self, message):

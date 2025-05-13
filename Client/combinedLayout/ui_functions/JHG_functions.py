@@ -88,7 +88,7 @@ def update_jhg_popularity_graph(round_state, jhg_popularity_graph):
     jhg_popularity_graph.setYRange(0, max_popularity + 10, padding=0)
 
 
-def jhg_over(main_window, is_last):
+def jhg_over(main_window, is_last, init_pop_influence):
     update_jhg_network_graph(main_window)
 
     if not is_last:
@@ -108,6 +108,9 @@ def jhg_over(main_window, is_last):
         main_window.dockWidget.top_left.disable_highlight()
         main_window.SC_panel.setTabText(0, "Current Round")
         main_window.SC_panel.setCurrentIndex(0)
+
+    main_window.JHG_tornado_graph.update_jhg_tornado(main_window.round_state.influence_mat, init_pop_influence)
+
 
 def start_jhg_round(main_window):
     main_window.dockWidget.top_left.start_flashing()
