@@ -8,7 +8,7 @@ OPTIONS = {
     "NUM_HUMANS": 1,
     "TOTAL_PLAYERS": 12,
     "JHG_ROUNDS_PER_SC_ROUND" : 1,
-    "MAX_ROUNDS": 1, # just play one plz.
+    "MAX_ROUNDS": 2, # just play one plz.
     "SC_GROUP_OPTION": 2, # See options_creation.py -> group_size_options to understand what this means
     "SC_VOTE_CYCLES": 3,
     "JHG_LOGGING": True,

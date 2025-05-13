@@ -90,6 +90,7 @@ class JHGLogger():
         end_game_params["high"] = 30
         end_game_params["runtimeType"]  = "time"
         game_params["end_game_criteria"] = end_game_params
+        total_data["gameParams"] = game_params
         # popularity function params:
         popularity_function_params = {}
         popularity_function_params["alpha"] = 0.2
@@ -176,7 +177,7 @@ class JHGLogger():
 
         # literally zero clue if this works.
         all_rounds = {}
-        for round in range(len(self.big_boy_data[next(iter(self.big_boy_data))])-1):
+        for round in self.big_boy_data:
             current_transaction_matrix = self.big_boy_data[int(round)]["T"]
             current_round = {}
             for i in range(self.jhg_sim.num_players):
@@ -194,14 +195,24 @@ class JHGLogger():
 
         total_data["playerRoundInfo"] = player_round_info
 
-        total_data["influences"] = {} # not sure how to populate this either actually.
+
+        influences = {}
+        for round in self.big_boy_data:
+            current_round = {}
+            for i, player in enumerate(self.big_boy_data[int(round)]["Influence"]):
+                for individual in range(len(self.big_boy_data[int(round)]["Influence"][i])):
+                    current_round[str(i)] = self.big_boy_data[int(round)]["Influence"][i]
+            influences[str(round)] = current_round
+
+        total_data["Influences"] = influences
+
 
         # lots of problems within this particualr loop.
         popularities = {}
         for round in range(len(self.big_boy_data[next(iter(self.big_boy_data))])-1):
             current_round = {}
             for i, player in enumerate(self.big_boy_data[int(round)]["Popularity"]):
-                current_round[str(i)] = self.big_boy_data[int(round)]["Popularity"]
+                current_round[str(i)] = self.big_boy_data[int(round)]["Popularity"][i]
 
             popularities[str(round)] = current_round
 

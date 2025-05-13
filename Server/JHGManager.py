@@ -11,6 +11,8 @@ class JHGManager:
         self.num_bots = num_bots
         self.currentLogger : JHGLogger = JHGLogger(self.jhg_sim)
         self.jhg_logging = jhg_logging
+        if self.jhg_logging:
+            self.currentLogger.add_round_to_overview(-1) # just throw the round num in, the sim is already in there
 
     def play_jhg_round(self, round_num, is_last_jhg_round):
         # Occasionally if the JHG round was played to quickly after the SC round, this would catch the SC vote and brick the server.

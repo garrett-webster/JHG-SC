@@ -10,6 +10,7 @@ def run_trial(sim, num_rounds, create_graphs):
 
     currentLogger: JHGLogger = JHGLogger(current_sim)
     current_sim.start_game(num_humans, num_players)
+    currentLogger.add_round_to_overview(-1) # so we need to write the zero'th round to understand the initial conditions.
     for round in range(num_rounds):
         current_popularity = current_sim.execute_round(None, round)
         print("this is the current popularity ", current_popularity)
