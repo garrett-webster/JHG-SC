@@ -7,6 +7,7 @@ import numpy as np
 class simLogger:
     def __init__(self, current_sim=None):
         self.sim = current_sim
+        self.big_boy_data = {}
 
     def record_individual_round(self):
         all_nodes, all_votes, winning_vote, current_options_matrix, types_list, scenario, group, curr_round, cycle, chromosome = self.sim.prepare_graph()
@@ -22,13 +23,15 @@ class simLogger:
         total_data["curr_round"] = curr_round
         total_data["cycle"] = cycle
         total_data["chromosome"] = chromosome
-        my_path = os.path.dirname(os.path.abspath(__file__))
-        filename = "sc_logs_repo/individual_round/" + " scenario" + str(scenario) + "groups" + str(group) + "round" + str(
-            curr_round) + "cycle" + str(cycle) + "chromosome" + str(chromosome) + ".json"
-        file_path = os.path.join(my_path, filename)
 
-        with open(file_path, "w") as file:
-            json.dump(total_data, file, indent=4)
+        return total_data
+        # my_path = os.path.dirname(os.path.abspath(__file__))
+        # filename = "sc_logs_repo/individual_round/" + " scenario" + str(scenario) + "groups" + str(group) + "round" + str(
+        #     curr_round) + "cycle" + str(cycle) + "chromosome" + str(chromosome) + ".json"
+        # file_path = os.path.join(my_path, filename)
+        #
+        # with open(file_path, "w") as file:
+        #     json.dump(total_data, file, indent=4)
 
     def record_big_picture(self):
         results, cooperation_score, bot_type, num_rounds, scenario, group, chromosome = self.sim.get_results()
@@ -40,12 +43,14 @@ class simLogger:
         total_data["scenario"] = scenario
         total_data["group"] = group
         total_data["chromosome"] = chromosome
-        my_path = os.path.dirname(os.path.abspath(__file__))
-        filename = "sc_logs_repo/big_picture/" + " scenario" + str(scenario) + "groups" + str(group) + "chromosome" + str(chromosome) + ".json"
-        file_path = os.path.join(my_path, filename)
+        return total_data
 
-        with open(file_path, "w") as file:
-            json.dump(total_data, file, indent=4)
+        # my_path = os.path.dirname(os.path.abspath(__file__))
+        # filename = "sc_logs_repo/big_picture/" + " scenario" + str(scenario) + "groups" + str(group) + "chromosome" + str(chromosome) + ".json"
+        # file_path = os.path.join(my_path, filename)
+        #
+        # with open(file_path, "w") as file:
+        #     json.dump(total_data, file, indent=4)
 
 
     def record_round(self): # this saves everything. I don't know why you would want this, it was mroe of a proof of concept type beat.
@@ -67,12 +72,28 @@ class simLogger:
         total_data["final_votes"] = final_votes
         total_data["results"] = results
 
-        my_path = os.path.dirname(os.path.abspath(__file__))
-        filename = "sc_logs_repo/test/" + " scenario" + str(scenario) + "groups" + str(group) + "round" + str(curr_round) + "cycle" + str(cycle) + ".json"
-        file_path = os.path.join(my_path, filename)
+        return total_data
 
+        # my_path = os.path.dirname(os.path.abspath(__file__))
+        # filename = "sc_logs_repo/test/" + " scenario" + str(scenario) + "groups" + str(group) + "round" + str(curr_round) + "cycle" + str(cycle) + ".json"
+        # file_path = os.path.join(my_path, filename)
+        #
+        # with open(file_path, "w") as file:
+        #     json.dump(total_data, file, indent=4)
+
+    def add_round_to_sim(self, round_num):
+        self.big_boy_data[round_num] = self.record_individual_round()
+
+    def finish_json(self, filename):
+        self.big_boy_data["Conclusion"] = self.record_big_picture()
+        self.write_a_json_to_file(self.big_boy_data)
+        file_path = "sc_logs_repo/"
+        file_path += filename + ".json"
+        my_path = os.path.dirname(os.path.abspath(__file__))
+        file_path = os.path.join(my_path, file_path)
         with open(file_path, "w") as file:
-            json.dump(total_data, file, indent=4)
+            json.dump(self.big_boy_data, file, indent=4)
+
 
 
     def log_stuff_for_chromosome(self, big_boy_json):
@@ -123,6 +144,3 @@ class simLogger:
         file_path = os.path.join(directory_path, file_name)
         with open(file_path, "w") as file:
             json.dump(big_boy_json, file, indent=4)
-
-
-

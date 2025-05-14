@@ -1,18 +1,18 @@
 from Server.JHGManager import JHGManager
 from Server.SCManager import SCManager
 from Server.ServerConnectionManager import ServerConnectionManager
-
+from Server.simLogger import simLogger # this is SC_SIM logger for reference.
 
 OPTIONS = {
     #General settings
     "NUM_HUMANS": 1,
     "TOTAL_PLAYERS": 5,
     "JHG_ROUNDS_PER_SC_ROUND" : 1,
-    "MAX_ROUNDS": 100,
+    "MAX_ROUNDS": 10,
     "SC_GROUP_OPTION": 2, # See options_creation.py -> group_size_options to understand what this means
     "SC_VOTE_CYCLES": 3,
     "JHG_LOGGING": False,
-    "SC_LOGGING": False,
+    "SC_LOGGING": True,
 }
 OPTIONS["NUM_BOTS"] =  OPTIONS["TOTAL_PLAYERS"] - OPTIONS["NUM_HUMANS"]
 
@@ -44,9 +44,15 @@ class Server():
 
     def play_game(self):
         # Main game loop -- Play as many rounds as specified in OPTIONS
+        # current_logger : simLogger = simLogger(self.SC_manager)
         self.SC_manager.init_next_round()
-        for round_num in range(100):
+        # current_logger.add_round_to_sim(-1)
+        for round_num in range(self.max_rounds):
             self.SC_manager.play_social_choice_round()
+        #     current_logger.add_round_to_sim(round_num)
+        # current_logger.finish_json()
+        self.SC_manager.finish_results("human_study_results")
+
 
         # while self.JHG_manager.current_round <= self.max_rounds:
         #     is_last_jhg_round = False

@@ -35,7 +35,8 @@ class causeNodeGraphVisualizer:
         curr_round = dict["curr_round"]
         cycle = dict["cycle"]
         types_list = dict["types_list"]
-        self.create_graph(all_nodes, all_votes, winning_vote, current_options_matrix, types_list, scenario, group, curr_round, cycle)
+        chromosome = dict["chromosome"]
+        self.create_graph(all_nodes, all_votes, winning_vote, current_options_matrix, types_list, scenario, group, curr_round, cycle, chromosome)
 
 
     def create_graph(self, all_nodes, all_votes, winning_vote, current_options_matrix, types_list, scenario, group, curr_round, cycle, chromosome):
@@ -193,6 +194,6 @@ class causeNodeGraphVisualizer:
         full_path = os.path.join(dir_path, file_name)
 
         plt.savefig(full_path, dpi=300)  # I want it to have the round, and cycle, and that shoudl do it
-        plt.show()
+        #plt.show()
 
 

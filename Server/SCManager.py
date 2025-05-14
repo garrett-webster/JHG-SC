@@ -3,6 +3,7 @@ import time
 from Server.social_choice_sim import Social_Choice_Sim
 from Server.options_creation import generate_two_plus_one_groups
 from offlineSimStuff.variousGraphingTools.causeNodeGraphVisualizer import causeNodeGraphVisualizer
+from Server.simLogger import simLogger # this logs stuff
 import os
 import copy
 
@@ -37,6 +38,7 @@ class SCManager:
         self.negative_vote_effects_history = create_empty_vote_matrix(num_players)
 
         self.sc_logger = sc_logging
+        self.current_logger = simLogger(self.sc_sim) # go ahead and prep it anyway.
 
     def init_next_round(self):
         # Initialize the round
@@ -67,11 +69,9 @@ class SCManager:
         winning_vote, new_utilities = self.sc_sim.return_win(zero_idx_votes)
         print("did we have a winning vote ?", winning_vote)
         print("These are the utilities ", new_utilities)
-        #new_utilities = {i: new_utilities[i] for i in range(self.num_players)}
-
-        # new_utilities = {i: 1 for i in range(self.num_players)}
 
         self.sc_sim.save_results()
+        self.sc_sim.set_rounds(self.round_num) # should set it to the last number of rounds before calculation. I hope this works.
         new_utilities = copy.copy(self.sc_sim.get_new_utilities())
         new_utilities = {str(k): sum(v) for k,v in new_utilities.items()}
         print("here are the new utilities ", new_utilities)
@@ -84,8 +84,7 @@ class SCManager:
 
         time.sleep(.5)  # Without this, messages get sent out of order, and the sc_history gets screwed up.
         if self.sc_logger:
-            current_visualizer = causeNodeGraphVisualizer()
-            current_visualizer.create_graph_with_sim(self.sc_sim)
+            self.current_logger.add_round_to_sim(self.round_num)
         self.round_num += 1
         self.init_next_round()
 
@@ -138,3 +137,6 @@ class SCManager:
 
     def get_bot_votes(self):
         self.sc_sim.get_votes()
+
+    def finish_results(self, filename):
+        self.current_logger.finish_json(filename)

@@ -1,362 +1,1068 @@
 {
-    "0.01,0.01.txt": {
-        "total_average_increase": 0.3260818181818182,
-        "cooperation_score": 0.1724,
-        "cv": 0.03976138861053424
-    },
-    "0.01,0.1.txt": {
-        "total_average_increase": 0.3344727272727273,
-        "cooperation_score": 0.1752,
-        "cv": 0.06680975989035749
-    },
-    "0.01,0.5.txt": {
-        "total_average_increase": 0.7121454545454543,
-        "cooperation_score": 0.3514,
-        "cv": 0.04325022826757866
-    },
-    "0.01,0.9.txt": {
-        "total_average_increase": 0.9921181818181787,
-        "cooperation_score": 0.5333,
-        "cv": 0.041175773796868306
-    },
-    "0.01,1.txt": {
-        "total_average_increase": 1.0138909090909056,
-        "cooperation_score": 0.568,
-        "cv": 0.03328665059445098
-    },
-    "0.01,10.txt": {
-        "total_average_increase": 1.152272727272726,
-        "cooperation_score": 0.6846,
-        "cv": 0.034140611422516176
-    },
-    "0.01,2.txt": {
-        "total_average_increase": 1.1272727272727245,
-        "cooperation_score": 0.6586,
-        "cv": 0.03642452961893205
-    },
-    "0.01,5.txt": {
-        "total_average_increase": 1.1473545454545486,
-        "cooperation_score": 0.6784,
-        "cv": 0.0216154950420676
-    },
-    "0.1,0.01.txt": {
-        "total_average_increase": 0.34142727272727286,
-        "cooperation_score": 0.1792,
-        "cv": 0.04077836295279395
-    },
-    "0.1,0.1.txt": {
-        "total_average_increase": 0.3358181818181815,
-        "cooperation_score": 0.1757,
-        "cv": 0.061830919067613746
-    },
-    "0.1,0.5.txt": {
-        "total_average_increase": 0.7036636363636356,
-        "cooperation_score": 0.3475,
-        "cv": 0.03691070727198817
-    },
-    "0.1,0.9.txt": {
-        "total_average_increase": 1.001436363636364,
-        "cooperation_score": 0.5425,
-        "cv": 0.04203799369491032
-    },
-    "0.1,1.txt": {
-        "total_average_increase": 1.024763636363635,
-        "cooperation_score": 0.5642,
-        "cv": 0.03841151633984791
-    },
-    "0.1,10.txt": {
-        "total_average_increase": 1.1516454545454522,
-        "cooperation_score": 0.688,
-        "cv": 0.03746360951805187
-    },
-    "0.1,2.txt": {
-        "total_average_increase": 1.1080181818181807,
-        "cooperation_score": 0.6508,
-        "cv": 0.05254401325148944
-    },
-    "0.1,5.txt": {
-        "total_average_increase": 1.1617090909090924,
-        "cooperation_score": 0.6812,
-        "cv": 0.028345876206489772
-    },
-    "0.2,0.01.txt": {
-        "total_average_increase": 0.34577272727272773,
-        "cooperation_score": 0.1825,
-        "cv": 0.08715568199912987
-    },
-    "0.2,0.1.txt": {
-        "total_average_increase": 0.372136363636364,
-        "cooperation_score": 0.1881,
-        "cv": 0.06802413167272943
-    },
-    "0.2,0.5.txt": {
-        "total_average_increase": 0.7356090909090905,
-        "cooperation_score": 0.3709,
-        "cv": 0.04308499989367838
-    },
-    "0.2,0.9.txt": {
-        "total_average_increase": 1.0034272727272706,
-        "cooperation_score": 0.5527,
-        "cv": 0.04325731876503765
-    },
-    "0.2,1.txt": {
-        "total_average_increase": 1.0231454545454548,
-        "cooperation_score": 0.5721,
-        "cv": 0.03559712044352706
-    },
-    "0.2,10.txt": {
-        "total_average_increase": 1.1501636363636385,
-        "cooperation_score": 0.6967,
-        "cv": 0.05156852672238795
-    },
-    "0.2,2.txt": {
-        "total_average_increase": 1.1298636363636323,
-        "cooperation_score": 0.6593,
-        "cv": 0.04011886294466937
-    },
-    "0.2,5.txt": {
-        "total_average_increase": 1.1391363636363554,
-        "cooperation_score": 0.689,
-        "cv": 0.02267462104293951
-    },
-    "0.5,0.01.txt": {
-        "total_average_increase": 0.39410909090909096,
-        "cooperation_score": 0.2133,
-        "cv": 0.06177716252762453
-    },
-    "0.5,0.1.txt": {
-        "total_average_increase": 0.4531636363636358,
-        "cooperation_score": 0.2301,
-        "cv": 0.04719395314323239
-    },
-    "0.5,0.5.txt": {
-        "total_average_increase": 0.8362818181818189,
-        "cooperation_score": 0.4311,
-        "cv": 0.05812538048075385
-    },
-    "0.5,0.9.txt": {
-        "total_average_increase": 1.0383181818181835,
-        "cooperation_score": 0.57,
-        "cv": 0.03514631541880667
-    },
-    "0.5,1.txt": {
-        "total_average_increase": 1.064600000000002,
-        "cooperation_score": 0.6025,
-        "cv": 0.026996465475083962
-    },
-    "0.5,10.txt": {
-        "total_average_increase": 1.1749454545454514,
-        "cooperation_score": 0.7058,
-        "cv": 0.024978643658680973
-    },
-    "0.5,2.txt": {
-        "total_average_increase": 1.1270000000000044,
-        "cooperation_score": 0.6661,
-        "cv": 0.029137463653587083
-    },
-    "0.5,5.txt": {
-        "total_average_increase": 1.1522818181818186,
-        "cooperation_score": 0.6956,
-        "cv": 0.04071549415453784
-    },
-    "0.9,0.01.txt": {
-        "total_average_increase": 0.4599363636363636,
-        "cooperation_score": 0.2504,
-        "cv": 0.06245568058925335
-    },
-    "0.9,0.1.txt": {
-        "total_average_increase": 0.5182363636363639,
-        "cooperation_score": 0.2648,
-        "cv": 0.04504079855763156
-    },
-    "0.9,0.5.txt": {
-        "total_average_increase": 0.9168454545454502,
-        "cooperation_score": 0.4922,
-        "cv": 0.03987601849290627
-    },
-    "0.9,0.9.txt": {
-        "total_average_increase": 1.072236363636365,
-        "cooperation_score": 0.6111,
-        "cv": 0.0405725660630835
-    },
-    "0.9,1.txt": {
-        "total_average_increase": 1.0913545454545417,
-        "cooperation_score": 0.6209,
-        "cv": 0.03195035715676575
-    },
-    "0.9,10.txt": {
-        "total_average_increase": 1.174218181818181,
-        "cooperation_score": 0.7122,
-        "cv": 0.02693089164895772
-    },
-    "0.9,2.txt": {
-        "total_average_increase": 1.1700636363636374,
-        "cooperation_score": 0.6969,
-        "cv": 0.03980017919658839
-    },
-    "0.9,5.txt": {
-        "total_average_increase": 1.1784818181818177,
-        "cooperation_score": 0.7145,
-        "cv": 0.032648352381934566
-    },
-    "1,0.01.txt": {
-        "total_average_increase": 0.46498181818181883,
-        "cooperation_score": 0.2574,
-        "cv": 0.044944188275422604
-    },
-    "1,0.1.txt": {
-        "total_average_increase": 0.5508454545454552,
-        "cooperation_score": 0.2788,
-        "cv": 0.03523733092740043
-    },
-    "1,0.5.txt": {
-        "total_average_increase": 0.9672454545454539,
-        "cooperation_score": 0.5105,
-        "cv": 0.04148471398506307
-    },
-    "1,0.9.txt": {
-        "total_average_increase": 1.0963454545454578,
-        "cooperation_score": 0.6278,
-        "cv": 0.043996358015893806
-    },
-    "1,1.txt": {
-        "total_average_increase": 1.1019272727272693,
-        "cooperation_score": 0.6333,
-        "cv": 0.04112584345540293
-    },
-    "1,10.txt": {
-        "total_average_increase": 1.1859454545454515,
-        "cooperation_score": 0.7216,
-        "cv": 0.023708462151693685
-    },
-    "1,2.txt": {
-        "total_average_increase": 1.1817999999999995,
-        "cooperation_score": 0.6959,
-        "cv": 0.020390754090806026
-    },
-    "1,5.txt": {
-        "total_average_increase": 1.1687999999999994,
-        "cooperation_score": 0.7124,
-        "cv": 0.03191060211973098
-    },
-    "10,0.01.txt": {
-        "total_average_increase": 1.1263636363636333,
-        "cooperation_score": 0.6563,
-        "cv": 0.04156155663142957
-    },
-    "10,0.1.txt": {
-        "total_average_increase": 1.1941181818181776,
-        "cooperation_score": 0.7237,
-        "cv": 0.03793325991059455
-    },
-    "10,0.5.txt": {
-        "total_average_increase": 1.2325454545454593,
-        "cooperation_score": 0.748,
-        "cv": 0.028458940592728754
-    },
-    "10,0.9.txt": {
-        "total_average_increase": 1.2262090909090944,
-        "cooperation_score": 0.7555,
-        "cv": 0.043492441998858294
-    },
-    "10,1.txt": {
-        "total_average_increase": 1.225018181818184,
-        "cooperation_score": 0.7569,
-        "cv": 0.02546684084940149
-    },
-    "10,10.txt": {
-        "total_average_increase": 1.2383727272727296,
-        "cooperation_score": 0.7592,
-        "cv": 0.04082676501585613
-    },
-    "10,2.txt": {
-        "total_average_increase": 1.2546181818181845,
-        "cooperation_score": 0.7638,
-        "cv": 0.04413121513179015
-    },
-    "10,5.txt": {
-        "total_average_increase": 1.221736363636366,
-        "cooperation_score": 0.7606,
-        "cv": 0.04777333237876643
-    },
-    "2,0.01.txt": {
-        "total_average_increase": 0.5558636363636378,
-        "cooperation_score": 0.3194,
-        "cv": 0.055569045191121595
-    },
-    "2,0.1.txt": {
-        "total_average_increase": 0.7677727272727266,
-        "cooperation_score": 0.3879,
-        "cv": 0.03563904265014386
-    },
-    "2,0.5.txt": {
-        "total_average_increase": 1.0597090909090903,
-        "cooperation_score": 0.5979,
-        "cv": 0.019187529701093515
-    },
-    "2,0.9.txt": {
-        "total_average_increase": 1.1533636363636357,
-        "cooperation_score": 0.6705,
-        "cv": 0.03159233474577364
-    },
-    "2,1.txt": {
-        "total_average_increase": 1.1515545454545475,
-        "cooperation_score": 0.6857,
-        "cv": 0.022973069206085092
-    },
-    "2,10.txt": {
-        "total_average_increase": 1.225681818181819,
-        "cooperation_score": 0.7386,
-        "cv": 0.033830407673081334
-    },
-    "2,2.txt": {
-        "total_average_increase": 1.199109090909096,
-        "cooperation_score": 0.7247,
-        "cv": 0.038389648339991256
-    },
-    "2,5.txt": {
-        "total_average_increase": 1.2017727272727308,
-        "cooperation_score": 0.7334,
-        "cv": 0.03537719387573695
-    },
-    "5,0.01.txt": {
-        "total_average_increase": 0.9198545454545428,
-        "cooperation_score": 0.4867,
-        "cv": 0.04362816363131526
-    },
-    "5,0.1.txt": {
-        "total_average_increase": 1.085118181818178,
-        "cooperation_score": 0.6156,
-        "cv": 0.03182637568155414
-    },
-    "5,0.5.txt": {
-        "total_average_increase": 1.190363636363639,
-        "cooperation_score": 0.7112,
-        "cv": 0.034496921477805066
-    },
-    "5,0.9.txt": {
-        "total_average_increase": 1.2167545454545443,
-        "cooperation_score": 0.739,
-        "cv": 0.02901754717239992
-    },
-    "5,1.txt": {
-        "total_average_increase": 1.209899999999993,
-        "cooperation_score": 0.7322,
-        "cv": 0.029374552981156193
-    },
-    "5,10.txt": {
-        "total_average_increase": 1.2417272727272697,
-        "cooperation_score": 0.7576,
-        "cv": 0.03040171879359433
-    },
-    "5,2.txt": {
-        "total_average_increase": 1.2087090909090903,
-        "cooperation_score": 0.7515,
-        "cv": 0.02673236181322931
-    },
-    "5,5.txt": {
-        "total_average_increase": 1.2274363636363619,
-        "cooperation_score": 0.7547,
-        "cv": 0.03752148014861632
+    "1": {
+        "types_list": [
+            6,
+            6,
+            6,
+            6,
+            6
+        ],
+        "all_nodes": [
+            {
+                "type": "CAUSE",
+                "text": "Cause 1",
+                "x_pos": 5.0,
+                "y_pos": 0.0
+            },
+            {
+                "type": "CAUSE",
+                "text": "Cause 2",
+                "x_pos": -2.499999999999999,
+                "y_pos": 4.330127018922194
+            },
+            {
+                "type": "CAUSE",
+                "text": "Cause 3",
+                "x_pos": -2.500000000000002,
+                "y_pos": -4.330127018922193
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 1",
+                "x_pos": 1.7500000000000013,
+                "y_pos": 1.2990381056766576
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 2",
+                "x_pos": -2.999999999999998,
+                "y_pos": -4.330127018922193
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 3",
+                "x_pos": -0.7499999999999996,
+                "y_pos": 0.4330127018922191
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 4",
+                "x_pos": -6.999999999999997,
+                "y_pos": 10.392304845413264
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 5",
+                "x_pos": 2.4998239969346074,
+                "y_pos": -6.928139718113078
+            }
+        ],
+        "all_votes": {
+            "0": 0,
+            "1": 0,
+            "2": 0,
+            "3": -1,
+            "4": 0
+        },
+        "winning_vote": 0,
+        "current_options_matrix": [
+            [
+                4,
+                -2,
+                3
+            ],
+            [
+                4,
+                -2,
+                6
+            ],
+            [
+                2,
+                -5,
+                3
+            ],
+            [
+                -5,
+                6,
+                -4
+            ],
+            [
+                6,
+                -4,
+                -2
+            ]
+        ],
+        "scenario": "somewhatMoreAwareGreedy",
+        "group": -1,
+        "curr_round": "1",
+        "cycle": 2,
+        "chromosome": "highestFromTesting"
+    },
+    "2": {
+        "types_list": [
+            6,
+            6,
+            6,
+            6,
+            6
+        ],
+        "all_nodes": [
+            {
+                "type": "CAUSE",
+                "text": "Cause 1",
+                "x_pos": 5.0,
+                "y_pos": 0.0
+            },
+            {
+                "type": "CAUSE",
+                "text": "Cause 2",
+                "x_pos": -2.499999999999999,
+                "y_pos": 4.330127018922194
+            },
+            {
+                "type": "CAUSE",
+                "text": "Cause 3",
+                "x_pos": -2.500000000000002,
+                "y_pos": -4.330127018922193
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 1",
+                "x_pos": -5.250000000000004,
+                "y_pos": -10.825317547305483
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 2",
+                "x_pos": 9.0,
+                "y_pos": -2.220446049250313e-16
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 3",
+                "x_pos": 2.0000000000000004,
+                "y_pos": 1.7320508075688774
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 4",
+                "x_pos": -2.249999999999998,
+                "y_pos": 3.8971143170299736
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 5",
+                "x_pos": 1.7499670003226941,
+                "y_pos": -1.2989555423526027
+            }
+        ],
+        "all_votes": {
+            "0": 1,
+            "1": 1,
+            "2": 1,
+            "3": -1,
+            "4": -1
+        },
+        "winning_vote": 1,
+        "current_options_matrix": [
+            [
+                5,
+                7,
+                -3
+            ],
+            [
+                -4,
+                7,
+                8
+            ],
+            [
+                -4,
+                6,
+                2
+            ],
+            [
+                0,
+                -1,
+                -1
+            ],
+            [
+                -1,
+                -6,
+                -4
+            ]
+        ],
+        "scenario": "somewhatMoreAwareGreedy",
+        "group": -1,
+        "curr_round": "2",
+        "cycle": 2,
+        "chromosome": "highestFromTesting"
+    },
+    "3": {
+        "types_list": [
+            6,
+            6,
+            6,
+            6,
+            6
+        ],
+        "all_nodes": [
+            {
+                "type": "CAUSE",
+                "text": "Cause 1",
+                "x_pos": 5.0,
+                "y_pos": 0.0
+            },
+            {
+                "type": "CAUSE",
+                "text": "Cause 2",
+                "x_pos": -2.499999999999999,
+                "y_pos": 4.330127018922194
+            },
+            {
+                "type": "CAUSE",
+                "text": "Cause 3",
+                "x_pos": -2.500000000000002,
+                "y_pos": -4.330127018922193
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 1",
+                "x_pos": 0.7499999999999998,
+                "y_pos": 0.43301270189221963
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 2",
+                "x_pos": 2.220446049250313e-15,
+                "y_pos": 3.464101615137754
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 3",
+                "x_pos": 2.4998679979026313,
+                "y_pos": -5.1960889111031
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 4",
+                "x_pos": 4.249989000000005,
+                "y_pos": 0.4329936487744446
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 5",
+                "x_pos": 9.25,
+                "y_pos": 1.2990381056766578
+            }
+        ],
+        "all_votes": {
+            "0": 2,
+            "1": 2,
+            "2": 2,
+            "3": -1,
+            "4": 2
+        },
+        "winning_vote": 2,
+        "current_options_matrix": [
+            [
+                -4,
+                3,
+                1
+            ],
+            [
+                -5,
+                -7,
+                7
+            ],
+            [
+                -5,
+                4,
+                3
+            ],
+            [
+                3,
+                -6,
+                -2
+            ],
+            [
+                1,
+                -5,
+                5
+            ]
+        ],
+        "scenario": "somewhatMoreAwareGreedy",
+        "group": -1,
+        "curr_round": "3",
+        "cycle": 2,
+        "chromosome": "highestFromTesting"
+    },
+    "4": {
+        "types_list": [
+            6,
+            6,
+            6,
+            6,
+            6
+        ],
+        "all_nodes": [
+            {
+                "type": "CAUSE",
+                "text": "Cause 1",
+                "x_pos": 5.0,
+                "y_pos": 0.0
+            },
+            {
+                "type": "CAUSE",
+                "text": "Cause 2",
+                "x_pos": -2.499999999999999,
+                "y_pos": 4.330127018922194
+            },
+            {
+                "type": "CAUSE",
+                "text": "Cause 3",
+                "x_pos": -2.500000000000002,
+                "y_pos": -4.330127018922193
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 1",
+                "x_pos": 1.4998899987093237,
+                "y_pos": -4.33003810362738
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 2",
+                "x_pos": -4.750000000000004,
+                "y_pos": -9.093266739736604
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 3",
+                "x_pos": 4.249900998063958,
+                "y_pos": 3.8970952627943998
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 4",
+                "x_pos": 8.881784197001252e-16,
+                "y_pos": 0.8660254037844382
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 5",
+                "x_pos": -4.749999999999998,
+                "y_pos": 9.093266739736606
+            }
+        ],
+        "all_votes": {
+            "0": -1,
+            "1": 2,
+            "2": 2,
+            "3": -1,
+            "4": -1
+        },
+        "winning_vote": -1,
+        "current_options_matrix": [
+            [
+                -4,
+                -3,
+                0
+            ],
+            [
+                -10,
+                4,
+                2
+            ],
+            [
+                -8,
+                10,
+                9
+            ],
+            [
+                -3,
+                -3,
+                -3
+            ],
+            [
+                -4,
+                -2,
+                -9
+            ]
+        ],
+        "scenario": "somewhatMoreAwareGreedy",
+        "group": -1,
+        "curr_round": "4",
+        "cycle": 2,
+        "chromosome": "highestFromTesting"
+    },
+    "5": {
+        "types_list": [
+            6,
+            6,
+            6,
+            6,
+            6
+        ],
+        "all_nodes": [
+            {
+                "type": "CAUSE",
+                "text": "Cause 1",
+                "x_pos": 5.0,
+                "y_pos": 0.0
+            },
+            {
+                "type": "CAUSE",
+                "text": "Cause 2",
+                "x_pos": -2.499999999999999,
+                "y_pos": 4.330127018922194
+            },
+            {
+                "type": "CAUSE",
+                "text": "Cause 3",
+                "x_pos": -2.500000000000002,
+                "y_pos": -4.330127018922193
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 1",
+                "x_pos": 2.25,
+                "y_pos": 0.43301270189221935
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 2",
+                "x_pos": 6.99988999693458,
+                "y_pos": -4.33017782546641
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 3",
+                "x_pos": 4.999977999515988,
+                "y_pos": 0.866025403504989
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 4",
+                "x_pos": 0.7500000000000004,
+                "y_pos": 2.165063509461097
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 5",
+                "x_pos": 12.5,
+                "y_pos": -2.598076211353316
+            }
+        ],
+        "all_votes": {
+            "0": -1,
+            "1": 0,
+            "2": -1,
+            "3": -1,
+            "4": 0
+        },
+        "winning_vote": -1,
+        "current_options_matrix": [
+            [
+                -2,
+                -3,
+                -2
+            ],
+            [
+                9,
+                -2,
+                0
+            ],
+            [
+                0,
+                10,
+                -2
+            ],
+            [
+                -7,
+                -5,
+                7
+            ],
+            [
+                10,
+                -3,
+                7
+            ]
+        ],
+        "scenario": "somewhatMoreAwareGreedy",
+        "group": -1,
+        "curr_round": "5",
+        "cycle": 2,
+        "chromosome": "highestFromTesting"
+    },
+    "6": {
+        "types_list": [
+            6,
+            6,
+            6,
+            6,
+            6
+        ],
+        "all_nodes": [
+            {
+                "type": "CAUSE",
+                "text": "Cause 1",
+                "x_pos": 5.0,
+                "y_pos": 0.0
+            },
+            {
+                "type": "CAUSE",
+                "text": "Cause 2",
+                "x_pos": -2.499999999999999,
+                "y_pos": 4.330127018922194
+            },
+            {
+                "type": "CAUSE",
+                "text": "Cause 3",
+                "x_pos": -2.500000000000002,
+                "y_pos": -4.330127018922193
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 1",
+                "x_pos": 2.9998679977412914,
+                "y_pos": -5.196101613088468
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 2",
+                "x_pos": -0.4999999999999998,
+                "y_pos": -1.1102230246251565e-16
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 3",
+                "x_pos": 12.000000000000002,
+                "y_pos": 2.598076211353315
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 4",
+                "x_pos": 2.0000000000000004,
+                "y_pos": -0.8660254037844393
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 5",
+                "x_pos": -0.5001540016133381,
+                "y_pos": 6.06203810269589
+            }
+        ],
+        "all_votes": {
+            "0": -1,
+            "1": 0,
+            "2": 0,
+            "3": -1,
+            "4": 0
+        },
+        "winning_vote": 0,
+        "current_options_matrix": [
+            [
+                -1,
+                7,
+                -9
+            ],
+            [
+                1,
+                -4,
+                -6
+            ],
+            [
+                4,
+                3,
+                -4
+            ],
+            [
+                -4,
+                -2,
+                7
+            ],
+            [
+                6,
+                1,
+                -7
+            ]
+        ],
+        "scenario": "somewhatMoreAwareGreedy",
+        "group": -1,
+        "curr_round": "6",
+        "cycle": 2,
+        "chromosome": "highestFromTesting"
+    },
+    "7": {
+        "types_list": [
+            6,
+            6,
+            6,
+            6,
+            6
+        ],
+        "all_nodes": [
+            {
+                "type": "CAUSE",
+                "text": "Cause 1",
+                "x_pos": 5.0,
+                "y_pos": 0.0
+            },
+            {
+                "type": "CAUSE",
+                "text": "Cause 2",
+                "x_pos": -2.499999999999999,
+                "y_pos": 4.330127018922194
+            },
+            {
+                "type": "CAUSE",
+                "text": "Cause 3",
+                "x_pos": -2.500000000000002,
+                "y_pos": -4.330127018922193
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 1",
+                "x_pos": 3.4998239966119256,
+                "y_pos": 6.928165122083812
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 2",
+                "x_pos": 1.75,
+                "y_pos": 1.2990381056766582
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 3",
+                "x_pos": 1.0000000000000004,
+                "y_pos": 2.598076211353316
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 4",
+                "x_pos": -0.25000000000000044,
+                "y_pos": 1.2990381056766584
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 5",
+                "x_pos": 0.7498789987093286,
+                "y_pos": -4.763031752401824
+            }
+        ],
+        "all_votes": {
+            "0": 0,
+            "1": 0,
+            "2": -1,
+            "3": -1,
+            "4": -1
+        },
+        "winning_vote": -1,
+        "current_options_matrix": [
+            [
+                5,
+                -1,
+                -5
+            ],
+            [
+                7,
+                8,
+                4
+            ],
+            [
+                0,
+                -6,
+                -1
+            ],
+            [
+                -6,
+                -3,
+                0
+            ],
+            [
+                -5,
+                2,
+                -2
+            ]
+        ],
+        "scenario": "somewhatMoreAwareGreedy",
+        "group": -1,
+        "curr_round": "7",
+        "cycle": 2,
+        "chromosome": "highestFromTesting"
+    },
+    "8": {
+        "types_list": [
+            6,
+            6,
+            6,
+            6,
+            6
+        ],
+        "all_nodes": [
+            {
+                "type": "CAUSE",
+                "text": "Cause 1",
+                "x_pos": 5.0,
+                "y_pos": 0.0
+            },
+            {
+                "type": "CAUSE",
+                "text": "Cause 2",
+                "x_pos": -2.499999999999999,
+                "y_pos": 4.330127018922194
+            },
+            {
+                "type": "CAUSE",
+                "text": "Cause 3",
+                "x_pos": -2.500000000000002,
+                "y_pos": -4.330127018922193
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 1",
+                "x_pos": 0.4999119995160161,
+                "y_pos": -3.4639872961516587
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 2",
+                "x_pos": 1.999889998547983,
+                "y_pos": 4.330050805612746
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 3",
+                "x_pos": -4.499999999999999,
+                "y_pos": -1.732050807568877
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 4",
+                "x_pos": -4.0,
+                "y_pos": 1.7320508075688779
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 5",
+                "x_pos": 1.7498569979026362,
+                "y_pos": -5.629082559877545
+            }
+        ],
+        "all_votes": {
+            "0": -1,
+            "1": -1,
+            "2": 1,
+            "3": 1,
+            "4": -1
+        },
+        "winning_vote": -1,
+        "current_options_matrix": [
+            [
+                -6,
+                -2,
+                -7
+            ],
+            [
+                1,
+                -9,
+                3
+            ],
+            [
+                -2,
+                3,
+                -5
+            ],
+            [
+                5,
+                3,
+                4
+            ],
+            [
+                -3,
+                0,
+                -7
+            ]
+        ],
+        "scenario": "somewhatMoreAwareGreedy",
+        "group": -1,
+        "curr_round": "8",
+        "cycle": 2,
+        "chromosome": "highestFromTesting"
+    },
+    "9": {
+        "types_list": [
+            6,
+            6,
+            6,
+            6,
+            6
+        ],
+        "all_nodes": [
+            {
+                "type": "CAUSE",
+                "text": "Cause 1",
+                "x_pos": 5.0,
+                "y_pos": 0.0
+            },
+            {
+                "type": "CAUSE",
+                "text": "Cause 2",
+                "x_pos": -2.499999999999999,
+                "y_pos": 4.330127018922194
+            },
+            {
+                "type": "CAUSE",
+                "text": "Cause 3",
+                "x_pos": -2.500000000000002,
+                "y_pos": -4.330127018922193
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 1",
+                "x_pos": -3.4999999999999973,
+                "y_pos": 8.660254037844387
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 2",
+                "x_pos": -5.749999999999998,
+                "y_pos": 8.227241335952169
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 3",
+                "x_pos": 3.4998679975799503,
+                "y_pos": -5.196114315073834
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 4",
+                "x_pos": -3.4999999999999982,
+                "y_pos": 7.794228634059948
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 5",
+                "x_pos": 11.500000000000002,
+                "y_pos": 3.464101615137754
+            }
+        ],
+        "all_votes": {
+            "0": 1,
+            "1": 1,
+            "2": 1,
+            "3": -1,
+            "4": -1
+        },
+        "winning_vote": 1,
+        "current_options_matrix": [
+            [
+                -3,
+                3,
+                -1
+            ],
+            [
+                6,
+                1,
+                -5
+            ],
+            [
+                5,
+                9,
+                5
+            ],
+            [
+                -5,
+                -2,
+                7
+            ],
+            [
+                -1,
+                -9,
+                -4
+            ]
+        ],
+        "scenario": "somewhatMoreAwareGreedy",
+        "group": -1,
+        "curr_round": "9",
+        "cycle": 2,
+        "chromosome": "highestFromTesting"
+    },
+    "10": {
+        "types_list": [
+            6,
+            6,
+            6,
+            6,
+            6
+        ],
+        "all_nodes": [
+            {
+                "type": "CAUSE",
+                "text": "Cause 1",
+                "x_pos": 5.0,
+                "y_pos": 0.0
+            },
+            {
+                "type": "CAUSE",
+                "text": "Cause 2",
+                "x_pos": -2.499999999999999,
+                "y_pos": 4.330127018922194
+            },
+            {
+                "type": "CAUSE",
+                "text": "Cause 3",
+                "x_pos": -2.500000000000002,
+                "y_pos": -4.330127018922193
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 1",
+                "x_pos": 0.25000000000000067,
+                "y_pos": 3.0310889132455356
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 2",
+                "x_pos": -5.500000000000002,
+                "y_pos": -6.06217782649107
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 3",
+                "x_pos": -1.7500000000000027,
+                "y_pos": -7.361215932167728
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 4",
+                "x_pos": -4.999999999999998,
+                "y_pos": 6.062177826491071
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 5",
+                "x_pos": -2.0001320006453054,
+                "y_pos": 5.195974593234801
+            }
+        ],
+        "all_votes": {
+            "0": 0,
+            "1": 1,
+            "2": 0,
+            "3": 0,
+            "4": 1
+        },
+        "winning_vote": 0,
+        "current_options_matrix": [
+            [
+                7,
+                5,
+                -1
+            ],
+            [
+                -5,
+                5,
+                -7
+            ],
+            [
+                9,
+                -3,
+                -6
+            ],
+            [
+                5,
+                -3,
+                4
+            ],
+            [
+                -1,
+                4,
+                0
+            ]
+        ],
+        "scenario": "somewhatMoreAwareGreedy",
+        "group": -1,
+        "curr_round": "10",
+        "cycle": 2,
+        "chromosome": "highestFromTesting"
+    },
+    "Conclusion": {
+        "results": {
+            "0": [
+                4,
+                7,
+                1,
+                0,
+                0,
+                -1,
+                0,
+                0,
+                3,
+                7
+            ],
+            "1": [
+                4,
+                7,
+                7,
+                0,
+                0,
+                1,
+                0,
+                0,
+                1,
+                -5
+            ],
+            "2": [
+                2,
+                6,
+                3,
+                0,
+                0,
+                4,
+                0,
+                0,
+                9,
+                9
+            ],
+            "3": [
+                -5,
+                -1,
+                -2,
+                0,
+                0,
+                -4,
+                0,
+                0,
+                -2,
+                5
+            ],
+            "4": [
+                6,
+                -6,
+                5,
+                0,
+                0,
+                6,
+                0,
+                0,
+                -9,
+                -1
+            ]
+        },
+        "cooperation_score": 0.6,
+        "bot_type": [
+            6,
+            6,
+            6,
+            6,
+            6
+        ],
+        "num_rounds": 10,
+        "scenario": "somewhatMoreAwareGreedy",
+        "group": -1,
+        "chromosome": "highestFromTesting"
     }
 }

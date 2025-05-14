@@ -346,6 +346,7 @@ class Social_Choice_Sim:
         return current_node_json, self.final_votes, winning_vote, self.current_options_matrix, self.total_types, self.scenario_string, group, self.round, self.cycle, self.chromosome_string
 
     def get_results(self):
+        #print("Aight were is the zero, its gotta be under num_rounds right?") literally zero clue whawt this print statement was supposed to be for.
         cooperation_score = self.cooperation_score / self.num_rounds  # as a percent, how often we cooperated. (had a non negative cause pass)
         return self.results, cooperation_score, self.total_types, self.num_rounds, self.scenario_string, self.group, self.chromosome_string
 
@@ -369,6 +370,10 @@ class Social_Choice_Sim:
         for bot in bots_list:
             bots_as_string.append(str(bot.get_number_type()))
         return bots_as_string
+
+    def set_new_options_matrix(self, new_optins_matrix):
+        self.current_options_matrix = new_optins_matrix
+
 
 
     ###--- NODE CREATION FOR FRONT END. NOT USEFUL FOR GENETIC STUFF. ---###
