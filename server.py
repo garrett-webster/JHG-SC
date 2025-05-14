@@ -6,7 +6,7 @@ from datetime import datetime
 
 OPTIONS = {
     #General settings
-    "NUM_HUMANS": 1,
+    "NUM_HUMANS": 2,
     "TOTAL_PLAYERS": 5,
     "JHG_ROUNDS_PER_SC_ROUND" : 1,
     "MAX_ROUNDS": 3,

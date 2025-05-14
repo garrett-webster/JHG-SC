@@ -101,11 +101,11 @@ class Social_Choice_Sim:
         bots_array = []
 
         if len(self.bot_type) != self.num_bots:
-            print("THERE HAS BEEN AN ERROR!! WAAAH")
-            return # early return, blow everything up.
-        else:
-            for i, bot_type in enumerate(self.bot_type):
-                bots_array.append(self.match_bot_type(bot_type, i))
+            # lets fix this logic right here and now.
+            self.bot_type = [self.bot_type[0]] * self.num_bots
+
+        for i, bot_type in enumerate(self.bot_type):
+            bots_array.append(self.match_bot_type(bot_type, i))
 
         return bots_array
 
