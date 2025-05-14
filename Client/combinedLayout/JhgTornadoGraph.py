@@ -21,7 +21,6 @@ class JhgTornadoGraph(FigureCanvas):
 
 
     def update_jhg_tornado(self, influence_mat, init_pop_influence):
-        print(init_pop_influence)
         self.ax.cla()
         y_positions = np.arange(self.num_players)[::-1]
         max_extent = 0  # To determine symmetric x-axis limits

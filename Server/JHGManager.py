@@ -39,7 +39,7 @@ class JHGManager:
         sent_dict, received_dict = self.get_sent_and_received(allocations_matrix)
         unique_messages = [received_dict, sent_dict]
 
-        init_pop_influence = (1 - self.alpha)**(round_num - 1) * 100
+        init_pop_influence = (1 - self.alpha) ** round_num * 100
         self.connection_manager.distribute_message("JHG_OVER", round_num, list(current_popularity),
                                                    self.jhg_sim.get_influence().tolist(), init_pop_influence, is_last_jhg_round,
                                                    unique_messages=unique_messages)
