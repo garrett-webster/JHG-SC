@@ -8,6 +8,7 @@ import json
 from Server.social_choice_sim import Social_Choice_Sim # gets me the actual sim
 from Server.simLogger import simLogger
 from offlineSimStuff.variousGraphingTools.fromJsonToGraph import create_stuff # tis just a funciton but here we are
+import textdistance
 
 if __name__ == "__main__":
 
@@ -34,7 +35,7 @@ if __name__ == "__main__":
     for round in big_boy_data:
         if round != "Conclusion":
             current_fetcher = big_boy_data[round]["all_votes"]
-            current_fetcher["winning_vote"] = big_boy_data[round]["winning_vote"]
+            #current_fetcher["winning_vote"] = big_boy_data[round]["winning_vote"] # get rid of the winningVote for now
             old_votes_json[round] = current_fetcher
 
         elif round == "Conclusion":
@@ -97,10 +98,22 @@ if __name__ == "__main__":
     for curr_round in new_boy_data:
         if curr_round != "Conclusion":
             current_fetcher = new_boy_data[curr_round]["all_votes"]
-            current_fetcher["winning_vote"] = new_boy_data[curr_round]["winning_vote"]
+            #current_fetcher["winning_vote"] = new_boy_data[curr_round]["winning_vote"] # get rid of the wining_vote for now
             new_votes_json[curr_round] = current_fetcher
 
-    print("here is the old_votes_json ", old_votes_json)
-    print("here is the new votes json ", new_votes_json)
 
+    # ok lets flatten these votes
+    flattened_old_votes = []
+    flattened_new_votes = []
+    for round in old_votes_json:
+        for vote in old_votes_json[round]:
+            flattened_new_votes.append(str(new_votes_json[round][vote]))
+            flattened_old_votes.append(str(old_votes_json[round][vote]))
 
+    #distance = textdistance.levenshtein.distance(flattened_old_votes, flattened_new_votes) # distance doesn't make any sense in this context. here for reference only.
+    similarity = textdistance.levenshtein.normalized_similarity(flattened_old_votes, flattened_new_votes)
+
+    print("old ", flattened_old_votes)
+    print("new ", flattened_new_votes)
+
+    print(f"Normalized similarity: {similarity:.2f}")
