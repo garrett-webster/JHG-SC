@@ -138,11 +138,12 @@ class Social_Choice_Sim:
 
 
     def set_bot_chromosomes(self, chromosomes):
-        if len(chromosomes) != len(self.bot_type):
-            print("WRONG WRONG WRONG")
-        else:
-            for i in range(len(self.bots)):
-                self.bots[i].set_chromosome(chromosomes[i])
+        if len(chromosomes) != len(self.bots):
+            chromosomes = [chromosomes[0]] * len(self.bots)
+
+
+        for i in range(len(self.bots)):
+            self.bots[i].set_chromosome(chromosomes[i])
 
 
     def apply_vote(self, winning_vote):
