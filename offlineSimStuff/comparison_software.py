@@ -9,11 +9,13 @@ from Server.social_choice_sim import Social_Choice_Sim # gets me the actual sim
 from Server.simLogger import simLogger
 from offlineSimStuff.variousGraphingTools.fromJsonToGraph import create_stuff # tis just a funciton but here we are
 import textdistance
+from datetime import datetime
 
 if __name__ == "__main__":
 
     directory = "../../JHG-SC/Server/sc_logs_repo" # once again
-    filename = "human_study_results.json"
+    now = datetime.now()
+    filename = datetime.now().strftime("%Y%m%d_%H%M%S") + "human_study_results.json"
     filepath = os.path.join(directory, filename)
     with open(filepath, 'r') as f:
         big_boy_data = json.load(f)
