@@ -1,7 +1,7 @@
 from PyQt6.QtWidgets import QHBoxLayout, QLabel, QComboBox
 
-from combinedLayout.SCGrid import SCGrid
-from combinedLayout.ui_functions.SC_functions import get_winning_vote
+from Client.combinedLayout.SCGrid import SCGrid
+from Client.combinedLayout.ui_functions.SC_functions import get_winning_vote
 
 
 class SCHistoryGrid(SCGrid):
@@ -38,7 +38,7 @@ class SCHistoryGrid(SCGrid):
 
     def update_grid(self, votes, utilities, round_num):
         one_idx_votes = {key: value + 1 for key, value in votes.items()}
-        super().update_grid(one_idx_votes, utilities, round_num)
+        super().update_grid(one_idx_votes, utilities)
         winning_vote = get_winning_vote(votes)
 
         # Color the labels for each player coinciding with the winning vote. Green if that cause has positive utility

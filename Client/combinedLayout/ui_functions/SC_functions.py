@@ -17,7 +17,7 @@ def create_sc_ui_elements(main_window):
 
     # Set up the SC history panel
     main_window.SC_voting_grid = SCVotingGrid(main_window.round_state.num_players, client_id, graphs_layout, main_window)
-    main_window.SC_voting_grid.update_grid([0 for _ in range(main_window.round_state.num_players)], [[0 for _ in range(3)] for _ in range(main_window.round_state.num_players)], 0)
+    main_window.SC_voting_grid.update_grid([0 for _ in range(main_window.round_state.num_players)], [[0 for _ in range(3)] for _ in range(main_window.round_state.num_players)])
 
     main_window.SC_panel.setMinimumWidth(400)
     main_window.SC_panel.addTab(main_window.SC_voting_grid, "Next Round")

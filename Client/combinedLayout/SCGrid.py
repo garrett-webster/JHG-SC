@@ -1,7 +1,7 @@
 from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import QVBoxLayout, QGridLayout, QLabel, QTabWidget
 
-from combinedLayout.colors import COLORS
+from Client.combinedLayout.colors import COLORS
 
 
 class SCGrid(QTabWidget):
@@ -46,8 +46,18 @@ class SCGrid(QTabWidget):
             for col, label in enumerate(row_labels):
                 self.grid.addWidget(label, row + 1, col + 2)
 
+        # Add the footer that adds up the column totals for utilities
+            self.footer_col_1 = centered_label("0")
+            self.footer_col_2 = centered_label("0")
+            self.footer_col_3 = centered_label("0")
 
-    def update_grid(self, col_2_vals, utility_mat, round_num):
+            self.grid.addWidget(QLabel("Total Affect"), num_players + 2, 0, 1, 2)
+            self.grid.addWidget(self.footer_col_1, num_players + 2, 2)
+            self.grid.addWidget(self.footer_col_2, num_players + 2, 3)
+            self.grid.addWidget(self.footer_col_3, num_players + 2, 4)
+
+
+    def update_grid(self, col_2_vals, utility_mat):
         self.update_col_2(col_2_vals)
         self.update_utilities(utility_mat)
 
@@ -63,3 +73,13 @@ class SCGrid(QTabWidget):
         for row, row_labels in enumerate(self.cause_utility_labels):
             for col, widget in enumerate(row_labels):
                 row_labels[col].setText(str(utility_mat[row][col]))
+
+        utility_col_sums = [0,0,0]
+        for col_idx in range(3):
+            utility_col_sums[col_idx] = sum(row[col_idx] for row in utility_mat)
+
+        print(utility_col_sums)
+
+        self.footer_col_1.setText(str(utility_col_sums[0]))
+        self.footer_col_2.setText(str(utility_col_sums[1]))
+        self.footer_col_3.setText(str(utility_col_sums[2]))
