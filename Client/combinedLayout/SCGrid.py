@@ -47,14 +47,14 @@ class SCGrid(QTabWidget):
                 self.grid.addWidget(label, row + 1, col + 2)
 
         # Add the footer that adds up the column totals for utilities
-            self.footer_col_1 = centered_label("0")
-            self.footer_col_2 = centered_label("0")
-            self.footer_col_3 = centered_label("0")
+        self.footer_col_1 = centered_label("0")
+        self.footer_col_2 = centered_label("0")
+        self.footer_col_3 = centered_label("0")
 
-            self.grid.addWidget(QLabel("Total Affect"), num_players + 2, 0, 1, 2)
-            self.grid.addWidget(self.footer_col_1, num_players + 2, 2)
-            self.grid.addWidget(self.footer_col_2, num_players + 2, 3)
-            self.grid.addWidget(self.footer_col_3, num_players + 2, 4)
+        self.grid.addWidget(centered_label("Total Affect"), num_players + 2, 0, 1, 2)
+        self.grid.addWidget(self.footer_col_1, num_players + 2, 2)
+        self.grid.addWidget(self.footer_col_2, num_players + 2, 3)
+        self.grid.addWidget(self.footer_col_3, num_players + 2, 4)
 
 
     def update_grid(self, col_2_vals, utility_mat):
