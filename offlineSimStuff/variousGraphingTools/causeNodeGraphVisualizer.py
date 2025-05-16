@@ -46,11 +46,12 @@ class causeNodeGraphVisualizer:
             "-1": "lightgreen",
             "0": "purple",
             "1": "black",
-            "2": "darkgreen",
+            "2": "purple",
             "3": "blue",
             "4": "orange",
             "5": "plum",
             "6": "lightblue",
+            "7" : "darkgreen",
             "default": "gray"
         }
 
@@ -63,7 +64,7 @@ class causeNodeGraphVisualizer:
             "4": "limitedAwareness",
             "5": "secondChoice",
             "6": "somewhatMoreAwareness",
-            "7": "greedyWMDP",
+            "7": "humanAttempt1",
         }
 
         fig = plt.figure(figsize=(13, 6))  # Compact figure size

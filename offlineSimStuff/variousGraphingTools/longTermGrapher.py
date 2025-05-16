@@ -129,6 +129,8 @@ class longTermGrapher():
             bot_name = "limitedAwarenessGreedy"
         if bot_type == 6:
             bot_name = "somewhatMoreAwareGreedy"
+        if bot_type == 7:
+            bot_name = "humanAttempt1"
 
         # what we are naming this new graph
         group_title = group
@@ -148,7 +150,7 @@ class longTermGrapher():
 
         #Save to longTermGrapherFolder
         long_term_path = os.path.join(my_path, "longTermGrapherFolder", file_name)
-        plt.savefig(long_term_path, dpi=300)
+        #plt.savefig(long_term_path, dpi=300)
 
         # Save to individualRoundGraphs folder
         #full_path = os.path.join(dir_path, file_name)

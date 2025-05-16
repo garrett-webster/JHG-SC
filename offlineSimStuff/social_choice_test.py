@@ -23,8 +23,8 @@ def run_trial(sim, num_rounds, num_cycles, create_graphs, group):
         bot_votes = {}
         for cycle in range(num_cycles):
             bot_votes[cycle] = sim.get_votes(bot_votes, curr_round, cycle)
-            if create_graphs:
-                graph_nodes(sim) # only do this for specific rounds
+            #if create_graphs:
+                #graph_nodes(sim) # only do this for specific rounds
 
         bot_votes = bot_votes[num_cycles-1] # grab just the last votes, they are the only ones that matter anyway.
         total_votes = len(bot_votes)
@@ -53,9 +53,9 @@ def create_sim(scenario=None, chromosomes=None, group=""):
 
     # SUM: this sets the bot list type, so we can have siutaions set up
     if scenario is None:
-        scenario = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\offlineSimStuff\scenarioIndicator\somewhatMoreAwareGreedy"
+        scenario = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\offlineSimStuff\scenarioIndicator\humanAttempt1"
     if chromosomes is None:
-        chromosomes = r"C:/Users/Sean/Documents/GitHub/OtherGarrettStuff/JHG-SC/offlineSimStuff/chromosomes/bGStandard.csv"
+        chromosomes = r"C:/Users/Sean/Documents/GitHub/OtherGarrettStuff/JHG-SC/offlineSimStuff/chromosomes/highestFromTesting.csv"
     cycle = -1 # a negative cycle indicates to me that this is a test - that, or something is really really wrong.
     curr_round = -1
 
@@ -72,8 +72,8 @@ if __name__ == "__main__":
     total_groups = ["", 0, 1, 2]
     chromosomes_directory = "testChromosome"
     group = ""
-    scenario = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\offlineSimStuff\scenarioIndicator\somewhatMoreAwareGreedy"
-    chromosome = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\offlineSimStuff\chromosomes\highestFromTesting"
+    scenario = r"C:\Users\seanv\OneDrive\Documents\GitHub\JHG-SC\offlineSimStuff\scenarioIndicator\humanAttempt1"
+    chromosome = r"C:\Users\seanv\OneDrive\Documents\GitHub\JHG-SC\offlineSimStuff\chromosomes\highestFromTesting"
     current_sim = create_sim(scenario, chromosome, group)
     updated_sim = run_trial(current_sim, num_rounds, num_cycles, create_graphs, group)
     current_visualizer = longTermGrapher()

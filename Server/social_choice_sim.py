@@ -16,6 +16,7 @@ from Server.SC_Bots.limitedAwareGreedy import limitedAwarenessGreedy
 from Server.Node import Node
 from Server.SC_Bots.secondChoiceGreedy import secondChoiceGreedy
 from Server.SC_Bots.somewhatMoreAwareGreedy import somewhatMoreAwarenessGreedy
+from Server.SC_Bots.humanAttempt1 import HumanAttempt1
 
 NUM_CAUSES = 3
 
@@ -127,6 +128,8 @@ class Social_Choice_Sim:
             new_bot = (secondChoiceGreedy(i))
         if bot_type == 6:
             new_bot = (somewhatMoreAwarenessGreedy(i))
+        if bot_type == 7:
+            new_bot = (HumanAttempt1(i))
 
 
         return new_bot # the matched bot that we were looking for.

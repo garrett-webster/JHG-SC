@@ -1,7 +1,11 @@
 # ok so the biggest thing I think I noticed was that we need to implement tie breakers, and there were a few weird edge cases.
+# so the biggest difference between humans and bots right now is their macro knoweldge of how things will impact other players
+# even if an option is better for them adn they can get it to pass, they are more likely to pick the one that is better for society as a whole
+# sometimes. Its really hard for me to tell. I am rapidly begininning to understand more acutely why gathering human data is the hardest fetching part of this thing.
 
 
-class somewhatMoreAwarenessGreedy:
+
+class HumanAttempt1:
     def __init__(self, self_id):
         self.self_id = self_id
         self.type = "BG"
@@ -50,6 +54,11 @@ class somewhatMoreAwarenessGreedy:
     def get_column_probabilities(self, matrix):
         num_cols = len(matrix[0])
         col_sums = [sum(matrix[row][col] for row in range(len(matrix))) for col in range(num_cols)]
+
+        min_sum = min(col_sums)
+        if min_sum < 0:  # we have a negative number here....
+            col_sums = [val - min_sum for val in col_sums]
+
         total = sum(col_sums)
         return [val / total for val in col_sums]
 
