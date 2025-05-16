@@ -20,19 +20,22 @@ def run_trial(sim, num_rounds, num_cycles, create_graphs, group):
     for curr_round in tqdm(range(num_rounds)): # do this outside the sim, could make it inside but I like it outside.
 
         sim.start_round() # creates the current current options matrix, makes da player nodes, sets up causes, etc.
+        print("starting round ", round)
+        print("here is the current optino matrix ", sim.get_current_options_matrix())
         bot_votes = {}
         for cycle in range(num_cycles):
+            print("cycle ", cycle, " time")
             bot_votes[cycle] = sim.get_votes(bot_votes, curr_round, cycle)
-            #if create_graphs:
-                #graph_nodes(sim) # only do this for specific rounds
+            if create_graphs:
+                graph_nodes(sim) # only do this for specific rounds
 
         bot_votes = bot_votes[num_cycles-1] # grab just the last votes, they are the only ones that matter anyway.
         total_votes = len(bot_votes)
         # keep this out just in case.
         winning_vote, round_results = sim.return_win(bot_votes)  # is all votes, works here
-        if sim.get_last_option() == 3: # I just wanna understand why this happens.
-            print("This was the winning vote ", winning_vote+1)
-            graph_nodes(sim)  # only do this for specific rounds
+        #if sim.get_last_option() == 3: # I just wanna understand why this happens.
+            #print("This was the winning vote ", winning_vote+1)
+            #graph_nodes(sim)  # only do this for specific rounds
         # this saves everything to the JSON that we need. I mean it saves it to the sim, I can change that so we can log it instead.
         sim.save_results()
         #current_logger.record_individual_round()

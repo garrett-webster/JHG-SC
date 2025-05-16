@@ -342,7 +342,7 @@ class Social_Choice_Sim:
             [3, 6, 7],
         ]
         self.set_new_options_matrix(current_options_matrix)
-        print('this is the len of the current options matrix ', len(self.current_options_matrix))
+        # print('this is the len of the current options matrix ', len(self.current_options_matrix))
 
 
         self.player_nodes = self.create_player_nodes()
@@ -425,7 +425,9 @@ class Social_Choice_Sim:
         self.player_nodes = self.create_player_nodes()
 
     def print_col_passing(self):
-        print(self.choice_matrix)
+        total = sum(self.choice_matrix)
+        normalized_list = [val / total for val in self.choice_matrix]
+        print(normalized_list)
 
 
     ###--- NODE CREATION FOR FRONT END. NOT USEFUL FOR GENETIC STUFF. ---###

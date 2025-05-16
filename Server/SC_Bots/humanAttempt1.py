@@ -41,8 +41,14 @@ class HumanAttempt1:
             return self.choose_best_vote(new_row, cause_sums)
 
 
-    def initialize_matrix(self, current_options_matrix): # creates padding and allows for 0 to be an option
-        return [[max(val+1, 0) for val in [0] + row] for row in current_options_matrix]
+    def initialize_matrix(self, current_options_matrix): # completely changed this to better deal with negatives.
+        flat = [val for row in current_options_matrix for val in row]
+        global_min = min(flat)
+        shift = -global_min if global_min < 0 else 0
+        return [
+            [val + shift for val in [0] + row]
+            for row in current_options_matrix
+        ]
 
     def normalize_rows(self, matrix):
         for row in matrix:
@@ -57,10 +63,11 @@ class HumanAttempt1:
 
         min_sum = min(col_sums)
         if min_sum < 0:  # we have a negative number here....
-            col_sums = [val - min_sum for val in col_sums]
+            col_sums = [val + min_sum for val in col_sums]
 
         total = sum(col_sums)
-        return [val / total for val in col_sums]
+        normalized_columns = [val / total for val in col_sums]
+        return normalized_columns
 
     def apply_previous_votes(self, matrix, previous_votes):
         player_dict = {player: [] for player in previous_votes[next(iter(previous_votes))]}
@@ -72,7 +79,7 @@ class HumanAttempt1:
         for key in player_dict:
             for i, vote in enumerate(player_dict[key]):
                 index = vote + 1
-                matrix[key][index] += 1
+                #matrix[key][index] += 1
                 if key != self.self_id:
                     cause_sums[index] += 1
 
