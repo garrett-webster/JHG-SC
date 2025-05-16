@@ -3,17 +3,15 @@ import math
 import random
 from collections import Counter
 from pathlib import Path
-
 import numpy as np
 
-
+from Server.Node import Node
 from Server.options_creation import generate_two_plus_one_groups_options_best_of_three, generate_two_plus_one_groups
 from Server.SC_Bots.Greedy import GreedyBot
 from Server.SC_Bots.betterGreedy import betterGreedy
 from Server.SC_Bots.SocialWelfare import SocialWelfareBot
 from Server.SC_Bots.Random import RandomBot
 from Server.SC_Bots.limitedAwareGreedy import limitedAwarenessGreedy
-from Server.Node import Node
 from Server.SC_Bots.secondChoiceGreedy import secondChoiceGreedy
 from Server.SC_Bots.somewhatMoreAwareGreedy import somewhatMoreAwarenessGreedy
 from Server.SC_Bots.humanAttempt1 import HumanAttempt1
@@ -66,6 +64,7 @@ class Social_Choice_Sim:
         self.total_types = self.create_total_types() # holds EVERYONE. now we gotta do a significant amount of refactoring.
         self.choice_matrix = [0] * (self.num_causes + 1)
         self.last_option = 0
+        self.all_numbers_matrix = [0] * 21
 
 
 
@@ -327,21 +326,22 @@ class Social_Choice_Sim:
         if sc_groups != None:
             self.sc_groups = sc_groups
         self.current_options_matrix = self.create_options_matrix() # cause we have to create groups.
+        for row in self.current_options_matrix:
+            for num in row:
+                self.all_numbers_matrix[num+10] += 1
 
-        # current_options_matrix = [
-        #     [2, -2, -7],
-        #     [5, 6, 8],
-        #     [-5, -2, 2],
-        #     [-1, -5, 4],
-        #     [-3, -6, -8],
-        #     [-7, -2, -5],
-        #     [8, 6, -6],
-        #     [7, -1, -5],
-        #     [2, -1, 6],
-        #     [1, 7, 3],
-        #     [3, 6, 7],
+        # self.current_options_matrix = [
+        #     [-3,0,4],
+        #     [-5,4,-4],
+        #     [-8,3,6],
+        #     [-1,4,-7],
+        #     [-6,0,0],
+        #     [8,-2,-3],
+        #     [5,7,3],
         # ]
-        # self.set_new_options_matrix(current_options_matrix)
+
+
+        #self.set_new_options_matrix(self.current_options_matrix)
         # print('this is the len of the current options matrix ', len(self.current_options_matrix))
 
 
@@ -427,7 +427,27 @@ class Social_Choice_Sim:
     def print_col_passing(self):
         total = sum(self.choice_matrix)
         normalized_list = [val / total for val in self.choice_matrix]
-        print(normalized_list)
+        print("ratio passing ", normalized_list)
+
+        total = sum(self.all_numbers_matrix)
+        normalized_list = [val / total for val in self.all_numbers_matrix]
+        print("number distro ", normalized_list)
+        below_zero = sum(normalized_list[0:9])
+        zero = normalized_list[10]
+        above_zero = sum(normalized_list[11:20])
+        print("here are below zero ", below_zero, " here are above zero ", above_zero, " and here is zero ", zero)
+        #self.create_heat_map(normalized_list)
+
+
+    # def create_heat_map(self, data):
+    #     array = np.array(data).reshape(3, 7)  # shape it however you want
+    #
+    #     # Create heatmap
+    #     plt.figure(figsize=(8, 4))
+    #     sns.heatmap(array, annot=True, cmap="YlGnBu", cbar=True)
+    #     plt.title("Heatmap of Number Distribution")
+    #     plt.show()
+
 
 
     ###--- NODE CREATION FOR FRONT END. NOT USEFUL FOR GENETIC STUFF. ---###

@@ -23,8 +23,8 @@ def run_trial(sim, num_rounds, num_cycles, create_graphs, group):
         bot_votes = {}
         for cycle in range(num_cycles):
             bot_votes[cycle] = sim.get_votes(bot_votes, curr_round, cycle)
-            #if create_graphs:
-                #graph_nodes(sim) # only do this for specific rounds
+            if create_graphs:
+                graph_nodes(sim) # only do this for specific rounds
 
         bot_votes = bot_votes[num_cycles-1] # grab just the last votes, they are the only ones that matter anyway.
         total_votes = len(bot_votes)
@@ -68,7 +68,7 @@ def create_sim(scenario=None, chromosomes=None, group=""):
 if __name__ == "__main__":
     num_rounds = 100000
     num_cycles = 3
-    create_graphs = True
+    create_graphs = False
     total_groups = ["", 0, 1, 2]
     chromosomes_directory = "testChromosome"
     group = ""

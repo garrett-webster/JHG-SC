@@ -3,7 +3,7 @@
 # even if an option is better for them adn they can get it to pass, they are more likely to pick the one that is better for society as a whole
 # sometimes. Its really hard for me to tell. I am rapidly begininning to understand more acutely why gathering human data is the hardest fetching part of this thing.
 
-
+import math
 
 class HumanAttempt1:
     def __init__(self, self_id):
@@ -38,7 +38,11 @@ class HumanAttempt1:
             majority_factor = self.chromosome[1]
 
             new_row = self.calculate_vote_row(our_row, col_probs, cause_sums, risk_aversion, majority_factor)
-            return self.choose_best_vote(new_row, cause_sums)
+            current_vote = self.choose_best_vote(new_row, cause_sums)
+            if current_vote == -1 and max(current_options_matrix[self.self_id]) >= 0: # if we can create some social lubrication here
+                # at no cost to ourselves, we can select the 0 option and increase the rate of passing. this happened sometimes within human play.
+                return current_options_matrix[self.self_id].index(max(current_options_matrix[self.self_id]))
+            return current_vote
 
 
     def initialize_matrix(self, current_options_matrix): # completely changed this to better deal with negatives.
@@ -88,17 +92,27 @@ class HumanAttempt1:
             cause_sums[key] = cause_sums[key] / length
         return cause_sums
 
+    def smooth_majority_bonus(self, ratio, majority_factor):
+        steepness = 10
+        s = 1 / (1 + math.exp(-steepness * (ratio - 0.5)))
+        return 1 + (majority_factor - 1) * s
+
     def calculate_vote_row(self, our_row, col_probs, cause_sums, risk_aversion, majority_factor):
         new_row = [0]
+        total_voters = len(our_row)
+
         for i, val in enumerate(our_row):
             if val > 0:
                 new_prob = col_probs[i + 1] ** risk_aversion
-                if cause_sums and cause_sums[i + 1] + 1 > len(our_row) // 2:
-                    new_row.append(new_prob * val * majority_factor)
+                if cause_sums:
+                    alignment_ratio = cause_sums[i + 1] / total_voters
+                    bonus = self.smooth_majority_bonus(alignment_ratio, majority_factor)
+                    new_row.append(new_prob * val * bonus)
                 else:
                     new_row.append(new_prob * val)
             else:
                 new_row.append(0)
+
         return new_row
 
     def choose_best_vote(self, new_row, cause_sums=None):
