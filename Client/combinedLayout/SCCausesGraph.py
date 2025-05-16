@@ -2,9 +2,9 @@ from PyQt6.QtWidgets import QWidget, QVBoxLayout
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 
-from combinedLayout.colors import COLORS
+from Client.combinedLayout.colors import COLORS
 
-from combinedLayout.Arrow import Arrow
+from Client.combinedLayout.Arrow import Arrow
 
 
 class SCCausesGraph(QWidget):

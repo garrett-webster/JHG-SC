@@ -2,9 +2,9 @@ from functools import partial
 
 from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import QVBoxLayout, QLabel, QGridLayout, QFrame
-from combinedLayout.SubmitButton import SubmitButton
+from Client.combinedLayout.SubmitButton import SubmitButton
 
-from combinedLayout.colors import COLORS
+from Client.combinedLayout.colors import COLORS
 
 
 class JhgVotingPanel(QVBoxLayout):

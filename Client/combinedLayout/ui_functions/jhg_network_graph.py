@@ -1,6 +1,6 @@
 import numpy as np
-from combinedLayout.ui_functions.StudyScripts.network import NodeNetwork
-from combinedLayout.colors import COLORS
+from Client.combinedLayout.ui_functions.StudyScripts.network import NodeNetwork
+from Client.combinedLayout.colors import COLORS
 import pyqtgraph as pg
 
 def update_jhg_network_graph(main_window):
