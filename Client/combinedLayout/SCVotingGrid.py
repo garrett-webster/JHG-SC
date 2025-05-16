@@ -3,7 +3,7 @@ from functools import partial
 from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import QPushButton, QHBoxLayout, QWidget
 
-from combinedLayout.SCGrid import SCGrid
+from Client.combinedLayout.SCGrid import SCGrid
 
 
 NUM_CAUSES = 3
