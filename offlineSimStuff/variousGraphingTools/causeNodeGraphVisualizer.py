@@ -36,15 +36,16 @@ class causeNodeGraphVisualizer:
         cycle = dict["cycle"]
         types_list = dict["types_list"]
         chromosome = dict["chromosome"]
+        print("This is the curr_round we are passing in under cuaseNODeGraph", curr_round)
         self.create_graph(all_nodes, all_votes, winning_vote, current_options_matrix, types_list, scenario, group, curr_round, cycle, chromosome)
 
 
     def create_graph(self, all_nodes, all_votes, winning_vote, current_options_matrix, types_list, scenario, group, curr_round, cycle, chromosome):
         bot_color_map = {
             # -1 is player, 0 is random, 1 is socialWelfare, 2 is greedy, 3 is betterGreedy, 4 is limitedAwareness, 5 is secondChoice
-            "-1": "black",
+            "-1": "lightgreen",
             "0": "purple",
-            "1": "lightgreen",
+            "1": "black",
             "2": "darkgreen",
             "3": "blue",
             "4": "orange",
@@ -164,7 +165,7 @@ class causeNodeGraphVisualizer:
                 ax.add_patch(arrow)
 
         fig.suptitle(
-            f"Round: {curr_round + 1}   Situation: {scenario}   Cycle: {cycle}    Group: {group}",
+            f"Round: {str(int(curr_round) + 1)}   Situation: {scenario}   Cycle: {cycle}    Group: {group}",
             fontsize=16, fontweight='bold', y=0.98)
 
         # creates a legend that allows us to see which bot types are active, and which ones are what
@@ -188,7 +189,7 @@ class causeNodeGraphVisualizer:
         my_path = os.path.dirname(os.path.abspath(__file__))
         scenario_str = f"scenario_{scenario}"
         group_str = f"group_{group}"
-        file_name = f"round_{curr_round+1}_cycle_{cycle}.png"
+        file_name = f"round_{str(int(curr_round)+1)}_cycle_{cycle}.png"
         dir_path = os.path.join(my_path, "individualRoundGraphs", scenario_str, group_str)
         os.makedirs(dir_path, exist_ok=True)
         full_path = os.path.join(dir_path, file_name)

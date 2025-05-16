@@ -63,7 +63,8 @@ class Social_Choice_Sim:
         self.current_results = [] # holds the results from the last "return win" call, which we can access later.
         self.results = self.create_results()  # dict key: player id, attribute: list of all utility changes per round.
         self.total_types = self.create_total_types() # holds EVERYONE. now we gotta do a significant amount of refactoring.
-
+        self.choice_matrix = [0] * (self.num_causes + 1)
+        self.last_option = 0
 
 
 
@@ -235,6 +236,19 @@ class Social_Choice_Sim:
         #self.final_votes = all_votes
         winning_vote_count = Counter(total_votes.values()).most_common(1)[0][1]
         winning_vote = Counter(total_votes.values()).most_common(1)[0][0]
+
+        col_sums = [sum(col) for col in zip(*self.current_options_matrix)]
+        col_sums.insert(0, 0)
+
+        sorted_column_sums = sorted(col_sums, reverse=True)
+
+        index = int(winning_vote) + 1
+        self.choice_matrix[sorted_column_sums.index(col_sums[index])] += 1
+        self.last_option = sorted_column_sums.index(col_sums[index])
+
+
+
+
         if not (winning_vote_count > len(total_votes) // 2):
             winning_vote = -1
 
@@ -247,6 +261,12 @@ class Social_Choice_Sim:
                 self.current_results.append(0)
 
         return winning_vote, self.current_results
+
+    def set_choice_matrix(self, new_choice_matrix):
+        self.choice_matrix = new_choice_matrix
+
+    def get_last_option(self):
+        return self.last_option
 
     def save_results(self):
         for player in range(len(self.current_results)):
@@ -303,7 +323,25 @@ class Social_Choice_Sim:
     def start_round(self, sc_groups=None):
         if sc_groups != None:
             self.sc_groups = sc_groups
-        self.current_options_matrix = self.create_options_matrix()
+        self.current_options_matrix = self.create_options_matrix() # cause we have to create groups.
+
+        current_options_matrix = [
+            [2, -2, -7],
+            [5, 6, 8],
+            [-5, -2, 2],
+            [-1, -5, 4],
+            [-3, -6, -8],
+            [-7, -2, -5],
+            [8, 6, -6],
+            [7, -1, -5],
+            [2, -1, 6],
+            [1, 7, 3],
+            [3, 6, 7],
+        ]
+        self.set_new_options_matrix(current_options_matrix)
+        print('this is the len of the current options matrix ', len(self.current_options_matrix))
+
+
         self.player_nodes = self.create_player_nodes()
 
     def make_native_type(self, return_values):
@@ -338,8 +376,10 @@ class Social_Choice_Sim:
         for node in current_nodes:
             current_node_json.append(node.to_json())
 
+        current_choice_matrix = copy.copy(self.choice_matrix)
         current_cooperation_score = copy.copy(self.cooperation_score)
         winning_vote, _ = self.return_win(self.final_votes)
+        self.set_choice_matrix(current_choice_matrix)
         self.set_coop_score(current_cooperation_score)  # reset it bc the above does silly things.
 
         group = self.get_group()
@@ -359,7 +399,9 @@ class Social_Choice_Sim:
             current_node_json.append(node.to_json())
 
         current_cooperation_score = copy.copy(self.cooperation_score)
+        current_choice_matrix = copy.copy(self.choice_matrix)
         winning_vote, _ = self.return_win(self.final_votes)
+        self.choice_matrix = current_choice_matrix
         self.set_coop_score(current_cooperation_score)  # reset it bc the above does silly things.
         cooperation_score = self.cooperation_score / self.num_rounds  # as a percent, how often we cooperated. (had a non negative cause pass)
 
@@ -375,6 +417,12 @@ class Social_Choice_Sim:
     def set_new_options_matrix(self, new_optins_matrix):
         self.current_options_matrix = new_optins_matrix
 
+    def set_player_nodes(self, new_options_matrix):
+        self.current_options_matrix = new_options_matrix
+        self.player_nodes = self.create_player_nodes()
+
+    def print_col_passing(self):
+        print(self.choice_matrix)
 
 
     ###--- NODE CREATION FOR FRONT END. NOT USEFUL FOR GENETIC STUFF. ---###

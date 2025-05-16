@@ -1,12 +1,11 @@
 # so this allows me to run the fetcher and create visualizations based off of scenarios and whatnot.
 import time
 from Server.social_choice_sim import Social_Choice_Sim
-import os
 from tqdm import tqdm
 
 from offlineSimStuff.variousGraphingTools.causeNodeGraphVisualizer import causeNodeGraphVisualizer
 from offlineSimStuff.variousGraphingTools.longTermGrapher import longTermGrapher
-from Server.simLogger import simLogger
+from offlineSimStuff.variousGraphingTools.simLogger import simLogger
 
 
 # starts the sim, could make this take command line arguments
@@ -31,12 +30,16 @@ def run_trial(sim, num_rounds, num_cycles, create_graphs, group):
         total_votes = len(bot_votes)
         # keep this out just in case.
         winning_vote, round_results = sim.return_win(bot_votes)  # is all votes, works here
+        if sim.get_last_option() == 3: # I just wanna understand why this happens.
+            print("This was the winning vote ", winning_vote+1)
+            graph_nodes(sim)  # only do this for specific rounds
         # this saves everything to the JSON that we need. I mean it saves it to the sim, I can change that so we can log it instead.
         sim.save_results()
         #current_logger.record_individual_round()
 
     end_time = time.time()
-    current_logger.record_big_picture()
+    sim.print_col_passing()
+    #current_logger.record_big_picture()
     #print("This was the total time ", end_time - start_time)
     return sim
 
@@ -63,7 +66,7 @@ def create_sim(scenario=None, chromosomes=None, group=""):
 
 
 if __name__ == "__main__":
-    num_rounds = 10
+    num_rounds = 2
     num_cycles = 3
     create_graphs = True
     total_groups = ["", 0, 1, 2]

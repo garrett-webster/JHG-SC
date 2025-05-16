@@ -1,15 +1,14 @@
 from Server.JHGManager import JHGManager
 from Server.SCManager import SCManager
 from Server.ServerConnectionManager import ServerConnectionManager
-from Server.simLogger import simLogger # this is SC_SIM logger for reference.
 from datetime import datetime
 
 OPTIONS = {
     #General settings
-    "NUM_HUMANS": 2,
+    "NUM_HUMANS": 1,
     "TOTAL_PLAYERS": 5,
     "JHG_ROUNDS_PER_SC_ROUND" : 1,
-    "MAX_ROUNDS": 3,
+    "MAX_ROUNDS": 2,
     "SC_GROUP_OPTION": 2, # See options_creation.py -> group_size_options to understand what this means
     "SC_VOTE_CYCLES": 3,
     "JHG_LOGGING": False,

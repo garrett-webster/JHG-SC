@@ -2,9 +2,7 @@ import time
 
 from Server.social_choice_sim import Social_Choice_Sim
 from Server.options_creation import generate_two_plus_one_groups
-from offlineSimStuff.variousGraphingTools.causeNodeGraphVisualizer import causeNodeGraphVisualizer
-from Server.simLogger import simLogger # this logs stuff
-import os
+from offlineSimStuff.variousGraphingTools.simLogger import simLogger # this logs stuff
 import copy
 
 def create_empty_vote_matrix(num_players):

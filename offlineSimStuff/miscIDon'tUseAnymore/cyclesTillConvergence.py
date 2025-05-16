@@ -1,12 +1,10 @@
 # so this allows me to run the fetcher and create visualizations based off of scenarios and whatnot.
 import time
 from Server.social_choice_sim import Social_Choice_Sim
-import os
 from tqdm import tqdm
 import statistics
 from offlineSimStuff.variousGraphingTools.causeNodeGraphVisualizer import causeNodeGraphVisualizer
-from offlineSimStuff.variousGraphingTools.longTermGrapher import longTermGrapher
-from Server.simLogger import simLogger
+from offlineSimStuff.variousGraphingTools.simLogger import simLogger
 
 
 # starts the sim, could make this take command line arguments
