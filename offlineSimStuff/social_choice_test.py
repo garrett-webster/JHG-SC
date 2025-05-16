@@ -20,14 +20,11 @@ def run_trial(sim, num_rounds, num_cycles, create_graphs, group):
     for curr_round in tqdm(range(num_rounds)): # do this outside the sim, could make it inside but I like it outside.
 
         sim.start_round() # creates the current current options matrix, makes da player nodes, sets up causes, etc.
-        print("starting round ", round)
-        print("here is the current optino matrix ", sim.get_current_options_matrix())
         bot_votes = {}
         for cycle in range(num_cycles):
-            print("cycle ", cycle, " time")
             bot_votes[cycle] = sim.get_votes(bot_votes, curr_round, cycle)
-            if create_graphs:
-                graph_nodes(sim) # only do this for specific rounds
+            #if create_graphs:
+                #graph_nodes(sim) # only do this for specific rounds
 
         bot_votes = bot_votes[num_cycles-1] # grab just the last votes, they are the only ones that matter anyway.
         total_votes = len(bot_votes)
@@ -69,7 +66,7 @@ def create_sim(scenario=None, chromosomes=None, group=""):
 
 
 if __name__ == "__main__":
-    num_rounds = 2
+    num_rounds = 100000
     num_cycles = 3
     create_graphs = True
     total_groups = ["", 0, 1, 2]

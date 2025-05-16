@@ -54,7 +54,6 @@ class somewhatMoreAwarenessGreedy:
         col_sums = [sum(matrix[row][col] for row in range(len(matrix))) for col in range(num_cols)]
         total = sum(col_sums)
         normalized_columns = [val / total for val in col_sums]
-        print("normalized_columns", normalized_columns)
         return normalized_columns
 
     def apply_previous_votes(self, matrix, previous_votes):

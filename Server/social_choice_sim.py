@@ -328,20 +328,20 @@ class Social_Choice_Sim:
             self.sc_groups = sc_groups
         self.current_options_matrix = self.create_options_matrix() # cause we have to create groups.
 
-        current_options_matrix = [
-            [2, -2, -7],
-            [5, 6, 8],
-            [-5, -2, 2],
-            [-1, -5, 4],
-            [-3, -6, -8],
-            [-7, -2, -5],
-            [8, 6, -6],
-            [7, -1, -5],
-            [2, -1, 6],
-            [1, 7, 3],
-            [3, 6, 7],
-        ]
-        self.set_new_options_matrix(current_options_matrix)
+        # current_options_matrix = [
+        #     [2, -2, -7],
+        #     [5, 6, 8],
+        #     [-5, -2, 2],
+        #     [-1, -5, 4],
+        #     [-3, -6, -8],
+        #     [-7, -2, -5],
+        #     [8, 6, -6],
+        #     [7, -1, -5],
+        #     [2, -1, 6],
+        #     [1, 7, 3],
+        #     [3, 6, 7],
+        # ]
+        # self.set_new_options_matrix(current_options_matrix)
         # print('this is the len of the current options matrix ', len(self.current_options_matrix))
 
 
