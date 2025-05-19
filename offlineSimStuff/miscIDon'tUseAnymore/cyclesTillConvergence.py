@@ -4,6 +4,7 @@ from Server.social_choice_sim import Social_Choice_Sim
 from tqdm import tqdm
 import statistics
 from offlineSimStuff.variousGraphingTools.causeNodeGraphVisualizer import causeNodeGraphVisualizer
+from offlineSimStuff.variousGraphingTools.longTermGrapher import longTermGrapher
 from offlineSimStuff.variousGraphingTools.simLogger import simLogger
 
 
@@ -30,9 +31,8 @@ def run_trial(sim, num_rounds, num_cycles, create_graphs, group):
                     break
             #if create_graphs:
                 #graph_nodes(sim) # only do this for specific rounds
-            if cycle > 14:
-                for cycle in bot_votes:
-                    graph_nodes(sim, vote_override)
+            if cycle > 20:
+                print("Maximum reached")
                 break
         cycle_list.append(cycle)
 
@@ -66,14 +66,14 @@ def create_sim(scenario=None, chromosomes=None, group=""):
     cycle = -1 # a negative cycle indicates to me that this is a test - that, or something is really really wrong.
     curr_round = -1
 
-    sim = Social_Choice_Sim(11, 3, 0, cycle, curr_round, chromosomes, scenario, group)
+    sim = Social_Choice_Sim(7, 3, 0, cycle, curr_round, chromosomes, scenario, group)
 
     return sim
 
 
 
 if __name__ == "__main__":
-    num_rounds = 100000
+    num_rounds = 10
     num_cycles = 3
     create_graphs = True
     total_groups = ["", 0, 1, 2]
@@ -83,7 +83,7 @@ if __name__ == "__main__":
     chromosome = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\offlineSimStuff\chromosomes\highestFromTesting"
     current_sim = create_sim(scenario, chromosome, group)
     updated_sim = run_trial(current_sim, num_rounds, num_cycles, create_graphs, group)
-    #current_visualizer = longTermGrapher()
-    #current_visualizer.draw_graph_from_sim(updated_sim)
+    current_visualizer = longTermGrapher()
+    current_visualizer.draw_graph_from_sim(updated_sim)
 
     big_boy_json = {}

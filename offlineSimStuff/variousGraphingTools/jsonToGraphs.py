@@ -6,8 +6,8 @@ if __name__ == '__main__':
     # this is an idividual round below.
     #filename = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\Server\sc_logs_repo\individual_round\ scenariosomewhatMoreAwareGreedygroups-1round8cycle2.json"
 
-    # # human results time # these are already exactly where they need to be. don't mess with them, I don't think.
-    # filepath = r"C:\Users\seanv\OneDrive\Documents\GitHub\JHG-SC\offlineSimStuff\human_results_time\human_results.json"
+    # human results time # these are already exactly where they need to be. don't mess with them, I don't think.
+    # filepath = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\offlineSimStuff\human_results_time\human_study_results.json"
     # with open(filepath, 'r') as f:
     #     data = json.load(f)
     #
@@ -20,7 +20,7 @@ if __name__ == '__main__':
     #         curr_maker.big_picture_from_dict(data[curr_round])
 
 
-    filepath = r"C:\Users\seanv\OneDrive\Documents\GitHub\JHG-SC\offlineSimStuff\human_results_time\machine_comparison.json"
+    filepath = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\offlineSimStuff\human_results_time\machine_comparison.json"
     with open(filepath, 'r') as f:
         data = json.load(f)
 

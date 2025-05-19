@@ -14,7 +14,7 @@ if __name__ == "__main__":
     # filename = datetime.now().strftime("%Y%m%d_%H%M%S") + "human_study_results.json"
     # filepath = os.path.join(directory, filename)
 
-    filepath = r"C:\Users\seanv\OneDrive\Documents\GitHub\JHG-SC\offlineSimStuff\human_results_time\human_results.json"
+    filepath = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\offlineSimStuff\human_results_time\human_study_results.json"
 
     with open(filepath, 'r') as f:
         big_boy_data = json.load(f)
@@ -55,8 +55,8 @@ if __name__ == "__main__":
         else:
             print("Aight this is the round ", round)
 
-    chromosomes = r"C:\Users\seanv\OneDrive\Documents\GitHub\JHG-SC\offlineSimStuff\chromosomes\highestFromTesting"
-    scenario = r"C:\Users\seanv\OneDrive\Documents\GitHub\JHG-SC\offlineSimStuff\scenarioIndicator\humanAttempt1"
+    chromosomes = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\offlineSimStuff\chromosomes\highestFromTesting"
+    scenario = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\offlineSimStuff\scenarioIndicator\humanAttempt1"
 
     new_sim = Social_Choice_Sim(total_players, num_causes, num_humans, cycle, round, chromosomes, scenario, group)
     new_sim.set_group(group)

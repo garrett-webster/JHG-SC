@@ -4,6 +4,8 @@
 # sometimes. Its really hard for me to tell. I am rapidly begininning to understand more acutely why gathering human data is the hardest fetching part of this thing.
 
 import math
+import random
+
 
 class HumanAttempt1:
     def __init__(self, self_id):
@@ -24,25 +26,46 @@ class HumanAttempt1:
     def get_vote(self, current_options_matrix, previous_votes=None):
         # this first part is exactly the saem as the betterGreedy - for an initial guess, we just have to use something. Pure probability is a go
 
-            matrix = self.initialize_matrix(current_options_matrix)
+        matrix = self.initialize_matrix(current_options_matrix)
+        self.normalize_rows(matrix)
+
+        cause_sums = None
+        rand_num = random.random()
+
+        if previous_votes == None:
+            # make default
+
+        if previous_votes: # if there are previous votes to consider
+            # if rand_num < 1.0:
+            #     #print("silly time")
+            #     last_key = list(previous_votes.keys())[-1]
+            #     new_dict = {}
+            #     for key in previous_votes:
+            #         if key != last_key:
+            #             new_dict[key] = previous_votes[key]
+            #     previous_votes = new_dict
+            #
+            #     if previous_votes:
+            cause_sums = self.apply_previous_votes(matrix, previous_votes)
             self.normalize_rows(matrix)
+            # else:
+            #     pass
+            #     #print("noT silly time. ")
 
-            cause_sums = None
-            if previous_votes:
-                cause_sums = self.apply_previous_votes(matrix, previous_votes)
-                self.normalize_rows(matrix)
+        col_probs = self.get_column_probabilities(matrix)
+        our_row = current_options_matrix[self.self_id]
+        risk_aversion = self.chromosome[0]
+        majority_factor = self.chromosome[1]
 
-            col_probs = self.get_column_probabilities(matrix)
-            our_row = current_options_matrix[self.self_id]
-            risk_aversion = self.chromosome[0]
-            majority_factor = self.chromosome[1]
+        new_row = self.calculate_vote_row(our_row, col_probs, cause_sums, risk_aversion, majority_factor)
+        current_vote = self.choose_best_vote(new_row, cause_sums)
 
-            new_row = self.calculate_vote_row(our_row, col_probs, cause_sums, risk_aversion, majority_factor)
-            current_vote = self.choose_best_vote(new_row, cause_sums)
-            if current_vote == -1 and max(current_options_matrix[self.self_id]) >= 0: # if we can create some social lubrication here
-                # at no cost to ourselves, we can select the 0 option and increase the rate of passing. this happened sometimes within human play.
-                return current_options_matrix[self.self_id].index(max(current_options_matrix[self.self_id]))
-            return current_vote
+
+
+        if current_vote == -1 and max(current_options_matrix[self.self_id]) >= 0: # if we can create some social lubrication here
+            # at no cost to ourselves, we can select the 0 option and increase the rate of passing. this happened sometimes within human play.
+            return current_options_matrix[self.self_id].index(max(current_options_matrix[self.self_id]))
+        return current_vote
 
 
     def initialize_matrix(self, current_options_matrix): # completely changed this to better deal with negatives.
@@ -83,7 +106,6 @@ class HumanAttempt1:
         for key in player_dict:
             for i, vote in enumerate(player_dict[key]):
                 index = vote + 1
-                #matrix[key][index] += 1
                 if key != self.self_id:
                     cause_sums[index] += 1
 
@@ -92,7 +114,7 @@ class HumanAttempt1:
             cause_sums[key] = cause_sums[key] / length
         return cause_sums
 
-    def smooth_majority_bonus(self, ratio, majority_factor):
+    def smooth_majority_bonus(self, ratio, majority_factor): # this is a sigmoid return to help us smooth out majorities. Works, just didn't help in teh case that I wanted it to.
         steepness = 10
         s = 1 / (1 + math.exp(-steepness * (ratio - 0.5)))
         return 1 + (majority_factor - 1) * s
@@ -101,7 +123,7 @@ class HumanAttempt1:
         new_row = [0]
         total_voters = len(our_row)
 
-        for i, val in enumerate(our_row):
+        for i, val in enumerate(our_row): # our row is the players row within current option matrix.
             if val > 0:
                 new_prob = col_probs[i + 1] ** risk_aversion
                 if cause_sums:

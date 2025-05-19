@@ -322,6 +322,17 @@ class Social_Choice_Sim:
             for num in row:
                 self.all_numbers_matrix[num+10] += 1
 
+        # this is the swap case. Should I be documenting these somewhere better? definitely! but here we are
+        self.current_options_matrix = [
+            [5,4,3],
+            [-5,-9,-4],
+            [-2,-6,4],
+            [-7,1,-6],
+            [-1,1,7],
+            [5,8,4],
+            [0,4,-4]
+        ]
+
         # self.current_options_matrix = [
         #     [-3,0,4],
         #     [-5,4,-4],

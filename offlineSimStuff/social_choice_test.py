@@ -18,6 +18,7 @@ def run_trial(sim, num_rounds, num_cycles, create_graphs, group):
     sim.set_group(group)
 
     for curr_round in tqdm(range(num_rounds)): # do this outside the sim, could make it inside but I like it outside.
+    #for curr_round in (range(num_rounds)): # do this outside the sim, could make it inside but I like it outside.
 
         sim.start_round() # creates the current current options matrix, makes da player nodes, sets up causes, etc.
         bot_votes = {}
@@ -38,7 +39,7 @@ def run_trial(sim, num_rounds, num_cycles, create_graphs, group):
         #current_logger.record_individual_round()
 
     end_time = time.time()
-    sim.print_col_passing()
+    sim.print_col_passing() # this shows us the breakdown of the number distro. incredibly fascinating! look at it later.
     #current_logger.record_big_picture()
     #print("This was the total time ", end_time - start_time)
     return sim
@@ -59,21 +60,21 @@ def create_sim(scenario=None, chromosomes=None, group=""):
     cycle = -1 # a negative cycle indicates to me that this is a test - that, or something is really really wrong.
     curr_round = -1
 
-    sim = Social_Choice_Sim(11, 3, 0, cycle, curr_round, chromosomes, scenario, group)
+    sim = Social_Choice_Sim(7, 3, 0, cycle, curr_round, chromosomes, scenario, group)
 
     return sim
 
 
 
 if __name__ == "__main__":
-    num_rounds = 100000
-    num_cycles = 3
-    create_graphs = False
+    num_rounds = 5
+    num_cycles = 5
+    create_graphs = True
     total_groups = ["", 0, 1, 2]
     chromosomes_directory = "testChromosome"
     group = ""
-    scenario = r"C:\Users\seanv\OneDrive\Documents\GitHub\JHG-SC\offlineSimStuff\scenarioIndicator\humanAttempt1"
-    chromosome = r"C:\Users\seanv\OneDrive\Documents\GitHub\JHG-SC\offlineSimStuff\chromosomes\highestFromTesting"
+    scenario = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\offlineSimStuff\scenarioIndicator\humanAttempt1"
+    chromosome = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\offlineSimStuff\chromosomes\highestFromTesting"
     current_sim = create_sim(scenario, chromosome, group)
     updated_sim = run_trial(current_sim, num_rounds, num_cycles, create_graphs, group)
     current_visualizer = longTermGrapher()
