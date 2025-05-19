@@ -30,32 +30,28 @@ class HumanAttempt1:
         self.normalize_rows(matrix)
 
         cause_sums = None
-        rand_num = random.random()
-
-        if previous_votes == None:
-            # make default
-
-        if previous_votes: # if there are previous votes to consider
-            # if rand_num < 1.0:
-            #     #print("silly time")
-            #     last_key = list(previous_votes.keys())[-1]
-            #     new_dict = {}
-            #     for key in previous_votes:
-            #         if key != last_key:
-            #             new_dict[key] = previous_votes[key]
-            #     previous_votes = new_dict
-            #
-            #     if previous_votes:
-            cause_sums = self.apply_previous_votes(matrix, previous_votes)
-            self.normalize_rows(matrix)
-            # else:
-            #     pass
-            #     #print("noT silly time. ")
 
         col_probs = self.get_column_probabilities(matrix)
         our_row = current_options_matrix[self.self_id]
         risk_aversion = self.chromosome[0]
         majority_factor = self.chromosome[1]
+        if previous_votes == None:
+            previous_votes = {}
+
+        previous_votes[-1] = {}
+        new_votes = {}
+
+        for i, player in enumerate(current_options_matrix):
+            player_vote = self.calculate_vote_row(player, col_probs, cause_sums, risk_aversion, majority_factor)
+            current_vote = self.choose_best_vote(player_vote, cause_sums)
+            new_votes[i] = current_vote
+
+        previous_votes[-1] = new_votes
+
+        if previous_votes: # if there are previous votes to consider
+                cause_sums = self.apply_previous_votes(matrix, previous_votes)
+                self.normalize_rows(matrix)
+
 
         new_row = self.calculate_vote_row(our_row, col_probs, cause_sums, risk_aversion, majority_factor)
         current_vote = self.choose_best_vote(new_row, cause_sums)

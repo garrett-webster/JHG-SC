@@ -67,9 +67,9 @@ def create_sim(scenario=None, chromosomes=None, group=""):
 
 
 if __name__ == "__main__":
-    num_rounds = 5
-    num_cycles = 5
-    create_graphs = True
+    num_rounds = 100000
+    num_cycles = 3
+    create_graphs = False
     total_groups = ["", 0, 1, 2]
     chromosomes_directory = "testChromosome"
     group = ""
