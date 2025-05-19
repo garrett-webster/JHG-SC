@@ -1,0 +1,2675 @@
+{
+    "1": {
+        "types_list": [
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1
+        ],
+        "all_nodes": [
+            {
+                "type": "CAUSE",
+                "text": "Cause 1",
+                "x_pos": 5.0,
+                "y_pos": 0.0
+            },
+            {
+                "type": "CAUSE",
+                "text": "Cause 2",
+                "x_pos": -2.499999999999999,
+                "y_pos": 4.330127018922194
+            },
+            {
+                "type": "CAUSE",
+                "text": "Cause 3",
+                "x_pos": -2.500000000000002,
+                "y_pos": -4.330127018922192
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 1",
+                "x_pos": -4.2500000000000036,
+                "y_pos": -8.227241335952165
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 2",
+                "x_pos": 3.99986799741861,
+                "y_pos": -5.196127017059201
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 3",
+                "x_pos": 4.249922998547968,
+                "y_pos": 3.0310698592894116
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 4",
+                "x_pos": 0.4998239975799694,
+                "y_pos": -6.928088910171614
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 5",
+                "x_pos": 3.499999999999999,
+                "y_pos": -0.866025403784438
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 6",
+                "x_pos": -3.749999999999999,
+                "y_pos": 0.4330127018922205
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 7",
+                "x_pos": 2.749856997579954,
+                "y_pos": 5.629107963848279
+            }
+        ],
+        "all_votes": {
+            "6": 0,
+            "2": 0,
+            "5": 1,
+            "0": 2,
+            "3": 2,
+            "1": 0,
+            "4": 2
+        },
+        "winning_vote": -1,
+        "current_options_matrix": [
+            [
+                -5,
+                -6,
+                7
+            ],
+            [
+                4,
+                -6,
+                2
+            ],
+            [
+                10,
+                5,
+                -7
+            ],
+            [
+                2,
+                -8,
+                9
+            ],
+            [
+                10,
+                2,
+                4
+            ],
+            [
+                -5,
+                8,
+                7
+            ],
+            [
+                2,
+                3,
+                -5
+            ]
+        ],
+        "scenario": "humanTesting",
+        "group": -1,
+        "curr_round": 1,
+        "cycle": 3,
+        "chromosome": "NA"
+    },
+    "2": {
+        "types_list": [
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1
+        ],
+        "all_nodes": [
+            {
+                "type": "CAUSE",
+                "text": "Cause 1",
+                "x_pos": 5.0,
+                "y_pos": 0.0
+            },
+            {
+                "type": "CAUSE",
+                "text": "Cause 2",
+                "x_pos": -2.499999999999999,
+                "y_pos": 4.330127018922194
+            },
+            {
+                "type": "CAUSE",
+                "text": "Cause 3",
+                "x_pos": -2.500000000000002,
+                "y_pos": -4.330127018922192
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 1",
+                "x_pos": -0.24999999999999967,
+                "y_pos": 0.433012701892219
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 2",
+                "x_pos": -8.25,
+                "y_pos": -0.433012701892219
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 3",
+                "x_pos": -6.25,
+                "y_pos": 0.4330127018922195
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 4",
+                "x_pos": 0.7499999999999998,
+                "y_pos": 1.2990381056766584
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 5",
+                "x_pos": -4.999999999999998,
+                "y_pos": -2.598076211353315
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 6",
+                "x_pos": 1.999911999031995,
+                "y_pos": 3.464025402107757
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 7",
+                "x_pos": 10.0,
+                "y_pos": -1.6653345369377348e-16
+            }
+        ],
+        "all_votes": {
+            "5": 1,
+            "0": -1,
+            "2": 1,
+            "6": 0,
+            "1": 1,
+            "3": 1,
+            "4": 1
+        },
+        "winning_vote": 1,
+        "current_options_matrix": [
+            [
+                -2,
+                -1,
+                -2
+            ],
+            [
+                -8,
+                1,
+                2
+            ],
+            [
+                -4,
+                2,
+                1
+            ],
+            [
+                6,
+                6,
+                3
+            ],
+            [
+                -3,
+                0,
+                6
+            ],
+            [
+                3,
+                3,
+                -1
+            ],
+            [
+                1,
+                -1,
+                -1
+            ]
+        ],
+        "scenario": "humanTesting",
+        "group": -1,
+        "curr_round": 2,
+        "cycle": 3,
+        "chromosome": "NA"
+    },
+    "3": {
+        "types_list": [
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1
+        ],
+        "all_nodes": [
+            {
+                "type": "CAUSE",
+                "text": "Cause 1",
+                "x_pos": 5.0,
+                "y_pos": 0.0
+            },
+            {
+                "type": "CAUSE",
+                "text": "Cause 2",
+                "x_pos": -2.499999999999999,
+                "y_pos": 4.330127018922194
+            },
+            {
+                "type": "CAUSE",
+                "text": "Cause 3",
+                "x_pos": -2.500000000000002,
+                "y_pos": -4.330127018922192
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 1",
+                "x_pos": 0.7499999999999998,
+                "y_pos": 0.43301270189221985
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 2",
+                "x_pos": 0.75,
+                "y_pos": -2.1650635094610973
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 3",
+                "x_pos": -3.500000000000004,
+                "y_pos": -9.526279441628823
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 4",
+                "x_pos": -6.7499999999999964,
+                "y_pos": 10.825317547305483
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 5",
+                "x_pos": -3.4999999999999987,
+                "y_pos": -2.598076211353315
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 6",
+                "x_pos": -0.5000000000000002,
+                "y_pos": 1.732050807568878
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 7",
+                "x_pos": 1.4998459977412995,
+                "y_pos": 6.062088910637357
+            }
+        ],
+        "all_votes": {
+            "1": -1,
+            "5": 1,
+            "0": 1,
+            "3": 1,
+            "2": -1,
+            "4": 1,
+            "6": 1
+        },
+        "winning_vote": 1,
+        "current_options_matrix": [
+            [
+                5,
+                4,
+                3
+            ],
+            [
+                -5,
+                -9,
+                -4
+            ],
+            [
+                -2,
+                -6,
+                4
+            ],
+            [
+                -7,
+                1,
+                -6
+            ],
+            [
+                -1,
+                1,
+                7
+            ],
+            [
+                5,
+                8,
+                4
+            ],
+            [
+                0,
+                4,
+                -4
+            ]
+        ],
+        "scenario": "humanTesting",
+        "group": -1,
+        "curr_round": 3,
+        "cycle": 3,
+        "chromosome": "NA"
+    },
+    "4": {
+        "types_list": [
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1
+        ],
+        "all_nodes": [
+            {
+                "type": "CAUSE",
+                "text": "Cause 1",
+                "x_pos": 5.0,
+                "y_pos": 0.0
+            },
+            {
+                "type": "CAUSE",
+                "text": "Cause 2",
+                "x_pos": -2.499999999999999,
+                "y_pos": 4.330127018922194
+            },
+            {
+                "type": "CAUSE",
+                "text": "Cause 3",
+                "x_pos": -2.500000000000002,
+                "y_pos": -4.330127018922192
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 1",
+                "x_pos": -1.2499999999999996,
+                "y_pos": 3.0310889132455356
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 2",
+                "x_pos": 5.749900997579935,
+                "y_pos": 3.8971333687505005
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 3",
+                "x_pos": 3.9998899979026206,
+                "y_pos": 4.330101613554212
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 4",
+                "x_pos": -2.5000000000000004,
+                "y_pos": 0.8660254037844393
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 5",
+                "x_pos": 2.000000000000001,
+                "y_pos": -0.8660254037844402
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 6",
+                "x_pos": -1.7499999999999993,
+                "y_pos": 0.4330127018922185
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 7",
+                "x_pos": -6.000000000000004,
+                "y_pos": -9.526279441628823
+            }
+        ],
+        "all_votes": {
+            "6": -1,
+            "5": 1,
+            "2": 0,
+            "4": 2,
+            "0": 0,
+            "1": 0,
+            "3": 2
+        },
+        "winning_vote": -1,
+        "current_options_matrix": [
+            [
+                2,
+                8,
+                1
+            ],
+            [
+                7,
+                0,
+                -6
+            ],
+            [
+                3,
+                0,
+                -3
+            ],
+            [
+                0,
+                6,
+                4
+            ],
+            [
+                -5,
+                -10,
+                -8
+            ],
+            [
+                -8,
+                -4,
+                -5
+            ],
+            [
+                -3,
+                -2,
+                0
+            ]
+        ],
+        "scenario": "humanTesting",
+        "group": -1,
+        "curr_round": 4,
+        "cycle": 3,
+        "chromosome": "NA"
+    },
+    "5": {
+        "types_list": [
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1
+        ],
+        "all_nodes": [
+            {
+                "type": "CAUSE",
+                "text": "Cause 1",
+                "x_pos": 5.0,
+                "y_pos": 0.0
+            },
+            {
+                "type": "CAUSE",
+                "text": "Cause 2",
+                "x_pos": -2.499999999999999,
+                "y_pos": 4.330127018922194
+            },
+            {
+                "type": "CAUSE",
+                "text": "Cause 3",
+                "x_pos": -2.500000000000002,
+                "y_pos": -4.330127018922192
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 1",
+                "x_pos": 1.25,
+                "y_pos": -1.2990381056766584
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 2",
+                "x_pos": -1.75,
+                "y_pos": 2.1650635094610977
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 3",
+                "x_pos": -6.499999999999998,
+                "y_pos": 8.660254037844387
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 4",
+                "x_pos": 3.2498789979026257,
+                "y_pos": 4.763095262328656
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 5",
+                "x_pos": -2.999999999999999,
+                "y_pos": 5.196152422706632
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 6",
+                "x_pos": 9.0,
+                "y_pos": -1.6653345369377348e-16
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 7",
+                "x_pos": -3.249999999999999,
+                "y_pos": -0.4330127018922185
+            }
+        ],
+        "all_votes": {
+            "3": 0,
+            "6": 1,
+            "4": 1,
+            "2": 1,
+            "5": 1,
+            "0": 0,
+            "1": 1
+        },
+        "winning_vote": 1,
+        "current_options_matrix": [
+            [
+                -1,
+                -5,
+                -2
+            ],
+            [
+                -1,
+                10,
+                5
+            ],
+            [
+                -4,
+                1,
+                -1
+            ],
+            [
+                1,
+                0,
+                -2
+            ],
+            [
+                -1,
+                9,
+                -1
+            ],
+            [
+                3,
+                -1,
+                -1
+            ],
+            [
+                -1,
+                4,
+                5
+            ]
+        ],
+        "scenario": "humanTesting",
+        "group": -1,
+        "curr_round": 5,
+        "cycle": 3,
+        "chromosome": "NA"
+    },
+    "6": {
+        "types_list": [
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1
+        ],
+        "all_nodes": [
+            {
+                "type": "CAUSE",
+                "text": "Cause 1",
+                "x_pos": 5.0,
+                "y_pos": 0.0
+            },
+            {
+                "type": "CAUSE",
+                "text": "Cause 2",
+                "x_pos": -2.499999999999999,
+                "y_pos": 4.330127018922194
+            },
+            {
+                "type": "CAUSE",
+                "text": "Cause 3",
+                "x_pos": -2.500000000000002,
+                "y_pos": -4.330127018922192
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 1",
+                "x_pos": -6.75,
+                "y_pos": 0.43301270189221963
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 2",
+                "x_pos": 0.5000000000000007,
+                "y_pos": -1.3322676295501878e-15
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 3",
+                "x_pos": 3.4998899980639617,
+                "y_pos": 4.330088911568845
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 4",
+                "x_pos": 0.7499999999999996,
+                "y_pos": -0.43301270189221885
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 5",
+                "x_pos": 9.0,
+                "y_pos": -1.7320508075688776
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 6",
+                "x_pos": -8.250000000000004,
+                "y_pos": -9.959292143521042
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 7",
+                "x_pos": -2.7499999999999973,
+                "y_pos": 8.227241335952167
+            }
+        ],
+        "all_votes": {
+            "6": 1,
+            "3": 1,
+            "2": 0,
+            "1": 0,
+            "0": 1,
+            "5": -1,
+            "4": 0
+        },
+        "winning_vote": -1,
+        "current_options_matrix": [
+            [
+                -6,
+                3,
+                2
+            ],
+            [
+                -6,
+                -7,
+                -7
+            ],
+            [
+                2,
+                0,
+                -2
+            ],
+            [
+                4,
+                2,
+                3
+            ],
+            [
+                5,
+                -5,
+                -1
+            ],
+            [
+                -8,
+                -3,
+                0
+            ],
+            [
+                -1,
+                6,
+                -5
+            ]
+        ],
+        "scenario": "humanTesting",
+        "group": -1,
+        "curr_round": 6,
+        "cycle": 3,
+        "chromosome": "NA"
+    },
+    "7": {
+        "types_list": [
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1
+        ],
+        "all_nodes": [
+            {
+                "type": "CAUSE",
+                "text": "Cause 1",
+                "x_pos": 5.0,
+                "y_pos": 0.0
+            },
+            {
+                "type": "CAUSE",
+                "text": "Cause 2",
+                "x_pos": -2.499999999999999,
+                "y_pos": 4.330127018922194
+            },
+            {
+                "type": "CAUSE",
+                "text": "Cause 3",
+                "x_pos": -2.500000000000002,
+                "y_pos": -4.330127018922192
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 1",
+                "x_pos": 2.2498569977412943,
+                "y_pos": 5.629095261862912
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 2",
+                "x_pos": -3.7500000000000036,
+                "y_pos": -7.361215932167727
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 3",
+                "x_pos": 1.7498789983866483,
+                "y_pos": -4.763057156372558
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 4",
+                "x_pos": 2.2498349972572824,
+                "y_pos": 6.495120665367901
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 5",
+                "x_pos": -3.5000000000000053,
+                "y_pos": -12.124355652982139
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 6",
+                "x_pos": -2.500000000000001,
+                "y_pos": 1.3322676295501878e-15
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 7",
+                "x_pos": 4.2499229985479685,
+                "y_pos": 3.031069859289411
+            }
+        ],
+        "all_votes": {
+            "5": 2,
+            "0": 0,
+            "1": 2,
+            "3": 0,
+            "6": 0,
+            "4": 2,
+            "2": 2
+        },
+        "winning_vote": 2,
+        "current_options_matrix": [
+            [
+                1,
+                3,
+                -4
+            ],
+            [
+                -3,
+                -4,
+                7
+            ],
+            [
+                7,
+                -8,
+                9
+            ],
+            [
+                1,
+                4,
+                -6
+            ],
+            [
+                -1,
+                -8,
+                0
+            ],
+            [
+                2,
+                7,
+                7
+            ],
+            [
+                7,
+                2,
+                -4
+            ]
+        ],
+        "scenario": "humanTesting",
+        "group": -1,
+        "curr_round": 7,
+        "cycle": 3,
+        "chromosome": "NA"
+    },
+    "8": {
+        "types_list": [
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1
+        ],
+        "all_nodes": [
+            {
+                "type": "CAUSE",
+                "text": "Cause 1",
+                "x_pos": 5.0,
+                "y_pos": 0.0
+            },
+            {
+                "type": "CAUSE",
+                "text": "Cause 2",
+                "x_pos": -2.499999999999999,
+                "y_pos": 4.330127018922194
+            },
+            {
+                "type": "CAUSE",
+                "text": "Cause 3",
+                "x_pos": -2.500000000000002,
+                "y_pos": -4.330127018922192
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 1",
+                "x_pos": 5.499911997902611,
+                "y_pos": -3.4641143160053223
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 2",
+                "x_pos": -4.2499999999999964,
+                "y_pos": 12.55736835487436
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 3",
+                "x_pos": -4.499999999999998,
+                "y_pos": 6.92820323027551
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 4",
+                "x_pos": 8.5,
+                "y_pos": -8.881784197001252e-16
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 5",
+                "x_pos": -3.999999999999998,
+                "y_pos": 8.660254037844387
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 6",
+                "x_pos": 2.5000000000000013,
+                "y_pos": -1.3322676295501878e-15
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 7",
+                "x_pos": 2.2498569977412957,
+                "y_pos": -5.629095261862913
+            }
+        ],
+        "all_votes": {
+            "1": -1,
+            "6": 0,
+            "3": 0,
+            "5": -1,
+            "0": 0,
+            "4": 1,
+            "2": -1
+        },
+        "winning_vote": -1,
+        "current_options_matrix": [
+            [
+                7,
+                -5,
+                0
+            ],
+            [
+                -3,
+                0,
+                -9
+            ],
+            [
+                -3,
+                6,
+                -2
+            ],
+            [
+                8,
+                -5,
+                -5
+            ],
+            [
+                -2,
+                4,
+                -4
+            ],
+            [
+                -4,
+                -9,
+                -9
+            ],
+            [
+                2,
+                -5,
+                4
+            ]
+        ],
+        "scenario": "humanTesting",
+        "group": -1,
+        "curr_round": 8,
+        "cycle": 3,
+        "chromosome": "NA"
+    },
+    "9": {
+        "types_list": [
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1
+        ],
+        "all_nodes": [
+            {
+                "type": "CAUSE",
+                "text": "Cause 1",
+                "x_pos": 5.0,
+                "y_pos": 0.0
+            },
+            {
+                "type": "CAUSE",
+                "text": "Cause 2",
+                "x_pos": -2.499999999999999,
+                "y_pos": 4.330127018922194
+            },
+            {
+                "type": "CAUSE",
+                "text": "Cause 3",
+                "x_pos": -2.500000000000002,
+                "y_pos": -4.330127018922192
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 1",
+                "x_pos": 10.000000000000002,
+                "y_pos": 2.5980762113533142
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 2",
+                "x_pos": 3.749878997741284,
+                "y_pos": 4.763107964314023
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 3",
+                "x_pos": -0.4999999999999991,
+                "y_pos": 0.8660254037844379
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 4",
+                "x_pos": 9.5,
+                "y_pos": -0.866025403784439
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 5",
+                "x_pos": -4.0,
+                "y_pos": 2.598076211353316
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 6",
+                "x_pos": 4.440892098500626e-16,
+                "y_pos": -6.661338147750939e-16
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 7",
+                "x_pos": -2.5000000000000036,
+                "y_pos": -8.660254037844386
+            }
+        ],
+        "all_votes": {
+            "5": -1,
+            "1": 0,
+            "6": 2,
+            "3": 0,
+            "0": 0,
+            "2": -1,
+            "4": 1
+        },
+        "winning_vote": -1,
+        "current_options_matrix": [
+            [
+                7,
+                -4,
+                -10
+            ],
+            [
+                4,
+                2,
+                -5
+            ],
+            [
+                -5,
+                -3,
+                -5
+            ],
+            [
+                4,
+                -4,
+                -2
+            ],
+            [
+                -1,
+                6,
+                0
+            ],
+            [
+                -4,
+                -4,
+                -4
+            ],
+            [
+                -1,
+                -6,
+                6
+            ]
+        ],
+        "scenario": "humanTesting",
+        "group": -1,
+        "curr_round": 9,
+        "cycle": 3,
+        "chromosome": "NA"
+    },
+    "10": {
+        "types_list": [
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1
+        ],
+        "all_nodes": [
+            {
+                "type": "CAUSE",
+                "text": "Cause 1",
+                "x_pos": 5.0,
+                "y_pos": 0.0
+            },
+            {
+                "type": "CAUSE",
+                "text": "Cause 2",
+                "x_pos": -2.499999999999999,
+                "y_pos": 4.330127018922194
+            },
+            {
+                "type": "CAUSE",
+                "text": "Cause 3",
+                "x_pos": -2.500000000000002,
+                "y_pos": -4.330127018922192
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 1",
+                "x_pos": -5.000000000000004,
+                "y_pos": -10.39230484541326
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 2",
+                "x_pos": 1.9998899985479826,
+                "y_pos": 4.330050805612746
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 3",
+                "x_pos": -2.250121000322629,
+                "y_pos": 4.762955540489624
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 4",
+                "x_pos": -6.250000000000004,
+                "y_pos": -9.959292143521042
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 5",
+                "x_pos": 2.499801996450594,
+                "y_pos": 7.794165121618067
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 6",
+                "x_pos": 0.49988999903200504,
+                "y_pos": -4.330012699656647
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 7",
+                "x_pos": 10.75,
+                "y_pos": -0.4330127018922201
+            }
+        ],
+        "all_votes": {
+            "5": 0,
+            "6": 0,
+            "3": 2,
+            "4": 1,
+            "0": 2,
+            "2": 1,
+            "1": 0
+        },
+        "winning_vote": -1,
+        "current_options_matrix": [
+            [
+                -4,
+                -6,
+                2
+            ],
+            [
+                5,
+                6,
+                -5
+            ],
+            [
+                0,
+                10,
+                -1
+            ],
+            [
+                -7,
+                -6,
+                3
+            ],
+            [
+                0,
+                4,
+                -8
+            ],
+            [
+                3,
+                -3,
+                7
+            ],
+            [
+                4,
+                -6,
+                -5
+            ]
+        ],
+        "scenario": "humanTesting",
+        "group": -1,
+        "curr_round": 10,
+        "cycle": 3,
+        "chromosome": "NA"
+    },
+    "11": {
+        "types_list": [
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1
+        ],
+        "all_nodes": [
+            {
+                "type": "CAUSE",
+                "text": "Cause 1",
+                "x_pos": 5.0,
+                "y_pos": 0.0
+            },
+            {
+                "type": "CAUSE",
+                "text": "Cause 2",
+                "x_pos": -2.499999999999999,
+                "y_pos": 4.330127018922194
+            },
+            {
+                "type": "CAUSE",
+                "text": "Cause 3",
+                "x_pos": -2.500000000000002,
+                "y_pos": -4.330127018922192
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 1",
+                "x_pos": 3.4998899980639626,
+                "y_pos": -4.330088911568846
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 2",
+                "x_pos": -1.0001320009679864,
+                "y_pos": 5.195999997205535
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 3",
+                "x_pos": 11.250000000000002,
+                "y_pos": 2.1650635094610955
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 4",
+                "x_pos": -5.249999999999997,
+                "y_pos": 9.093266739736606
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 5",
+                "x_pos": 3.0,
+                "y_pos": 0.0
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 6",
+                "x_pos": -4.499999999999998,
+                "y_pos": -2.5980762113533147
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 7",
+                "x_pos": -2.0,
+                "y_pos": 1.732050807568878
+            }
+        ],
+        "all_votes": {
+            "6": 1,
+            "3": 1,
+            "4": 0,
+            "1": 1,
+            "5": 1,
+            "0": 2,
+            "2": -1
+        },
+        "winning_vote": 1,
+        "current_options_matrix": [
+            [
+                7,
+                -7,
+                5
+            ],
+            [
+                2,
+                10,
+                -4
+            ],
+            [
+                4,
+                -4,
+                -9
+            ],
+            [
+                -5,
+                4,
+                -5
+            ],
+            [
+                6,
+                0,
+                0
+            ],
+            [
+                -5,
+                3,
+                9
+            ],
+            [
+                2,
+                8,
+                4
+            ]
+        ],
+        "scenario": "humanTesting",
+        "group": -1,
+        "curr_round": 11,
+        "cycle": 3,
+        "chromosome": "NA"
+    },
+    "12": {
+        "types_list": [
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1
+        ],
+        "all_nodes": [
+            {
+                "type": "CAUSE",
+                "text": "Cause 1",
+                "x_pos": 5.0,
+                "y_pos": 0.0
+            },
+            {
+                "type": "CAUSE",
+                "text": "Cause 2",
+                "x_pos": -2.499999999999999,
+                "y_pos": 4.330127018922194
+            },
+            {
+                "type": "CAUSE",
+                "text": "Cause 3",
+                "x_pos": -2.500000000000002,
+                "y_pos": -4.330127018922192
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 1",
+                "x_pos": -3.2499999999999982,
+                "y_pos": 7.361215932167729
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 2",
+                "x_pos": -6.5,
+                "y_pos": 0.0
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 3",
+                "x_pos": -5.7499999999999964,
+                "y_pos": 10.825317547305483
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 4",
+                "x_pos": -4.499999999999999,
+                "y_pos": -0.8660254037844379
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 5",
+                "x_pos": -3.4999999999999996,
+                "y_pos": -3.3306690738754696e-16
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 6",
+                "x_pos": 0.9999560003226988,
+                "y_pos": 1.7319491911270455
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 7",
+                "x_pos": -4.499999999999999,
+                "y_pos": 8.881784197001252e-16
+            }
+        ],
+        "all_votes": {
+            "0": 1,
+            "6": 1,
+            "1": 1,
+            "4": 1,
+            "2": 1,
+            "3": 1,
+            "5": 1
+        },
+        "winning_vote": 1,
+        "current_options_matrix": [
+            [
+                -1,
+                6,
+                -3
+            ],
+            [
+                -3,
+                0,
+                0
+            ],
+            [
+                -8,
+                4,
+                -9
+            ],
+            [
+                -3,
+                3,
+                5
+            ],
+            [
+                -9,
+                -2,
+                -2
+            ],
+            [
+                7,
+                7,
+                -1
+            ],
+            [
+                -5,
+                6,
+                6
+            ]
+        ],
+        "scenario": "humanTesting",
+        "group": -1,
+        "curr_round": 12,
+        "cycle": 3,
+        "chromosome": "NA"
+    },
+    "13": {
+        "types_list": [
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1
+        ],
+        "all_nodes": [
+            {
+                "type": "CAUSE",
+                "text": "Cause 1",
+                "x_pos": 5.0,
+                "y_pos": 0.0
+            },
+            {
+                "type": "CAUSE",
+                "text": "Cause 2",
+                "x_pos": -2.499999999999999,
+                "y_pos": 4.330127018922194
+            },
+            {
+                "type": "CAUSE",
+                "text": "Cause 3",
+                "x_pos": -2.500000000000002,
+                "y_pos": -4.330127018922192
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 1",
+                "x_pos": 1.499956000161359,
+                "y_pos": -1.7319618931124139
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 2",
+                "x_pos": 10.500000000000002,
+                "y_pos": 2.598076211353315
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 3",
+                "x_pos": -3.7500000000000027,
+                "y_pos": -6.495190528383288
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 4",
+                "x_pos": 5.249878997257262,
+                "y_pos": 4.763146070270123
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 5",
+                "x_pos": -3.500000000000003,
+                "y_pos": -6.062177826491069
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 6",
+                "x_pos": -3.7499999999999973,
+                "y_pos": 8.227241335952167
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 7",
+                "x_pos": 2.4999119988706555,
+                "y_pos": -3.4640381040931234
+            }
+        ],
+        "all_votes": {
+            "1": 0,
+            "0": 0,
+            "5": -1,
+            "3": 0,
+            "2": 2,
+            "4": 2,
+            "6": 0
+        },
+        "winning_vote": 0,
+        "current_options_matrix": [
+            [
+                8,
+                -2,
+                7
+            ],
+            [
+                3,
+                -1,
+                -7
+            ],
+            [
+                -3,
+                -3,
+                8
+            ],
+            [
+                9,
+                4,
+                -10
+            ],
+            [
+                -1,
+                -1,
+                7
+            ],
+            [
+                -3,
+                6,
+                -5
+            ],
+            [
+                5,
+                -3,
+                4
+            ]
+        ],
+        "scenario": "humanTesting",
+        "group": -1,
+        "curr_round": 13,
+        "cycle": 3,
+        "chromosome": "NA"
+    },
+    "14": {
+        "types_list": [
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1
+        ],
+        "all_nodes": [
+            {
+                "type": "CAUSE",
+                "text": "Cause 1",
+                "x_pos": 5.0,
+                "y_pos": 0.0
+            },
+            {
+                "type": "CAUSE",
+                "text": "Cause 2",
+                "x_pos": -2.499999999999999,
+                "y_pos": 4.330127018922194
+            },
+            {
+                "type": "CAUSE",
+                "text": "Cause 3",
+                "x_pos": -2.500000000000002,
+                "y_pos": -4.330127018922192
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 1",
+                "x_pos": -0.24999999999999778,
+                "y_pos": 3.031088913245534
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 2",
+                "x_pos": -4.5000000000000036,
+                "y_pos": -7.794228634059946
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 3",
+                "x_pos": 0.750000000000002,
+                "y_pos": 3.031088913245534
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 4",
+                "x_pos": -5.5,
+                "y_pos": 0.0
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 5",
+                "x_pos": -4.4999999999999964,
+                "y_pos": 9.526279441628825
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 6",
+                "x_pos": 3.499933999031985,
+                "y_pos": 2.598038104558867
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 7",
+                "x_pos": -2.7499999999999982,
+                "y_pos": -2.1650635094610955
+            }
+        ],
+        "all_votes": {
+            "2": -1,
+            "5": 1,
+            "4": 1,
+            "1": 2,
+            "3": -1,
+            "0": -1,
+            "6": 1
+        },
+        "winning_vote": -1,
+        "current_options_matrix": [
+            [
+                -6,
+                -2,
+                -9
+            ],
+            [
+                -3,
+                -3,
+                5
+            ],
+            [
+                -4,
+                -2,
+                -9
+            ],
+            [
+                -1,
+                0,
+                0
+            ],
+            [
+                -6,
+                6,
+                -8
+            ],
+            [
+                8,
+                4,
+                -4
+            ],
+            [
+                -2,
+                4,
+                9
+            ]
+        ],
+        "scenario": "humanTesting",
+        "group": -1,
+        "curr_round": 14,
+        "cycle": 3,
+        "chromosome": "NA"
+    },
+    "15": {
+        "types_list": [
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1
+        ],
+        "all_nodes": [
+            {
+                "type": "CAUSE",
+                "text": "Cause 1",
+                "x_pos": 5.0,
+                "y_pos": 0.0
+            },
+            {
+                "type": "CAUSE",
+                "text": "Cause 2",
+                "x_pos": -2.499999999999999,
+                "y_pos": 4.330127018922194
+            },
+            {
+                "type": "CAUSE",
+                "text": "Cause 3",
+                "x_pos": -2.500000000000002,
+                "y_pos": -4.330127018922192
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 1",
+                "x_pos": -1.0001320009679855,
+                "y_pos": -5.195999997205537
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 2",
+                "x_pos": 1.4998899987093224,
+                "y_pos": 4.330038103627379
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 3",
+                "x_pos": 1.7498569979026364,
+                "y_pos": -5.629082559877546
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 4",
+                "x_pos": -7.5,
+                "y_pos": 2.5980762113533165
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 5",
+                "x_pos": -2.500000000000001,
+                "y_pos": -3.464101615137755
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 6",
+                "x_pos": 11.75,
+                "y_pos": -0.4330127018922201
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 7",
+                "x_pos": 0.25,
+                "y_pos": 1.2990381056766584
+            }
+        ],
+        "all_votes": {
+            "4": -1,
+            "5": 0,
+            "2": 2,
+            "0": 2,
+            "3": 2,
+            "1": 0,
+            "6": 2
+        },
+        "winning_vote": 2,
+        "current_options_matrix": [
+            [
+                2,
+                -4,
+                10
+            ],
+            [
+                6,
+                8,
+                -6
+            ],
+            [
+                0,
+                -3,
+                3
+            ],
+            [
+                -10,
+                8,
+                2
+            ],
+            [
+                -10,
+                -9,
+                -1
+            ],
+            [
+                2,
+                -6,
+                -5
+            ],
+            [
+                4,
+                5,
+                2
+            ]
+        ],
+        "scenario": "humanTesting",
+        "group": -1,
+        "curr_round": 15,
+        "cycle": 3,
+        "chromosome": "NA"
+    },
+    "16": {
+        "types_list": [
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1
+        ],
+        "all_nodes": [
+            {
+                "type": "CAUSE",
+                "text": "Cause 1",
+                "x_pos": 5.0,
+                "y_pos": 0.0
+            },
+            {
+                "type": "CAUSE",
+                "text": "Cause 2",
+                "x_pos": -2.499999999999999,
+                "y_pos": 4.330127018922194
+            },
+            {
+                "type": "CAUSE",
+                "text": "Cause 3",
+                "x_pos": -2.500000000000002,
+                "y_pos": -4.330127018922192
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 1",
+                "x_pos": 9.500000000000002,
+                "y_pos": 1.732050807568876
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 2",
+                "x_pos": -0.2499999999999991,
+                "y_pos": 1.2990381056766571
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 3",
+                "x_pos": -1.0000000000000009,
+                "y_pos": -1.7320508075688767
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 4",
+                "x_pos": -7.250000000000001,
+                "y_pos": 3.0310889132455356
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 5",
+                "x_pos": 8.75,
+                "y_pos": -0.4330127018922201
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 6",
+                "x_pos": -6.999999999999999,
+                "y_pos": -1.7320508075688765
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 7",
+                "x_pos": -6.0,
+                "y_pos": 3.3306690738754696e-16
+            }
+        ],
+        "all_votes": {
+            "5": 2,
+            "2": 2,
+            "1": 1,
+            "0": 0,
+            "3": 1,
+            "6": 2,
+            "4": 0
+        },
+        "winning_vote": -1,
+        "current_options_matrix": [
+            [
+                7,
+                -4,
+                -8
+            ],
+            [
+                -4,
+                -2,
+                -5
+            ],
+            [
+                0,
+                0,
+                4
+            ],
+            [
+                -8,
+                7,
+                0
+            ],
+            [
+                8,
+                -6,
+                -5
+            ],
+            [
+                -7,
+                1,
+                5
+            ],
+            [
+                -4,
+                2,
+                2
+            ]
+        ],
+        "scenario": "humanTesting",
+        "group": -1,
+        "curr_round": 16,
+        "cycle": 3,
+        "chromosome": "NA"
+    },
+    "17": {
+        "types_list": [
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1
+        ],
+        "all_nodes": [
+            {
+                "type": "CAUSE",
+                "text": "Cause 1",
+                "x_pos": 5.0,
+                "y_pos": 0.0
+            },
+            {
+                "type": "CAUSE",
+                "text": "Cause 2",
+                "x_pos": -2.499999999999999,
+                "y_pos": 4.330127018922194
+            },
+            {
+                "type": "CAUSE",
+                "text": "Cause 3",
+                "x_pos": -2.500000000000002,
+                "y_pos": -4.330127018922192
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 1",
+                "x_pos": -6.250000000000001,
+                "y_pos": 3.0310889132455356
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 2",
+                "x_pos": -1.0000000000000002,
+                "y_pos": -1.7320508075688776
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 3",
+                "x_pos": -6.999999999999997,
+                "y_pos": 9.526279441628825
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 4",
+                "x_pos": -1.9999999999999996,
+                "y_pos": 0.8660254037844397
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 5",
+                "x_pos": -0.25012100096799084,
+                "y_pos": 4.763006348431089
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 6",
+                "x_pos": 8.75,
+                "y_pos": -3.0310889132455356
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 7",
+                "x_pos": -5.499999999999998,
+                "y_pos": -1.7320508075688759
+            }
+        ],
+        "all_votes": {
+            "0": 1,
+            "1": 2,
+            "3": 1,
+            "5": -1,
+            "2": 1,
+            "6": 1,
+            "4": 1
+        },
+        "winning_vote": 1,
+        "current_options_matrix": [
+            [
+                -6,
+                7,
+                0
+            ],
+            [
+                -5,
+                -5,
+                -1
+            ],
+            [
+                -6,
+                1,
+                -3
+            ],
+            [
+                -2,
+                9,
+                7
+            ],
+            [
+                1,
+                7,
+                -2
+            ],
+            [
+                7,
+                -8,
+                -1
+            ],
+            [
+                -8,
+                5,
+                9
+            ]
+        ],
+        "scenario": "humanTesting",
+        "group": -1,
+        "curr_round": 17,
+        "cycle": 3,
+        "chromosome": "NA"
+    },
+    "18": {
+        "types_list": [
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1
+        ],
+        "all_nodes": [
+            {
+                "type": "CAUSE",
+                "text": "Cause 1",
+                "x_pos": 5.0,
+                "y_pos": 0.0
+            },
+            {
+                "type": "CAUSE",
+                "text": "Cause 2",
+                "x_pos": -2.499999999999999,
+                "y_pos": 4.330127018922194
+            },
+            {
+                "type": "CAUSE",
+                "text": "Cause 3",
+                "x_pos": -2.500000000000002,
+                "y_pos": -4.330127018922192
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 1",
+                "x_pos": -5.499999999999999,
+                "y_pos": -1.7320508075688767
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 2",
+                "x_pos": -5.499999999999998,
+                "y_pos": 8.660254037844387
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 3",
+                "x_pos": -6.749999999999998,
+                "y_pos": -1.2990381056766571
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 4",
+                "x_pos": -2.7499999999999973,
+                "y_pos": 9.959292143521044
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 5",
+                "x_pos": -8.0,
+                "y_pos": 0.0
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 6",
+                "x_pos": 7.250000000000001,
+                "y_pos": 0.43301270189221885
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 7",
+                "x_pos": 0.0,
+                "y_pos": 1.732050807568878
+            }
+        ],
+        "all_votes": {
+            "4": -1,
+            "1": 1,
+            "6": 1,
+            "2": 1,
+            "5": 0,
+            "0": 2,
+            "3": 1
+        },
+        "winning_vote": 1,
+        "current_options_matrix": [
+            [
+                -3,
+                0,
+                4
+            ],
+            [
+                -5,
+                4,
+                -4
+            ],
+            [
+                -8,
+                3,
+                6
+            ],
+            [
+                -1,
+                4,
+                -7
+            ],
+            [
+                -6,
+                0,
+                0
+            ],
+            [
+                8,
+                -2,
+                -3
+            ],
+            [
+                5,
+                7,
+                3
+            ]
+        ],
+        "scenario": "humanTesting",
+        "group": -1,
+        "curr_round": 18,
+        "cycle": 3,
+        "chromosome": "NA"
+    },
+    "19": {
+        "types_list": [
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1
+        ],
+        "all_nodes": [
+            {
+                "type": "CAUSE",
+                "text": "Cause 1",
+                "x_pos": 5.0,
+                "y_pos": 0.0
+            },
+            {
+                "type": "CAUSE",
+                "text": "Cause 2",
+                "x_pos": -2.499999999999999,
+                "y_pos": 4.330127018922194
+            },
+            {
+                "type": "CAUSE",
+                "text": "Cause 3",
+                "x_pos": -2.500000000000002,
+                "y_pos": -4.330127018922192
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 1",
+                "x_pos": -2.7499999999999964,
+                "y_pos": 9.959292143521044
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 2",
+                "x_pos": 9.750000000000002,
+                "y_pos": 2.1650635094610955
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 3",
+                "x_pos": -0.9999999999999996,
+                "y_pos": 2.598076211353316
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 4",
+                "x_pos": 4.7498789974186035,
+                "y_pos": 4.763133368284756
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 5",
+                "x_pos": 2.4998459974186176,
+                "y_pos": 6.06211431460809
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 6",
+                "x_pos": -5.7500000000000036,
+                "y_pos": -8.227241335952165
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 7",
+                "x_pos": 3.749944999193321,
+                "y_pos": -2.165031753799057
+            }
+        ],
+        "all_votes": {
+            "6": 0,
+            "1": 0,
+            "2": 1,
+            "3": -1,
+            "5": -1,
+            "4": 0,
+            "0": 1
+        },
+        "winning_vote": -1,
+        "current_options_matrix": [
+            [
+                -3,
+                6,
+                -9
+            ],
+            [
+                5,
+                -2,
+                -7
+            ],
+            [
+                1,
+                6,
+                0
+            ],
+            [
+                4,
+                0,
+                -5
+            ],
+            [
+                4,
+                6,
+                -8
+            ],
+            [
+                -3,
+                -1,
+                2
+            ],
+            [
+                8,
+                -3,
+                3
+            ]
+        ],
+        "scenario": "humanTesting",
+        "group": -1,
+        "curr_round": 19,
+        "cycle": 3,
+        "chromosome": "NA"
+    },
+    "20": {
+        "types_list": [
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1
+        ],
+        "all_nodes": [
+            {
+                "type": "CAUSE",
+                "text": "Cause 1",
+                "x_pos": 5.0,
+                "y_pos": 0.0
+            },
+            {
+                "type": "CAUSE",
+                "text": "Cause 2",
+                "x_pos": -2.499999999999999,
+                "y_pos": 4.330127018922194
+            },
+            {
+                "type": "CAUSE",
+                "text": "Cause 3",
+                "x_pos": -2.500000000000002,
+                "y_pos": -4.330127018922192
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 1",
+                "x_pos": -2.750000000000002,
+                "y_pos": -3.031088913245534
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 2",
+                "x_pos": 3.749944999193321,
+                "y_pos": -2.165031753799057
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 3",
+                "x_pos": 2.7498789980639673,
+                "y_pos": -4.763082560343291
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 4",
+                "x_pos": 5.249856996773252,
+                "y_pos": 5.629171473775111
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 5",
+                "x_pos": 1.2499999999999987,
+                "y_pos": -2.165063509461096
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 6",
+                "x_pos": 1.7498789983866474,
+                "y_pos": 4.7630571563725566
+            },
+            {
+                "type": "PLAYER",
+                "text": "Player 7",
+                "x_pos": 2.74992299903199,
+                "y_pos": 3.031031753333312
+            }
+        ],
+        "all_votes": {
+            "5": -1,
+            "3": 1,
+            "6": 0,
+            "4": 0,
+            "2": 0,
+            "0": 1,
+            "1": 0
+        },
+        "winning_vote": 0,
+        "current_options_matrix": [
+            [
+                0,
+                2,
+                9
+            ],
+            [
+                8,
+                -3,
+                3
+            ],
+            [
+                5,
+                -6,
+                5
+            ],
+            [
+                4,
+                0,
+                -7
+            ],
+            [
+                6,
+                1,
+                6
+            ],
+            [
+                0,
+                2,
+                -1
+            ],
+            [
+                4,
+                2,
+                -1
+            ]
+        ],
+        "scenario": "humanTesting",
+        "group": -1,
+        "curr_round": 20,
+        "cycle": 3,
+        "chromosome": "NA"
+    },
+"Conclusion": {
+        "results": {
+            "0": [
+                0,
+                -1,
+                4,
+                0,
+                -5,
+                0,
+                -4,
+                0,
+                0,
+                0, 
+		-7,
+                6,
+                8,
+                0,
+                10,
+                0,
+                7,
+                0,
+                0,
+                0
+            ],
+            "1": [
+                0,
+                1,
+                -9,
+                0,
+                10,
+                0,
+                7,
+                0,
+                0,
+                0,
+		10,
+                0,
+                3,
+                0,
+                -6,
+                0,
+                -5,
+                4,
+                0,
+                8
+
+            ],
+            "2": [
+                0,
+                2,
+                -6,
+                0,
+                1,
+                0,
+                9,
+                0,
+                0,
+                0,
+                -4,
+                4,
+                -3,
+                0,
+                3,
+                0,
+                1,
+                3,
+                0,
+                5
+            ],
+            "3": [
+                0,
+                6,
+                1,
+                0,
+                0,
+                0,
+                -6,
+                0,
+                0,
+                0, 
+                4,
+                3,
+                9,
+                0,
+                2,
+                0,
+                9,
+                4,
+                0,
+                4
+            ],
+            "4": [
+                0,
+                0,
+                1,
+                0,
+                9,
+                0,
+                0,
+                0,
+                0,
+                0, 
+                0,
+                -2,
+                -1,
+                0,
+                -1,
+                0,
+                7,
+                0,
+                0,
+                6
+            ],
+            "5": [
+                0,
+                3,
+                8,
+                0,
+                -1,
+                0,
+                7,
+                0,
+                0,
+                0, 
+                3,
+                7,
+                -3,
+                0,
+                -5,
+                0,
+                -8,
+                -2,
+                0,
+                0
+            ],
+            "6": [
+                0,
+                -1,
+                4,
+                0,
+                4,
+                0,
+                -4,
+                0,
+                0,
+                0, 
+                8,
+                6,
+                5,
+                0,
+                2,
+                0,
+                5,
+                7,
+                0,
+                4
+            ]
+        },
+        "cooperation_score": 0.55,
+        "bot_type": [
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1,
+            -1
+        ],
+        "num_rounds": 20,
+        "scenario": "humanTesting",
+        "group": -1,
+        "chromosome": "NAN"
+    }
+}
