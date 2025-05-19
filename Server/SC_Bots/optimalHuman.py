@@ -4,10 +4,8 @@
 # sometimes. Its really hard for me to tell. I am rapidly begininning to understand more acutely why gathering human data is the hardest fetching part of this thing.
 
 import math
-import random
 
-
-class HumanAttempt1:
+class optimalHuman:
     def __init__(self, self_id):
         self.self_id = self_id
         self.type = "BG"
@@ -35,29 +33,29 @@ class HumanAttempt1:
         our_row = current_options_matrix[self.self_id]
         risk_aversion = self.chromosome[0]
         majority_factor = self.chromosome[1]
-        if previous_votes == None:
+
+        if previous_votes is None: # if we have nothing passed in, we need to pass it in as SOMETHING.
             previous_votes = {}
 
         previous_votes[-1] = {}
         new_votes = {}
 
-        for i, player in enumerate(current_options_matrix):
+        # create bayseian prior
+        for i, player in enumerate(current_options_matrix): # can cycle through every vote, will disregard our own later.
             player_vote = self.calculate_vote_row(player, col_probs, cause_sums, risk_aversion, majority_factor)
             current_vote = self.choose_best_vote(player_vote, cause_sums)
             new_votes[i] = current_vote
 
         previous_votes[-1] = new_votes
 
-        if previous_votes: # if there are previous votes to consider
-                cause_sums = self.apply_previous_votes(matrix, previous_votes)
-                self.normalize_rows(matrix)
 
+        cause_sums = self.apply_previous_votes(matrix, previous_votes)
 
         new_row = self.calculate_vote_row(our_row, col_probs, cause_sums, risk_aversion, majority_factor)
         current_vote = self.choose_best_vote(new_row, cause_sums)
 
 
-
+        # social lubrication! if there is an opportunity to help the world, go for it. creates optimal results.
         if current_vote == -1 and max(current_options_matrix[self.self_id]) >= 0: # if we can create some social lubrication here
             # at no cost to ourselves, we can select the 0 option and increase the rate of passing. this happened sometimes within human play.
             return current_options_matrix[self.self_id].index(max(current_options_matrix[self.self_id]))
@@ -85,6 +83,7 @@ class HumanAttempt1:
         col_sums = [sum(matrix[row][col] for row in range(len(matrix))) for col in range(num_cols)]
 
         min_sum = min(col_sums)
+        min_sum = -min_sum if min_sum < 0 else 0
         if min_sum < 0:  # we have a negative number here....
             col_sums = [val + min_sum for val in col_sums]
 
@@ -124,9 +123,9 @@ class HumanAttempt1:
                 new_prob = col_probs[i + 1] ** risk_aversion
                 if cause_sums:
                     alignment_ratio = cause_sums[i + 1] / total_voters
-                    bonus = self.smooth_majority_bonus(alignment_ratio, majority_factor)
+                    bonus = alignment_ratio * majority_factor # see if a linear relationship does the trick.
                     new_row.append(new_prob * val * bonus)
-                else:
+                else: # ironically, used only in the best guess creation thing.
                     new_row.append(new_prob * val)
             else:
                 new_row.append(0)

@@ -14,7 +14,7 @@ if __name__ == "__main__":
     # filename = datetime.now().strftime("%Y%m%d_%H%M%S") + "human_study_results.json"
     # filepath = os.path.join(directory, filename)
 
-    filepath = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\offlineSimStuff\human_results_time\human_study_results.json"
+    filepath = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\offlineSimStuff\human_results_time\doctored_human_results.json"
 
     with open(filepath, 'r') as f:
         big_boy_data = json.load(f)

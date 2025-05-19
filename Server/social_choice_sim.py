@@ -4,6 +4,8 @@ import random
 from collections import Counter
 from pathlib import Path
 import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
 
 from Server.Node import Node
 from Server.options_creation import generate_two_plus_one_groups_options_best_of_three, generate_two_plus_one_groups
@@ -11,7 +13,7 @@ from Server.SC_Bots.Greedy import GreedyBot
 from Server.SC_Bots.SocialWelfare import SocialWelfareBot
 from Server.SC_Bots.Random import RandomBot
 from Server.SC_Bots.somewhatMoreAwareGreedy import somewhatMoreAwarenessGreedy
-from Server.SC_Bots.humanAttempt1 import HumanAttempt1
+from Server.SC_Bots.optimalHuman import optimalHuman
 
 NUM_CAUSES = 3
 
@@ -120,7 +122,7 @@ class Social_Choice_Sim:
         if bot_type == 6:
             new_bot = (somewhatMoreAwarenessGreedy(i))
         if bot_type == 7:
-            new_bot = (HumanAttempt1(i))
+            new_bot = (optimalHuman(i))
 
 
         return new_bot # the matched bot that we were looking for.
@@ -151,7 +153,7 @@ class Social_Choice_Sim:
             self.current_options_matrix = generate_two_plus_one_groups_options_best_of_three(self.sc_groups)
         else: # so we have to generate noise to try and "mimic" the other stuff.
             self.current_options_matrix = [[random.randint(-8, 8) for _ in range(self.num_causes)] for _ in range(self.total_players)]
-            noise_matrix = [[random.choice([-2, 2]) for _ in range(self.num_causes)] for _ in range(self.total_players)]
+            noise_matrix = [[random.randint(-2, 2) for _ in range(self.num_causes)] for _ in range(self.total_players)]
             self.current_options_matrix = [
                 [original + noise for original, noise in zip(row, noise_row)]
                 for row, noise_row in zip(self.current_options_matrix, noise_matrix)
@@ -439,17 +441,17 @@ class Social_Choice_Sim:
         zero = normalized_list[10]
         above_zero = sum(normalized_list[11:20])
         print("here are below zero ", below_zero, " here are above zero ", above_zero, " and here is zero ", zero)
-        #self.create_heat_map(normalized_list)
+        self.create_heat_map(normalized_list)
 
 
-    # def create_heat_map(self, data):
-    #     array = np.array(data).reshape(3, 7)  # shape it however you want
-    #
-    #     # Create heatmap
-    #     plt.figure(figsize=(8, 4))
-    #     sns.heatmap(array, annot=True, cmap="YlGnBu", cbar=True)
-    #     plt.title("Heatmap of Number Distribution")
-    #     plt.show()
+    def create_heat_map(self, data):
+        array = np.array(data).reshape(3, 7)  # shape it however you want
+
+        # Create heatmap
+        plt.figure(figsize=(8, 4))
+        sns.heatmap(array, annot=True, cmap="YlGnBu", cbar=True)
+        plt.title("Heatmap of Number Distribution")
+        plt.show()
 
 
 

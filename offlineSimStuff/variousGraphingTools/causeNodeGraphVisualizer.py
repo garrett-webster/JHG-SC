@@ -36,7 +36,7 @@ class causeNodeGraphVisualizer:
         cycle = dict["cycle"]
         types_list = dict["types_list"]
         chromosome = dict["chromosome"]
-        print("This is the curr_round we are passing in under cuaseNODeGraph", curr_round)
+        #print("This is the curr_round we are passing in under cuaseNODeGraph", curr_round)
         self.create_graph(all_nodes, all_votes, winning_vote, current_options_matrix, types_list, scenario, group, curr_round, cycle, chromosome)
 
 
@@ -52,6 +52,7 @@ class causeNodeGraphVisualizer:
             "5": "plum",
             "6": "lightblue",
             "7" : "darkgreen",
+            "8" : "green",
             "default": "gray"
         }
 
@@ -64,7 +65,8 @@ class causeNodeGraphVisualizer:
             "4": "limitedAwareness",
             "5": "secondChoice",
             "6": "somewhatMoreAwareness",
-            "7": "humanAttempt1",
+            "7": "optimalHuman",
+            "8": "clumsyHuman"
         }
 
         fig = plt.figure(figsize=(13, 6))  # Compact figure size

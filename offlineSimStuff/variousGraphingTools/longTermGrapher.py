@@ -130,7 +130,7 @@ class longTermGrapher():
         if bot_type == 6:
             bot_name = "somewhatMoreAwareGreedy"
         if bot_type == 7:
-            bot_name = "humanAttempt1"
+            bot_name = "optimalHuman"
 
         # what we are naming this new graph
         group_title = group
