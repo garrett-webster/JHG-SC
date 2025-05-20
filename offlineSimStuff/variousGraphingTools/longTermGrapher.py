@@ -82,78 +82,78 @@ class longTermGrapher():
         # create da plot
         plt.figure(figsize=(10, 6))
 
-        # goes through that big ol fetcher and plots all the polayer socres per round
-        for i, (player, scores_list) in enumerate(sums_per_round.items()):
-            bot_type_id = bot_type[int(player)]  # player is likely a string, ensure int
-            bot_type_name = bot_name_map.get(bot_type_id, f"Bot {bot_name_map[str(bot_type_id)]}")
-            label = f'Player {int(player) + 1} ({bot_type_name})'
-            plt.plot(rounds, scores_list, marker='o', label=label)
-
-        plt.plot(rounds, cumulative_average_score, marker='x', label='Cumulative Total Score', linewidth=3,
-                 color='black')
-
-        plt.text(0.95, 0.90, f'Coefficient of Variation: {cv:.2f}',
-                 # should display the average standard deviation as well.
-                 horizontalalignment='right', verticalalignment='top',
-                 transform=plt.gca().transAxes, fontsize=12, color='black', weight='bold')
-
-        plt.text(0.95, 0.95, f'Avg Increase: {total_average_increase:.2f}',
-                 horizontalalignment='right', verticalalignment='top',
-                 transform=plt.gca().transAxes, fontsize=12, color='black', weight='bold')
-
-        plt.text(0.95, 0.85, f'Cooperation Score: {cooperation_score:.2f}',
-                 # should display the average standard deviation as well.
-                 horizontalalignment='right', verticalalignment='top',
-                 transform=plt.gca().transAxes, fontsize=12, color='black', weight='bold')
-
-        # labels and a title
-        plt.xlabel('Round')
-        plt.ylabel('Score')
-        plt.title('Big Graph for ' + str(scenario) + " group " + str(group) + " chromosome " + str(chromosome))
-        plt.legend()
-
-        # I would like to see the baby
-        plt.grid(True)
-        plt.tight_layout()
-
-        bot_name = ""
-        if bot_type == 1:
-            bot_name = "SocialWelfare"
-        if bot_type == 2:
-            bot_name = "Greedy"
-        if bot_type == 3:
-            bot_name = "Random"
-        if bot_type == 4:
-            bot_name = "betterGreedy"
-        if bot_type == 5:
-            bot_name = "limitedAwarenessGreedy"
-        if bot_type == 6:
-            bot_name = "somewhatMoreAwareGreedy"
-        if bot_type == 7:
-            bot_name = "optimalHuman"
-
-        # what we are naming this new graph
-        group_title = group
-        if group_title == "":
-            group_title = "No group"
-
-
-
-        my_path = os.path.dirname(os.path.abspath(__file__))
-        scenario_str = f"scenario_{scenario}"
-        group_str = f"group_{group}"
-        dir_path = os.path.join(my_path, "individualRoundGraphs", scenario_str, group_str)
-        os.makedirs(dir_path, exist_ok=True)
-
-        #file_name = f"Scenario {scenario} Group {group_title}. Chromosome {chromosome}.png"
-        file_name = f"Chromosome {chromosome}.png"
-
-        #Save to longTermGrapherFolder
-        long_term_path = os.path.join(my_path, "longTermGrapherFolder", file_name)
-        plt.savefig(long_term_path, dpi=300)
-
-        # Save to individualRoundGraphs folder
-        #full_path = os.path.join(dir_path, file_name)
-        #plt.savefig(full_path, dpi=300)
-
-        plt.show()
+        # # goes through that big ol fetcher and plots all the polayer socres per round
+        # for i, (player, scores_list) in enumerate(sums_per_round.items()):
+        #     bot_type_id = bot_type[int(player)]  # player is likely a string, ensure int
+        #     bot_type_name = bot_name_map.get(bot_type_id, f"Bot {bot_name_map[str(bot_type_id)]}")
+        #     label = f'Player {int(player) + 1} ({bot_type_name})'
+        #     plt.plot(rounds, scores_list, marker='o', label=label)
+        #
+        # plt.plot(rounds, cumulative_average_score, marker='x', label='Cumulative Total Score', linewidth=3,
+        #          color='black')
+        #
+        # plt.text(0.95, 0.90, f'Coefficient of Variation: {cv:.2f}',
+        #          # should display the average standard deviation as well.
+        #          horizontalalignment='right', verticalalignment='top',
+        #          transform=plt.gca().transAxes, fontsize=12, color='black', weight='bold')
+        #
+        # plt.text(0.95, 0.95, f'Avg Increase: {total_average_increase:.2f}',
+        #          horizontalalignment='right', verticalalignment='top',
+        #          transform=plt.gca().transAxes, fontsize=12, color='black', weight='bold')
+        #
+        # plt.text(0.95, 0.85, f'Cooperation Score: {cooperation_score:.2f}',
+        #          # should display the average standard deviation as well.
+        #          horizontalalignment='right', verticalalignment='top',
+        #          transform=plt.gca().transAxes, fontsize=12, color='black', weight='bold')
+        #
+        # # labels and a title
+        # plt.xlabel('Round')
+        # plt.ylabel('Score')
+        # plt.title('Big Graph for ' + str(scenario) + " group " + str(group) + " chromosome " + str(chromosome))
+        # plt.legend()
+        #
+        # # I would like to see the baby
+        # plt.grid(True)
+        # plt.tight_layout()
+        #
+        # bot_name = ""
+        # if bot_type == 1:
+        #     bot_name = "SocialWelfare"
+        # if bot_type == 2:
+        #     bot_name = "Greedy"
+        # if bot_type == 3:
+        #     bot_name = "Random"
+        # if bot_type == 4:
+        #     bot_name = "betterGreedy"
+        # if bot_type == 5:
+        #     bot_name = "limitedAwarenessGreedy"
+        # if bot_type == 6:
+        #     bot_name = "somewhatMoreAwareGreedy"
+        # if bot_type == 7:
+        #     bot_name = "optimalHuman"
+        #
+        # # what we are naming this new graph
+        # group_title = group
+        # if group_title == "":
+        #     group_title = "No group"
+        #
+        #
+        #
+        # my_path = os.path.dirname(os.path.abspath(__file__))
+        # scenario_str = f"scenario_{scenario}"
+        # group_str = f"group_{group}"
+        # dir_path = os.path.join(my_path, "individualRoundGraphs", scenario_str, group_str)
+        # os.makedirs(dir_path, exist_ok=True)
+        #
+        # #file_name = f"Scenario {scenario} Group {group_title}. Chromosome {chromosome}.png"
+        # file_name = f"Chromosome {chromosome}.png"
+        #
+        # #Save to longTermGrapherFolder
+        # long_term_path = os.path.join(my_path, "longTermGrapherFolder", file_name)
+        # plt.savefig(long_term_path, dpi=300)
+        #
+        # # Save to individualRoundGraphs folder
+        # #full_path = os.path.join(dir_path, file_name)
+        # #plt.savefig(full_path, dpi=300)
+        #
+        # plt.show()

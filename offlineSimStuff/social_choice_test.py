@@ -17,8 +17,8 @@ def run_trial(sim, num_rounds, num_cycles, create_graphs, group):
     start_time = time.time() # so we can calculate total time. not entirely necessary.
     sim.set_group(group)
 
-    for curr_round in tqdm(range(num_rounds)): # do this outside the sim, could make it inside but I like it outside.
-    #for curr_round in (range(num_rounds)): # do this outside the sim, could make it inside but I like it outside.
+    #for curr_round in tqdm(range(num_rounds)): # do this outside the sim, could make it inside but I like it outside.
+    for curr_round in (range(num_rounds)): # do this outside the sim, could make it inside but I like it outside.
 
         sim.start_round() # creates the current current options matrix, makes da player nodes, sets up causes, etc.
         bot_votes = {}
@@ -39,7 +39,7 @@ def run_trial(sim, num_rounds, num_cycles, create_graphs, group):
         #current_logger.record_individual_round()
 
     end_time = time.time()
-    sim.print_col_passing() # this shows us the breakdown of the number distro. incredibly fascinating! look at it later.
+    #sim.print_col_passing() # this shows us the breakdown of the number distro. incredibly fascinating! look at it later.
     #current_logger.record_big_picture()
     #print("This was the total time ", end_time - start_time)
     return sim
@@ -67,9 +67,9 @@ def create_sim(scenario=None, chromosomes=None, group=""):
 
 
 if __name__ == "__main__":
-    num_rounds = 300000
+    num_rounds = 1
     num_cycles = 3
-    create_graphs = False
+    create_graphs = True
     total_groups = ["", 0, 1, 2]
     chromosomes_directory = "testChromosome"
     group = ""

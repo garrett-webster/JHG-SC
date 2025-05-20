@@ -198,6 +198,6 @@ class causeNodeGraphVisualizer:
         full_path = os.path.join(dir_path, file_name)
 
         plt.savefig(full_path, dpi=300)  # I want it to have the round, and cycle, and that shoudl do it
-        #plt.show()
+        plt.show()
 
 

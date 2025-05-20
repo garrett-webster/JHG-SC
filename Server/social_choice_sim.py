@@ -324,6 +324,58 @@ class Social_Choice_Sim:
             for num in row:
                 self.all_numbers_matrix[num+10] += 1
 
+        # here players pass 3 but bots pass 1 - one is better for society but 3 has mroe groud support. trying to reconcile.
+        self.current_options_matrix = [
+        	[
+            	1,
+            	3,
+            	-4
+        	],
+        	[
+            	-3,
+            	-4,
+            	7
+        	],
+        	[
+            	7,
+            	-8,
+            	9
+        	],
+        	[
+            	1,
+            	4,
+            	-6
+        	],
+        	[
+            	-1,
+            	-8,
+            	0
+        	],
+        	[
+            	2,
+            	7,
+            	7
+        	],
+        	[
+            	7,
+            	2,
+            	-4
+        	]
+    	]
+
+
+        # other odd cobb case.
+        # self.current_options_matrix = [
+        #     [-7, 0, -2],
+        #     [3, 8, -7],
+        #     [-3, 4, 0],
+        #     [-3, -1, 3],
+        #     [0, -5, 4],
+        #     [3, 0, -1],
+        #     [7, -6, 3]
+        # ]
+
+
         # this is the swap case. Should I be documenting these somewhere better? definitely! but here we are
         # self.current_options_matrix = [
         #     [5,4,3],
