@@ -10,13 +10,13 @@ class simLogger:
         self.big_boy_data = {}
 
     def record_individual_round(self):
-        all_nodes, all_votes, winning_vote, current_options_matrix, types_list, scenario, group, curr_round, cycle, chromosome = self.sim.prepare_graph()
+        all_nodes, all_votes, winning_vote_list, current_options_matrix, types_list, scenario, group, curr_round, cycle, chromosome = self.sim.prepare_graph()
         total_data = {}
         total_data["types_list"] = types_list
         total_data["all_nodes"] = all_nodes
         new_votes = copy.deepcopy(all_votes)
         total_data["all_votes"] = new_votes
-        total_data["winning_vote"] = winning_vote
+        total_data["winning_vote"] = winning_vote_list
         total_data["current_options_matrix"] = current_options_matrix
         total_data["scenario"] = scenario
         total_data["group"] = group

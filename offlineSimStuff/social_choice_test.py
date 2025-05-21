@@ -17,16 +17,16 @@ def run_trial(sim, num_rounds, num_cycles, create_graphs, group):
     start_time = time.time() # so we can calculate total time. not entirely necessary.
     sim.set_group(group)
 
-    #for curr_round in tqdm(range(num_rounds)): # do this outside the sim, could make it inside but I like it outside.
-    for curr_round in (range(num_rounds)): # do this outside the sim, could make it inside but I like it outside.
+    for curr_round in tqdm(range(num_rounds)): # do this outside the sim, could make it inside but I like it outside.
+    #for curr_round in (range(num_rounds)): # do this outside the sim, could make it inside but I like it outside.
 
         sim.start_round() # creates the current current options matrix, makes da player nodes, sets up causes, etc.
         bot_votes = {}
         for cycle in range(num_cycles):
             bot_votes[cycle] = sim.get_votes(bot_votes, curr_round, cycle)
-            if create_graphs:
-                graph_nodes(sim) # only do this for specific rounds
+            sim.record_votes(bot_votes[cycle], cycle)
 
+        all_votes = bot_votes
         bot_votes = bot_votes[num_cycles-1] # grab just the last votes, they are the only ones that matter anyway.
         total_votes = len(bot_votes)
         # keep this out just in case.
@@ -35,12 +35,18 @@ def run_trial(sim, num_rounds, num_cycles, create_graphs, group):
             #print("This was the winning vote ", winning_vote+1)
             #graph_nodes(sim)  # only do this for specific rounds
         # this saves everything to the JSON that we need. I mean it saves it to the sim, I can change that so we can log it instead.
+        if create_graphs:  # only do this once, makes sense for jsoning stuff.
+            graph_nodes(sim)  # only do this for specific rounds
+
         sim.save_results()
-        #current_logger.record_individual_round()
+        current_logger.add_round_to_sim(int(curr_round))
+        current_logger.record_individual_round()
 
     end_time = time.time()
     #sim.print_col_passing() # this shows us the breakdown of the number distro. incredibly fascinating! look at it later.
     #current_logger.record_big_picture()
+    filename = "madMessign'"
+    current_logger.finish_json(filename)
     #print("This was the total time ", end_time - start_time)
     return sim
 
@@ -67,9 +73,9 @@ def create_sim(scenario=None, chromosomes=None, group=""):
 
 
 if __name__ == "__main__":
-    num_rounds = 1
+    num_rounds = 10
     num_cycles = 3
-    create_graphs = True
+    create_graphs = False
     total_groups = ["", 0, 1, 2]
     chromosomes_directory = "testChromosome"
     group = ""

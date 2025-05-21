@@ -6,9 +6,7 @@
 # so there are a couple of values that I want to understand better
 # cause sums - how many people on average voted for a particular cause, given bayesian prior and evidence as gathered
 # col probs - probability distribution of each cause passing, given their total sums.
-#
 
-from collections import defaultdict
 
 class optimalHuman:
     def __init__(self, self_id):
@@ -24,17 +22,19 @@ class optimalHuman:
     def get_number_type(self): # used for logging.
         return self.number_type
 
+
+
+
     # returns the bots vote given the current option matrix and previous votes.
     def get_vote(self, current_options_matrix, previous_votes=None):
         # shift the matrix so that we have all positive values (makes normalization eaiser)
-        matrix = [[0] + row for row in current_options_matrix]  # pad with the zero at the front.
-        #matrix = self.initialize_matrix(current_options_matrix)
-        #self.normalize_rows(matrix) # sort of turns it into a probability distribution
+        matrix = self.initialize_matrix(current_options_matrix) # creates no negatives w/ a positive shift
+        self.normalize_rows(matrix) # normalizes the rows and creates a probability distro.
+        col_probs = [sum(col) for col in zip(*matrix)] # how likely everything is to pass given what they like.
 
         cause_sums = None # used for generating bayseian prior - otherwise alwyas have col sums
 
-        col_probs = self.get_column_probabilities(matrix) # how likely each column is to pass
-        our_row = current_options_matrix[self.self_id] # our actual base utility given the original matrix.
+        our_row = current_options_matrix[self.self_id]
         risk_aversion = self.chromosome[0] # how likely we are to stay selfish
         majority_factor = self.chromosome[1] # how much we care about majorities.
 
@@ -56,8 +56,7 @@ class optimalHuman:
 
         new_row = self.calculate_vote_row(our_row, col_probs, cause_sums, risk_aversion, majority_factor) # creates expected values list.
         current_vote = self.choose_best_vote(new_row, cause_sums) # pick the best vote from our expected values
-        if self.self_id == 5:
-            print("Here is the col probsn ", col_probs, " and here are the previous_votes ", previous_votes, " and here is teh cause sums ", cause_sums, " and here is the new row ", new_row, ". theres another thing thats hard to get to. ")
+
 
         # social lubrication! if there is an opportunity to help the world, go for it. creates optimal results.
         if current_vote == -1 and max(current_options_matrix[self.self_id]) >= 0: # if we can create some social lubrication here
@@ -82,6 +81,11 @@ class optimalHuman:
                 for i in range(len(row)):
                     row[i] /= total
 
+    def get_our_row(self, current_options_matrix):
+        shift = max(-min(current_options_matrix[self.self_id]), 0)
+        our_row = [val + shift for val in current_options_matrix[self.self_id]]
+        return our_row
+
     def get_column_probabilities(self, matrix): # get probability distribution based on liklihood of passing. may want to rework into choice matrix. Worth looking at later.
 
         scores = [0] * len(matrix[0])
@@ -96,6 +100,18 @@ class optimalHuman:
 
 
         return scores # we have significantly shifted the math here. wild.
+
+        # num_cols = len(matrix[0]) # this is the old code. want to see somethind.
+        # col_sums = [sum(matrix[row][col] for row in range(len(matrix))) for col in range(num_cols)]
+        #
+        # min_sum = min(col_sums) # find the min and shift it up
+        # min_sum = -min_sum if min_sum < 0 else 0 # old bug was here. fix that.
+        # if min_sum < 0:  # we have a negative number here....
+        #     col_sums = [val + min_sum for val in col_sums]
+        # # just normalizing the col sums here. Reason teh above bug didn't matter - normalization made it all equal anyway.
+        # total = sum(col_sums)
+        # normalized_columns = [val / total for val in col_sums]
+        # return normalized_columns
 
     def apply_previous_votes(self, matrix, previous_votes): # using evidence and baysiean prior, effect our numbers as such.
         player_dict = {player: [] for player in previous_votes[next(iter(previous_votes))]} # creates a player dict that records the lsit of votes
@@ -125,7 +141,10 @@ class optimalHuman:
                 new_prob = col_probs[i + 1] ** risk_aversion # create our new probbaility given our risk aversion and likelihood of cause passing.
                 if cause_sums: # if we have some prior information
                     alignment_ratio = cause_sums[i + 1] / total_voters # consider how alinged we are with overall majority
-                    bonus = alignment_ratio * majority_factor # just a linear relationship - considered sigmoid but it didn't make a difference.
+                    if alignment_ratio > 0.55:
+                        bonus = alignment_ratio * majority_factor # just a linear relationship - considered sigmoid but it didn't make a difference.
+                    else:
+                        bonus = 0.5
                     new_row.append(new_prob * val * bonus) # append that new probability to teh list.
                 else: # ironically, used only in the best guess creation thing.
                     new_row.append(new_prob * val)
@@ -138,7 +157,6 @@ class optimalHuman:
         if cause_sums: # if we have prior information
             # consider the probability of that cuase passing with the expected value
             expected_values = [new_row[i] * cause_sums.get(i, 0) for i in range(len(new_row))]
-            if self.self_id == 5: print("here are hte expected values ", expected_values)
             return expected_values.index(max(expected_values)) - 1 # off by one error
         else: # no prior information, just return the greedy solution.
             return new_row.index(max(new_row)) - 1

@@ -40,7 +40,7 @@ class SCManager:
 
     def init_next_round(self):
         # Initialize the round
-        self.sc_sim.start_round(self.sc_groups)
+        self.sc_sim.start_round() # I don't want there to be groups. A mi no me gusta. for now.
         self.current_options_matrix = self.sc_sim.get_current_options_matrix()
         self.options_history[self.round_num] = self.current_options_matrix
         self.player_nodes = self.sc_sim.get_player_nodes()
@@ -82,6 +82,7 @@ class SCManager:
 
         time.sleep(.5)  # Without this, messages get sent out of order, and the sc_history gets screwed up.
         if self.sc_logger:
+            print("this is round ", self.round_num)
             self.current_logger.add_round_to_sim(self.round_num)
         self.round_num += 1
         self.init_next_round()
@@ -92,6 +93,7 @@ class SCManager:
         previous_votes = {}
 
         for cycle in range(self.vote_cycles):
+            print("we are working for cycle ", cycle)
             player_votes.clear()
             # Waits for a vote from each client
             while len(player_votes) < self.connection_manager.num_clients:
@@ -114,7 +116,9 @@ class SCManager:
         all_votes_list = [option_num + 1 if option_num != -1 else -1 for option_num in
                           all_votes.values()]  # Convert 0-based votes to 1-based for display, but leave voters of -1 as they are
         self.options_votes_history[round_num] = all_votes  # Saves the history of votes
-
+        if cycle < self.vote_cycles:
+            print("recording for cycle " , cycle)
+            self.sc_sim.record_votes(all_votes, cycle)
         return all_votes, all_votes_list
 
     def update_vote_effects(self, all_votes, current_options_matrix, round_num):

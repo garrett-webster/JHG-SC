@@ -64,6 +64,7 @@ class Social_Choice_Sim:
         self.choice_matrix = [0] * (self.num_causes + 1)
         self.last_option = 0
         self.all_numbers_matrix = [0] * 21
+        self.all_votes = {}
 
 
 
@@ -223,9 +224,14 @@ class Social_Choice_Sim:
 
         self.final_votes = bot_votes
 
+
         return bot_votes
 
+    # this exists of necessity of needing to add player votes to this fetcher. Bot votes only are easy, but we need player votes as well.
+    def record_votes(self, current_votes, cycle_number):
+        self.all_votes[cycle_number] = current_votes
 
+    # tallies if there is a winning vote and does a bunch of stuff with it for tracking purposes.
     def return_win(self, all_votes):
         self.current_results = []
         total_votes = all_votes
@@ -243,8 +249,6 @@ class Social_Choice_Sim:
         self.last_option = sorted_column_sums.index(col_sums[index])
 
 
-
-
         if not (winning_vote_count > len(total_votes) // 2):
             winning_vote = -1
 
@@ -256,7 +260,29 @@ class Social_Choice_Sim:
             for i in range(len(total_votes)):
                 self.current_results.append(0)
 
+
         return winning_vote, self.current_results
+
+    # this one has one goal. is there a winning vote.
+    def return_win_without_silly(self, all_votes):
+        self.current_results = []
+        total_votes = all_votes
+        winning_vote_count = Counter(total_votes.values()).most_common(1)[0][1]
+        winning_vote = Counter(total_votes.values()).most_common(1)[0][0]
+
+        if not (winning_vote_count > len(total_votes) // 2):
+            winning_vote = -1
+
+        if winning_vote != -1: # if its -1, then nothing happend. NOT the last entry in the fetcher. that was a big bug that flew under the radar.
+            for i in range(len(total_votes)):
+                self.current_results.append(self.current_options_matrix[i][winning_vote])
+        else:
+            for i in range(len(total_votes)):
+                self.current_results.append(0)
+
+        print("this was teh winning vote ! ", winning_vote)
+        return winning_vote, self.current_results # literally just returns who won. thats it.
+
 
     def set_choice_matrix(self, new_choice_matrix):
         self.choice_matrix = new_choice_matrix
@@ -324,44 +350,121 @@ class Social_Choice_Sim:
             for num in row:
                 self.all_numbers_matrix[num+10] += 1
 
+        # self.current_options_matrix = [
+        #     [
+        #         2,
+        #         -4,
+        #         10
+        #     ],
+        #     [
+        #         6,
+        #         8,
+        #         -6
+        #     ],
+        #     [
+        #         0,
+        #         -3,
+        #         3
+        #     ],
+        #     [
+        #         -10,
+        #         8,
+        #         2
+        #     ],
+        #     [
+        #         -10,
+        #         -9,
+        #         -1
+        #     ],
+        #     [
+        #         2,
+        #         -6,
+        #         -5
+        #     ],
+        #     [
+        #         4,
+        #         5,
+        #         2
+        #     ]
+        # ]
+
+        # self.current_options_matrix = [
+        #     [
+        #         1,
+        #         3,
+        #         -4
+        #     ],
+        #     [
+        #         -3,
+        #         -4,
+        #         7
+        #     ],
+        #     [
+        #         7,
+        #         -8,
+        #         9
+        #     ],
+        #     [
+        #         1,
+        #         4,
+        #         -6
+        #     ],
+        #     [
+        #         -1,
+        #         -8,
+        #         0
+        #     ],
+        #     [
+        #         2,
+        #         7,
+        #         7
+        #     ],
+        #     [
+        #         7,
+        #         2,
+        #         -4
+        #     ]
+        # ]
+
+
         # here players pass 3 but bots pass 1 - one is better for society but 3 has mroe groud support. trying to reconcile.
-        self.current_options_matrix = [
-            [
-                8,
-                -2,
-                7
-            ],
-            [
-                3,
-                -1,
-                -7
-            ],
-            [
-                -3,
-                -3,
-                8
-            ],
-            [
-                9,
-                4,
-                -10
-            ],
-            [
-                -1,
-                -1,
-                7
-            ],
-            [
-                -3,
-                6,
-                -5
-            ],
-            [
-                5,
-                -3,
-                4
-            ]
-        ]
+        # self.current_options_matrix = [
+        #     [
+        #         8,
+        #         -2,
+        #         7
+        #     ],
+        #     [
+        #         3,
+        #         -1,
+        #         -7
+        #     ],
+        #     [
+        #         -3,
+        #         -3,
+        #         8
+        #     ],
+        #     [
+        #         9,
+        #         4,
+        #         -10
+        #     ],
+        #     [
+        #         -1,
+        #         -1,
+        #         7
+        #     ],
+        #     [
+        #         -3,
+        #         6,
+        #         -5
+        #     ],
+        #     [
+        #         5,
+        #         -3,
+        #         4
+        #     ]
+        # ]
 
 
         # other odd cobb case.
@@ -436,15 +539,14 @@ class Social_Choice_Sim:
         for node in current_nodes:
             current_node_json.append(node.to_json())
 
-        current_choice_matrix = copy.copy(self.choice_matrix)
-        current_cooperation_score = copy.copy(self.cooperation_score)
-        winning_vote, _ = self.return_win(self.final_votes)
-        self.set_choice_matrix(current_choice_matrix)
-        self.set_coop_score(current_cooperation_score)  # reset it bc the above does silly things.
+        winning_vote_list = {} # key is the cycle, and the attribute is the winning vote of that cycle.
+        for cycle in self.all_votes:
+            winning_vote_list[cycle], _ = self.return_win_without_silly(self.all_votes[cycle])
+
 
         group = self.get_group()
-
-        return current_node_json, self.final_votes, winning_vote, self.current_options_matrix, self.total_types, self.scenario_string, group, self.round, self.cycle, self.chromosome_string
+        # so now what we do instead is that we take in a winning vote list cycle by cycle and spit it out as necessary.
+        return current_node_json, self.all_votes, winning_vote_list, self.current_options_matrix, self.total_types, self.scenario_string, group, self.round, self.cycle, self.chromosome_string
 
     def get_results(self):
         #print("Aight were is the zero, its gotta be under num_rounds right?") literally zero clue whawt this print statement was supposed to be for.
