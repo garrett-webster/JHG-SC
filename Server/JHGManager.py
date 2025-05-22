@@ -3,14 +3,15 @@ from Server.jhgLogger import JHGLogger
 
 
 class JHGManager:
-    def __init__(self, connection_manager, num_humans, num_players, num_bots, jhg_logging):
+    def __init__(self, connection_manager, num_humans, num_players, num_bots, jhg_logging, total_order):
         self.current_round = 1
         self.connection_manager = connection_manager
         self.num_players = num_players
-        self.jhg_sim = JHG_simulator(num_humans, num_players)
+        self.jhg_sim = JHG_simulator(num_humans, num_players, total_order)
         self.num_bots = num_bots
         self.currentLogger : JHGLogger = JHGLogger(self.jhg_sim)
         self.jhg_logging = jhg_logging
+        self.total_order = total_order
 
     def play_jhg_round(self, round_num, is_last_jhg_round):
         # Occasionally if the JHG round was played to quickly after the SC round, this would catch the SC vote and brick the server.

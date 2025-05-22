@@ -10,7 +10,7 @@ def create_empty_vote_matrix(num_players):
 
 
 class SCManager:
-    def __init__(self, connection_manager, num_humans, num_players, num_bots, sc_group_option, vote_cycles, sc_logging):
+    def __init__(self, connection_manager, num_humans, num_players, num_bots, sc_group_option, vote_cycles, sc_logging, total_order):
         self.connection_manager = connection_manager
         self.round_num = 1
         self.save_dict = {}
@@ -37,6 +37,7 @@ class SCManager:
 
         self.sc_logger = sc_logging
         self.current_logger = simLogger(self.sc_sim) # go ahead and prep it anyway.
+        self.total_order = total_order # keeps track of which are players and which are bots.
 
     def init_next_round(self):
         # Initialize the round

@@ -33,15 +33,16 @@ class Server():
 
     def start_server(self, host='0.0.0.0', port=12345):
         self.connection_manager = ServerConnectionManager(host, port, OPTIONS["TOTAL_PLAYERS"], OPTIONS["NUM_BOTS"])
+        self.total_order = self.connection_manager.get_total_list()
         print("Server started")
         # Halts execution until enough players have joined
         self.connection_manager.add_clients(OPTIONS["NUM_HUMANS"], OPTIONS["NUM_BOTS"], OPTIONS["SC_VOTE_CYCLES"])
 
 
         self.JHG_manager = JHGManager(self.connection_manager, self.num_humans, self.num_players, self.num_bots,
-                                      self.JHG_logging)
+                                      self.JHG_logging, self.total_order)
         self.SC_manager = SCManager(self.connection_manager, self.num_humans, self.num_players, self.num_bots,
-                                    self.sc_group_option, self.sc_vote_cycles, self.SC_logging)
+                                    self.sc_group_option, self.sc_vote_cycles, self.SC_logging, self.total_order)
 
 
 

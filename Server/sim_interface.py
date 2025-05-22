@@ -1,4 +1,5 @@
 # refer to "main.py" in ../ for more information
+import copy
 import os
 import sys
 
@@ -13,12 +14,14 @@ import random
 np.set_printoptions(precision=2, suppress=True)
 
 class JHG_simulator():
-    def __init__(self, num_human_players, num_players):
+    def __init__(self, num_human_players, num_players, total_order):
         self.num_players = num_players
+        self.total_order = total_order
         self.sim = None
         self.players = None
         self.start_game(num_human_players, num_players)
         self.T = None
+
 
 
     def start_game(self, num_human_players, num_players):
@@ -49,6 +52,12 @@ class JHG_simulator():
                 plyrs.append(configured_players[int(player_idxs[i] - popSize)])
             else:
                 plyrs.append(theGenePools[player_idxs[i]])
+        # we gotta organize the plyrs thing
+        new_order = copy.copy(self.total_order)
+        # lets try something silly.
+        plyrs = self.reorder_agents(plyrs) # reorder them so we like them better.
+
+
         players = np.array(plyrs)
         self.players = players
         agents = list(players)
@@ -86,6 +95,21 @@ class JHG_simulator():
         self.sim = GameSimulator(
             game_params)  # sets up our sim object - might need to make this global so we can grab it wherever we need it.
 
+    def reorder_agents(self, plyrs):
+        bots = [a for a in plyrs if a.whoami == "gene"]
+        players = [a for a in plyrs if a.whoami == "Human"]
+
+        ordered_agents = []
+
+        for id in self.total_order:
+            if id.startswith("B"):
+                ordered_agents.append(bots.pop(0))
+            elif id.startswith("P"):
+                ordered_agents.append(players.pop(0))
+            else:
+                raise ValueError(f"")
+
+        return ordered_agents
 
     def execute_round(self, client_input, round):  # all of the player allocations will get passed in here
         # build allocations here.
