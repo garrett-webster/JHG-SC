@@ -78,7 +78,6 @@ def create_sim(scenario=None, chromosomes=None, group=""):
     for human in range(num_humans):
         total_order.append("P" + str(human))
 
-
     sim = Social_Choice_Sim(total_players, num_causes, num_humans, cycle, curr_round, chromosomes, scenario, group, total_order)
 
     return sim
@@ -88,7 +87,7 @@ def create_sim(scenario=None, chromosomes=None, group=""):
 if __name__ == "__main__":
     num_rounds = 10
     num_cycles = 3
-    create_graphs = False
+    create_graphs = True
     total_groups = ["", 0, 1, 2]
     chromosomes_directory = "testChromosome"
     group = ""
