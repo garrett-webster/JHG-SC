@@ -19,8 +19,9 @@ NUM_CAUSES = 3
 
 
 class Social_Choice_Sim:
-    def __init__(self, total_players, num_causes, num_humans, cycle=0, round=0, chromosomes="", scenario="", group=""):
+    def __init__(self, total_players, num_causes, num_humans, cycle=0, round=0, chromosomes="", scenario="", group="", total_order=None):
         # just a bunch of base setters.
+        self.total_order = total_order
         self.total_players = total_players
         self.num_humans = num_humans
         self.num_bots = total_players - num_humans
@@ -79,12 +80,14 @@ class Social_Choice_Sim:
         self.chromosome_string = Path(chromosomes).name
         return self.chromosome_string
 
-
+    # here is the offender. this is the thing we have to rework.
     def create_total_types(self):
         self.total_types = self.bot_type
         if self.total_players != self.num_humans or self.total_players != self.num_bots: # if there is a mistmatch
-            for player in range(self.total_players - self.num_bots):
-                self.total_types.insert(0, -1)
+            for index, player in enumerate(self.total_order):
+                if player.startswith("P"):
+                    self.total_types.insert(index, -1)
+        print("these are the new total types ", self.total_types)
         return self.total_types
 
 
@@ -214,18 +217,23 @@ class Social_Choice_Sim:
     def get_votes(self, previous_votes=None, round=0, cycle=0): # generic get votes for all bot types. Not optimized for a single chromosome
         self.round = round
         self.cycle = cycle
+        all_votes = {}
+        bot_indexes = []
+        for i, thing in enumerate(self.total_types):
+            all_votes[i] = -1 # just assume they are all abstaining
+            if thing != -1:
+                bot_indexes.append(i)
 
         bot_votes = {}
-
         final_votes = None
-        for i, bot in enumerate(self.bots):
-                final_votes = bot.get_vote(self.current_options_matrix, previous_votes)
-                bot_votes[i] = final_votes
+        for bot in self.bots:
+            final_votes = bot.get_vote(self.current_options_matrix, previous_votes)
+            all_votes[bot_indexes.pop()] = final_votes
 
-        self.final_votes = bot_votes
+        self.final_votes = all_votes
 
 
-        return bot_votes
+        return all_votes
 
     # this exists of necessity of needing to add player votes to this fetcher. Bot votes only are easy, but we need player votes as well.
     def record_votes(self, current_votes, cycle_number):
