@@ -18,11 +18,11 @@ class SCManager:
         self.utilities = {i: 0 for i in range(num_humans)}
         # num_humans, bot_type
         # so the arguments here are total_players, likely type bot and group option, if I had to guess.
-        scenario = "../JHG-SC/offlineSimStuff/scenarioIndicator/somewhatMoreAwareGreedy"
+        scenario = "../JHG-SC/offlineSimStuff/scenarioIndicator/humanAttempt1"
         chromosomes = "../JHG-SC/offlineSimStuff/chromosomes/highestFromTesting"
         print("this is the total ordering ", total_order)
         self.sc_sim = Social_Choice_Sim(num_players, 3, num_humans, 3, 0, chromosomes, scenario, "", total_order)
-        self.sc_groups = generate_two_plus_one_groups(num_players, sc_group_option)
+        #self.sc_groups = generate_two_plus_one_groups(num_players, sc_group_option)
         self.num_players = num_players
         self.num_bots = num_bots
         self.vote_cycles = vote_cycles
@@ -114,6 +114,7 @@ class SCManager:
         bot_votes = self.sc_sim.get_votes(previous_votes, round_num, cycle)
 
         all_votes = {**bot_votes, **player_votes}
+        print("Here are the submitted votes ", all_votes)
         all_votes_list = [option_num + 1 if option_num != -1 else -1 for option_num in
                           all_votes.values()]  # Convert 0-based votes to 1-based for display, but leave voters of -1 as they are
         self.options_votes_history[round_num] = all_votes  # Saves the history of votes

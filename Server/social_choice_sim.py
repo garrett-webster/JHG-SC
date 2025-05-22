@@ -119,32 +119,33 @@ class Social_Choice_Sim:
         if total_order is not None:
             for index, object in enumerate(total_order):
                 if object.startswith("B"):
-                    bot_indexes.append(object)
-        bot_indexes = list(range(self.num_bots))
+                    bot_indexes.append(index)
 
         if len(self.bot_type) != self.num_bots:
             # lets fix this logic right here and now.
             self.bot_type = [self.bot_type[0]] * self.num_bots
 
         for i, bot_type in enumerate(self.bot_type):
-            bots_array.append(self.match_bot_type(bot_type, bot_indexes.pop()))
+            current_index = bot_indexes.pop(0)
+            print("this the bot index that we are adding ", current_index)
+            bots_array.append(self.match_bot_type(bot_type, current_index))
 
         return bots_array
 
     # I am not changing this. I don't bother with it. It does what it does and I don't want to refactor all the stubbins.
-    def match_bot_type(self, bot_type, i):
+    def match_bot_type(self, bot_type, index):
         new_bot = None
         bot_type = int(bot_type)
         if bot_type == 0:
-            new_bot = (RandomBot(i))
+            new_bot = (RandomBot(index))
         if bot_type == 1:
-            new_bot = (SocialWelfareBot(i))
+            new_bot = (SocialWelfareBot(index))
         if bot_type == 2:
-            new_bot = (GreedyBot(i))
+            new_bot = (GreedyBot(index))
         if bot_type == 6:
-            new_bot = (somewhatMoreAwarenessGreedy(i))
+            new_bot = (somewhatMoreAwarenessGreedy(index))
         if bot_type == 7:
-            new_bot = (optimalHuman(i))
+            new_bot = (optimalHuman(index))
 
 
         return new_bot # the matched bot that we were looking for.
@@ -244,9 +245,10 @@ class Social_Choice_Sim:
 
         bot_votes = {}
         final_votes = None
-        for bot in self.bots:
+        for i, bot in enumerate(self.bots):
+            print("this is the bot id ", bot.self_id, " an dthis is the i index ", i)
             final_votes = bot.get_vote(self.current_options_matrix, previous_votes)
-            all_votes[bot_indexes.pop()] = final_votes
+            all_votes[bot_indexes.pop(0)] = final_votes
 
         self.final_votes = all_votes
 
@@ -374,157 +376,6 @@ class Social_Choice_Sim:
         for row in self.current_options_matrix:
             for num in row:
                 self.all_numbers_matrix[num+10] += 1
-
-        # self.current_options_matrix = [
-        #     [
-        #         2,
-        #         -4,
-        #         10
-        #     ],
-        #     [
-        #         6,
-        #         8,
-        #         -6
-        #     ],
-        #     [
-        #         0,
-        #         -3,
-        #         3
-        #     ],
-        #     [
-        #         -10,
-        #         8,
-        #         2
-        #     ],
-        #     [
-        #         -10,
-        #         -9,
-        #         -1
-        #     ],
-        #     [
-        #         2,
-        #         -6,
-        #         -5
-        #     ],
-        #     [
-        #         4,
-        #         5,
-        #         2
-        #     ]
-        # ]
-
-        # self.current_options_matrix = [
-        #     [
-        #         1,
-        #         3,
-        #         -4
-        #     ],
-        #     [
-        #         -3,
-        #         -4,
-        #         7
-        #     ],
-        #     [
-        #         7,
-        #         -8,
-        #         9
-        #     ],
-        #     [
-        #         1,
-        #         4,
-        #         -6
-        #     ],
-        #     [
-        #         -1,
-        #         -8,
-        #         0
-        #     ],
-        #     [
-        #         2,
-        #         7,
-        #         7
-        #     ],
-        #     [
-        #         7,
-        #         2,
-        #         -4
-        #     ]
-        # ]
-
-
-        # here players pass 3 but bots pass 1 - one is better for society but 3 has mroe groud support. trying to reconcile.
-        # self.current_options_matrix = [
-        #     [
-        #         8,
-        #         -2,
-        #         7
-        #     ],
-        #     [
-        #         3,
-        #         -1,
-        #         -7
-        #     ],
-        #     [
-        #         -3,
-        #         -3,
-        #         8
-        #     ],
-        #     [
-        #         9,
-        #         4,
-        #         -10
-        #     ],
-        #     [
-        #         -1,
-        #         -1,
-        #         7
-        #     ],
-        #     [
-        #         -3,
-        #         6,
-        #         -5
-        #     ],
-        #     [
-        #         5,
-        #         -3,
-        #         4
-        #     ]
-        # ]
-
-
-        # other odd cobb case.
-        # self.current_options_matrix = [
-        #     [-7, 0, -2],
-        #     [3, 8, -7],
-        #     [-3, 4, 0],
-        #     [-3, -1, 3],
-        #     [0, -5, 4],
-        #     [3, 0, -1],
-        #     [7, -6, 3]
-        # ]
-
-
-        # this is the swap case. Should I be documenting these somewhere better? definitely! but here we are
-        # self.current_options_matrix = [
-        #     [5,4,3],
-        #     [-5,-9,-4],
-        #     [-2,-6,4],
-        #     [-7,1,-6],
-        #     [-1,1,7],
-        #     [5,8,4],
-        #     [0,4,-4]
-        # ]
-
-        # self.current_options_matrix = [
-        #     [-3,0,4],
-        #     [-5,4,-4],
-        #     [-8,3,6],
-        #     [-1,4,-7],
-        #     [-6,0,0],
-        #     [8,-2,-3],
-        #     [5,7,3],
-        # ]
-
 
         self.set_new_options_matrix(self.current_options_matrix)
         # print('this is the len of the current options matrix ', len(self.current_options_matrix))

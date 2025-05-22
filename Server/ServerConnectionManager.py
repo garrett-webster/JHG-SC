@@ -189,15 +189,16 @@ class ServerConnectionManager(ConnectionManager):
 
 
     def add_clients(self, num_clients, num_bots, num_cycles):
-        player_specific_id = self.player_only_ids.pop()
-
         # LETS SEE IF THIS WORKS
         # Accept new connections and add them to the connection manager until the specified number of connections have been made
         while len(self.clients) < num_clients:
             client_socket, client_address = self.socket.accept()
+            player_specific_id = self.player_only_ids.pop(0)
+            print("this is the player specific id ", player_specific_id)
             print("Received new client from: ", client_address)
             self.clients[player_specific_id] = client_socket
             self.num_clients += 1
+            print("this is the size of numclients ", num_clients, " and this is the size of self.clients ", len(self.clients))
             self.send_message(client_socket, "SETUP", player_specific_id, num_clients + num_bots, num_cycles)
 
 

@@ -27,6 +27,7 @@ class optimalHuman:
 
     # returns the bots vote given the current option matrix and previous votes.
     def get_vote(self, current_options_matrix, previous_votes=None):
+
         # shift the matrix so that we have all positive values (makes normalization eaiser)
         matrix = self.initialize_matrix(current_options_matrix) # creates no negatives w/ a positive shift
         self.normalize_rows(matrix) # normalizes the rows and creates a probability distro.
@@ -57,6 +58,7 @@ class optimalHuman:
         new_row = self.calculate_vote_row(our_row, col_probs, cause_sums, risk_aversion, majority_factor) # creates expected values list.
         current_vote = self.choose_best_vote(new_row, cause_sums) # pick the best vote from our expected values
 
+        print("we are accessing the vote of ", self.self_id, " and this is the row we are accessing ", current_options_matrix[self.self_id], " and this was our final vote ", current_vote)
 
         # social lubrication! if there is an opportunity to help the world, go for it. creates optimal results.
         if current_vote == -1 and max(current_options_matrix[self.self_id]) >= 0: # if we can create some social lubrication here
