@@ -104,7 +104,6 @@ class Social_Choice_Sim:
             for index, object in enumerate(total_order):
                 if object.startswith("B"):
                     bot_indexes.append(index)
-        bot_indexes = list(range(self.num_bots))
         if len(self.bot_type) != self.num_bots:
             # lets fix this logic right here and now.
             self.bot_type = [self.bot_type[0]] * self.num_bots
@@ -218,7 +217,7 @@ class Social_Choice_Sim:
         final_votes = None
 
         for i, bot in enumerate(self.bots):
-            print("this is the bot id ", bot.self_id, " an dthis is the i index ", i)
+            print("this is the i ", i)
             final_votes = bot.get_vote(self.current_options_matrix, previous_votes)
             all_votes[bot_indexes.pop(0)] = final_votes
 

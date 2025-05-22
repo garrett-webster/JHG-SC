@@ -57,7 +57,7 @@ class optimalHuman:
         new_row = self.calculate_vote_row(our_row, col_probs, cause_sums, risk_aversion, majority_factor) # creates expected values list.
         current_vote = self.choose_best_vote(new_row, cause_sums) # pick the best vote from our expected values
 
-
+        print("this is the id ", self.self_id, " and this is the curr option row ", current_options_matrix[self.self_id], " and our current vote ", current_vote)
         # social lubrication! if there is an opportunity to help the world, go for it. creates optimal results.
         if current_vote == -1 and max(current_options_matrix[self.self_id]) >= 0: # if we can create some social lubrication here
             # at no cost to ourselves, we can select the 0 option and increase the rate of passing. this happened sometimes within human play.
