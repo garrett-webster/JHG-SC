@@ -22,7 +22,7 @@ class SCManager:
         chromosomes = "../JHG-SC/offlineSimStuff/chromosomes/highestFromTesting"
         print("this is the total ordering ", total_order)
         self.sc_sim = Social_Choice_Sim(num_players, 3, num_humans, 3, 0, chromosomes, scenario, "", total_order)
-        self.sc_groups = generate_two_plus_one_groups(num_players, sc_group_option)
+        #self.sc_groups = generate_two_plus_one_groups(num_players, sc_group_option)
         self.num_players = num_players
         self.num_bots = num_bots
         self.vote_cycles = vote_cycles

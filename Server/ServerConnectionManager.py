@@ -141,11 +141,11 @@ class ServerConnectionManager(ConnectionManager):
     # NOTE: This is somewhat hard coded for JHG/SC.
     # If trying to make this a more general use codebase, this needs some refactoring.
     def add_clients(self, num_clients, num_bots, num_cycles):
-        player_specific_id = self.player_only_ids.pop()
         # LETS SEE IF THIS WORKS
         # Accept new connections and add them to the connection manager until the specified number of connections have been made
         while len(self.clients) < num_clients:
             client_socket, client_address = self.socket.accept()
+            player_specific_id = self.player_only_ids.pop(0)
             print("Received new client from: ", client_address)
             self.clients[player_specific_id] = client_socket
             self.num_clients += 1

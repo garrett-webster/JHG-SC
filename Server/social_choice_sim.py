@@ -1,530 +1,229 @@
 import copy
-
 import math
-
 import random
-
 from collections import Counter
-
 from pathlib import Path
-
 import numpy as np
-
 import matplotlib.pyplot as plt
-
 import seaborn as sns
 
-
-
 from Server.Node import Node
-
 from Server.options_creation import generate_two_plus_one_groups_options_best_of_three, generate_two_plus_one_groups
-
 from Server.SC_Bots.Greedy import GreedyBot
-
 from Server.SC_Bots.SocialWelfare import SocialWelfareBot
-
 from Server.SC_Bots.Random import RandomBot
-
 from Server.SC_Bots.somewhatMoreAwareGreedy import somewhatMoreAwarenessGreedy
-
 from Server.SC_Bots.optimalHuman import optimalHuman
-
-
-
 NUM_CAUSES = 3
 
-
-
-
-
 class Social_Choice_Sim:
-
     def __init__(self, total_players, num_causes, num_humans, cycle=0, round=0, chromosomes="", scenario="", group="", total_order=None):
-
         # just a bunch of base setters.
-
         self.total_order = total_order
-
         self.total_players = total_players
-
         self.num_humans = num_humans
-
         self.num_bots = total_players - num_humans
-
         self.num_causes = num_causes
-
         self.cycle = cycle # set these for graphing and logging purposes, we usually set these round by round and cycle by cycle for logging purposes.
-
         self.round = round
-
         self.rad = 5  # used for graphing the dots on the board.
-
-
-
-
-
         self.players = self.create_players() # ??? This might be used for multiplayer functionality.
-
         self.causes = self.create_cause_nodes() # graphing stuff.
-
         self.player_nodes = [] # also graphing stuff.
-
-
-
         self.chromosome_string = "" # holds the file name of the chromosome baering file.
-
         self.chromosomes = self.set_chromosomes(chromosomes) # self.chromosomes contains the full list of all chromosomes.
-
-
-
         # sets the scenario
-
         self.scenario_string = Path(scenario).name
-
-
-
         # create the bots, first getting number and type from scenario and then setting the chromosomes from the chromsomes.
-
         self.bot_type = self.set_bot_list(scenario)
-
-
         self.bots = self.create_bots(total_order)
-
         self.bot_list_as_string = self.create_bot_list_as_string(self.bots)
-
         self.set_bot_chromosomes(self.chromosomes)
-
-
-
         # group stuff - all used under set group, and then there are defualts just in case.
-
         self.group = -1 # doesn't exist, let me know it hasn't been set.
-
         self.sc_groups = -1 # no group exists, can ignore.
-
         self.group_option = group
-
-
-
         # the bread and butter of the sim. set under start round.
-
         self.current_options_matrix = {}
-
-
-
         # holds all the results from all the games we have played with this current sim
-
         self.results = {} # holds all of our results from long term simulations before graphing.
-
         self.cooperation_score = 0
-
         self.num_rounds = 0 # used in various spots for graphing and whatnot. not terribly important.
-
         self.current_results = [] # holds the results from the last "return win" call, which we can access later.
-
         self.results = self.create_results()  # dict key: player id, attribute: list of all utility changes per round.
-
         self.total_types = self.create_total_types() # holds EVERYONE. now we gotta do a significant amount of refactoring.
-
         self.choice_matrix = [0] * (self.num_causes + 1)
-
         self.last_option = 0
-
         self.all_numbers_matrix = [0] * 21
-
         self.all_votes = {}
 
-
-
-
     def create_total_order(self, total_players, num_humans):
-
-
         num_bots = total_players - num_humans
-
-
         new_list = []
-
-
         for bot in range(num_bots):
-
-
             new_list.append("B" + str(bot))
-
-
         for human in range(num_humans):
-
-
             new_list.append("P" + str(human))
-
-
-
-
-
         return new_list
 
-
-
-
-
-
-
-
     def create_results(self):
-
         self.results = {}
-
         for i in range(self.total_players):  # total_players
-
             self.results[i] = []  # just throw in all the utilites
-
         return self.results
 
-
-
-
-
     def set_chromosome(self, chromosomes):
-
         self.chromosome_string = Path(chromosomes).name
-
         return self.chromosome_string
 
-
-
     # here is the offender. this is the thing we have to rework.
-
     def create_total_types(self):
-
-
         if self.total_order is None:
-
-
             return self.bot_type
 
         self.total_types = self.bot_type
-
         if self.total_players != self.num_humans or self.total_players != self.num_bots: # if there is a mistmatch
-
             for index, player in enumerate(self.total_order):
-
                 if player.startswith("P"):
-
                     self.total_types.insert(index, -1)
-
         print("these are the new total types ", self.total_types)
-
         return self.total_types
 
-
-
-
-
     def set_group(self, group_option):
-
         if group_option == "":
-
             self.group = -1
-
             self.sc_groups = -1
-
         else:
-
             self.group = group_option
-
             self.sc_groups = generate_two_plus_one_groups(self.total_players, group_option)
 
-
-
-
-
-
-
-
     def create_bots(self, total_order):
-
         bots_array = []
-
-
         bot_indexes = []
-
-
         if total_order is not None:
-
-
             for index, object in enumerate(total_order):
-
-
                 if object.startswith("B"):
-
-
-                    bot_indexes.append(object)
-
-
+                    bot_indexes.append(index)
         bot_indexes = list(range(self.num_bots))
-
-
-
         if len(self.bot_type) != self.num_bots:
-
             # lets fix this logic right here and now.
-
             self.bot_type = [self.bot_type[0]] * self.num_bots
-
-
-
         for i, bot_type in enumerate(self.bot_type):
-
-
-            bots_array.append(self.match_bot_type(bot_type, bot_indexes.pop()))
-
-
-
+            current_index = bot_indexes.pop(0)
+            bots_array.append(self.match_bot_type(bot_type, current_index))
         return bots_array
-
-
 
     # I am not changing this. I don't bother with it. It does what it does and I don't want to refactor all the stubbins.
 
-    def match_bot_type(self, bot_type, i):
-
+    def match_bot_type(self, bot_type, index):
         new_bot = None
-
         bot_type = int(bot_type)
-
         if bot_type == 0:
-
-            new_bot = (RandomBot(i))
-
+            new_bot = (RandomBot(index))
         if bot_type == 1:
-
-            new_bot = (SocialWelfareBot(i))
-
+            new_bot = (SocialWelfareBot(index))
         if bot_type == 2:
-
-            new_bot = (GreedyBot(i))
-
+            new_bot = (GreedyBot(index))
         if bot_type == 6:
-
-            new_bot = (somewhatMoreAwarenessGreedy(i))
-
+            new_bot = (somewhatMoreAwarenessGreedy(index))
         if bot_type == 7:
-
-            new_bot = (optimalHuman(i))
-
-
-
-
-
+            new_bot = (optimalHuman(index))
         return new_bot # the matched bot that we were looking for.
 
-
-
     def create_players(self):
-
         players = {}
-
         for i in range(self.total_players):
-
             players[str(i)] = 0
-
         return players
 
 
-
-
-
     def set_bot_chromosomes(self, chromosomes):
-
         if len(chromosomes) != len(self.bots):
-
             chromosomes = [chromosomes[0]] * len(self.bots)
 
-
-
-
-
         for i in range(len(self.bots)):
-
             self.bots[i].set_chromosome(chromosomes[i])
 
-
-
-
-
     def apply_vote(self, winning_vote):
-
         for i in range(self.total_players):
-
             self.players[str(i)] += self.current_options_matrix[i][int(winning_vote)]
 
-
-
-
-
     def create_options_matrix(self):
-
         if self.sc_groups != -1:
-
             self.current_options_matrix = generate_two_plus_one_groups_options_best_of_three(self.sc_groups)
-
         else: # so we have to generate noise to try and "mimic" the other stuff.
-
             self.current_options_matrix = [[random.randint(-8, 8) for _ in range(self.num_causes)] for _ in range(self.total_players)]
-
             noise_matrix = [[random.randint(-2, 2) for _ in range(self.num_causes)] for _ in range(self.total_players)]
-
             self.current_options_matrix = [
-
                 [original + noise for original, noise in zip(row, noise_row)]
-
                 for row, noise_row in zip(self.current_options_matrix, noise_matrix)
-
             ]
-
         return self.current_options_matrix # because why not
 
-
-
     def get_scenario(self):
-
         return self.scenario_string
 
-
-
     def get_chromosome(self):
-
         return self.chromosomes
 
-
-
     def get_causes(self):
-
         return self.causes
 
-
-
-
-
     def get_current_options_matrix(self):
-
         return self.current_options_matrix
 
-
-
-
-
     def get_player_nodes(self):
-
         return self.player_nodes
 
-
-
-
-
     def get_nodes(self):
-
         return self.player_nodes + self.causes
 
-
-
-
-
     def get_player_utility(self):
-
         return self.players
 
-
-
     def get_cycle(self):
-
         return self.cycle
 
-
-
-
-
     def get_bot_type(self):
-
         return self.bot_type
 
-
-
     def set_final_votes(self, zero_idx_votes):
-
         self.final_votes = zero_idx_votes
 
-
-
-
-
     def set_rounds(self, num_rounds):
-
         self.num_rounds = num_rounds
 
 
-
     def add_coop_score(self):
-
         self.cooperation_score = self.cooperation_score + 1
 
-
-
     def set_coop_score(self, coop_score):
-
         self.cooperation_score = coop_score
 
-
-
-
-
     def get_group(self):
-
         return self.group
 
-
-
-
-
     def get_votes(self, previous_votes=None, round=0, cycle=0): # generic get votes for all bot types. Not optimized for a single chromosome
-
         self.round = round
-
         self.cycle = cycle
-
         all_votes = {}
-
         bot_indexes = []
 
         for i, thing in enumerate(self.total_types):
-
             all_votes[i] = -1 # just assume they are all abstaining
-
             if thing != -1:
-
                 bot_indexes.append(i)
 
-
-
         bot_votes = {}
-
         final_votes = None
 
-        for bot in self.bots:
-
+        for i, bot in enumerate(self.bots):
+            print("this is the bot id ", bot.self_id, " an dthis is the i index ", i)
             final_votes = bot.get_vote(self.current_options_matrix, previous_votes)
-
-            all_votes[bot_indexes.pop()] = final_votes
-
+            all_votes[bot_indexes.pop(0)] = final_votes
 
 
         self.final_votes = all_votes
-
-
-
-
-
         return all_votes
 
 
