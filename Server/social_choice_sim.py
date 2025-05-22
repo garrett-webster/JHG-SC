@@ -43,7 +43,7 @@ class Social_Choice_Sim:
 
         # create the bots, first getting number and type from scenario and then setting the chromosomes from the chromsomes.
         self.bot_type = self.set_bot_list(scenario)
-        self.bots = self.create_bots()
+        self.bots = self.create_bots(total_order)
         self.bot_list_as_string = self.create_bot_list_as_string(self.bots)
         self.set_bot_chromosomes(self.chromosomes)
 
@@ -67,6 +67,16 @@ class Social_Choice_Sim:
         self.all_numbers_matrix = [0] * 21
         self.all_votes = {}
 
+    def create_total_order(self, total_players, num_humans):
+        num_bots = total_players - num_humans
+        new_list = []
+        for bot in range(num_bots):
+            new_list.append("B" + str(bot))
+        for human in range(num_humans):
+            new_list.append("P" + str(human))
+
+        return new_list
+
 
 
     def create_results(self):
@@ -82,6 +92,8 @@ class Social_Choice_Sim:
 
     # here is the offender. this is the thing we have to rework.
     def create_total_types(self):
+        if self.total_order is None:
+            return self.bot_type
         self.total_types = self.bot_type
         if self.total_players != self.num_humans or self.total_players != self.num_bots: # if there is a mistmatch
             for index, player in enumerate(self.total_order):
@@ -101,15 +113,21 @@ class Social_Choice_Sim:
 
 
 
-    def create_bots(self):
+    def create_bots(self, total_order):
         bots_array = []
+        bot_indexes = []
+        if total_order is not None:
+            for index, object in enumerate(total_order):
+                if object.startswith("B"):
+                    bot_indexes.append(object)
+        bot_indexes = list(range(self.num_bots))
 
         if len(self.bot_type) != self.num_bots:
             # lets fix this logic right here and now.
             self.bot_type = [self.bot_type[0]] * self.num_bots
 
         for i, bot_type in enumerate(self.bot_type):
-            bots_array.append(self.match_bot_type(bot_type, i))
+            bots_array.append(self.match_bot_type(bot_type, bot_indexes.pop()))
 
         return bots_array
 
@@ -288,7 +306,6 @@ class Social_Choice_Sim:
             for i in range(len(total_votes)):
                 self.current_results.append(0)
 
-        print("this was teh winning vote ! ", winning_vote)
         return winning_vote, self.current_results # literally just returns who won. thats it.
 
 

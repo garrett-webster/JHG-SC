@@ -40,7 +40,7 @@ def run_trial(sim, num_rounds, num_cycles, create_graphs, group):
             graph_nodes(sim)  # only do this for specific rounds
 
         sim.save_results()
-        print("this is the round numb we are adding ", int(curr_round))
+        #print("this is the round numb we are adding ", int(curr_round))
         current_logger.add_round_to_sim(int(curr_round)) # make it start at one instead of zero.
         current_logger.record_individual_round()
 
@@ -67,22 +67,34 @@ def create_sim(scenario=None, chromosomes=None, group=""):
         chromosomes = r"C:/Users/Sean/Documents/GitHub/OtherGarrettStuff/JHG-SC/offlineSimStuff/chromosomes/highestFromTesting.csv"
     cycle = -1 # a negative cycle indicates to me that this is a test - that, or something is really really wrong.
     curr_round = -1
+    total_order = []
+    total_players = 5
+    num_causes = 3
+    num_humans = 0
+    num_bots = total_players - num_humans
+    total_order = []
+    for bot in range(num_bots):
+        total_order.append("B" + str(bot))
+    for human in range(num_humans):
+        total_order.append("P" + str(human))
 
-    sim = Social_Choice_Sim(7, 3, 0, cycle, curr_round, chromosomes, scenario, group)
+
+    sim = Social_Choice_Sim(total_players, num_causes, num_humans, cycle, curr_round, chromosomes, scenario, group, total_order)
 
     return sim
 
 
 
 if __name__ == "__main__":
-    num_rounds = 3
+    num_rounds = 10
     num_cycles = 3
-    create_graphs = True
+    create_graphs = False
     total_groups = ["", 0, 1, 2]
     chromosomes_directory = "testChromosome"
     group = ""
     scenario = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\offlineSimStuff\scenarioIndicator\humanAttempt1"
     chromosome = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\offlineSimStuff\chromosomes\highestFromTesting"
+
     current_sim = create_sim(scenario, chromosome, group)
     updated_sim = run_trial(current_sim, num_rounds, num_cycles, create_graphs, group)
     current_visualizer = longTermGrapher()

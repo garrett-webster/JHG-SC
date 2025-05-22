@@ -82,7 +82,7 @@ class simLogger:
         #     json.dump(total_data, file, indent=4)
 
     def add_round_to_sim(self, round_num):
-        print("This is the round number that we are adding ", round_num)
+        #print("This is the round number that we are adding ", round_num)
         self.big_boy_data[round_num] = self.record_individual_round()
 
     def finish_json(self, filename):
