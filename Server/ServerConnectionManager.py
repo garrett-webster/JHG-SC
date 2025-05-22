@@ -2,7 +2,10 @@ import json
 import select
 
 from ConnectionManager import ConnectionManager
-
+import random
+# ok so here is what I am thinking about doing
+# have a dictionary that maps from all of the actual ID's and whatnot to their respective randomized dictionary, and just go from there.
+# the bots don't actually need to get thrown anywhere, but I should make sure that their slots are correctly taken up just in case.
 
 class ServerConnectionManager(ConnectionManager):
     def __init__(self, host, port, num_players, num_bots = 0):
@@ -15,6 +18,14 @@ class ServerConnectionManager(ConnectionManager):
         self.num_clients = 0
         self.num_bots = num_bots
         self.clients = {}
+        self.connected_clients = [] # just a list of all the connected clients in the order that I need them.
+        self.client_id_dict = {}
+        self.total_order = []
+        self.only_player_order = []
+        self.client_id_to_socket = {}  # key: the hidden client id (0 - 4), and the attribute is their socket.
+        self.create_total_order(num_players, num_bots)
+
+
 
         self.message_type_names = {
             "SC_INIT": ["ROUND_NUM", "OPTIONS", "NODES", "UTILITIES"],
@@ -33,6 +44,30 @@ class ServerConnectionManager(ConnectionManager):
             "SUBMIT_SC": ["FINAL_VOTE"],
         }
 
+    def get_total_order(self):
+        return self.total_order
+
+    def create_total_order(self, num_players, num_bots):
+        # assuming that we have broken out of the group
+        # i now need to somewhat randomly generate a sequence of zeros and ones
+        num_clients = num_players - num_bots
+        zeros = [-1] * num_bots
+        ones = [1] * num_clients
+        total_list = zeros + ones
+        print("here is the len of total_list ", len(total_list), " and num bots ", num_bots, " and num_clients ", num_clients)
+        random.shuffle(total_list)
+        self.player_order = total_list
+        for i, val in enumerate(self.player_order):
+            if val == 1:
+                self.only_player_order.append(i) # just the index that we are at
+
+        for i, val in enumerate(total_list):
+            if val != -1:
+                total_list[i] = self.only_player_order.pop()
+
+        print("this is the new total_list! ", total_list)
+
+
     ''' Functions to send messages to clients '''
 
     # Sends a given message to all clients
@@ -50,6 +85,7 @@ class ServerConnectionManager(ConnectionManager):
                 self.send_message(client_socket, *args)
             else: # If a unique_message was passed, send the appropriate message to each client
                 message = tuple(msg_dict.get(client_id) for msg_dict in unique_messages)
+                print("under distribute message this is what we got ", message)
                 self.send_message(client_socket, *args, *message)
 
 
@@ -116,15 +152,22 @@ class ServerConnectionManager(ConnectionManager):
     # If trying to make this a more general use codebase, this needs some refactoring.
     def add_clients(self, num_clients, num_bots, num_cycles):
         next_id = 0
-
+        print(self.only_player_order)
         # Accept new connections and add them to the connection manager until the specified number of connections have been made
         while len(self.clients) < num_clients:
             client_socket, client_address = self.socket.accept()
+
             print("Received new client from: ", client_address)
             self.clients[next_id] = client_socket
             self.num_clients += 1
             next_id += 1
-
+            new_id = self.only_player_order.pop()
+            self.client_id_to_socket[new_id] = client_socket
             #Send the info needed to set up the client
             new_id = len(self.clients) - 1 + num_bots
             self.send_message(client_socket, "SETUP", new_id, num_clients + num_bots, num_cycles)
+
+        print("These are the self client id ot socket things ", self.client_id_to_socket, " and then this is the total list ", self.total_order, " and then this is the player portion ", self.only_player_order)
+
+
+

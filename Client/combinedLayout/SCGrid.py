@@ -1,8 +1,7 @@
 from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import QVBoxLayout, QGridLayout, QLabel, QTabWidget
 
-from combinedLayout.colors import COLORS
-
+from Client.combinedLayout.colors import COLORS
 
 class SCGrid(QTabWidget):
     def __init__(self, num_players, client_id, col_2_header_text, col_2_vals, utility_mat):
@@ -47,17 +46,25 @@ class SCGrid(QTabWidget):
                 self.grid.addWidget(label, row + 1, col + 2)
 
 
-    def update_grid(self, col_2_vals, utility_mat, round_num):
+    # Add the footer that adds up the column totals for utilitie
+        self.footer_col_1 = centered_label("0")
+        self.footer_col_2 = centered_label("0")
+        self.footer_col_3 = centered_label("0")
+
+        self.grid.addWidget(QLabel("Total Affect"), num_players + 2, 0, 1, 2)
+        self.grid.addWidget(self.footer_col_1, num_players + 2, 2)
+        self.grid.addWidget(self.footer_col_2, num_players + 2, 3)
+        self.grid.addWidget(self.footer_col_3, num_players + 2, 4)
+
+    def update_grid(self, col_2_vals, utility_mat):
         self.update_col_2(col_2_vals)
         self.update_utilities(utility_mat)
 
 
     def update_col_2(self, col_2_vals):
-        print("here are the pre sort col 2 vals ", col_2_vals)
         if type(col_2_vals) == dict:
             col_2_vals = [value for key, value in sorted(col_2_vals.items(), key=lambda item: int(item[0]))]
             # col_2_vals = [value for key, value in sorted(col_2_vals.items())]
-        print("here are the post sort col 2 vals ", col_2_vals)
         for i, label in enumerate(self.col_2_labels):
             label.setText(str(col_2_vals[i]))
 
@@ -66,3 +73,12 @@ class SCGrid(QTabWidget):
         for row, row_labels in enumerate(self.cause_utility_labels):
             for col, widget in enumerate(row_labels):
                 row_labels[col].setText(str(utility_mat[row][col]))
+
+            utility_col_sums = [0, 0, 0]
+
+            for col_idx in range(3):
+                utility_col_sums[col_idx] = sum(row[col_idx] for row in utility_mat)
+
+            self.footer_col_1.setText(str(utility_col_sums[0]))
+            self.footer_col_2.setText(str(utility_col_sums[1]))
+            self.footer_col_3.setText(str(utility_col_sums[2]))

@@ -176,7 +176,7 @@ class causeNodeGraphVisualizer:
                     ax.add_patch(arrow)
 
             fig.suptitle(
-                f"Round: {str(int(curr_round) + 1)}   Situation: {scenario}   Cycle: {str(cycle_key)}    Group: {group}",
+                f"Round: {str(int(curr_round))}   Situation: {scenario}   Cycle: {str(cycle_key)}    Group: {group}",
                 fontsize=16, fontweight='bold', y=0.98)
 
             # creates a legend that allows us to see which bot types are active, and which ones are what
@@ -200,7 +200,7 @@ class causeNodeGraphVisualizer:
             my_path = os.path.dirname(os.path.abspath(__file__))
             scenario_str = f"scenario_{scenario}"
             group_str = f"group_{group}"
-            file_name = f"round_{str(int(curr_round)+1)}_cycle_{str(cycle_key)}.png"
+            file_name = f"round_{str(int(curr_round))}_cycle_{str(cycle_key)}.png"
             dir_path = os.path.join(my_path, "individualRoundGraphs", scenario_str, group_str)
             os.makedirs(dir_path, exist_ok=True)
             full_path = os.path.join(dir_path, file_name)

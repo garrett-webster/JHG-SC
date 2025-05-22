@@ -22,6 +22,7 @@ class JHGManager:
             try:
                 first_key = next(iter(client_input))
                 client_input[first_key]["ALLOCATIONS"]
+                print("this was the received first key ", first_key)
                 break
             except KeyError:
                 print("Error processinging client_input: ", client_input)
@@ -35,6 +36,7 @@ class JHGManager:
 
         sent_dict, received_dict = self.get_sent_and_received(allocations_matrix)
         unique_messages = [received_dict, sent_dict]
+        print("These are the sent dict and the received dict ", sent_dict, received_dict)
         self.connection_manager.distribute_message("JHG_OVER", round_num, list(current_popularity),
                                                    self.jhg_sim.get_influence().tolist(), is_last_jhg_round,
                                                    unique_messages=unique_messages)

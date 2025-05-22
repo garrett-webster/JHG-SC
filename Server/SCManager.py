@@ -93,7 +93,6 @@ class SCManager:
         previous_votes = {}
 
         for cycle in range(self.vote_cycles):
-            print("we are working for cycle ", cycle)
             player_votes.clear()
             # Waits for a vote from each client
             while len(player_votes) < self.connection_manager.num_clients:

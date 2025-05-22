@@ -8,7 +8,7 @@ OPTIONS = {
     "NUM_HUMANS": 1,
     "TOTAL_PLAYERS": 5,
     "JHG_ROUNDS_PER_SC_ROUND" : 1,
-    "MAX_ROUNDS": 5,
+    "MAX_ROUNDS": 10,
     "SC_GROUP_OPTION": 0, # See options_creation.py -> group_size_options to understand what this means
     "SC_VOTE_CYCLES": 3,
     "JHG_LOGGING": False,
@@ -33,24 +33,23 @@ class Server():
 
     def start_server(self, host='0.0.0.0', port=12345):
         self.connection_manager = ServerConnectionManager(host, port, OPTIONS["TOTAL_PLAYERS"], OPTIONS["NUM_BOTS"])
-        self.JHG_manager = JHGManager(self.connection_manager, self.num_humans, self.num_players, self.num_bots, self.JHG_logging)
-        self.SC_manager = SCManager(self.connection_manager, self.num_humans, self.num_players, self.num_bots,
-                                    self.sc_group_option, self.sc_vote_cycles, self.SC_logging)
         print("Server started")
-
         # Halts execution until enough players have joined
         self.connection_manager.add_clients(OPTIONS["NUM_HUMANS"], OPTIONS["NUM_BOTS"], OPTIONS["SC_VOTE_CYCLES"])
 
 
+        self.JHG_manager = JHGManager(self.connection_manager, self.num_humans, self.num_players, self.num_bots,
+                                      self.JHG_logging)
+        self.SC_manager = SCManager(self.connection_manager, self.num_humans, self.num_players, self.num_bots,
+                                    self.sc_group_option, self.sc_vote_cycles, self.SC_logging)
+
+
+
     def play_game(self):
         # Main game loop -- Play as many rounds as specified in OPTIONS
-        # current_logger : simLogger = simLogger(self.SC_manager)
         self.SC_manager.init_next_round()
-        # current_logger.add_round_to_sim(-1)
         for round_num in range(self.max_rounds):
             self.SC_manager.play_social_choice_round()
-        #     current_logger.add_round_to_sim(round_num)
-        # current_logger.finish_json()
         filename = datetime.now().strftime("%Y%m%d_%H%M%S") + "human_study_results.json"
         self.SC_manager.finish_results(filename)
 
