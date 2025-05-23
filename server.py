@@ -53,7 +53,7 @@ class Server():
                 if i == self.jhg_rounds_per_sc_round - 1: is_last_jhg_round = True
                 self.JHG_manager.play_jhg_round(self.JHG_manager.current_round, is_last_jhg_round)
             self.SC_manager.play_social_choice_round()
-            print("New round")
+            #print("New round")
         self.JHG_manager.log_jhg_overview()
 
         print("game over")
