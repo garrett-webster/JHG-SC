@@ -148,11 +148,15 @@ class MainWindow(QMainWindow):
         self.round_state.sc_cycle = cycle
         self.SC_cause_graph.update_arrows(votes, True)
         self.SC_voting_grid.current_vote = -1
-        self.SC_voting_grid.select_button(None)  # Clears the selection from the SC voting buttons
+        self.SC_voting_grid.set_selected_button_style_to_border()
 
         if not is_last_cycle:
             self.SC_voting_grid.submit_button.setText("Submit")
             self.dockWidget.bottom_left.start_flashing(4)
+
+        else:
+            self.SC_voting_grid.current_vote = -1
+            self.SC_voting_grid.select_button(None)  # Clears the selection from the SC voting buttons
 
 
     def update_sc_utilities_labels(self, round_num, new_utilities, winning_vote, last_round_votes,
