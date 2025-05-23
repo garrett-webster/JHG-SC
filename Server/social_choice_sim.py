@@ -496,7 +496,7 @@ class Social_Choice_Sim:
             causes.append(Node(new_x, new_y, "CAUSE", "Cause " + str(i+1)))
         return causes
 
-
+    # about to try to start a major rework, wish me luck. 
     def create_player_nodes(self):
         normalized_current_options_matrix = self.current_options_matrix
 

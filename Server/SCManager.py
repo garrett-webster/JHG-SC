@@ -20,7 +20,6 @@ class SCManager:
         # so the arguments here are total_players, likely type bot and group option, if I had to guess.
         scenario = "../JHG-SC/offlineSimStuff/scenarioIndicator/humanAttempt1"
         chromosomes = "../JHG-SC/offlineSimStuff/chromosomes/highestFromTesting"
-        print("this is the total ordering ", total_order) # I do actually want thsi one
         self.sc_sim = Social_Choice_Sim(num_players, 3, num_humans, 3, 0, chromosomes, scenario, "", total_order)
         #self.sc_groups = generate_two_plus_one_groups(num_players, sc_group_option)
         self.num_players = num_players
@@ -67,14 +66,10 @@ class SCManager:
 
         # Calculate the winning vote
         winning_vote, new_utilities = self.sc_sim.return_win(zero_idx_votes)
-        print("did we have a winning vote ?", winning_vote)
-        print("These are the utilities ", new_utilities)
-
         self.sc_sim.save_results()
         self.sc_sim.set_rounds(self.round_num) # should set it to the last number of rounds before calculation. I hope this works.
         new_utilities = copy.copy(self.sc_sim.get_new_utilities())
         new_utilities = {str(k): sum(v) for k,v in new_utilities.items()}
-        print("here are the new utilities ", new_utilities)
 
 
         self.connection_manager.distribute_message("SC_OVER", self.round_num, winning_vote, new_utilities,
@@ -84,7 +79,6 @@ class SCManager:
 
         time.sleep(.5)  # Without this, messages get sent out of order, and the sc_history gets screwed up.
         if self.sc_logger:
-            print("this is round ", self.round_num)
             self.current_logger.add_round_to_sim(self.round_num)
         self.round_num += 1
         self.init_next_round()
@@ -114,12 +108,10 @@ class SCManager:
         bot_votes = self.sc_sim.get_votes(previous_votes, round_num, cycle)
 
         all_votes = {**bot_votes, **player_votes}
-        print("Here are the submitted votes ", all_votes)
         all_votes_list = [option_num + 1 if option_num != -1 else -1 for option_num in
                           all_votes.values()]  # Convert 0-based votes to 1-based for display, but leave voters of -1 as they are
         self.options_votes_history[round_num] = all_votes  # Saves the history of votes
         if cycle < self.vote_cycles:
-            print("recording for cycle " , cycle)
             self.sc_sim.record_votes(all_votes, cycle)
         return all_votes, all_votes_list
 
