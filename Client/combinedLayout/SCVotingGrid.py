@@ -89,7 +89,6 @@ class SCVotingGrid(SCGrid):
             # print(vote_button.property("btnState"))
             if vote_button.property("btnState") == "checked":
                 vote_button.setProperty("btnState", "past_vote")
-                print(vote_button.property("btnState"))
                 # vote_button.setStyleSheet("background-color: #3a414a; color: red; border: solid 20px red;")
                 vote_button.style().unpolish(vote_button)
                 vote_button.style().polish(vote_button)
