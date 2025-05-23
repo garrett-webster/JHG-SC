@@ -3,15 +3,16 @@ from Server.jhgLogger import JHGLogger
 
 
 class JHGManager:
-    def __init__(self, connection_manager, num_humans, num_players, num_bots, jhg_logging):
+    def __init__(self, connection_manager, num_humans, num_players, num_bots, jhg_logging, total_order):
         self.current_round = 1
         self.connection_manager = connection_manager
         self.num_players = num_players
-        self.jhg_sim = JHG_simulator(num_humans, num_players)
+        self.jhg_sim = JHG_simulator(num_humans, num_players, total_order)
         self.num_bots = num_bots
         self.currentLogger : JHGLogger = JHGLogger(self.jhg_sim)
         self.jhg_logging = jhg_logging
         self.alpha = self.jhg_sim.sim.engine.alpha
+        self.total_order = total_order
         if self.jhg_logging:
             self.currentLogger.add_round_to_overview(-1) # just throw the round num in, the sim is already in there
 
@@ -58,8 +59,8 @@ class JHGManager:
             sent = [0 for _ in range(self.num_players)]
             received = [0 for _ in range(self.num_players)]
             for player in range(self.num_players):
-                sent[player] = allocations_matrix[client_id + bot_offset][player]
-                received[player] = allocations_matrix[player][client_id + bot_offset]
+                sent[player] = allocations_matrix[client_id][player]
+                received[player] = allocations_matrix[player][client_id]
             sent_dict[client_id] = sent
             received_dict[client_id] = received
 

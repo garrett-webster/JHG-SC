@@ -1,5 +1,6 @@
 import json
 import select
+import random
 
 from ConnectionManager import ConnectionManager
 
@@ -15,6 +16,8 @@ class ServerConnectionManager(ConnectionManager):
         self.num_clients = 0
         self.num_bots = num_bots
         self.clients = {}
+        self.player_only_ids = []
+        self.create_total_order(num_players, num_bots)
 
         self.message_type_names = {
             "SC_INIT": ["ROUND_NUM", "OPTIONS", "NODES", "UTILITIES"],
@@ -32,6 +35,29 @@ class ServerConnectionManager(ConnectionManager):
             "SUBMIT_JHG": ["ROUND_NUMBER", "ALLOCATIONS"],
             "SUBMIT_SC": ["FINAL_VOTE"],
         }
+
+    def create_total_order(self, num_players, num_bots):
+        num_clients = num_players - num_bots
+        client_list = []
+        bots_list = []
+        for i in range(num_clients):  # call me old fashioned but I want them to start at 1
+            client_list.append("P" + str(i + 1))
+        for i in range(num_bots):
+            bots_list.append("B" + str(i + 1))
+
+        total_list = client_list + bots_list
+        random.shuffle(total_list)  # bars
+        self.total_order = total_list
+        print("This is the total order ", self.total_order)
+        # now we need to list out hte player ID's.
+        self.player_only_ids = [self.total_order.index(val) for val in total_list if
+                                val.startswith("P")]  # this ID is zero indexed.
+        print("these are the player only ID's ", self.player_only_ids)
+
+    def get_total_list(self):
+        return self.total_order
+
+
 
     ''' Functions to send messages to clients '''
 
@@ -115,16 +141,13 @@ class ServerConnectionManager(ConnectionManager):
     # NOTE: This is somewhat hard coded for JHG/SC.
     # If trying to make this a more general use codebase, this needs some refactoring.
     def add_clients(self, num_clients, num_bots, num_cycles):
-        next_id = 0
-
+        # LETS SEE IF THIS WORKS
         # Accept new connections and add them to the connection manager until the specified number of connections have been made
         while len(self.clients) < num_clients:
             client_socket, client_address = self.socket.accept()
+            player_specific_id = self.player_only_ids.pop(0)
             print("Received new client from: ", client_address)
-            self.clients[next_id] = client_socket
+            self.clients[player_specific_id] = client_socket
             self.num_clients += 1
-            next_id += 1
+            self.send_message(client_socket, "SETUP", player_specific_id, num_clients + num_bots, num_cycles)
 
-            #Send the info needed to set up the client
-            new_id = len(self.clients) - 1 + num_bots
-            self.send_message(client_socket, "SETUP", new_id, num_clients + num_bots, num_cycles)
