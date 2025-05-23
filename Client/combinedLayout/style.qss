@@ -127,6 +127,17 @@ QScrollArea QPushButton[btnState="checked"] {
     color: #ecf0f1;
     border: solid 2px #2980b9;
 }
+
+/*QScrollArea QPushButton[btnState="past_vote"] {*/
+/*    background-color: #3a414a;*/
+/*    color: red;*/
+/*    border: solid 2px red;*/
+/*}*/
+
+QPushButton[btnState="past_vote"] {
+    border: 2px solid #2980b9;
+}
+
 QScrollBar::handle:horizontal, QScrollBar::handle:vertical {
     background-color: #888;
     border-radius: 5px;

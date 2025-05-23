@@ -86,6 +86,20 @@ class SCVotingGrid(SCGrid):
         if button is None:
             self.clear_button.setEnabled(False)
 
+    def set_selected_button_style_to_border(self):
+        for vote_button in self.vote_buttons:
+            # print(vote_button.property("btnState"))
+            if vote_button.property("btnState") == "checked":
+                vote_button.setProperty("btnState", "past_vote")
+                print(vote_button.property("btnState"))
+                # vote_button.setStyleSheet("background-color: #3a414a; color: red; border: solid 20px red;")
+
+
+                vote_button.style().unpolish(vote_button)
+                vote_button.style().polish(vote_button)
+                vote_button.update()
+
+
     def submit_clicked(self, main_window, submit_button):
         from ui_functions.SC_functions import sc_submit
         sc_submit(main_window, self)
