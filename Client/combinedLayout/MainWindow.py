@@ -147,7 +147,7 @@ class MainWindow(QMainWindow):
     def update_sc_votes(self, votes, cycle, is_last_cycle):
         self.round_state.sc_cycle = cycle
         self.SC_cause_graph.update_arrows(votes, True)
-        self.SC_voting_grid.current_vote = -1
+        #self.SC_voting_grid.current_vote = -1
         self.SC_voting_grid.set_selected_button_style_to_border()
 
         if not is_last_cycle:
