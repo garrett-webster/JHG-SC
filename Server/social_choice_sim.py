@@ -99,7 +99,7 @@ class Social_Choice_Sim:
             for index, player in enumerate(self.total_order):
                 if player.startswith("P"):
                     self.total_types.insert(index, -1)
-        print("these are the new total types ", self.total_types)
+        #print("these are the new total types ", self.total_types)
         return self.total_types
 
 
@@ -127,7 +127,7 @@ class Social_Choice_Sim:
 
         for i, bot_type in enumerate(self.bot_type):
             current_index = bot_indexes.pop(0)
-            print("this the bot index that we are adding ", current_index)
+            #print("this the bot index that we are adding ", current_index)
             bots_array.append(self.match_bot_type(bot_type, current_index))
 
         return bots_array
@@ -246,7 +246,7 @@ class Social_Choice_Sim:
         bot_votes = {}
         final_votes = None
         for i, bot in enumerate(self.bots):
-            print("this is the bot id ", bot.self_id, " an dthis is the i index ", i)
+            #print("this is the bot id ", bot.self_id, " an dthis is the i index ", i)
             final_votes = bot.get_vote(self.current_options_matrix, previous_votes)
             all_votes[bot_indexes.pop(0)] = final_votes
 
