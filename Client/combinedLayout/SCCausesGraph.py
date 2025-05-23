@@ -20,6 +20,8 @@ class SCCausesGraph(QWidget):
         self.nodes_text = []
         self.nodes_x = []
         self.nodes_y = []
+        self.node_flag = []
+        self.player_alphas = []
         self.round_state = None
         self.num_cycles = num_cycles
 
@@ -57,6 +59,8 @@ class SCCausesGraph(QWidget):
             self.nodes_y.clear()
             self.nodes_type.clear()
             self.nodes_text.clear()
+            self.node_flag.clear()
+            self.player_alphas.clear()
 
             # Show round number
             self.nodes_ax.text(
@@ -78,6 +82,7 @@ class SCCausesGraph(QWidget):
                 self.nodes_y.append(float(node["y_pos"]))
                 self.nodes_type.append(node["type"])
                 self.nodes_text.append(node["text"])
+                self.node_flag.append(node["negatives_flag"])
 
             colors = []
 
@@ -86,12 +91,14 @@ class SCCausesGraph(QWidget):
                 winning_vote += 1
 
             # Lists to store node info based on type
-            player_x, player_y, player_colors, player_texts, player_text_colors = [], [], [], [], []
-            cause_x, cause_y, cause_colors, cause_texts, cause_text_colors = [], [], [], [], []
+            player_x, player_y, player_colors, player_texts, player_text_colors, player_alphas = [], [], [], [], [], []
+            cause_x, cause_y, cause_colors, cause_texts, cause_text_colors, cause_alphas = [], [], [], [], [], []
 
             for i, (x_val, y_val) in enumerate(zip(self.nodes_x, self.nodes_y)):
                 full_text = self.nodes_text[i]
                 display_text = full_text
+                flag = self.node_flag[i]
+                alpha = 0.5 if flag else 1.0
                 text_color = 'black'  # default
 
                 if full_text.startswith("Player"):
@@ -104,6 +111,7 @@ class SCCausesGraph(QWidget):
                     player_colors.append(color)
                     player_texts.append(display_text)
                     player_text_colors.append(text_color)
+                    player_alphas.append(alpha)
 
                 elif full_text.startswith("Cause "):
                     display_text = full_text.replace("Cause ", "")
@@ -119,18 +127,21 @@ class SCCausesGraph(QWidget):
                     cause_colors.append(color)
                     cause_texts.append(display_text)
                     cause_text_colors.append(text_color)
+                    cause_alphas.append(alpha)
 
             # Draw annotations
-            for x, y, text, color in zip(player_x, player_y, player_texts, player_text_colors):
+            for x, y, text, color, alpha in zip(player_x, player_y, player_texts, player_text_colors, player_alphas):
                 self.nodes_ax.annotate(text, (x - 0.05, y - 0.1), ha='center', va='center',
-                                       fontsize=10, color=color, weight='bold', zorder=587)
-            for x, y, text, color in zip(cause_x, cause_y, cause_texts, cause_text_colors):
+                                       fontsize=10, color=color, weight='bold', zorder=587, alpha=alpha)
+            for x, y, text, color, alpha in zip(cause_x, cause_y, cause_texts, cause_text_colors, cause_alphas):
                 self.nodes_ax.annotate(text, (x, y - 0.25), ha='center', va='center',
-                                       fontsize=10, color=color, weight='bold', zorder=587)
+                                       fontsize=10, color=color, weight='bold', zorder=587, alpha=alpha)
 
             # Draw nodes: players as circles, causes as triangles
-            self.nodes_ax.scatter(player_x, player_y, marker='o', c=player_colors, s=150, zorder=500)
-            self.nodes_ax.scatter(cause_x, cause_y, marker='^', c=cause_colors, s=180, zorder=501)
+            for x, y, c, a in zip(player_x, player_y, player_colors, player_alphas): # players
+                self.nodes_ax.scatter(x, y, marker='o', c=c, s=150, zorder=500, alpha=a)
+            for x, y, c, a in zip(cause_x, cause_y, cause_colors, cause_alphas): # causes
+                self.nodes_ax.scatter(x, y, marker='^', c=c, s=180, zorder=501, alpha=a)
 
             self.nodes_ax.scatter(self.nodes_x, self.nodes_y, marker='o', c=colors, s=150)
 
