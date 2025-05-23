@@ -98,7 +98,7 @@ class SCCausesGraph(QWidget):
                 full_text = self.nodes_text[i]
                 display_text = full_text
                 flag = self.node_flag[i]
-                alpha = 0.5 if flag else 1.0
+                alpha = 0.2 if flag else 1.0
                 text_color = 'black'  # default
 
                 if full_text.startswith("Player"):
