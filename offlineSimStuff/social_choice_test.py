@@ -24,7 +24,7 @@ def run_trial(sim, num_rounds, num_cycles, create_graphs, group):
         sim.start_round() # creates the current current options matrix, makes da player nodes, sets up causes, etc.
         bot_votes = {}
         for cycle in range(num_cycles):
-            bot_votes[cycle] = sim.get_votes(bot_votes, curr_round, cycle)
+            bot_votes[cycle] = sim.get_votes(bot_votes, curr_round, cycle, num_cycles)
             sim.record_votes(bot_votes[cycle], cycle)
 
         all_votes = bot_votes
@@ -85,9 +85,9 @@ def create_sim(scenario=None, chromosomes=None, group=""):
 
 
 if __name__ == "__main__":
-    num_rounds = 10
+    num_rounds = 10000
     num_cycles = 3
-    create_graphs = True
+    create_graphs = False
     total_groups = ["", 0, 1, 2]
     chromosomes_directory = "testChromosome"
     group = ""

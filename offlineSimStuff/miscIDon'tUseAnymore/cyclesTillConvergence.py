@@ -24,7 +24,7 @@ def run_trial(sim, num_rounds, num_cycles, create_graphs, group):
         cycle = 0
         while True:
             cycle += 1
-            bot_votes[cycle] = sim.get_votes(bot_votes, curr_round, cycle)
+            bot_votes[cycle] = sim.get_votes(bot_votes, curr_round, cycle, num_cycles)
             prev_votes = bot_votes.get(cycle-1)
             if prev_votes is not None:
                 if prev_votes == bot_votes[cycle]:

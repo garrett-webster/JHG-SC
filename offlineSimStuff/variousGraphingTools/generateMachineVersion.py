@@ -73,7 +73,7 @@ if __name__ == "__main__":
             new_sim.set_player_nodes(current_options_matrix)
             bot_votes = {}
             for cycle in range(num_cycles): # might actually need to extrapolate this from json
-                bot_votes[cycle] = new_sim.get_votes(bot_votes, curr_round, cycle)
+                bot_votes[cycle] = new_sim.get_votes(bot_votes, curr_round, cycle, num_cycles)
                 # can graph stuff here. lets jsut write it to json and call it a day.
 
             bot_votes = bot_votes[num_cycles-1]

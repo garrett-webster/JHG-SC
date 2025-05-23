@@ -12,7 +12,7 @@ class SocialWelfareBot:
     def get_number_type(self):
         return self.number_type
 
-    def get_vote(self, current_options_matrix, previous_votes=None):
+    def get_vote(self, current_options_matrix, previous_votes=None, cycle=0, max_cycle=3):
 
         options = {}
 

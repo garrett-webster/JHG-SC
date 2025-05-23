@@ -26,7 +26,7 @@ class optimalHuman:
 
 
     # returns the bots vote given the current option matrix and previous votes.
-    def get_vote(self, current_options_matrix, previous_votes=None):
+    def get_vote(self, current_options_matrix, previous_votes=None, cycle=0, max_cycle=3):
         # shift the matrix so that we have all positive values (makes normalization eaiser)
         matrix = self.initialize_matrix(current_options_matrix) # creates no negatives w/ a positive shift
         self.normalize_rows(matrix) # normalizes the rows and creates a probability distro.

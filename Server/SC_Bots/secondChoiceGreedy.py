@@ -13,7 +13,7 @@ class secondChoiceGreedy():
     def get_number_type(self):
         return self.number_type
 
-    def get_vote(self, current_options_matrix, previous_votes=None):
+    def get_vote(self, current_options_matrix, previous_votes=None, cycle=0, max_cycle=3):
         current_row = current_options_matrix[self.self_id]
         temp_row = current_row[:] # make a copy for the fetcher
         first_vote = temp_row.index(max(temp_row)) # take the first vote

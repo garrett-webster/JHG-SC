@@ -15,7 +15,7 @@ class GreedyBot():
     def get_number_type(self):
         return self.number_type
 
-    def get_vote(self, current_options_matrix, previous_votes=None):
+    def get_vote(self, current_options_matrix, previous_votes=None, cycle=0, max_cycle=3):
         current_row = current_options_matrix[self.self_id]
         current_vote = current_row.index(max(current_row))
         if current_row[current_vote] < 0: # if our best option is less than 0, try to make nothing happen.

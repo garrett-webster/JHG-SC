@@ -14,7 +14,7 @@ class RandomBot():
     def get_number_type(self):
         return self.number_type
 
-    def get_vote(self, current_options_matrix, previous_votes=None):
+    def get_vote(self, current_options_matrix, previous_votes=None, cycle=0, max_cycle=3):
         total_options = len(current_options_matrix[0]) # how many cuases are there w/ abstaining. Before they couldn't vote for cause 3.
         final_vote = random.randint(0, total_options) # so this is inclusive of upper limit,
         final_vote -= 1 # off my one error.

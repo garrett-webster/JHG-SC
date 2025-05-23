@@ -232,7 +232,7 @@ class Social_Choice_Sim:
         return self.group
 
 
-    def get_votes(self, previous_votes=None, round=0, cycle=0): # generic get votes for all bot types. Not optimized for a single chromosome
+    def get_votes(self, previous_votes=None, round=0, cycle=0, max_cycle=3): # generic get votes for all bot types. Not optimized for a single chromosome
         self.round = round
         self.cycle = cycle
         all_votes = {}
@@ -246,7 +246,7 @@ class Social_Choice_Sim:
         final_votes = None
         for i, bot in enumerate(self.bots):
             #print("this is the bot id ", bot.self_id, " an dthis is the i index ", i)
-            final_votes = bot.get_vote(self.current_options_matrix, previous_votes)
+            final_votes = bot.get_vote(self.current_options_matrix, previous_votes, cycle, max_cycle)
             all_votes[bot_indexes.pop(0)] = final_votes
 
         self.final_votes = all_votes

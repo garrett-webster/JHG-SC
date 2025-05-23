@@ -19,7 +19,7 @@ class somewhatMoreAwarenessGreedy:
         return self.number_type
 
     # here is what teh scturecture is going to look like. store an array, and at that index store the value of what they ahve voted for.
-    def get_vote(self, current_options_matrix, previous_votes=None):
+    def get_vote(self, current_options_matrix, previous_votes=None, cycle=0, max_cycle=3):
         # this first part is exactly the saem as the betterGreedy - for an initial guess, we just have to use something. Pure probability is a go
 
             matrix = self.initialize_matrix(current_options_matrix)

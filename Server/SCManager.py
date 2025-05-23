@@ -111,7 +111,7 @@ class SCManager:
         return player_votes
 
     def compile_sc_votes(self, player_votes, round_num, cycle, previous_votes):
-        bot_votes = self.sc_sim.get_votes(previous_votes, round_num, cycle)
+        bot_votes = self.sc_sim.get_votes(previous_votes, round_num, cycle, self.vote_cycles)
 
         all_votes = {**bot_votes, **player_votes}
         all_votes_list = [option_num + 1 if option_num != -1 else -1 for option_num in
