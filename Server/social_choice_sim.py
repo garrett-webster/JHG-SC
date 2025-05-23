@@ -5,7 +5,6 @@ from collections import Counter
 from pathlib import Path
 import numpy as np
 import matplotlib.pyplot as plt
-import seaborn as sns
 
 from Server.Node import Node
 from Server.options_creation import generate_two_plus_one_groups_options_best_of_three, generate_two_plus_one_groups
@@ -471,7 +470,7 @@ class Social_Choice_Sim:
         zero = normalized_list[10]
         above_zero = sum(normalized_list[11:20])
         print("here are below zero ", below_zero, " here are above zero ", above_zero, " and here is zero ", zero)
-        self.create_heat_map(normalized_list)
+        #self.create_heat_map(normalized_list) # used to create a heatmap of number distro, probably deleteable.
 
 
     def create_heat_map(self, data):
@@ -479,7 +478,7 @@ class Social_Choice_Sim:
 
         # Create heatmap
         plt.figure(figsize=(8, 4))
-        sns.heatmap(array, annot=True, cmap="YlGnBu", cbar=True)
+        #sns.heatmap(array, annot=True, cmap="YlGnBu", cbar=True)
         plt.title("Heatmap of Number Distribution")
         plt.show()
 
