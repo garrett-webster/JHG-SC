@@ -78,8 +78,6 @@ class SCGrid(QTabWidget):
         for col_idx in range(3):
             utility_col_sums[col_idx] = sum(row[col_idx] for row in utility_mat)
 
-        print(utility_col_sums)
-
         self.footer_col_1.setText(str(utility_col_sums[0]))
         self.footer_col_2.setText(str(utility_col_sums[1]))
         self.footer_col_3.setText(str(utility_col_sums[2]))
