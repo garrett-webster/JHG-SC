@@ -65,6 +65,7 @@ class longTermGrapher():
 
         # total score per round (for the black line)
         total_scores_per_round = [sum(results[player][round_num] for player in results) for round_num in rounds]
+        print("These are the total scores per round for last round ", total_scores_per_round[-1])
 
         # average score per round, by using the total score and num playres.
         num_players = len(results)  # Number of players (bots)
@@ -129,6 +130,8 @@ class longTermGrapher():
             bot_name = "limitedAwarenessGreedy"
         if bot_type == 6:
             bot_name = "somewhatMoreAwareGreedy"
+        if bot_type == 7:
+            bot_name = "optimalHuman"
 
         # what we are naming this new graph
         group_title = group

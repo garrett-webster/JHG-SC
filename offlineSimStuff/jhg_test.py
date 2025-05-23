@@ -7,25 +7,23 @@ def create_sim(num_players, num_humans):
     return current_sim
 
 def run_trial(sim, num_rounds, create_graphs):
-
+    big_boy_kush = {}
     currentLogger: JHGLogger = JHGLogger(current_sim)
     current_sim.start_game(num_humans, num_players)
-    currentLogger.add_round_to_overview(-1) # so we need to write the zero'th round to understand the initial conditions.
     for round in range(num_rounds):
+        big_boy_kush[round] = {}
         current_popularity = current_sim.execute_round(None, round)
         print("this is the current popularity ", current_popularity)
-        currentLogger.add_round_to_overview(round)
-
-        #time.sleep(1)
-        # problem is I can't control the allocations here, which is a bust.
-    currentLogger.write_official_version()
-
+        currentLogger.record_individual_round()
+        big_boy_kush[round]["Popularity"] = current_popularity
+        time.sleep(1)
+    currentLogger.record_longer_vision(big_boy_kush)
 
 if __name__ == '__main__':
     num_players = 12
     num_humans = 0 # I Don't want any players. does that make this harder? Yes! I am gonna ignore that for now.
     create_graphs = True
-    num_rounds = 2
+    num_rounds = 10
     current_sim = create_sim(num_players, num_humans)
 
 

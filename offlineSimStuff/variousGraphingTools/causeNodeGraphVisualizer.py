@@ -210,3 +210,5 @@ class causeNodeGraphVisualizer:
             plt.savefig(full_path, dpi=300)  # I want it to have the round, and cycle, and that shoudl do it
             plt.show()
             plt.close(fig) # make sure the fetcher dissapears, thats what I am saying.
+
+
