@@ -138,6 +138,7 @@ class causeNodeGraphVisualizer:
                 x, y = node["x_pos"], node["y_pos"]
                 label = node["text"]
                 node_type = node["type"]
+                alpha = 0.5 if node["negatives_flag"] else 1.0
 
                 try:
                     number = int(label.split()[-1])
@@ -154,10 +155,11 @@ class causeNodeGraphVisualizer:
                     id = types_list[int(string[1]) - 1]
                     used_bot_types.add(str(id))
                     color = bot_color_map[str(id)]
-                    shape = plt.Circle((x, y), 0.7, color=color, ec='black', zorder=2)
+
+                    shape = plt.Circle((x, y), 0.7, color=color, ec='black', zorder=2, alpha=alpha)
                     ax.add_patch(shape)
 
-                ax.text(x, y, str(number), ha='center', va='center', fontsize=14, weight='bold', zorder=3)
+                ax.text(x, y, str(number), ha='center', va='center', fontsize=14, weight='bold', zorder=3, alpha=alpha)
 
             for player_index, vote in curr_votes.items():
                 player_label = f"Player {int(player_index) + 1}"

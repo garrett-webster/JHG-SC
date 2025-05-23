@@ -493,17 +493,15 @@ class Social_Choice_Sim:
         for i in range(NUM_CAUSES): #3 is the number of causes
             new_x = math.cos(displacement * i) * self.rad
             new_y = math.sin(displacement * i) * self.rad
-            causes.append(Node(new_x, new_y, "CAUSE", "Cause " + str(i+1)))
+            causes.append(Node(new_x, new_y, "CAUSE", "Cause " + str(i+1), False))
         return causes
 
-    # about to try to start a major rework, wish me luck. 
+    # about to try to start a major rework, wish me luck.
     def create_player_nodes(self):
         normalized_current_options_matrix = self.current_options_matrix
 
         player_nodes = []
         for i in range(self.total_players): # i is the player index
-            if i == 1:
-                pass
             player_index = i
             current_x = 0 # https://www.youtube.com/watch?v=r7l0Rq9E8MY
             current_y = 0
@@ -529,7 +527,7 @@ class Social_Choice_Sim:
 
             # so this should sum everything up.
             # lets make a novel edge case and test it from there.
-
+            all_negatives_flag = False
             if sum(curr_negatives) == 0: # if there are no negatives.
                 pass # do nothing, we are in the right spot.
 
@@ -551,8 +549,9 @@ class Social_Choice_Sim:
 
             if sum(curr_negatives) == 3: # flip over origin.
                 current_x, current_y = self.flip_point(current_x, current_y, 0, 0) # we just flip over teh origin.
+                all_negatives_flag = True
 
-            player_nodes.append(Node(current_x, current_y, "PLAYER", "Player " + str(player_index+1)))
+            player_nodes.append(Node(current_x, current_y, "PLAYER", "Player " + str(player_index+1), all_negatives_flag))
         return player_nodes
 
 

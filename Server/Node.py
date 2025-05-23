@@ -1,9 +1,10 @@
 class Node:
-    def __init__(self, x_pos, y_pos, type, text):
+    def __init__(self, x_pos, y_pos, type, text, negatives_flag):
         self.x_pos = x_pos
         self.y_pos = y_pos
         self.type = type
         self.text = text
+        self.negatives_flag = negatives_flag
 
 
     def calc_position(self, x_list, y_list):
@@ -24,4 +25,5 @@ class Node:
             "text": self.text,
             "x_pos": self.x_pos,
             "y_pos": self.y_pos,
+            "negatives_flag": self.negatives_flag # Bool so it should be fine.
         }
