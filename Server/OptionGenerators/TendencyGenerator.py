@@ -16,17 +16,17 @@ class TendencyGenerator(OptionGenerator):
         for player in range(self.num_players):
             # The total utility that the tendencies of each player should add to
             total_utility = UTILITIY_PER_PLAYER * num_options
-            for option_num in range(num_options):
-                if option_num == (num_options - 1): # The last tendency is set to whatever is left
-                    tendency = total_utility
-                else:
-                    # Randomly allocate some amount of the remaining total as the current tendency
-                    tendency = random.randint(MIN_TENDENCY, total_utility)
-                    total_utility -= tendency
-                # tendency = max(min(tendency, max_utility - noise_magnitude), MIN_TENDENCY) # Clamps the tendency numbers to the range from the minimum tendency to the max utility possible minus the noise magnitude to force it to be in the valid range
-                self.tendencies[player][option_num] = tendency
 
-        print("Debug")
+            option = int(round(total_utility/3 + random.randint(-3, 3)))
+            self.tendencies[player][0] = option
+            total_utility -= option
+
+            option = int(round(total_utility / 2 + random.randint(-3, 3)))
+            self.tendencies[player][1] = option
+            total_utility -= option
+
+            self.tendencies[player][2] = int(round(total_utility))
+
 
     def generateOptions(self) -> List[List[int]]:
         options = self.generateZeros()
