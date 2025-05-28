@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 
 from Server.Node import Node
 from Server.SC_Bots.humanAttempt2 import humanAttempt2
-from Server.options_creation import generate_two_plus_one_groups_options_best_of_three, generate_two_plus_one_groups
+from Server.OptionGenerators.options_creation import generate_two_plus_one_groups_options_best_of_three, generate_two_plus_one_groups
 from Server.SC_Bots.Greedy import GreedyBot
 from Server.SC_Bots.SocialWelfare import SocialWelfareBot
 from Server.SC_Bots.Random import RandomBot
@@ -67,7 +67,7 @@ class Social_Choice_Sim:
         self.total_types = self.create_total_types() # holds EVERYONE. now we gotta do a significant amount of refactoring.
         self.choice_matrix = [0] * (self.num_causes + 1)
         self.last_option = 0
-        self.all_numbers_matrix = [0] * 21
+        # self.all_numbers_matrix = [0] * 21
         self.all_votes = {}
 
     def create_total_order(self, total_players, num_humans):
