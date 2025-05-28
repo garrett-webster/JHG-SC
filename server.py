@@ -6,7 +6,7 @@ from Server.ServerConnectionManager import ServerConnectionManager
 OPTIONS = {
     #General settings
     "NUM_HUMANS": 1,
-    "TOTAL_PLAYERS": 5,
+    "TOTAL_PLAYERS": 11,
     "JHG_ROUNDS_PER_SC_ROUND" : 1, # Number of JHG rounds to play between each social choice round
     "MAX_ROUNDS": 10, # Max number of JHG rounds to play. Game ends after the nth round
     "SC_GROUP_OPTION": 0, # See options_creation.py -> group_size_options to understand what this means
@@ -15,8 +15,8 @@ OPTIONS = {
     "SC_LOGGING": True,
 
     # Generator options
-    "OPTION_GENERATOR": 1, # Defines what behavior the options generator should use. See Server.OptionsGenerators.generators for the full list
-    "NOISE_MAGNITUDE": 3, # Maximum noise to add to a generated number
+    "OPTION_GENERATOR": 2, # Defines what behavior the options generator should use. See Server.OptionsGenerators.generators for the full list
+    "NOISE_MAGNITUDE": 2, # Maximum noise to add to a generated number
     "MAX_UTILITY": 10, # The max number that a utility can be. Any utility generated higher will be snapped to this number
     "MIN_UTILITY": -10, # The min number that a utility can be. Any utility generated lower will be snapped to this number
     "NUM_OPTIONS": 3
@@ -52,9 +52,9 @@ class Server():
 
         self.JHG_manager = JHGManager(self.connection_manager, self.num_humans, self.num_players, self.num_bots,
                                       self.JHG_logging, self.total_order)
-        self.generator = generator_factory(OPTIONS["OPTION_GENERATOR"], OPTIONS["TOTAL_PLAYERS"],
-                                           OPTIONS["NOISE_MAGNITUDE"],
-                                           OPTIONS["MAX_UTILITY"], OPTIONS["MIN_UTILITY"], OPTIONS["NUM_OPTIONS"])
+        self.generator = generator_factory(OPTIONS["OPTION_GENERATOR"], OPTIONS["TOTAL_PLAYERS"], OPTIONS["NOISE_MAGNITUDE"],
+                                           OPTIONS["MAX_UTILITY"], OPTIONS["MIN_UTILITY"], OPTIONS["NUM_OPTIONS"],
+                                           self.JHG_manager, self.connection_manager)
         self.SC_manager = SCManager(self.connection_manager, self.num_humans, self.generator, self.num_players, self.num_bots,
                                     self.sc_group_option, self.sc_vote_cycles, self.SC_logging, self.total_order)
 

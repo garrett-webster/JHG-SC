@@ -1,4 +1,3 @@
-import copy
 import random
 from typing import List
 
@@ -9,7 +8,7 @@ MIN_TENDENCY = -3
 
 
 class TendencyGenerator(OptionGenerator):
-    def __init__(self, num_players: int, noise_magnitude: int, max_utility: int, min_utility: int, num_options: int):
+    def __init__(self, num_players: int, noise_magnitude: int, max_utility: int, min_utility: int, num_options: int, *args):
         super().__init__(num_players, noise_magnitude, max_utility, min_utility, num_options)
         self.tendencies = self.generateZeros()
 
@@ -17,11 +16,11 @@ class TendencyGenerator(OptionGenerator):
             # The total utility that the tendencies of each player should add to
             total_utility = UTILITIY_PER_PLAYER * num_options
 
-            option = int(round(total_utility/3 + random.randint(-3, 3)))
+            option = int(round(total_utility/3 + random.randint(-2, 2)))
             self.tendencies[player][0] = option
             total_utility -= option
 
-            option = int(round(total_utility / 2 + random.randint(-3, 3)))
+            option = int(round(total_utility / 2 + random.randint(-2, 2)))
             self.tendencies[player][1] = option
             total_utility -= option
 
@@ -36,9 +35,4 @@ class TendencyGenerator(OptionGenerator):
                 option = self.clamp(self.tendencies[i][j] + random.randint(-self.noise_magnitude, self.noise_magnitude))
                 options[i][j] = option
         return options
-
-    def clamp(self, option: int):
-        if option > self.max_utility: option = self.max_utility
-        if option < self.min_utility: option = self.min_utility
-
-        return option
+        # return self.tendencies

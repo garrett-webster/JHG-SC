@@ -5,7 +5,7 @@ from Server.OptionGenerators.OptionGenerator import OptionGenerator
 
 
 class RandomGenerator(OptionGenerator):
-    def __init__(self, num_players: int, noise_magnitude: int, max_utility: int, min_utility: int, num_options: int):
+    def __init__(self, num_players: int, noise_magnitude: int, max_utility: int, min_utility: int, num_options: int, *args):
         super().__init__(num_players, noise_magnitude, max_utility, min_utility, num_options)
 
     def generateOptions(self) -> List[List[int]]:
