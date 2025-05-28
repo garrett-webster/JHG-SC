@@ -11,7 +11,8 @@ def create_stuff(big_boy_data):
 
     for key in big_boy_data:
         if key != "Conclusion":
-            little_visualizer.create_graph_given_file(big_boy_data[key])
+            pass
+            #little_visualizer.create_graph_given_file(big_boy_data[key])
         else:
             big_visualizer.draw_graph_from_file(big_boy_data[key])
 
@@ -31,7 +32,7 @@ if __name__ == "__main__":
     # directory = "../../Server/sc_logs_repo"
     # filename = "human_study_results.json"
     # filepath = os.path.join(directory, filename)
-    filepath = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\offlineSimStuff\sc_logs_repo\20250523_140645human_study_results.json.json"
+    filepath = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\offlineSimStuff\sc_logs_repo\machine_comparison.json"
     # so from here, I need to recreate the results fetcher
     # Iwaht I want to do is jsut run it so I can create a godo file parser for it, but I still need to wait for all the graphs to freakin delete.
     # so big_boy_round_data has

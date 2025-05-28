@@ -7,12 +7,14 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from Server.Node import Node
+from Server.SC_Bots.humanAttempt2 import humanAttempt2
 from Server.options_creation import generate_two_plus_one_groups_options_best_of_three, generate_two_plus_one_groups
 from Server.SC_Bots.Greedy import GreedyBot
 from Server.SC_Bots.SocialWelfare import SocialWelfareBot
 from Server.SC_Bots.Random import RandomBot
 from Server.SC_Bots.somewhatMoreAwareGreedy import somewhatMoreAwarenessGreedy
 from Server.SC_Bots.optimalHuman import optimalHuman
+from Server.SC_Bots.reorganizedHuman import reorganizedHuman
 
 NUM_CAUSES = 3
 
@@ -145,6 +147,10 @@ class Social_Choice_Sim:
             new_bot = (somewhatMoreAwarenessGreedy(index))
         if bot_type == 7:
             new_bot = (optimalHuman(index))
+        if bot_type == 8:
+            new_bot = (humanAttempt2(index))
+        if bot_type == 9:
+            new_bot = (reorganizedHuman(index))
 
 
         return new_bot # the matched bot that we were looking for.
@@ -369,15 +375,63 @@ class Social_Choice_Sim:
 
     # default to groups being None,
     def start_round(self, sc_groups=None):
-        if sc_groups != None:
-            self.sc_groups = sc_groups
-        self.current_options_matrix = self.create_options_matrix() # cause we have to create groups.
-        for row in self.current_options_matrix:
-            for num in row:
-                self.all_numbers_matrix[num+10] += 1
+        #if sc_groups != None:
+            #self.sc_groups = sc_groups
+        #self.current_options_matrix = self.create_options_matrix() # cause we have to create groups.
+        # for row in self.current_options_matrix:
+        #     for num in row:
+        #         self.all_numbers_matrix[num+10] += 1
+        #
+        self.current_options_matrix = [
+            [
+                -3,
+                -2,
+                2
+            ],
+            [
+                -6,
+                6,
+                3
+            ],
+            [
+                -5,
+                8,
+                -1
+            ],
+            [
+                4,
+                -4,
+                -10
+            ],
+            [
+                8,
+                1,
+                -9
+            ],
+            [
+                -4,
+                3,
+                4
+            ],
+            [
+                3,
+                -1,
+                6
+            ],
+            [
+                -7,
+                -8,
+                1
+            ],
+            [
+                0,
+                -1,
+                -5
+            ]
+        ]
 
         self.set_new_options_matrix(self.current_options_matrix)
-        # print('this is the len of the current options matrix ', len(self.current_options_matrix))
+
 
 
         self.player_nodes = self.create_player_nodes()
