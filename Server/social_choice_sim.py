@@ -7,7 +7,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from Server.Node import Node
-from Server.options_creation import generate_two_plus_one_groups_options_best_of_three, generate_two_plus_one_groups
+from Server.OptionGenerators.options_creation import generate_two_plus_one_groups_options_best_of_three, generate_two_plus_one_groups
 from Server.SC_Bots.Greedy import GreedyBot
 from Server.SC_Bots.SocialWelfare import SocialWelfareBot
 from Server.SC_Bots.Random import RandomBot
@@ -18,7 +18,9 @@ NUM_CAUSES = 3
 
 
 class Social_Choice_Sim:
-    def __init__(self, total_players, num_causes, num_humans, cycle=0, round=0, chromosomes="", scenario="", group="", total_order=None):
+    def __init__(self, total_players, num_causes, num_humans, options_generator, cycle=0, round=0, chromosomes="", scenario="", group="", total_order=None):
+        self.options_generator = options_generator
+
         # just a bunch of base setters.
         self.total_order = total_order
         self.total_players = total_players
@@ -171,15 +173,17 @@ class Social_Choice_Sim:
 
 
     def create_options_matrix(self):
-        if self.sc_groups != -1:
-            self.current_options_matrix = generate_two_plus_one_groups_options_best_of_three(self.sc_groups)
-        else: # so we have to generate noise to try and "mimic" the other stuff.
-            self.current_options_matrix = [[random.randint(-8, 8) for _ in range(self.num_causes)] for _ in range(self.total_players)]
-            noise_matrix = [[random.randint(-2, 2) for _ in range(self.num_causes)] for _ in range(self.total_players)]
-            self.current_options_matrix = [
-                [original + noise for original, noise in zip(row, noise_row)]
-                for row, noise_row in zip(self.current_options_matrix, noise_matrix)
-            ]
+        # if self.sc_groups != -1:
+        #     self.current_options_matrix = generate_two_plus_one_groups_options_best_of_three(self.sc_groups)
+        # else: # so we have to generate noise to try and "mimic" the other stuff.
+        #     self.current_options_matrix = [[random.randint(-8, 8) for _ in range(self.num_causes)] for _ in range(self.total_players)]
+        #     noise_matrix = [[random.randint(-2, 2) for _ in range(self.num_causes)] for _ in range(self.total_players)]
+        #     self.current_options_matrix = [
+        #         [original + noise for original, noise in zip(row, noise_row)]
+        #         for row, noise_row in zip(self.current_options_matrix, noise_matrix)
+        #     ]
+
+        self.current_options_matrix = self.options_generator.generateOptions()
         return self.current_options_matrix # because why not
 
     def get_scenario(self):
