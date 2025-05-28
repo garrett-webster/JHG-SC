@@ -6,6 +6,7 @@ from tqdm import tqdm
 from offlineSimStuff.variousGraphingTools.causeNodeGraphVisualizer import causeNodeGraphVisualizer
 from offlineSimStuff.variousGraphingTools.longTermGrapher import longTermGrapher
 from offlineSimStuff.variousGraphingTools.simLogger import simLogger
+from Server.OptionGenerators.generators import generator_factory
 
 
 # starts the sim, could make this take command line arguments
@@ -17,7 +18,8 @@ def run_trial(sim, num_rounds, num_cycles, create_graphs, group):
     start_time = time.time() # so we can calculate total time. not entirely necessary.
     sim.set_group(group)
 
-    for curr_round in tqdm(range(1, num_rounds+1)): # do this outside the sim, could make it inside but I like it outside.
+    #for curr_round in tqdm(range(1, num_rounds+1)): # do this outside the sim, could make it inside but I like it outside.
+    for curr_round in (range(1, num_rounds+1)): # do this outside the sim, could make it inside but I like it outside.
         # force it to start at 1 instead of 0 -- helps prevent off by one errors later in the code.
     #for curr_round in (range(num_rounds)): # do this outside the sim, could make it inside but I like it outside.
 
@@ -78,14 +80,16 @@ def create_sim(scenario=None, chromosomes=None, group=""):
     for human in range(num_humans):
         total_order.append("P" + str(human))
 
-    sim = Social_Choice_Sim(total_players, num_causes, num_humans, cycle, curr_round, chromosomes, scenario, group, total_order)
+    generator = generator_factory(1, total_players, 3, 10, -10, 3)
+
+    sim = Social_Choice_Sim(total_players, num_causes, num_humans, generator, cycle, curr_round, chromosomes, scenario, group, total_order)
 
     return sim
 
 
 
 if __name__ == "__main__":
-    num_rounds = 1
+    num_rounds = 10
     num_cycles = 3
     create_graphs = True
     total_groups = ["", 0, 1, 2]

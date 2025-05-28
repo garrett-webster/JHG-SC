@@ -24,7 +24,12 @@ class reorganizedHuman:
         matrix = self.initialize_matrix(current_options_matrix)  # creates no negatives w/ a positive shift
         self.normalize_rows(matrix)  # normalizes the rows and creates a probability distro.
         col_probs = [sum(col) for col in zip(*matrix)]  # how likely everything is to pass given what they like.
-
+        total = sum(col_probs)
+        col_probs = [val / total for val in col_probs]
+        choice_list, choice_matrix = self.create_choice_matrix(current_options_matrix)
+        total = sum(choice_list)
+        choice_list = [val / total for val in choice_list]
+        #print("this is the col probs ", col_probs, "\nand this is the choice ", choice_matrix)
         cause_sums = None  # used for generating bayseian prior - otherwise alwyas have col sums
 
         our_row = current_options_matrix[self.self_id]
@@ -48,29 +53,93 @@ class reorganizedHuman:
 
         cause_sums = self.apply_previous_votes(matrix, previous_votes)  # get the cause sums given our padded matrix and previous votes
 
-
-        print("player ", self.self_id, " cause sums ", cause_sums)
-        if self.identify_outgroup(current_options_matrix, cause_sums):
-            return self.get_vote_negative(our_row, col_probs, cause_sums, risk_aversion, majority_factor, current_options_matrix, cycle, max_cycle)
+        if self.identify_outgroup(current_options_matrix, cause_sums, cycle, col_probs, max_cycle):
+            return self.get_vote_negative(our_row, col_probs, cause_sums, risk_aversion, majority_factor, current_options_matrix, cycle, max_cycle, choice_list, choice_matrix)
         else:
             return self.get_vote_positive(our_row, col_probs, cause_sums, risk_aversion, majority_factor, current_options_matrix)
 
-    def get_vote_negative(self, our_row, col_probs, cause_sums, risk_aversion, majority_factor, current_options_matrix, cycle, max_cycle):
-        # so the cuase sums are what kind of dictate if something is going to pass I think
+    def get_vote_negative(self, our_row, col_probs, cause_sums, risk_aversion, majority_factor, current_options_matrix, cycle, max_cycle, choice_list, choice_matrix):
+        # so the cause sums show us what people are CURRENTLY voting for, I think I can use that and the choice matrix for more effective posturing.
+        posturable_causes = self.find_posturable_causes(col_probs, cause_sums, choice_list, current_options_matrix, choice_matrix) # can I run the same algorithm to find other outgroup players? Saber.
+
         current_winner = max(cause_sums, key=cause_sums.get)
         majority_vote = cause_sums[current_winner]
         new_cause_sums = copy.deepcopy(cause_sums)
-        new_cause_sums[current_winner] = 0 # want to find second largers
+        new_cause_sums[current_winner] = 0  # want to find second largers
         second_largest_cause = max(new_cause_sums, key=new_cause_sums.get)
         second_largest_vote = cause_sums[second_largest_cause]
-        if cycle == max_cycle - 1: # if its the end of the line, vote for nothing
-            return -1  # final vote, so we are going to cast no vote and try to cause nothing to pass.
 
-        if majority_vote >= second_largest_vote * 2: # if there is no conceivable posturing to be done
-            return random.randrange(0, 2) # return a random causal vote, frustration reigns supreme in this guys mind.
+        if majority_vote > second_largest_vote * 3: # if there is no conceivable posturing to be done
+            print("Aight player ", self.self_id+1, "outgroup and is frustrated. voting random")
+            return random.randrange(0, 3) # return a random causal vote, frustration reigns supreme in this guys mind.
         else: # try and get people to vote for the second most likely cause.
-            return second_largest_cause - 1 # posture towards second most likely cause, and off by one error.
+            print("Aight player ", self.self_id+1, "outgroup and is posturing. voting for ", posturable_causes) # so if there is no posturing, just do -1 and call it a day. s
+            return posturable_causes
 
+    def find_posturable_causes(self, col_probs, cause_sums, choice_list, current_option_matrix, choice_matrix):
+        current_winner = max(cause_sums, key=cause_sums.get)
+        first_tier_swingers = [] # no negatives, just happy go lucky kinda guys
+        second_tier_swingers = [] # 1 negative, will swing between 2 options
+        possible_swing_probabilities = [0] * ((len(current_option_matrix[0]))+1)
+        for i, row in enumerate(current_option_matrix):
+            curr_negatives = 0
+            for val in row:
+                if val <= 0: curr_negatives += 1 # consider 0 to be negative --> its not a useful option for them, and is not particuarly swingable.
+            if curr_negatives == 0:
+                first_tier_swingers.append(i)
+            if curr_negatives == 1:
+                second_tier_swingers.append(i)
+
+        for player in first_tier_swingers: # consider all possible options, weighted
+            print("this is the player number ", player)
+            player_choices = copy.deepcopy(choice_matrix[player])
+            print(" and this is the player choices ", player_choices)
+            # next up, define their possible choices
+            # remove their min option
+            max_indicies = sorted(range(len(player_choices)), key=lambda i: player_choices[i], reverse=True)[:1]
+            for index in max_indicies:
+                if index != 0 and current_option_matrix[player][index-1] > 0: # make sure they aren't abstaining and that both of those options are positive for them
+                    possible_swing_probabilities[index] += (1 / (len(player_choices)-1) * player_choices[index]) # so 33% times their normalized probability.
+
+        for player in second_tier_swingers:
+            player_choices = copy.deepcopy(choice_matrix[player])
+            max_indicies = sorted(range(len(player_choices)), key=lambda i: player_choices[i], reverse=True)[:2]
+            for index in max_indicies: # ok that should work much better acftually.
+                if index != 0 and current_option_matrix[player][index-1] > 0: # this shouldn't actually do anything, actually.
+                    possible_swing_probabilities[index] += (1 / ((len(player_choices)-2) * player_choices[index]))  # so 50% times their normalized probability.
+
+            # they only have 2 optins to swing between, so they are more likley to swing to their other two options.
+
+        total_sum = sum(possible_swing_probabilities)
+        if total_sum > 0:
+            possible_swing_probabilities = [val / total_sum for val in possible_swing_probabilities]
+
+        possible_votes = []
+        possible_swings = sorted(range(len(possible_swing_probabilities)), key=lambda i: possible_swing_probabilities[i], reverse=True)[:2] # only the  two best options
+        for possible_vote in possible_swings: # ok so now that I have them, I shoudl really check if
+            if possible_vote != 0 and possible_vote != current_winner: # abstaining is literally 0% fun, so don't consider it
+                possible_votes.append(possible_vote)
+        print("these ar ethe possible swing votes for player ", self.self_id, possible_votes, "\n from considering ", first_tier_swingers, second_tier_swingers)
+        if possible_votes:
+            return possible_votes[0] - 1 # remember there is a off by one error.
+        else:
+            return -1
+
+    def create_choice_matrix(self, current_options_matrix):
+        current_options_matrix = [[0] + row for row in current_options_matrix] # append a 0 to it
+        choice_list = [0] * len(current_options_matrix[0])
+        choice_matrix = {}
+        for i, row in enumerate(current_options_matrix):
+            min_val = min(row) # lets avoid clamping for now IG.
+            adjusted_row = [x - min_val for x in row]
+            total = sum(adjusted_row)
+            if total == 0:
+                normalized_row = [0 for _ in adjusted_row]
+            else:
+                normalized_row = [x / total for x in adjusted_row]
+            choice_matrix[i] = normalized_row
+            choice_list = [choice_list[i] + normalized_row[i] for i in range(len(choice_list))]
+        return choice_list, choice_matrix
 
 
     def get_vote_positive(self, our_row, col_probs, cause_sums, risk_aversion, majority_factor, current_options_matrix):
@@ -86,35 +155,28 @@ class reorganizedHuman:
             return current_options_matrix[self.self_id].index(max(current_options_matrix[self.self_id]))
         return current_vote
 
-    def identify_outgroup(self, current_options_matrix, cause_sums, previous_votes):
-        pass # the purpose of this function is to allow us to realize if we are part of an "outgroup"
-        if self.self_id == 3 or self.self_id == 8:
-            print("STOP HERE CHEIF")
-        # I think the easiest way to od this is to
-        # find the indexes of the best 2 options, or the most popular options
-        # from there, if one fo THOSE is greater than or equal to 0, we can do a positive vote and go from there
-        # however, if neither of the 2 best options are within our best interest, we are going to go for the connivign option.
-        # so an example of this edgecase can be found in round 16, wherein the human players 4 and 9 were both voting for cause 2, a
-        # and becuase of this, they did seem to successfully commit players 2,3,5,6 to vote for cause 2 and lose the majority.
-        # so lets see if we can't replicate some of that behavior here.
+    def identify_outgroup(self, current_options_matrix, cause_sums, cycle, col_probs, max_cycle):
+
+        if cycle == max_cycle-1: # if its the last cycle, default to a more greedy solution. Might want to do more work on the baysiean prior.
+            return False
+        if cycle == 0:
+            return False
         current_winner = max(cause_sums, key=cause_sums.get)
-        new_cause_sums = copy.deepcopy(cause_sums)
-        new_cause_sums[current_winner] = 0  # want to find second largers
-        second_largest_cause = max(new_cause_sums, key=new_cause_sums.get)
         possibleReturnBig = current_options_matrix[self.self_id][current_winner-1]
-        possibleReturnSmall = current_options_matrix[self.self_id][second_largest_cause-1]
-        if possibleReturnBig > 0 and possibleReturnSmall > 0:
-            return False # we are part of a main group, don't worry about it
+        #print("player ", self.self_id, "These are the cause_sums ", cause_sums, " and these are the col probs ", col_probs)
+
+        if possibleReturnBig <= 0: # if either of our best options are possible.
+            #("OUTGROUP DETECTED, OPINION REJECTED!")
+            return True # we are part of a main group, don't worry about it
         else:
-            print("OUTGROUP DETECTED, OPINION REJECTED!")
-            return True #
+            return False #
 
 
     def initialize_matrix(self, current_options_matrix): # completely changed this to better deal with negatives.
         flat = [val for row in current_options_matrix for val in row] # flatten the matrix so its easier to work with
         global_min = min(flat) # find the smallest number (likely -10 or -9)
         shift = -global_min if global_min < 0 else 0 # create the shift as the inverse of that number
-        return [ # create the new, padded matrix with the shift and a new 0 entry as well.
+        return [ # create the new, padded matrix with the shift and a new 0 entry as well, that is then also shifted.
             [val + shift for val in [0] + row]
             for row in current_options_matrix
         ]
@@ -125,6 +187,7 @@ class reorganizedHuman:
             if total > 0:
                 for i in range(len(row)):
                     row[i] /= total
+        return matrix
 
     def get_our_row(self, current_options_matrix):
         shift = max(-min(current_options_matrix[self.self_id]), 0)
@@ -164,6 +227,7 @@ class reorganizedHuman:
             for player in previous_votes[key]:
                 player_dict[player].append(previous_votes[key][player])
 
+        print("these are the previous votes ", previous_votes)
         cause_sums = {i : 0.0 for i in range(len(matrix[0]))} # make sure it starts as a float, not an int.
         # if self.self_id == 0 and cycle == 1:
         #     print("Stop here on cycle 1")

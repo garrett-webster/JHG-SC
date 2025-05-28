@@ -381,63 +381,13 @@ class Social_Choice_Sim:
     def start_round(self, sc_groups=None):
         #if sc_groups != None:
             #self.sc_groups = sc_groups
-        #self.current_options_matrix = self.create_options_matrix() # cause we have to create groups.
+        self.current_options_matrix = self.create_options_matrix() # cause we have to create groups.
         # for row in self.current_options_matrix:
         #     for num in row:
         #         self.all_numbers_matrix[num+10] += 1
         #
-        self.current_options_matrix = [
-            [
-                -3,
-                -2,
-                2
-            ],
-            [
-                -6,
-                6,
-                3
-            ],
-            [
-                -5,
-                8,
-                -1
-            ],
-            [
-                4,
-                -4,
-                -10
-            ],
-            [
-                8,
-                1,
-                -9
-            ],
-            [
-                -4,
-                3,
-                4
-            ],
-            [
-                3,
-                -1,
-                6
-            ],
-            [
-                -7,
-                -8,
-                1
-            ],
-            [
-                0,
-                -1,
-                -5
-            ]
-        ]
 
         self.set_new_options_matrix(self.current_options_matrix)
-
-
-
         self.player_nodes = self.create_player_nodes()
 
     def make_native_type(self, return_values):
@@ -516,29 +466,29 @@ class Social_Choice_Sim:
         self.current_options_matrix = new_options_matrix
         self.player_nodes = self.create_player_nodes()
 
-    def print_col_passing(self):
-        total = sum(self.choice_matrix)
-        normalized_list = [val / total for val in self.choice_matrix]
-        print("ratio passing ", normalized_list)
-
-        total = sum(self.all_numbers_matrix)
-        normalized_list = [val / total for val in self.all_numbers_matrix]
-        print("number distro ", normalized_list)
-        below_zero = sum(normalized_list[0:9])
-        zero = normalized_list[10]
-        above_zero = sum(normalized_list[11:20])
-        print("here are below zero ", below_zero, " here are above zero ", above_zero, " and here is zero ", zero)
-        #self.create_heat_map(normalized_list) # used to create a heatmap of number distro, probably deleteable.
-
-
-    def create_heat_map(self, data):
-        array = np.array(data).reshape(3, 7)  # shape it however you want
-
-        # Create heatmap
-        plt.figure(figsize=(8, 4))
-        #sns.heatmap(array, annot=True, cmap="YlGnBu", cbar=True)
-        plt.title("Heatmap of Number Distribution")
-        plt.show()
+    # def print_col_passing(self):
+    #     total = sum(self.choice_matrix)
+    #     normalized_list = [val / total for val in self.choice_matrix]
+    #     print("ratio passing ", normalized_list)
+    #
+    #     total = sum(self.all_numbers_matrix)
+    #     normalized_list = [val / total for val in self.all_numbers_matrix]
+    #     print("number distro ", normalized_list)
+    #     below_zero = sum(normalized_list[0:9])
+    #     zero = normalized_list[10]
+    #     above_zero = sum(normalized_list[11:20])
+    #     print("here are below zero ", below_zero, " here are above zero ", above_zero, " and here is zero ", zero)
+    #     #self.create_heat_map(normalized_list) # used to create a heatmap of number distro, probably deleteable.
+    #
+    #
+    # def create_heat_map(self, data):
+    #     array = np.array(data).reshape(3, 7)  # shape it however you want
+    #
+    #     # Create heatmap
+    #     plt.figure(figsize=(8, 4))
+    #     #sns.heatmap(array, annot=True, cmap="YlGnBu", cbar=True)
+    #     plt.title("Heatmap of Number Distribution")
+    #     plt.show()
 
 
 
