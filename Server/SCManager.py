@@ -1,7 +1,6 @@
 import time
 
 from Server.social_choice_sim import Social_Choice_Sim
-from Server.options_creation import generate_two_plus_one_groups
 
 import copy
 
@@ -10,7 +9,7 @@ def create_empty_vote_matrix(num_players):
 
 
 class SCManager:
-    def __init__(self, connection_manager, num_humans, num_players, num_bots, sc_group_option, vote_cycles, sc_logging, total_order):
+    def __init__(self, connection_manager, num_humans, options_generator, num_players, num_bots, sc_group_option, vote_cycles, sc_logging, total_order):
         self.connection_manager = connection_manager
         self.round_num = 1
         self.save_dict = {}
@@ -21,7 +20,7 @@ class SCManager:
         scenario = "../JHG-SC/offlineSimStuff/scenarioIndicator/somewhatMoreAwareGreedy"
         chromosomes = "../JHG-SC/offlineSimStuff/chromosomes/highestFromTesting"
         #print("this is the total ordering ", total_order)
-        self.sc_sim = Social_Choice_Sim(num_players, 3, num_humans, 3, 0, chromosomes, scenario, "", total_order)
+        self.sc_sim = Social_Choice_Sim(num_players, 3, num_humans, options_generator, 3, 0, chromosomes, scenario, "", total_order)
         #self.sc_groups = generate_two_plus_one_groups(num_players, sc_group_option)
         self.num_players = num_players
         self.num_bots = num_bots
