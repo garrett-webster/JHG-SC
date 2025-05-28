@@ -53,7 +53,6 @@ class JHGManager:
     def get_sent_and_received(self, allocations_matrix):
         sent_dict = {}
         received_dict = {}
-        bot_offset = self.connection_manager.num_bots
 
         for client_id in self.connection_manager.clients.keys():
             sent = [0 for _ in range(self.num_players)]
