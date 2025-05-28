@@ -65,7 +65,7 @@ class Social_Choice_Sim:
         self.total_types = self.create_total_types() # holds EVERYONE. now we gotta do a significant amount of refactoring.
         self.choice_matrix = [0] * (self.num_causes + 1)
         self.last_option = 0
-        self.all_numbers_matrix = [0] * 21
+        # self.all_numbers_matrix = [0] * 21
         self.all_votes = {}
 
     def create_total_order(self, total_players, num_humans):
@@ -376,9 +376,9 @@ class Social_Choice_Sim:
         if sc_groups != None:
             self.sc_groups = sc_groups
         self.current_options_matrix = self.create_options_matrix() # cause we have to create groups.
-        for row in self.current_options_matrix:
-            for num in row:
-                self.all_numbers_matrix[num+10] += 1
+        # for row in self.current_options_matrix:
+        #     for num in row:
+        #         self.all_numbers_matrix[num+10] += 1
 
         self.set_new_options_matrix(self.current_options_matrix)
         # print('this is the len of the current options matrix ', len(self.current_options_matrix))
@@ -467,8 +467,8 @@ class Social_Choice_Sim:
         normalized_list = [val / total for val in self.choice_matrix]
         print("ratio passing ", normalized_list)
 
-        total = sum(self.all_numbers_matrix)
-        normalized_list = [val / total for val in self.all_numbers_matrix]
+        # total = sum(self.all_numbers_matrix)
+        # normalized_list = [val / total for val in self.all_numbers_matrix]
         print("number distro ", normalized_list)
         below_zero = sum(normalized_list[0:9])
         zero = normalized_list[10]
