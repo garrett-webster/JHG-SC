@@ -37,10 +37,6 @@ class HumanAgent(AbstractAgent):
                     print(f"Failed to delete visualTraits.txt: {e}")
             else:
                 print("visualTraits.txt does not exist.")
-        else:
-            print("running on linux or something ig")
-            os.system("rm ../State/HumanAllocations.txt")
-            os.system("rm ../State/visualTraits.txt")
         self.gameParams = {}
 
 
