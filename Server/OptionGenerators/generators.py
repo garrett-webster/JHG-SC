@@ -1,7 +1,9 @@
 from Server.OptionGenerators.RandomGenerator import RandomGenerator
+from Server.OptionGenerators.TendencyGenerator import TendencyGenerator
 
 GENERATORS = {
-    1: RandomGenerator
+    1: RandomGenerator,
+    2: TendencyGenerator
 }
 
 def generator_factory(generator_type: int, num_players: int, noise_magnitude: int, max_utility: int,
