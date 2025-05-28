@@ -53,6 +53,7 @@ class causeNodeGraphVisualizer:
             "6": "lightblue",
             "7" : "darkgreen",
             "8" : "green",
+            "9" : "orange",
             "default": "gray"
         }
 
@@ -66,7 +67,8 @@ class causeNodeGraphVisualizer:
             "5": "secondChoice",
             "6": "somewhatMoreAwareness",
             "7": "optimalHuman",
-            "8": "clumsyHuman"
+            "8": "humanAttempt2",
+            "9": "humanAttempt3",
         }
 
 

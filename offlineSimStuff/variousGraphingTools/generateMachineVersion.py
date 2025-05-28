@@ -14,7 +14,7 @@ if __name__ == "__main__":
     # filename = datetime.now().strftime("%Y%m%d_%H%M%S") + "human_study_results.json"
     # filepath = os.path.join(directory, filename)
 
-    filepath = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\offlineSimStuff\human_results_time\doctered_human_results.json"
+    filepath = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\offlineSimStuff\sc_logs_repo\20250523_140645human_study_results.json.json"
 
     with open(filepath, 'r') as f:
         big_boy_data = json.load(f)
@@ -23,7 +23,7 @@ if __name__ == "__main__":
 
 
     # lets get some defaults up in this mess
-    total_players = 7
+    total_players = 9
     num_causes = 3
     num_humans = 0
     cycle = 0
@@ -56,9 +56,19 @@ if __name__ == "__main__":
             print("Aight this is the round ", round)
 
     chromosomes = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\offlineSimStuff\chromosomes\highestFromTesting"
-    scenario = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\offlineSimStuff\scenarioIndicator\humanAttempt1"
+    scenario = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\offlineSimStuff\scenarioIndicator\humanAttempt2"
 
-    new_sim = Social_Choice_Sim(total_players, num_causes, num_humans, cycle, round, chromosomes, scenario, group)
+    total_players = 9
+    num_causes = 3
+    num_humans = 0
+    num_bots = total_players - num_humans
+    total_order = []
+    for bot in range(num_bots):
+        total_order.append("B" + str(bot))
+    for human in range(num_humans):
+        total_order.append("P" + str(human))
+
+    new_sim = Social_Choice_Sim(total_players, num_causes, num_humans, cycle, round, chromosomes, scenario, group, total_order)
     new_sim.set_group(group)
     curr_logger = simLogger(new_sim)
     num_cycles = 3 # TODO: change this to actually pull from json instead of hard coding.
@@ -74,10 +84,12 @@ if __name__ == "__main__":
             bot_votes = {}
             for cycle in range(num_cycles): # might actually need to extrapolate this from json
                 bot_votes[cycle] = new_sim.get_votes(bot_votes, curr_round, cycle, num_cycles)
+                new_sim.record_votes(bot_votes[cycle], cycle)
                 # can graph stuff here. lets jsut write it to json and call it a day.
 
             bot_votes = bot_votes[num_cycles-1]
             current_fetcher = bot_votes
+
 
             new_sim.return_win(bot_votes)
             new_sim.save_results()

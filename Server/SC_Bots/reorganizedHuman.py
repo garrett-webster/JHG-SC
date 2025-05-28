@@ -2,7 +2,7 @@
 import random
 import copy
 
-class humanAttempt2:
+class reorganizedHuman:
     def __init__(self, self_id):
         self.self_id = self_id # the id of ourself in realtion to other bots.
         self.type = "BG" # used for graphing purposes
@@ -46,9 +46,11 @@ class humanAttempt2:
 
         previous_votes[-1] = new_votes  # slap them in previous votes regardless.
 
-        cause_sums = self.apply_previous_votes(matrix,
-                                               previous_votes)  # get the cause sums given our padded matrix and previous votes
-        if self.allNegatives(current_options_matrix):
+        cause_sums = self.apply_previous_votes(matrix, previous_votes)  # get the cause sums given our padded matrix and previous votes
+
+
+        print("player ", self.self_id, " cause sums ", cause_sums)
+        if self.identify_outgroup(current_options_matrix, cause_sums):
             return self.get_vote_negative(our_row, col_probs, cause_sums, risk_aversion, majority_factor, current_options_matrix, cycle, max_cycle)
         else:
             return self.get_vote_positive(our_row, col_probs, cause_sums, risk_aversion, majority_factor, current_options_matrix)
@@ -84,12 +86,28 @@ class humanAttempt2:
             return current_options_matrix[self.self_id].index(max(current_options_matrix[self.self_id]))
         return current_vote
 
-    def allNegatives(self, current_options_matrix):
-        our_row = current_options_matrix[self.self_id]
-        for element in our_row:
-            if element > 0:
-                return False
-        return True
+    def identify_outgroup(self, current_options_matrix, cause_sums, previous_votes):
+        pass # the purpose of this function is to allow us to realize if we are part of an "outgroup"
+        if self.self_id == 3 or self.self_id == 8:
+            print("STOP HERE CHEIF")
+        # I think the easiest way to od this is to
+        # find the indexes of the best 2 options, or the most popular options
+        # from there, if one fo THOSE is greater than or equal to 0, we can do a positive vote and go from there
+        # however, if neither of the 2 best options are within our best interest, we are going to go for the connivign option.
+        # so an example of this edgecase can be found in round 16, wherein the human players 4 and 9 were both voting for cause 2, a
+        # and becuase of this, they did seem to successfully commit players 2,3,5,6 to vote for cause 2 and lose the majority.
+        # so lets see if we can't replicate some of that behavior here.
+        current_winner = max(cause_sums, key=cause_sums.get)
+        new_cause_sums = copy.deepcopy(cause_sums)
+        new_cause_sums[current_winner] = 0  # want to find second largers
+        second_largest_cause = max(new_cause_sums, key=new_cause_sums.get)
+        possibleReturnBig = current_options_matrix[self.self_id][current_winner-1]
+        possibleReturnSmall = current_options_matrix[self.self_id][second_largest_cause-1]
+        if possibleReturnBig > 0 and possibleReturnSmall > 0:
+            return False # we are part of a main group, don't worry about it
+        else:
+            print("OUTGROUP DETECTED, OPINION REJECTED!")
+            return True #
 
 
     def initialize_matrix(self, current_options_matrix): # completely changed this to better deal with negatives.

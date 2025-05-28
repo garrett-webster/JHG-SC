@@ -8,8 +8,8 @@ import textdistance
 
 if __name__ == "__main__":
 
-    human_result_file_path = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\offlineSimStuff\human_results_time\doctered_human_results.json"
-    machine_result_file_path = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\offlineSimStuff\human_results_time\machine_comparison.json"
+    human_result_file_path = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\offlineSimStuff\sc_logs_repo\20250523_140645human_study_results.json.json"
+    machine_result_file_path = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\offlineSimStuff\sc_logs_repo\machine_comparison.json"
 
     with open(human_result_file_path, 'r') as f:
         human_data = json.load(f)

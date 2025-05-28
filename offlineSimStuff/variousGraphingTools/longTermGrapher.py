@@ -38,7 +38,8 @@ class longTermGrapher():
             "4": "lA",
             "5": "sC",
             "6": "sMA",
-            "7": "gMDP",
+            "7": "hA1",
+            "8": "hA2"
         }
 
 

@@ -41,14 +41,14 @@ def run_trial(sim, num_rounds, num_cycles, create_graphs, group):
 
         sim.save_results()
         #print("this is the round numb we are adding ", int(curr_round))
-        current_logger.add_round_to_sim(int(curr_round)) # make it start at one instead of zero.
-        current_logger.record_individual_round()
+        #current_logger.add_round_to_sim(int(curr_round)) # make it start at one instead of zero.
+        #current_logger.record_individual_round()
 
     end_time = time.time()
     #sim.print_col_passing() # this shows us the breakdown of the number distro. incredibly fascinating! look at it later.
     #current_logger.record_big_picture()
-    filename = "madMessign'"
-    current_logger.finish_json(filename)
+    #filename = "madMessign'"
+    #current_logger.finish_json(filename)
     #print("This was the total time ", end_time - start_time)
     return sim
 
@@ -62,13 +62,13 @@ def create_sim(scenario=None, chromosomes=None, group=""):
 
     # SUM: this sets the bot list type, so we can have siutaions set up
     if scenario is None:
-        scenario = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\offlineSimStuff\scenarioIndicator\humanAttempt1"
+        scenario = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\offlineSimStuff\scenarioIndicator\humanAttempt3"
     if chromosomes is None:
         chromosomes = r"C:/Users/Sean/Documents/GitHub/OtherGarrettStuff/JHG-SC/offlineSimStuff/chromosomes/highestFromTesting.csv"
     cycle = -1 # a negative cycle indicates to me that this is a test - that, or something is really really wrong.
     curr_round = -1
     total_order = []
-    total_players = 5
+    total_players = 9
     num_causes = 3
     num_humans = 0
     num_bots = total_players - num_humans
@@ -85,19 +85,19 @@ def create_sim(scenario=None, chromosomes=None, group=""):
 
 
 if __name__ == "__main__":
-    num_rounds = 10000
+    num_rounds = 1
     num_cycles = 3
-    create_graphs = False
+    create_graphs = True
     total_groups = ["", 0, 1, 2]
     chromosomes_directory = "testChromosome"
     group = ""
-    scenario = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\offlineSimStuff\scenarioIndicator\humanAttempt1"
+    scenario = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\offlineSimStuff\scenarioIndicator\humanAttempt3"
     chromosome = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\offlineSimStuff\chromosomes\highestFromTesting"
 
     current_sim = create_sim(scenario, chromosome, group)
     updated_sim = run_trial(current_sim, num_rounds, num_cycles, create_graphs, group)
-    current_visualizer = longTermGrapher()
-    current_visualizer.draw_graph_from_sim(updated_sim)
+    #current_visualizer = longTermGrapher()
+    #current_visualizer.draw_graph_from_sim(updated_sim)
 
 
     big_boy_json = {}
