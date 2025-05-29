@@ -17,8 +17,6 @@ class reorganizedHuman:
         return self.number_type
 
 
-
-
     # returns the bots vote given the current option matrix and previous votes.
     def get_vote(self, current_options_matrix, previous_votes=None, cycle=0, max_cycle=3):
         matrix = self.initialize_matrix(current_options_matrix)  # creates no negatives w/ a positive shift
@@ -60,6 +58,8 @@ class reorganizedHuman:
 
     def get_vote_negative(self, our_row, col_probs, cause_sums, risk_aversion, majority_factor, current_options_matrix, cycle, max_cycle, choice_list, choice_matrix):
         # so the cause sums show us what people are CURRENTLY voting for, I think I can use that and the choice matrix for more effective posturing.
+        posturing_optimism = self.chromosome[2]
+
         posturable_causes = self.find_posturable_causes(col_probs, cause_sums, choice_list, current_options_matrix, choice_matrix) # can I run the same algorithm to find other outgroup players? Saber.
 
         current_winner = max(cause_sums, key=cause_sums.get)
@@ -69,7 +69,7 @@ class reorganizedHuman:
         second_largest_cause = max(new_cause_sums, key=new_cause_sums.get)
         second_largest_vote = cause_sums[second_largest_cause]
 
-        if majority_vote > second_largest_vote * 3: # if there is no conceivable posturing to be done
+        if majority_vote > second_largest_vote * posturing_optimism: # if there is no conceivable posturing to be done
             print("Aight player ", self.self_id+1, "outgroup and is frustrated. voting random")
             return random.randrange(0, 3) # return a random causal vote, frustration reigns supreme in this guys mind.
         else: # try and get people to vote for the second most likely cause.

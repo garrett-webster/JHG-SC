@@ -6,6 +6,7 @@
 import json
 from Server.social_choice_sim import Social_Choice_Sim # gets me the actual sim
 from offlineSimStuff.variousGraphingTools.simLogger import simLogger
+from Server.OptionGenerators.generators import generator_factory
 
 if __name__ == "__main__":
 
@@ -56,7 +57,7 @@ if __name__ == "__main__":
             print("Aight this is the round ", round)
 
     chromosomes = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\offlineSimStuff\chromosomes\highestFromTesting"
-    scenario = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\offlineSimStuff\scenarioIndicator\humanAttempt2"
+    scenario = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\offlineSimStuff\scenarioIndicator\humanAttempt3"
 
     total_players = 9
     num_causes = 3
@@ -68,7 +69,8 @@ if __name__ == "__main__":
     for human in range(num_humans):
         total_order.append("P" + str(human))
 
-    new_sim = Social_Choice_Sim(total_players, num_causes, num_humans, cycle, round, chromosomes, scenario, group, total_order)
+    generator = generator_factory(1, total_players, 3, 10,-10,3,None, None)
+    new_sim = Social_Choice_Sim(total_players, num_causes, num_humans, generator, cycle, round, chromosomes, scenario, group, total_order)
     new_sim.set_group(group)
     curr_logger = simLogger(new_sim)
     num_cycles = 3 # TODO: change this to actually pull from json instead of hard coding.

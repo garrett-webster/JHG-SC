@@ -39,7 +39,8 @@ class longTermGrapher():
             "5": "sC",
             "6": "sMA",
             "7": "hA1",
-            "8": "hA2"
+            "8": "hA2",
+            "9": "hA3",
         }
 
 

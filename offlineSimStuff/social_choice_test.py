@@ -80,7 +80,7 @@ def create_sim(scenario=None, chromosomes=None, group=""):
     for human in range(num_humans):
         total_order.append("P" + str(human))
 
-    generator = generator_factory(1, total_players, 3, 10, -10, 3)
+    generator = generator_factory(2, total_players, 3, 10, -10, 3, None, None)
 
     sim = Social_Choice_Sim(total_players, num_causes, num_humans, generator, cycle, curr_round, chromosomes, scenario, group, total_order)
 
@@ -89,14 +89,14 @@ def create_sim(scenario=None, chromosomes=None, group=""):
 
 
 if __name__ == "__main__":
-    num_rounds = 10
+    num_rounds = 1
     num_cycles = 3
     create_graphs = True
     total_groups = ["", 0, 1, 2]
     chromosomes_directory = "testChromosome"
     group = ""
     scenario = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\offlineSimStuff\scenarioIndicator\humanAttempt3"
-    chromosome = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\offlineSimStuff\chromosomes\highestFromTesting"
+    chromosome = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\offlineSimStuff\chromosomes\experiment"
 
     current_sim = create_sim(scenario, chromosome, group)
     updated_sim = run_trial(current_sim, num_rounds, num_cycles, create_graphs, group)

@@ -20,15 +20,14 @@ if __name__ == '__main__':
     #         curr_maker.big_picture_from_dict(data[curr_round])
 
 
-    filepath = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\offlineSimStuff\sc_logs_repo\20250523_140645human_study_results.json.json"
+    filepath = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\offlineSimStuff\human_results_time\machine_comparison.json"
     with open(filepath, 'r') as f:
         data = json.load(f)
 
     # aight so data is everything SO
     for curr_round in data:
         if curr_round != "Conclusion":
-            pass
-            #curr_maker.individual_round_from_dict(data[curr_round])
+            curr_maker.individual_round_from_dict(data[curr_round])
         else:
             curr_maker.big_picture_from_dict(data[curr_round])
 

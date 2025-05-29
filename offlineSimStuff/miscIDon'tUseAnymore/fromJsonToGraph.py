@@ -12,7 +12,7 @@ def create_stuff(big_boy_data):
     for key in big_boy_data:
         if key != "Conclusion":
             pass
-            #little_visualizer.create_graph_given_file(big_boy_data[key])
+            little_visualizer.create_graph_given_file(big_boy_data[key])
         else:
             big_visualizer.draw_graph_from_file(big_boy_data[key])
 
