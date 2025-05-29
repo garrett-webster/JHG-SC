@@ -9,6 +9,8 @@ class reorganizedHuman:
         self.chromosome = None # used as a default holder, will be assinged later.
         self.risk_adversity = "MAX" # never used, actually.
         self.number_type = 6 # used for logging purposes.
+        self.social_lubrication = None
+        self.bad_vote = None # if we have a bad situation, we wnat our vote to be consistent between cycles. hold on to it.
 
     def set_chromosome(self, chromosome): # allows me to set the chromosome at will.
         self.chromosome = chromosome
@@ -50,11 +52,10 @@ class reorganizedHuman:
         previous_votes[-1] = new_votes  # slap them in previous votes regardless.
 
         cause_sums = self.apply_previous_votes(matrix, previous_votes)  # get the cause sums given our padded matrix and previous votes
-
         if self.identify_outgroup(current_options_matrix, cause_sums, cycle, col_probs, max_cycle):
             return self.get_vote_negative(our_row, col_probs, cause_sums, risk_aversion, majority_factor, current_options_matrix, cycle, max_cycle, choice_list, choice_matrix)
         else:
-            return self.get_vote_positive(our_row, col_probs, cause_sums, risk_aversion, majority_factor, current_options_matrix)
+            return self.get_vote_positive(our_row, col_probs, cause_sums, risk_aversion, majority_factor, current_options_matrix, cycle, max_cycle)
 
     def get_vote_negative(self, our_row, col_probs, cause_sums, risk_aversion, majority_factor, current_options_matrix, cycle, max_cycle, choice_list, choice_matrix):
         # so the cause sums show us what people are CURRENTLY voting for, I think I can use that and the choice matrix for more effective posturing.
@@ -69,12 +70,33 @@ class reorganizedHuman:
         second_largest_cause = max(new_cause_sums, key=new_cause_sums.get)
         second_largest_vote = cause_sums[second_largest_cause]
 
+        # ok second problem, we only want to do the non posturing stuff, we want to make sure that stick to it.
+
         if majority_vote > second_largest_vote * posturing_optimism: # if there is no conceivable posturing to be done
-            print("Aight player ", self.self_id+1, "outgroup and is frustrated. voting random")
-            return random.randrange(0, 3) # return a random causal vote, frustration reigns supreme in this guys mind.
+            print("NEgative no posture ", self.self_id, " and ", cycle)
+            if self.bad_vote is not None:
+                temp_bad_vote = self.bad_vote  # gives a way to return that vote while clearing the buffer.
+                if cycle == max_cycle - 1:  # clear the buffer so we stay consistent.
+                    self.bad_vote = None
+                return temp_bad_vote
+            else:
+                random_number = random.random() # there are 2 possible strats, and for now its a coin flip.
+                if random_number >= 0.5: # play greedy, least negative option, even if that cuase is winning.
+                    self.bad_vote = current_options_matrix[self.self_id].index(max(current_options_matrix[self.self_id])) # return the least negative option.
+                else:
+                    winning_votes = [0,1,2,3] # return a random vote that isn't the winnign one.
+                    winning_votes.remove(current_winner)
+                    self.bad_vote = random.choice(winning_votes) - 1 # off by one error
+                    self.bad_vote = current_options_matrix[self.self_id].index(max(current_options_matrix[self.self_id])) # return the least negative option.
+
+                temp_bad_vote = self.bad_vote # gives a way to return that vote while clearing the buffer.
+                if cycle == max_cycle - 1:  # clear the buffer so we stay consistent.
+                    self.bad_vote = None
+                return temp_bad_vote
+
         else: # try and get people to vote for the second most likely cause.
-            print("Aight player ", self.self_id+1, "outgroup and is posturing. voting for ", posturable_causes) # so if there is no posturing, just do -1 and call it a day. s
-            return posturable_causes
+            #print("Aight player ", self.self_id+1, "outgroup and is posturing. voting for ", posturable_causes) # so if there is no posturing, just do -1 and call it a day. s
+            return posturable_causes # i mean this is jsut the posture vote, so maybe this name is bad. oh well.
 
     def find_posturable_causes(self, col_probs, cause_sums, choice_list, current_option_matrix, choice_matrix):
         current_winner = max(cause_sums, key=cause_sums.get)
@@ -91,9 +113,9 @@ class reorganizedHuman:
                 second_tier_swingers.append(i)
 
         for player in first_tier_swingers: # consider all possible options, weighted
-            print("this is the player number ", player)
+            #print("this is the player number ", player)
             player_choices = copy.deepcopy(choice_matrix[player])
-            print(" and this is the player choices ", player_choices)
+           # print(" and this is the player choices ", player_choices)
             # next up, define their possible choices
             # remove their min option
             max_indicies = sorted(range(len(player_choices)), key=lambda i: player_choices[i], reverse=True)[:1]
@@ -119,7 +141,7 @@ class reorganizedHuman:
         for possible_vote in possible_swings: # ok so now that I have them, I shoudl really check if
             if possible_vote != 0 and possible_vote != current_winner: # abstaining is literally 0% fun, so don't consider it
                 possible_votes.append(possible_vote)
-        print("these ar ethe possible swing votes for player ", self.self_id, possible_votes, "\n from considering ", first_tier_swingers, second_tier_swingers)
+        #print("these ar ethe possible swing votes for player ", self.self_id, possible_votes, "\n from considering ", first_tier_swingers, second_tier_swingers)
         if possible_votes:
             return possible_votes[0] - 1 # remember there is a off by one error.
         else:
@@ -142,30 +164,32 @@ class reorganizedHuman:
         return choice_list, choice_matrix
 
 
-    def get_vote_positive(self, our_row, col_probs, cause_sums, risk_aversion, majority_factor, current_options_matrix):
+    def get_vote_positive(self, our_row, col_probs, cause_sums, risk_aversion, majority_factor, current_options_matrix, cycle, max_cycle):
         new_row = self.calculate_vote_row(our_row, col_probs, cause_sums, risk_aversion,
                                           majority_factor)  # creates expected values list.
         current_vote = self.choose_best_vote(new_row, cause_sums)  # pick the best vote from our expected values
-
         # print("this is the id ", self.self_id, " and this is the curr option row ", current_options_matrix[self.self_id], " and our current vote ", current_vote)
         # social lubrication! if there is an opportunity to help the world, go for it. creates optimal results.
-        if current_vote == -1 and max(
-                current_options_matrix[self.self_id]) >= 0:  # if we can create some social lubrication here
-            # at no cost to ourselves, we can select the 0 option and increase the rate of passing. this happened sometimes within human play.
-            return current_options_matrix[self.self_id].index(max(current_options_matrix[self.self_id]))
+        if current_vote == -1 and max(current_options_matrix[self.self_id]) >= 0:  # if we can create some social lubrication here
+            if self.social_lubrication == None:
+                self.social_lubrication = random.choice([True, False])
+            if self.social_lubrication:
+                current_vote = current_options_matrix[self.self_id].index(max(current_options_matrix[self.self_id]))
+        if cycle == max_cycle -1: # if its the last round, turn it back off.
+            self.social_lubrication = None
         return current_vote
 
     def identify_outgroup(self, current_options_matrix, cause_sums, cycle, col_probs, max_cycle):
 
-        if cycle == max_cycle-1: # if its the last cycle, default to a more greedy solution. Might want to do more work on the baysiean prior.
-            return False
-        if cycle == 0:
-            return False
+        # if cycle == max_cycle-1: # if its the last cycle, default to a more greedy solution. Might want to do more work on the baysiean prior.
+        #     return False
+        # if cycle == 0:
+        #     return False
         current_winner = max(cause_sums, key=cause_sums.get)
         possibleReturnBig = current_options_matrix[self.self_id][current_winner-1]
         #print("player ", self.self_id, "These are the cause_sums ", cause_sums, " and these are the col probs ", col_probs)
 
-        if possibleReturnBig <= 0: # if either of our best options are possible.
+        if possibleReturnBig < 0   : # if either of our best options are possible.
             #("OUTGROUP DETECTED, OPINION REJECTED!")
             return True # we are part of a main group, don't worry about it
         else:
@@ -227,7 +251,7 @@ class reorganizedHuman:
             for player in previous_votes[key]:
                 player_dict[player].append(previous_votes[key][player])
 
-        print("these are the previous votes ", previous_votes)
+        #print("these are the previous votes ", previous_votes)
         cause_sums = {i : 0.0 for i in range(len(matrix[0]))} # make sure it starts as a float, not an int.
         # if self.self_id == 0 and cycle == 1:
         #     print("Stop here on cycle 1")
@@ -235,8 +259,6 @@ class reorganizedHuman:
             for i, vote in enumerate(player_dict[key]):
                 index = vote + 1
                 if key != self.self_id:
-                    if index == 4:
-                        print("stop here")
                     cause_sums[index] += 1
 
         length = len(player_dict[next(iter(player_dict))]) # could I hard code this? yes. Did I? nope.

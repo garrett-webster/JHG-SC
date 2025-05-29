@@ -382,11 +382,6 @@ class Social_Choice_Sim:
         #if sc_groups != None:
             #self.sc_groups = sc_groups
         self.current_options_matrix = self.create_options_matrix() # cause we have to create groups.
-        # for row in self.current_options_matrix:
-        #     for num in row:
-        #         self.all_numbers_matrix[num+10] += 1
-        #
-
         self.set_new_options_matrix(self.current_options_matrix)
         self.player_nodes = self.create_player_nodes()
 
