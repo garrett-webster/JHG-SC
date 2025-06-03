@@ -10,6 +10,9 @@ from matplotlib.patches import Patch
 import os
 import numpy as np # for col sums
 
+from matplotlib.patches import Circle
+from itertools import combinations
+
 class causeNodeGraphVisualizer:
     def __init__(self):
         pass
@@ -136,6 +139,14 @@ class causeNodeGraphVisualizer:
             node_types = {node["text"]: node["type"] for node in all_nodes}
             used_bot_types = set()
 
+            cause_nodes = [node for node in all_nodes if node["type"] == "CAUSE"]
+            cause_positions = [(node["x_pos"], node["y_pos"]) for node in cause_nodes]
+
+
+            # Draw lines between every pair of cause nodes
+            for (x1, y1), (x2, y2) in combinations(cause_positions, 2):
+                ax.plot([x1, x2], [y1, y2], color='black', linewidth=2, alpha=0.8, zorder=1)
+
             for node in all_nodes:
                 x, y = node["x_pos"], node["y_pos"]
                 label = node["text"]
@@ -199,7 +210,20 @@ class causeNodeGraphVisualizer:
             fig.subplots_adjust(wspace=0.01, left=0.05, right=0.95, top=0.95, bottom=0.15)  # Adjust bottom margin
             # print("This is the round at the end!! ", curr_round)
 
+            # Add circle patch behind nodes/arrows
+            circle_patch = Circle((0, 0), radius=5, edgecolor='black', facecolor='none', linewidth=1, linestyle='--',
+                                  zorder=0)
+            ax.add_patch(circle_patch)
+            circle_patch = Circle((0, 0), radius=10, edgecolor='black', facecolor='none', linewidth=1, linestyle='--',
+                                  zorder=0)
+            ax.add_patch(circle_patch)
 
+            # Add dotted line "spokes" every 60 degrees
+            for angle_deg in range(30, 390, 60):  # 30, 90, 150, ..., 330
+                angle_rad = np.deg2rad(angle_deg)
+                x = 10 * np.cos(angle_rad)
+                y = 10 * np.sin(angle_rad)
+                ax.plot([0, x], [0, y], color='black', linestyle=':', linewidth=1, zorder=0)
 
             my_path = os.path.dirname(os.path.abspath(__file__))
             scenario_str = f"scenario_{scenario}"

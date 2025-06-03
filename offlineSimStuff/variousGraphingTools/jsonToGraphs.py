@@ -20,7 +20,7 @@ if __name__ == '__main__':
     #         curr_maker.big_picture_from_dict(data[curr_round])
 
 
-    filepath = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\offlineSimStuff\human_results_time\machine_comparison.json"
+    filepath = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\offlineSimStuff\sc_logs_repo\machine_comparison.json"
     with open(filepath, 'r') as f:
         data = json.load(f)
 

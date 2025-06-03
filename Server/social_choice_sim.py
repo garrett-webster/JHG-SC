@@ -2,9 +2,11 @@ import copy
 import math
 import random
 from collections import Counter
+from operator import index
 from pathlib import Path
 import numpy as np
 import matplotlib.pyplot as plt
+
 
 from Server.Node import Node
 from Server.SC_Bots.humanAttempt2 import humanAttempt2
@@ -35,7 +37,11 @@ class Social_Choice_Sim:
 
 
         self.players = self.create_players() # ??? This might be used for multiplayer functionality.
+        self.mid_points = []
+        self.outer_points = []
+        self.causes_rads = []
         self.causes = self.create_cause_nodes() # graphing stuff.
+
         self.player_nodes = [] # also graphing stuff.
 
         self.chromosome_string = "" # holds the file name of the chromosome baering file.
@@ -69,6 +75,11 @@ class Social_Choice_Sim:
         self.last_option = 0
         # self.all_numbers_matrix = [0] * 21
         self.all_votes = {}
+        self.midpoints_dict = { # maps causes to midpoints - so slap the cause number in and get the midpoint out.
+            2 : 0,
+            0 : 1,
+            1 : 2,
+        }
 
     def create_total_order(self, total_players, num_humans):
         num_bots = total_players - num_humans
@@ -382,6 +393,29 @@ class Social_Choice_Sim:
         #if sc_groups != None:
             #self.sc_groups = sc_groups
         self.current_options_matrix = self.create_options_matrix() # cause we have to create groups.
+        # self.current_options_matrix = [
+        #     [1,-5,10],
+        #     [0,0,0],
+        #     [0,0,0],
+        #     [0,0,0],
+        #     [0,0,0],
+        #     [0,0,0],
+        #     [0,0,0],
+        #     [0,0,0],
+        #     [0,0,0],
+        # ]
+        self.current_options_matrix = [
+            [5,2,-5],
+            [-2,-5,4],
+            [2,6,1],
+            [-4,6,7],
+            [6,6,-8],
+            [-9,-3,2],
+            [3,5,0],
+            [-6,2,1],
+            [2,-5,-4],
+        ]
+
         self.set_new_options_matrix(self.current_options_matrix)
         self.player_nodes = self.create_player_nodes()
 
@@ -497,16 +531,49 @@ class Social_Choice_Sim:
             new_x = math.cos(displacement * i) * self.rad
             new_y = math.sin(displacement * i) * self.rad
             causes.append(Node(new_x, new_y, "CAUSE", "Cause " + str(i+1), False))
-        return causes
+            self.causes_rads.append(i * displacement)
+        for i in range(NUM_CAUSES): #3 is the number of causes
+            new_x = math.cos(displacement * i) * self.rad * 2
+            new_y = math.sin(displacement * i) * self.rad * 2
+            self.outer_points.append(Node(new_x, new_y, "CAUSE", "Cause " + str(i+1), False))
+
+        causes.append(Node(0,0,"Cause", ".", False))
+        self.mid_points = []
+        for i in range(NUM_CAUSES):
+            n1 = causes[i]
+            n2 = causes[(i + 1) % NUM_CAUSES]
+
+            # Calculate angles of the two nodes
+            angle1 = math.atan2(n1.get_y(), n1.get_x())
+            angle2 = math.atan2(n2.get_y(), n2.get_x())
+
+            # Calculate midpoint angle (handle wrap-around)
+            mid_angle = (angle1 + angle2) / 2
+
+            # Special case: if the points are on opposite sides of the circle (angles near -π and π),
+            # average should wrap correctly:
+            if abs(angle1 - angle2) > math.pi:
+                mid_angle += math.pi
+                mid_angle = (mid_angle + 2 * math.pi) % (2 * math.pi)  # normalize angle
+
+            # Calculate midpoint coordinates on the circle
+            mid_x = math.cos(mid_angle) * self.rad
+            mid_y = math.sin(mid_angle) * self.rad
+
+            self.mid_points.append(Node(mid_x, mid_y, "MIDPOINT", f"Midpoint {i + 1}", False))
+        print("Here are the midpoints ", self.mid_points)
+        return causes # no need to return the midpoints
 
     # about to try to start a major rework, wish me luck.
     def create_player_nodes(self):
         normalized_current_options_matrix = self.current_options_matrix
+        print("here is the old options matrix ", self.current_options_matrix, "\nand here is the new one ",
+              normalized_current_options_matrix)
 
         player_nodes = []
-        for i in range(self.total_players): # i is the player index
+        for i in range(self.total_players):  # i is the player index
             player_index = i
-            current_x = 0 # https://www.youtube.com/watch?v=r7l0Rq9E8MY
+            current_x = 0  # https://www.youtube.com/watch?v=r7l0Rq9E8MY
             current_y = 0
             curr_negatives = []
             for cause_index in range(NUM_CAUSES):  # completely populate this fetcher first.
@@ -516,47 +583,142 @@ class Social_Choice_Sim:
                 else:
                     curr_negatives.append(0)
 
-            for cause_index in range(NUM_CAUSES):
-                # create the new positions (onyl use teh abs so the flips scale correctly.
-                position_x, position_y = (self.causes[cause_index].get_x()), self.causes[
-                    cause_index].get_y()  # get the strength based on where they are
-                position_x = ((position_x * abs(normalized_current_options_matrix[i][cause_index])) / (
-                            2 * self.rad))  # normalize it to the circle
-                position_y = ((position_y * abs(normalized_current_options_matrix[i][cause_index])) / (
-                            2 * self.rad))  # normalize it to the circle
-
-                current_x += position_x
-                current_y += position_y
 
             # so this should sum everything up.
             # lets make a novel edge case and test it from there.
             all_negatives_flag = False
-            if sum(curr_negatives) == 0: # if there are no negatives.
-                pass # do nothing, we are in the right spot.
+            if sum(curr_negatives) == 0:  # if there are no negatives.
+                normalized_current_options_matrix = self.normalize_current_options_matrix()
+                current_x, current_y = self.normal_coordinates_generation(i, normalized_current_options_matrix)
 
-            if sum(curr_negatives) == 1: # flip over unaffected line
-                dots_of_interest = []
-                for i, value in enumerate(curr_negatives):
-                    if value == 0:
-                        dots_of_interest.append(i) # need the index, might have to do a range thing.
-                point_1_x, point_1_y = round(self.causes[dots_of_interest[0]].get_x(), 2), round(self.causes[dots_of_interest[0]].get_y(), 2)
-                point_2_x, point_2_y = round(self.causes[dots_of_interest[1]].get_x(), 2), round(self.causes[dots_of_interest[1]].get_y(), 2)
-                current_x, current_y = self.flip_point_over_line(current_x, current_y, point_1_x, point_1_y, point_2_x, point_2_y)
-
-            if sum(curr_negatives) == 2: # flip over unaffectd point
-                pass
-                dot_of_interest = [i for i, value in enumerate(curr_negatives) if value == 0][0]
-
-                point_x, point_y = self.causes[dot_of_interest].get_x(), self.causes[dot_of_interest].get_y()
-                current_x, current_y = self.flip_point(current_x, current_y, point_x, point_y)
-
-            if sum(curr_negatives) == 3: # flip over origin.
-                current_x, current_y = self.flip_point(current_x, current_y, 0, 0) # we just flip over teh origin.
+            if sum(curr_negatives) == 3:  # flip over origin.
                 all_negatives_flag = True
+                normalized_current_options_matrix = self.normalize_current_options_matrix()
+                current_x, current_y = self.normal_coordinates_generation(i, normalized_current_options_matrix)
+                current_x *= -1 # flip over the origin
+                current_y *= -1
 
-            player_nodes.append(Node(current_x, current_y, "PLAYER", "Player " + str(player_index+1), all_negatives_flag))
+            # one negative means that the negative dtermines the maginute of the vector and the positive determines spin
+            if sum(curr_negatives) == 1: # flip over origin and use that line
+                index_of_interest = 0
+                positive_vectors = []
+                negative_magnitude = 0
+                positive_magnitude = []
+                for cause_index in range(NUM_CAUSES):
+                    if curr_negatives[cause_index] == 1:
+                        index_of_interest = cause_index
+                        negative_magnitude = self.current_options_matrix[i][cause_index]
+                    else:
+                        positive_vector = self.normal_vector_generation(i, normalized_current_options_matrix, cause_index)
+                        positive_vector = [-positive_vector[0], -positive_vector[1]]
+                        positive_vectors.append(positive_vector)
+                        positive_magnitude.append(self.current_options_matrix[i][cause_index])
+                total = sum(positive_magnitude)
+                positive_magnitude = [val / total for val in positive_magnitude]
+                outer_magnitude = (positive_magnitude[0] - positive_magnitude[1])
+                new_rads = -(outer_magnitude * math.pi) / 6  # same spell here, still 60 degrees
+                current_rads = (self.causes_rads[index_of_interest] - math.pi)  # flip it 180 degrees for reasons.
+                final_rads = new_rads + current_rads
+                inner_magnitude = abs(negative_magnitude)
+                final_mag = 5 + (0.5 * inner_magnitude)
+                current_x = final_mag * math.cos(final_rads)
+                current_y = final_mag * math.sin(final_rads)
+
+
+            # two negatives mean that the negative determines the spin adn the positive determiens the magnitude.
+            if sum(curr_negatives) == 2: # we need to flip over a midpoint, given the causes that we are using. prolly build a dict with it.
+                # so find those negative vectors, and create the new line and then add it to the non affected point, and hten from there use th epositive to affect spin.
+                point_of_interest = (0, 0)
+                index_of_interest = 0
+                negative_vectors = []
+                positive_magnitude = 0 # just for a default.
+                negative_magnitudes = []
+                for cause_index in range(NUM_CAUSES):
+                    # find the point that we need to flip it over
+                    if curr_negatives[cause_index] == 0:
+                        index_of_interest = cause_index
+                        point_of_interest = self.causes[cause_index].get_x(), self.causes[cause_index].get_y() # get the x and y of the point of interest
+                        positive_magnitude = self.current_options_matrix[i][cause_index]
+                    else:
+                        negative_vector = self.normal_vector_generation(i, normalized_current_options_matrix, cause_index)
+                        negative_vector = [-negative_vector[0], -negative_vector[1]]
+                        negative_vectors.append(negative_vector)
+                        negative_magnitudes.append(self.current_options_matrix[i][cause_index])
+                total = sum(negative_magnitudes)
+                negative_magnitudes = [val / total for val in negative_magnitudes]
+                outer_magnitude = (negative_magnitudes[0] - negative_magnitudes[1])
+                new_rads = (outer_magnitude * math.pi) / 6 # have pi/3 radians (60 degrees) from -1 to 1, so pi/6 for each directino.
+                current_rads = self.causes_rads[index_of_interest]
+                final_rads = new_rads + current_rads
+                inner_magnitude = abs(positive_magnitude)
+                final_mag = 10 - (0.5*inner_magnitude)
+                current_x = final_mag * math.cos(final_rads)
+                current_y = final_mag * math.sin(final_rads)
+
+            player_nodes.append(Node(current_x, current_y, "PLAYER", "Player " + str(player_index + 1), all_negatives_flag))
         return player_nodes
 
+
+    def normal_coordinates_generation(self, player_id, normalized_current_options_matrix):
+        curr_x = 0
+        curr_y = 0
+        for cause_index in range(NUM_CAUSES):
+            position_x, position_y = (self.causes[cause_index].get_x()), self.causes[cause_index].get_y()
+            position_x = ((position_x * abs(normalized_current_options_matrix[player_id][cause_index])) / (2 * self.rad))
+            position_y = ((position_y * abs(normalized_current_options_matrix[player_id][cause_index])) / (2 * self.rad))
+            curr_x += position_x
+            curr_y += position_y
+        return curr_x, curr_y
+
+    def unit_circle_coordinates_generation(self, player_id, normalized_current_options_matrix):
+        curr_x = 0
+        curr_y = 0
+
+        for cause_index in range(NUM_CAUSES):
+            weight = normalized_current_options_matrix[player_id][cause_index]
+            base_x, base_y = self.causes[cause_index].get_x(), self.causes[cause_index].get_y()
+
+            # Normalize the cause vector
+            length = math.sqrt(base_x ** 2 + base_y ** 2)
+            if length == 0:
+                continue  # Avoid division by zero
+
+            # Use the magnitude of the weight directly to scale outward
+            norm_x = base_x / length
+            norm_y = base_y / length
+
+            curr_x += norm_x * weight * self.rad
+            curr_y += norm_y * weight * self.rad
+
+            magnitude = math.sqrt(curr_x ** 2 + curr_y ** 2)
+            if magnitude > 10:
+                curr_x = (curr_x / magnitude) * 5
+                curr_y = (curr_y / magnitude) * 5
+
+        return curr_x, curr_y
+
+
+    def normal_vector_generation(self, player_id, normalized_current_options_matrix, cause_index):
+        curr_x = 0
+        curr_y = 0
+        position_x, position_y = (self.causes[cause_index].get_x()), self.causes[cause_index].get_y()
+        position_x = ((position_x * (normalized_current_options_matrix[player_id][cause_index])) / (2 * self.rad))
+        position_y = ((position_y * (normalized_current_options_matrix[player_id][cause_index])) / (2 * self.rad))
+        curr_x += position_x
+        curr_y += position_y
+        return (curr_x, curr_y)
+
+    def normalize_current_options_matrix(self):
+        current_options_matrix = self.current_options_matrix
+        new_options_matrix = []
+        new_row = []
+        for row in current_options_matrix:
+            current_sum = 0
+            for val in row:
+                current_sum += abs(val)
+            new_row = [(val / current_sum) * 10 for val in row]
+            new_options_matrix.append(new_row)
+        return new_options_matrix
 
     def slope(self, x1, y1, x2, y2):
         if x2 - x1 == 0:
