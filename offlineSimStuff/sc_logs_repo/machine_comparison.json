@@ -34,66 +34,73 @@
                 "negatives_flag": false
             },
             {
+                "type": "Cause",
+                "text": ".",
+                "x_pos": 0,
+                "y_pos": 0,
+                "negatives_flag": false
+            },
+            {
                 "type": "PLAYER",
                 "text": "Player 1",
-                "x_pos": -7.0000000000000036,
-                "y_pos": -7.794228634059947,
+                "x_pos": -2.112994176310723,
+                "y_pos": -7.196197302108731,
                 "negatives_flag": false
             },
             {
                 "type": "PLAYER",
                 "text": "Player 2",
-                "x_pos": -4.749999999999998,
-                "y_pos": -3.897114317029973,
+                "x_pos": -6.062177826491071,
+                "y_pos": -3.4999999999999996,
                 "negatives_flag": false
             },
             {
                 "type": "PLAYER",
                 "text": "Player 3",
-                "x_pos": -6.750000000000003,
-                "y_pos": -5.629165124598851,
+                "x_pos": -0.6965574847513851,
+                "y_pos": -5.959430146451657,
                 "negatives_flag": false
             },
             {
                 "type": "PLAYER",
                 "text": "Player 4",
-                "x_pos": -3.749999999999998,
-                "y_pos": 8.227241335952169,
+                "x_pos": -2.5651510749425137,
+                "y_pos": 7.047694655894313,
                 "negatives_flag": false
             },
             {
                 "type": "PLAYER",
                 "text": "Player 5",
-                "x_pos": 1.7498789983866474,
-                "y_pos": -4.763057156372557,
+                "x_pos": 4.588611490808368,
+                "y_pos": -6.553216354311934,
                 "negatives_flag": false
             },
             {
                 "type": "PLAYER",
                 "text": "Player 6",
-                "x_pos": 0.24983499790264485,
-                "y_pos": 6.495069857426435,
+                "x_pos": 2.1538409785880224,
+                "y_pos": 8.738476356834468,
                 "negatives_flag": false
             },
             {
                 "type": "PLAYER",
                 "text": "Player 7",
-                "x_pos": -2.999999999999999,
-                "y_pos": 5.196152422706632,
+                "x_pos": -2.7499999999999987,
+                "y_pos": 4.763139720814413,
                 "negatives_flag": false
             },
             {
                 "type": "PLAYER",
                 "text": "Player 8",
-                "x_pos": -4.000000000000004,
-                "y_pos": -10.392304845413262,
+                "x_pos": -6.363961030678931,
+                "y_pos": -6.363961030678924,
                 "negatives_flag": false
             },
             {
                 "type": "PLAYER",
                 "text": "Player 9",
-                "x_pos": -1.7500000000000009,
-                "y_pos": -1.2990381056766578,
+                "x_pos": -1.3461538461538467,
+                "y_pos": -0.9992600812897365,
                 "negatives_flag": false
             }
         ],
@@ -225,66 +232,73 @@
                 "negatives_flag": false
             },
             {
+                "type": "Cause",
+                "text": ".",
+                "x_pos": 0,
+                "y_pos": 0,
+                "negatives_flag": false
+            },
+            {
                 "type": "PLAYER",
                 "text": "Player 1",
-                "x_pos": 1.0000000000000009,
-                "y_pos": 0.8660254037844382,
+                "x_pos": 0.76923076923077,
+                "y_pos": 0.666173387526491,
                 "negatives_flag": true
             },
             {
                 "type": "PLAYER",
                 "text": "Player 2",
-                "x_pos": 0.5,
-                "y_pos": 0.8660254037844387,
+                "x_pos": 0.7142857142857144,
+                "y_pos": 1.237179148263484,
                 "negatives_flag": false
             },
             {
                 "type": "PLAYER",
                 "text": "Player 3",
-                "x_pos": 2.000000000000001,
-                "y_pos": 2.5980762113533165,
+                "x_pos": 1.2500000000000002,
+                "y_pos": 1.6237976320958225,
                 "negatives_flag": false
             },
             {
                 "type": "PLAYER",
                 "text": "Player 4",
-                "x_pos": -2.249999999999999,
-                "y_pos": 0.4330127018922191,
+                "x_pos": -1.875,
+                "y_pos": 0.360843918243516,
                 "negatives_flag": true
             },
             {
                 "type": "PLAYER",
                 "text": "Player 5",
-                "x_pos": 5.499867996934588,
-                "y_pos": -5.1961651230153,
+                "x_pos": 5.204748896376251e-16,
+                "y_pos": -8.5,
                 "negatives_flag": false
             },
             {
                 "type": "PLAYER",
                 "text": "Player 6",
-                "x_pos": -4.2500000000000036,
-                "y_pos": -7.3612159321677275,
+                "x_pos": -3.7500000000000036,
+                "y_pos": -6.495190528383288,
                 "negatives_flag": false
             },
             {
                 "type": "PLAYER",
                 "text": "Player 7",
-                "x_pos": 5.999911997741273,
-                "y_pos": -3.464127017990688,
+                "x_pos": 0.8884919377750544,
+                "y_pos": -8.453436110630323,
                 "negatives_flag": false
             },
             {
                 "type": "PLAYER",
                 "text": "Player 8",
-                "x_pos": -1.0,
-                "y_pos": 1.7320508075688779,
+                "x_pos": -0.7692307692307692,
+                "y_pos": 1.3323467750529825,
                 "negatives_flag": false
             },
             {
                 "type": "PLAYER",
                 "text": "Player 9",
-                "x_pos": 2.4998899983866423,
-                "y_pos": 4.330063507598112,
+                "x_pos": 4.000000000000003,
+                "y_pos": 6.928203230275508,
                 "negatives_flag": false
             }
         ],
@@ -416,66 +430,73 @@
                 "negatives_flag": false
             },
             {
+                "type": "Cause",
+                "text": ".",
+                "x_pos": 0,
+                "y_pos": 0,
+                "negatives_flag": false
+            },
+            {
                 "type": "PLAYER",
                 "text": "Player 1",
-                "x_pos": 10.5,
-                "y_pos": -4.440892098500626e-16,
+                "x_pos": 7.5,
+                "y_pos": 0.0,
                 "negatives_flag": false
             },
             {
                 "type": "PLAYER",
                 "text": "Player 2",
-                "x_pos": 4.499889997741281,
-                "y_pos": -4.3301143155395785,
+                "x_pos": 2.626644452187052,
+                "y_pos": -8.083980388508806,
                 "negatives_flag": false
             },
             {
                 "type": "PLAYER",
                 "text": "Player 3",
-                "x_pos": 3.499911998547973,
-                "y_pos": -3.464063508063856,
+                "x_pos": 1.9159086336708766,
+                "y_pos": -6.211223237609915,
                 "negatives_flag": false
             },
             {
                 "type": "PLAYER",
                 "text": "Player 4",
-                "x_pos": -0.9999999999999982,
-                "y_pos": 8.881784197001252e-16,
+                "x_pos": -5.5,
+                "y_pos": -6.735557395310443e-16,
                 "negatives_flag": false
             },
             {
                 "type": "PLAYER",
                 "text": "Player 5",
-                "x_pos": 0.24999999999999933,
-                "y_pos": 0.4330127018922201,
+                "x_pos": 0.12499999999999967,
+                "y_pos": 0.21650635094611004,
                 "negatives_flag": false
             },
             {
                 "type": "PLAYER",
                 "text": "Player 6",
-                "x_pos": 3.4998899980639613,
-                "y_pos": 4.330088911568845,
+                "x_pos": 4.702282018339787,
+                "y_pos": 6.472135954999578,
                 "negatives_flag": false
             },
             {
                 "type": "PLAYER",
                 "text": "Player 7",
-                "x_pos": 8.5,
-                "y_pos": -2.220446049250313e-16,
+                "x_pos": 7.0,
+                "y_pos": 0.0,
                 "negatives_flag": false
             },
             {
                 "type": "PLAYER",
                 "text": "Player 8",
-                "x_pos": 0.2500000000000002,
-                "y_pos": -1.2990381056766582,
+                "x_pos": 0.1923076923076925,
+                "y_pos": -0.9992600812897371,
                 "negatives_flag": true
             },
             {
                 "type": "PLAYER",
                 "text": "Player 9",
-                "x_pos": 2.749812996611932,
-                "y_pos": -7.361158770858256,
+                "x_pos": 7.361215932167728,
+                "y_pos": -4.250000000000001,
                 "negatives_flag": false
             }
         ],
@@ -607,66 +628,73 @@
                 "negatives_flag": false
             },
             {
+                "type": "Cause",
+                "text": ".",
+                "x_pos": 0,
+                "y_pos": 0,
+                "negatives_flag": false
+            },
+            {
                 "type": "PLAYER",
                 "text": "Player 1",
-                "x_pos": 10.750000000000002,
-                "y_pos": 3.031088913245535,
+                "x_pos": 7.804836908482329,
+                "y_pos": -3.3666780113328327,
                 "negatives_flag": false
             },
             {
                 "type": "PLAYER",
                 "text": "Player 2",
-                "x_pos": 10.5,
-                "y_pos": 0.8660254037844384,
+                "x_pos": 7.471460235688092,
+                "y_pos": -0.6536680706074364,
                 "negatives_flag": false
             },
             {
                 "type": "PLAYER",
                 "text": "Player 3",
-                "x_pos": -2.220446049250313e-15,
-                "y_pos": -3.464101615137754,
+                "x_pos": -1.3322676295501878e-15,
+                "y_pos": -2.3094010767585025,
                 "negatives_flag": false
             },
             {
                 "type": "PLAYER",
                 "text": "Player 4",
-                "x_pos": -0.9999999999999996,
-                "y_pos": -0.8660254037844388,
+                "x_pos": -0.5882352941176465,
+                "y_pos": -0.5094267081084936,
                 "negatives_flag": true
             },
             {
                 "type": "PLAYER",
                 "text": "Player 5",
-                "x_pos": 0.9998899988706642,
-                "y_pos": -4.330025401642013,
+                "x_pos": 4.0810364266255155,
+                "y_pos": -4.398311230978958,
                 "negatives_flag": false
             },
             {
                 "type": "PLAYER",
                 "text": "Player 6",
-                "x_pos": -1.9999999999999964,
-                "y_pos": 9.526279441628825,
+                "x_pos": -1.2301330883426642,
+                "y_pos": 6.382536532207594,
                 "negatives_flag": false
             },
             {
                 "type": "PLAYER",
                 "text": "Player 7",
-                "x_pos": -1.1102230246251565e-16,
-                "y_pos": 5.551115123125783e-17,
+                "x_pos": -4.440892098500626e-16,
+                "y_pos": 2.220446049250313e-16,
                 "negatives_flag": false
             },
             {
                 "type": "PLAYER",
                 "text": "Player 8",
-                "x_pos": 12.5,
-                "y_pos": -0.8660254037844388,
+                "x_pos": 9.945218953682733,
+                "y_pos": 1.0452846326765344,
                 "negatives_flag": false
             },
             {
                 "type": "PLAYER",
                 "text": "Player 9",
-                "x_pos": -2.2499999999999964,
-                "y_pos": 10.825317547305483,
+                "x_pos": -0.8362277061412267,
+                "y_pos": 7.956175162946187,
                 "negatives_flag": false
             }
         ],
@@ -798,66 +826,73 @@
                 "negatives_flag": false
             },
             {
+                "type": "Cause",
+                "text": ".",
+                "x_pos": 0,
+                "y_pos": 0,
+                "negatives_flag": false
+            },
+            {
                 "type": "PLAYER",
                 "text": "Player 1",
-                "x_pos": 0.4999999999999998,
-                "y_pos": -2.598076211353316,
+                "x_pos": 0.357142857142857,
+                "y_pos": -1.8557687223952257,
                 "negatives_flag": true
             },
             {
                 "type": "PLAYER",
                 "text": "Player 2",
-                "x_pos": 5.249878997257264,
-                "y_pos": -4.763146070270122,
+                "x_pos": 1.2668592624974826,
+                "y_pos": -8.405062022913592,
                 "negatives_flag": false
             },
             {
                 "type": "PLAYER",
                 "text": "Player 3",
-                "x_pos": 5.499911997902611,
-                "y_pos": -3.4641143160053223,
+                "x_pos": 4.592425496802575e-16,
+                "y_pos": -7.5,
                 "negatives_flag": false
             },
             {
                 "type": "PLAYER",
                 "text": "Player 4",
-                "x_pos": 4.249834996611922,
-                "y_pos": -6.495171473309367,
+                "x_pos": 2.907171218268183,
+                "y_pos": -7.987387276680222,
                 "negatives_flag": false
             },
             {
                 "type": "PLAYER",
                 "text": "Player 5",
-                "x_pos": -3.4999999999999982,
-                "y_pos": -2.5980762113533156,
+                "x_pos": -5.706339097770921,
+                "y_pos": -1.8541019662496852,
                 "negatives_flag": false
             },
             {
                 "type": "PLAYER",
                 "text": "Player 6",
-                "x_pos": -4.0000000000000036,
-                "y_pos": -9.526279441628825,
+                "x_pos": -4.6361923966545415,
+                "y_pos": -5.895398210570905,
                 "negatives_flag": false
             },
             {
                 "type": "PLAYER",
                 "text": "Player 7",
-                "x_pos": -1.7499999999999987,
-                "y_pos": 2.1650635094610964,
+                "x_pos": -1.0294117647058818,
+                "y_pos": 1.273566770271233,
                 "negatives_flag": true
             },
             {
                 "type": "PLAYER",
                 "text": "Player 8",
-                "x_pos": 0.4998899990320046,
-                "y_pos": -4.330012699656647,
+                "x_pos": 4.213244437154379,
+                "y_pos": -3.5353318532759666,
                 "negatives_flag": false
             },
             {
                 "type": "PLAYER",
                 "text": "Player 9",
-                "x_pos": -0.49999999999999933,
-                "y_pos": 0.8660254037844384,
+                "x_pos": -0.7142857142857133,
+                "y_pos": 1.2371791482634835,
                 "negatives_flag": true
             }
         ],
@@ -989,66 +1024,73 @@
                 "negatives_flag": false
             },
             {
+                "type": "Cause",
+                "text": ".",
+                "x_pos": 0,
+                "y_pos": 0,
+                "negatives_flag": false
+            },
+            {
                 "type": "PLAYER",
                 "text": "Player 1",
-                "x_pos": 0.7499999999999996,
-                "y_pos": 1.2990381056766584,
+                "x_pos": 0.3124999999999998,
+                "y_pos": 0.5412658773652743,
                 "negatives_flag": false
             },
             {
                 "type": "PLAYER",
                 "text": "Player 2",
-                "x_pos": 1.5000000000000022,
-                "y_pos": 3.464101615137754,
+                "x_pos": 1.2500000000000018,
+                "y_pos": 2.886751345948128,
                 "negatives_flag": true
             },
             {
                 "type": "PLAYER",
                 "text": "Player 3",
-                "x_pos": 1.5000000000000018,
-                "y_pos": 1.7320508075688763,
+                "x_pos": 0.8333333333333341,
+                "y_pos": 0.9622504486493759,
                 "negatives_flag": true
             },
             {
                 "type": "PLAYER",
                 "text": "Player 4",
-                "x_pos": -5.749999999999998,
-                "y_pos": -3.031088913245535,
+                "x_pos": -6.49519052838329,
+                "y_pos": -3.7499999999999996,
                 "negatives_flag": false
             },
             {
                 "type": "PLAYER",
                 "text": "Player 5",
-                "x_pos": -0.75,
-                "y_pos": -1.2990381056766582,
+                "x_pos": -0.625,
+                "y_pos": -1.0825317547305486,
                 "negatives_flag": true
             },
             {
                 "type": "PLAYER",
                 "text": "Player 6",
-                "x_pos": 1.5,
-                "y_pos": -1.7320508075688774,
+                "x_pos": 1.6666666666666665,
+                "y_pos": -1.9245008972987525,
                 "negatives_flag": true
             },
             {
                 "type": "PLAYER",
                 "text": "Player 7",
-                "x_pos": 6.249900997418596,
-                "y_pos": 3.8971460707358667,
+                "x_pos": 7.36121593216773,
+                "y_pos": 4.249999999999998,
                 "negatives_flag": false
             },
             {
                 "type": "PLAYER",
                 "text": "Player 8",
-                "x_pos": 3.2498789979026257,
-                "y_pos": 4.763095262328656,
+                "x_pos": 4.595446948372581,
+                "y_pos": 7.150655029065039,
                 "negatives_flag": false
             },
             {
                 "type": "PLAYER",
                 "text": "Player 9",
-                "x_pos": -2.999999999999998,
-                "y_pos": 6.928203230275509,
+                "x_pos": -2.0336832153790003,
+                "y_pos": 4.567727288213005,
                 "negatives_flag": false
             }
         ],
@@ -1180,75 +1222,82 @@
                 "negatives_flag": false
             },
             {
+                "type": "Cause",
+                "text": ".",
+                "x_pos": 0,
+                "y_pos": 0,
+                "negatives_flag": false
+            },
+            {
                 "type": "PLAYER",
                 "text": "Player 1",
-                "x_pos": -5.749999999999998,
-                "y_pos": 7.361215932167729,
+                "x_pos": -5.101295533281895,
+                "y_pos": 5.497889038723699,
                 "negatives_flag": false
             },
             {
                 "type": "PLAYER",
                 "text": "Player 2",
-                "x_pos": 5.249900997741277,
-                "y_pos": -3.897120666765133,
+                "x_pos": 1.044209537760412,
+                "y_pos": -7.931558890990483,
                 "negatives_flag": false
             },
             {
                 "type": "PLAYER",
                 "text": "Player 3",
-                "x_pos": 0.5000000000000004,
-                "y_pos": -0.8660254037844388,
+                "x_pos": 0.35714285714285743,
+                "y_pos": -0.6185895741317422,
                 "negatives_flag": true
             },
             {
                 "type": "PLAYER",
                 "text": "Player 4",
-                "x_pos": -7.249999999999997,
-                "y_pos": 9.959292143521045,
+                "x_pos": -6.42787609686539,
+                "y_pos": 7.6604444311897835,
                 "negatives_flag": false
             },
             {
                 "type": "PLAYER",
                 "text": "Player 5",
-                "x_pos": -1.3322676295501878e-15,
-                "y_pos": -1.732050807568877,
+                "x_pos": -8.881784197001252e-16,
+                "y_pos": -0.9622504486493759,
                 "negatives_flag": false
             },
             {
                 "type": "PLAYER",
                 "text": "Player 6",
-                "x_pos": 11.0,
-                "y_pos": -0.8660254037844388,
+                "x_pos": 9.355673653615977,
+                "y_pos": 1.6496576878358382,
                 "negatives_flag": false
             },
             {
                 "type": "PLAYER",
                 "text": "Player 7",
-                "x_pos": 4.249966999515992,
-                "y_pos": -1.2990190522794338,
+                "x_pos": 0.6385110276887654,
+                "y_pos": -5.462810967580687,
                 "negatives_flag": false
             },
             {
                 "type": "PLAYER",
                 "text": "Player 8",
-                "x_pos": -2.4999999999999996,
-                "y_pos": -0.8660254037844388,
+                "x_pos": -1.2499999999999998,
+                "y_pos": -0.4330127018922194,
                 "negatives_flag": true
             },
             {
                 "type": "PLAYER",
                 "text": "Player 9",
-                "x_pos": 2.749999999999999,
-                "y_pos": -1.2990381056766578,
+                "x_pos": 2.115384615384615,
+                "y_pos": -0.9992600812897368,
                 "negatives_flag": false
             }
         ],
         "all_votes": {
             "0": {
-                "0": -1,
+                "0": 1,
                 "1": 0,
                 "2": -1,
-                "3": 1,
+                "3": -1,
                 "4": 0,
                 "5": 0,
                 "6": 0,
@@ -1259,7 +1308,7 @@
                 "0": 1,
                 "1": 0,
                 "2": -1,
-                "3": 1,
+                "3": -1,
                 "4": 0,
                 "5": 0,
                 "6": 0,
@@ -1269,12 +1318,12 @@
             "2": {
                 "0": 1,
                 "1": 0,
-                "2": 0,
-                "3": 1,
+                "2": -1,
+                "3": -1,
                 "4": 0,
                 "5": 0,
                 "6": 0,
-                "7": 2,
+                "7": -1,
                 "8": 0
             }
         },
@@ -1371,66 +1420,73 @@
                 "negatives_flag": false
             },
             {
+                "type": "Cause",
+                "text": ".",
+                "x_pos": 0,
+                "y_pos": 0,
+                "negatives_flag": false
+            },
+            {
                 "type": "PLAYER",
                 "text": "Player 1",
-                "x_pos": 3.9998899979026206,
-                "y_pos": 4.330101613554212,
+                "x_pos": 5.101295533281897,
+                "y_pos": 5.497889038723696,
                 "negatives_flag": false
             },
             {
                 "type": "PLAYER",
                 "text": "Player 2",
-                "x_pos": -3.750000000000004,
-                "y_pos": -9.093266739736606,
+                "x_pos": -5.4413819021673575,
+                "y_pos": -5.864414974638608,
                 "negatives_flag": false
             },
             {
                 "type": "PLAYER",
                 "text": "Player 3",
-                "x_pos": -0.7499999999999998,
-                "y_pos": 2.165063509461097,
+                "x_pos": -0.8333333333333329,
+                "y_pos": 2.4056261216234405,
                 "negatives_flag": false
             },
             {
                 "type": "PLAYER",
                 "text": "Player 4",
-                "x_pos": -3.749999999999999,
-                "y_pos": -0.4330127018922192,
+                "x_pos": -6.994322987200987,
+                "y_pos": -0.28186158076590556,
                 "negatives_flag": false
             },
             {
                 "type": "PLAYER",
                 "text": "Player 5",
-                "x_pos": 2.99986799774129,
-                "y_pos": 5.196101613088468,
+                "x_pos": 4.500000000000003,
+                "y_pos": 7.794228634059946,
                 "negatives_flag": false
             },
             {
                 "type": "PLAYER",
                 "text": "Player 6",
-                "x_pos": -8.250000000000004,
-                "y_pos": -9.093266739736604,
+                "x_pos": -2.3293714059226938,
+                "y_pos": -8.693332436601613,
                 "negatives_flag": false
             },
             {
                 "type": "PLAYER",
                 "text": "Player 7",
-                "x_pos": 0.7499999999999998,
-                "y_pos": -0.4330127018922193,
+                "x_pos": 2.499999999999999,
+                "y_pos": -1.443375672974064,
                 "negatives_flag": false
             },
             {
                 "type": "PLAYER",
                 "text": "Player 8",
-                "x_pos": -7.25,
-                "y_pos": 0.4330127018922194,
+                "x_pos": -7.878462024097665,
+                "y_pos": 1.3891854213354402,
                 "negatives_flag": false
             },
             {
                 "type": "PLAYER",
                 "text": "Player 9",
-                "x_pos": 11.25,
-                "y_pos": -0.43301270189221963,
+                "x_pos": 8.984773424441414,
+                "y_pos": 0.5233034601942828,
                 "negatives_flag": false
             }
         ],
@@ -1562,66 +1618,73 @@
                 "negatives_flag": false
             },
             {
+                "type": "Cause",
+                "text": ".",
+                "x_pos": 0,
+                "y_pos": 0,
+                "negatives_flag": false
+            },
+            {
                 "type": "PLAYER",
                 "text": "Player 1",
-                "x_pos": -1.9999999999999996,
-                "y_pos": 3.4641016151377553,
+                "x_pos": -1.4285714285714284,
+                "y_pos": 2.474358296526968,
                 "negatives_flag": false
             },
             {
                 "type": "PLAYER",
                 "text": "Player 2",
-                "x_pos": -4.2500000000000036,
-                "y_pos": -7.3612159321677275,
+                "x_pos": -3.500000000000003,
+                "y_pos": -6.0621778264910695,
                 "negatives_flag": false
             },
             {
                 "type": "PLAYER",
                 "text": "Player 3",
-                "x_pos": -7.000000000000004,
-                "y_pos": -9.526279441628825,
+                "x_pos": -2.9475517441090466,
+                "y_pos": -9.555728057861405,
                 "negatives_flag": false
             },
             {
                 "type": "PLAYER",
                 "text": "Player 4",
-                "x_pos": 0.7499999999999996,
-                "y_pos": 0.4330127018922201,
+                "x_pos": 0.35714285714285676,
+                "y_pos": 0.2061965247105808,
                 "negatives_flag": false
             },
             {
                 "type": "PLAYER",
                 "text": "Player 5",
-                "x_pos": -5.500000000000004,
-                "y_pos": -10.392304845413264,
+                "x_pos": -5.220335291672662,
+                "y_pos": -7.937134208422893,
                 "negatives_flag": false
             },
             {
                 "type": "PLAYER",
                 "text": "Player 6",
-                "x_pos": 3.2498789979026266,
-                "y_pos": -4.763095262328656,
+                "x_pos": 3.894925434682987,
+                "y_pos": -7.55510131356685,
                 "negatives_flag": false
             },
             {
                 "type": "PLAYER",
                 "text": "Player 7",
-                "x_pos": -5.000000000000004,
-                "y_pos": -10.392304845413262,
+                "x_pos": -6.427876096865395,
+                "y_pos": -7.660444431189779,
                 "negatives_flag": false
             },
             {
                 "type": "PLAYER",
                 "text": "Player 8",
-                "x_pos": 0.2499009993546807,
-                "y_pos": -3.8969936469114694,
+                "x_pos": 4.0147836381531485,
+                "y_pos": -4.458868952864366,
                 "negatives_flag": false
             },
             {
                 "type": "PLAYER",
                 "text": "Player 9",
-                "x_pos": 2.250000000000002,
-                "y_pos": 3.8971143170299736,
+                "x_pos": 1.8750000000000018,
+                "y_pos": 3.2475952641916446,
                 "negatives_flag": true
             }
         ],
@@ -1633,7 +1696,7 @@
                 "3": 2,
                 "4": 2,
                 "5": 2,
-                "6": -1,
+                "6": 2,
                 "7": 2,
                 "8": -1
             },
@@ -1644,7 +1707,7 @@
                 "3": 2,
                 "4": 2,
                 "5": 2,
-                "6": -1,
+                "6": 2,
                 "7": 2,
                 "8": 0
             },
@@ -1655,7 +1718,7 @@
                 "3": 2,
                 "4": 2,
                 "5": 2,
-                "6": -1,
+                "6": 2,
                 "7": 2,
                 "8": 0
             }
@@ -1753,66 +1816,73 @@
                 "negatives_flag": false
             },
             {
+                "type": "Cause",
+                "text": ".",
+                "x_pos": 0,
+                "y_pos": 0,
+                "negatives_flag": false
+            },
+            {
                 "type": "PLAYER",
                 "text": "Player 1",
-                "x_pos": -3.4999999999999996,
-                "y_pos": 0.8660254037844388,
+                "x_pos": -7.483941924289526,
+                "y_pos": 0.4905234692260715,
                 "negatives_flag": false
             },
             {
                 "type": "PLAYER",
                 "text": "Player 2",
-                "x_pos": 0.49999999999999956,
-                "y_pos": -0.8660254037844386,
+                "x_pos": 1.249999999999999,
+                "y_pos": -2.1650635094610964,
                 "negatives_flag": false
             },
             {
                 "type": "PLAYER",
                 "text": "Player 3",
-                "x_pos": -1.000087999999962,
-                "y_pos": 3.463949190195556,
+                "x_pos": 1.4235047480638665,
+                "y_pos": 5.312592044589875,
                 "negatives_flag": false
             },
             {
                 "type": "PLAYER",
                 "text": "Player 4",
-                "x_pos": -1.7500000000000027,
-                "y_pos": -7.361215932167728,
+                "x_pos": -4.300073153574164,
+                "y_pos": -3.4291939102230335,
                 "negatives_flag": false
             },
             {
                 "type": "PLAYER",
                 "text": "Player 5",
-                "x_pos": -5.500000000000005,
-                "y_pos": -12.12435565298214,
+                "x_pos": -5.583959896778496,
+                "y_pos": -7.6856614465619995,
                 "negatives_flag": false
             },
             {
                 "type": "PLAYER",
                 "text": "Player 6",
-                "x_pos": 12.500000000000002,
-                "y_pos": 0.8660254037844375,
+                "x_pos": 8.48180084752813,
+                "y_pos": -0.5559265984562161,
                 "negatives_flag": false
             },
             {
                 "type": "PLAYER",
                 "text": "Player 7",
-                "x_pos": 3.24992299887065,
-                "y_pos": -3.0310444553186784,
+                "x_pos": 1.1435142994976757,
+                "y_pos": -5.379811804035931,
                 "negatives_flag": false
             },
             {
                 "type": "PLAYER",
                 "text": "Player 8",
-                "x_pos": 1.2499999999999998,
-                "y_pos": 0.43301270189221963,
+                "x_pos": 0.9615384615384615,
+                "y_pos": 0.33308669376324584,
                 "negatives_flag": false
             },
             {
                 "type": "PLAYER",
                 "text": "Player 9",
-                "x_pos": -7.749999999999998,
-                "y_pos": 8.227241335952169,
+                "x_pos": -7.140180062621115,
+                "y_pos": 5.478852861078488,
                 "negatives_flag": false
             }
         ],
@@ -1944,66 +2014,73 @@
                 "negatives_flag": false
             },
             {
+                "type": "Cause",
+                "text": ".",
+                "x_pos": 0,
+                "y_pos": 0,
+                "negatives_flag": false
+            },
+            {
                 "type": "PLAYER",
                 "text": "Player 1",
-                "x_pos": -3.7500000000000027,
-                "y_pos": -5.629165124598851,
+                "x_pos": -2.2370515369169053,
+                "y_pos": -5.024500017034303,
                 "negatives_flag": false
             },
             {
                 "type": "PLAYER",
                 "text": "Player 2",
-                "x_pos": 10.25,
-                "y_pos": -2.1650635094610973,
+                "x_pos": 7.663916098523911,
+                "y_pos": 2.2944258616887216,
                 "negatives_flag": false
             },
             {
                 "type": "PLAYER",
                 "text": "Player 3",
-                "x_pos": -5.000000000000005,
-                "y_pos": -11.258330249197702,
+                "x_pos": -6.427876096865395,
+                "y_pos": -7.660444431189779,
                 "negatives_flag": false
             },
             {
                 "type": "PLAYER",
                 "text": "Player 4",
-                "x_pos": 0.9998899988706638,
-                "y_pos": 4.330025401642011,
+                "x_pos": 2.939749573950566,
+                "y_pos": 6.89984582744118,
                 "negatives_flag": false
             },
             {
                 "type": "PLAYER",
                 "text": "Player 5",
-                "x_pos": -4.499999999999998,
-                "y_pos": 6.062177826491071,
+                "x_pos": -2.938926261462365,
+                "y_pos": 4.045084971874737,
                 "negatives_flag": false
             },
             {
                 "type": "PLAYER",
                 "text": "Player 6",
-                "x_pos": 2.2500000000000018,
-                "y_pos": 1.2990381056766571,
+                "x_pos": 1.2500000000000009,
+                "y_pos": 0.721687836487032,
                 "negatives_flag": true
             },
             {
                 "type": "PLAYER",
                 "text": "Player 7",
-                "x_pos": 5.999889997257259,
-                "y_pos": 4.330152421495679,
+                "x_pos": 7.2191087347953955,
+                "y_pos": 5.3744273253250725,
                 "negatives_flag": false
             },
             {
                 "type": "PLAYER",
                 "text": "Player 8",
-                "x_pos": -2.4999999999999987,
-                "y_pos": -0.8660254037844384,
+                "x_pos": -5.983222783087081,
+                "y_pos": -0.44838056151854533,
                 "negatives_flag": false
             },
             {
                 "type": "PLAYER",
                 "text": "Player 9",
-                "x_pos": -3.999999999999998,
-                "y_pos": 8.660254037844387,
+                "x_pos": -2.1999618833714254,
+                "y_pos": 8.21036952345708,
                 "negatives_flag": false
             }
         ],
@@ -2020,7 +2097,7 @@
                 "8": 1
             },
             "1": {
-                "0": 2,
+                "0": -1,
                 "1": 0,
                 "2": -1,
                 "3": 1,
@@ -2031,7 +2108,7 @@
                 "8": 1
             },
             "2": {
-                "0": 2,
+                "0": -1,
                 "1": 0,
                 "2": -1,
                 "3": 1,
@@ -2135,66 +2212,73 @@
                 "negatives_flag": false
             },
             {
+                "type": "Cause",
+                "text": ".",
+                "x_pos": 0,
+                "y_pos": 0,
+                "negatives_flag": false
+            },
+            {
                 "type": "PLAYER",
                 "text": "Player 1",
-                "x_pos": -2.9999999999999987,
-                "y_pos": -0.8660254037844384,
+                "x_pos": -6.481824681677671,
+                "y_pos": -0.48574560831175745,
                 "negatives_flag": false
             },
             {
                 "type": "PLAYER",
                 "text": "Player 2",
-                "x_pos": -1.2499999999999993,
-                "y_pos": 3.0310889132455356,
+                "x_pos": -1.5624999999999991,
+                "y_pos": 3.7888611415569193,
                 "negatives_flag": false
             },
             {
                 "type": "PLAYER",
                 "text": "Player 3",
-                "x_pos": -4.999999999999997,
-                "y_pos": 7.794228634059948,
+                "x_pos": -3.206794956766804,
+                "y_pos": 5.07114051326277,
                 "negatives_flag": false
             },
             {
                 "type": "PLAYER",
                 "text": "Player 4",
-                "x_pos": 8.5,
-                "y_pos": -1.7320508075688776,
+                "x_pos": 5.416442641567144,
+                "y_pos": 0.9550649771681168,
                 "negatives_flag": false
             },
             {
                 "type": "PLAYER",
                 "text": "Player 5",
-                "x_pos": -7.499999999999998,
-                "y_pos": 7.794228634059949,
+                "x_pos": -6.743503392475498,
+                "y_pos": 5.174472146574128,
                 "negatives_flag": false
             },
             {
                 "type": "PLAYER",
                 "text": "Player 6",
-                "x_pos": -4.75,
-                "y_pos": 0.43301270189221963,
+                "x_pos": -6.988157107898878,
+                "y_pos": 0.4070138023733315,
                 "negatives_flag": false
             },
             {
                 "type": "PLAYER",
                 "text": "Player 7",
-                "x_pos": -6.0,
-                "y_pos": 2.598076211353316,
+                "x_pos": -8.083980388508806,
+                "y_pos": 2.626644452187052,
                 "negatives_flag": false
             },
             {
                 "type": "PLAYER",
                 "text": "Player 8",
-                "x_pos": 12.250000000000002,
-                "y_pos": 1.2990381056766576,
+                "x_pos": 8.934379866882486,
+                "y_pos": -1.0848301222979075,
                 "negatives_flag": false
             },
             {
                 "type": "PLAYER",
                 "text": "Player 9",
-                "x_pos": -0.7500000000000009,
-                "y_pos": -0.43301270189221874,
+                "x_pos": -0.5000000000000007,
+                "y_pos": -0.28867513459481287,
                 "negatives_flag": false
             }
         ],
@@ -2326,66 +2410,73 @@
                 "negatives_flag": false
             },
             {
+                "type": "Cause",
+                "text": ".",
+                "x_pos": 0,
+                "y_pos": 0,
+                "negatives_flag": false
+            },
+            {
                 "type": "PLAYER",
                 "text": "Player 1",
-                "x_pos": 6.661338147750939e-16,
-                "y_pos": -4.440892098500626e-16,
+                "x_pos": 4.440892098500626e-16,
+                "y_pos": -2.220446049250313e-16,
                 "negatives_flag": true
             },
             {
                 "type": "PLAYER",
                 "text": "Player 2",
-                "x_pos": -2.750000000000001,
-                "y_pos": -0.4330127018922192,
+                "x_pos": -1.9642857142857149,
+                "y_pos": -0.30929478706587066,
                 "negatives_flag": false
             },
             {
                 "type": "PLAYER",
                 "text": "Player 3",
-                "x_pos": 2.749900998547978,
-                "y_pos": 3.8970571568383012,
+                "x_pos": 4.054806130916983,
+                "y_pos": 6.309401496233857,
                 "negatives_flag": false
             },
             {
                 "type": "PLAYER",
                 "text": "Player 4",
-                "x_pos": 10.750000000000002,
-                "y_pos": 0.43301270189221874,
+                "x_pos": 6.99573578913367,
+                "y_pos": -0.24429647691750672,
                 "negatives_flag": false
             },
             {
                 "type": "PLAYER",
                 "text": "Player 5",
-                "x_pos": 3.2498789979026257,
-                "y_pos": 4.763095262328656,
+                "x_pos": 5.196152422706633,
+                "y_pos": 2.9999999999999987,
                 "negatives_flag": false
             },
             {
                 "type": "PLAYER",
                 "text": "Player 6",
-                "x_pos": 0.9998459979026406,
-                "y_pos": -6.062076208651991,
+                "x_pos": 6.06217782649107,
+                "y_pos": -3.500000000000001,
                 "negatives_flag": false
             },
             {
                 "type": "PLAYER",
                 "text": "Player 7",
-                "x_pos": 1.0000000000000002,
-                "y_pos": 1.7320508075688776,
+                "x_pos": 0.9090909090909092,
+                "y_pos": 1.5745916432444336,
                 "negatives_flag": false
             },
             {
                 "type": "PLAYER",
                 "text": "Player 8",
-                "x_pos": 2.249999999999999,
-                "y_pos": -0.43301270189221897,
+                "x_pos": 1.2499999999999996,
+                "y_pos": -0.24056261216234387,
                 "negatives_flag": false
             },
             {
                 "type": "PLAYER",
                 "text": "Player 9",
-                "x_pos": 3.2498349969346014,
-                "y_pos": 6.4951460693386345,
+                "x_pos": 2.7361611466053524,
+                "y_pos": 7.5175409662872665,
                 "negatives_flag": false
             }
         ],
@@ -2517,66 +2608,73 @@
                 "negatives_flag": false
             },
             {
+                "type": "Cause",
+                "text": ".",
+                "x_pos": 0,
+                "y_pos": 0,
+                "negatives_flag": false
+            },
+            {
                 "type": "PLAYER",
                 "text": "Player 1",
-                "x_pos": 3.749834996773263,
-                "y_pos": -6.495158771324,
+                "x_pos": 3.999999999999999,
+                "y_pos": -6.92820323027551,
                 "negatives_flag": false
             },
             {
                 "type": "PLAYER",
                 "text": "Player 2",
-                "x_pos": 9.500000000000002,
-                "y_pos": 1.7320508075688767,
+                "x_pos": 7.244443697168013,
+                "y_pos": -1.9411428382689055,
                 "negatives_flag": false
             },
             {
                 "type": "PLAYER",
                 "text": "Player 3",
-                "x_pos": -1.7499999999999987,
-                "y_pos": 2.1650635094610964,
+                "x_pos": -1.2499999999999991,
+                "y_pos": 1.5464739353293544,
                 "negatives_flag": true
             },
             {
                 "type": "PLAYER",
                 "text": "Player 4",
-                "x_pos": 3.749856997257274,
-                "y_pos": -5.629133367819012,
+                "x_pos": 3.2538931446064017,
+                "y_pos": -7.308363661140807,
                 "negatives_flag": false
             },
             {
                 "type": "PLAYER",
                 "text": "Player 5",
-                "x_pos": -0.9999999999999998,
-                "y_pos": 1.7320508075688776,
+                "x_pos": -1.4285714285714284,
+                "y_pos": 2.474358296526968,
                 "negatives_flag": false
             },
             {
                 "type": "PLAYER",
                 "text": "Player 6",
-                "x_pos": 1.749834997418624,
-                "y_pos": -6.495107963382535,
+                "x_pos": 6.128355544951824,
+                "y_pos": -5.142300877492315,
                 "negatives_flag": false
             },
             {
                 "type": "PLAYER",
                 "text": "Player 7",
-                "x_pos": 3.499845997095938,
-                "y_pos": 6.062139718578823,
+                "x_pos": 3.500000000000002,
+                "y_pos": 6.0621778264910695,
                 "negatives_flag": false
             },
             {
                 "type": "PLAYER",
                 "text": "Player 8",
-                "x_pos": -0.5001320011293267,
-                "y_pos": 5.196012699190901,
+                "x_pos": 3.031929298844582e-15,
+                "y_pos": 6.0,
                 "negatives_flag": false
             },
             {
                 "type": "PLAYER",
                 "text": "Player 9",
-                "x_pos": -6.75,
-                "y_pos": 1.299038105676658,
+                "x_pos": -7.608452130361229,
+                "y_pos": 2.4721359549995783,
                 "negatives_flag": false
             }
         ],
@@ -2708,66 +2806,73 @@
                 "negatives_flag": false
             },
             {
+                "type": "Cause",
+                "text": ".",
+                "x_pos": 0,
+                "y_pos": 0,
+                "negatives_flag": false
+            },
+            {
                 "type": "PLAYER",
                 "text": "Player 1",
-                "x_pos": -7.249999999999998,
-                "y_pos": 7.361215932167729,
+                "x_pos": -6.34682672232988,
+                "y_pos": 4.870091432069767,
                 "negatives_flag": false
             },
             {
                 "type": "PLAYER",
                 "text": "Player 2",
-                "x_pos": 11.25,
-                "y_pos": -2.165063509461097,
+                "x_pos": 7.838325216338141,
+                "y_pos": 1.6002055502083552,
                 "negatives_flag": false
             },
             {
                 "type": "PLAYER",
                 "text": "Player 3",
-                "x_pos": -6.4999999999999964,
-                "y_pos": 12.12435565298214,
+                "x_pos": -4.494388789942095,
+                "y_pos": 8.369615845714954,
                 "negatives_flag": false
             },
             {
                 "type": "PLAYER",
                 "text": "Player 4",
-                "x_pos": 2.0,
-                "y_pos": 1.7320508075688774,
+                "x_pos": 1.2500000000000002,
+                "y_pos": 1.0825317547305484,
                 "negatives_flag": false
             },
             {
                 "type": "PLAYER",
                 "text": "Player 5",
-                "x_pos": -6.749999999999998,
-                "y_pos": -2.1650635094610964,
+                "x_pos": -8.6219056108394,
+                "y_pos": -2.581229094399812,
                 "negatives_flag": false
             },
             {
                 "type": "PLAYER",
                 "text": "Player 6",
-                "x_pos": 3.999955999354657,
-                "y_pos": -1.7320254030392452,
+                "x_pos": 1.2474701449065555,
+                "y_pos": -5.868885604402834,
                 "negatives_flag": false
             },
             {
                 "type": "PLAYER",
                 "text": "Player 7",
-                "x_pos": 2.7499009985479783,
-                "y_pos": 3.897057156838301,
+                "x_pos": 3.8465628464956443,
+                "y_pos": 5.848414679890554,
                 "negatives_flag": false
             },
             {
                 "type": "PLAYER",
                 "text": "Player 8",
-                "x_pos": -0.4999999999999991,
-                "y_pos": 0.8660254037844384,
+                "x_pos": -0.3846153846153839,
+                "y_pos": 0.666173387526491,
                 "negatives_flag": true
             },
             {
                 "type": "PLAYER",
                 "text": "Player 9",
-                "x_pos": 9.25,
-                "y_pos": 0.43301270189221874,
+                "x_pos": 6.492637704689551,
+                "y_pos": -0.3092824528543248,
                 "negatives_flag": false
             }
         ],
@@ -2899,66 +3004,73 @@
                 "negatives_flag": false
             },
             {
+                "type": "Cause",
+                "text": ".",
+                "x_pos": 0,
+                "y_pos": 0,
+                "negatives_flag": false
+            },
+            {
                 "type": "PLAYER",
                 "text": "Player 1",
-                "x_pos": -5.500000000000004,
-                "y_pos": -8.660254037844386,
+                "x_pos": -3.6606297876822085,
+                "y_pos": -8.221909118783405,
                 "negatives_flag": false
             },
             {
                 "type": "PLAYER",
                 "text": "Player 2",
-                "x_pos": -5.75,
-                "y_pos": 1.2990381056766582,
+                "x_pos": -7.878462024097665,
+                "y_pos": 1.3891854213354402,
                 "negatives_flag": false
             },
             {
                 "type": "PLAYER",
                 "text": "Player 3",
-                "x_pos": -5.249999999999998,
-                "y_pos": 5.629165124598852,
+                "x_pos": -4.596266658713867,
+                "y_pos": 3.856725658119237,
                 "negatives_flag": false
             },
             {
                 "type": "PLAYER",
                 "text": "Player 4",
-                "x_pos": 11.500000000000002,
-                "y_pos": 2.598076211353315,
+                "x_pos": 7.799423297454589,
+                "y_pos": -1.7801674716505151,
                 "negatives_flag": false
             },
             {
                 "type": "PLAYER",
                 "text": "Player 5",
-                "x_pos": 6.249878996934582,
-                "y_pos": 4.763171474240857,
+                "x_pos": 7.620170331172917,
+                "y_pos": 5.673006621176466,
                 "negatives_flag": false
             },
             {
                 "type": "PLAYER",
                 "text": "Player 6",
-                "x_pos": -5.249999999999999,
-                "y_pos": -0.4330127018922192,
+                "x_pos": -6.980426580268261,
+                "y_pos": -0.5231106551049696,
                 "negatives_flag": false
             },
             {
                 "type": "PLAYER",
                 "text": "Player 7",
-                "x_pos": 0.49991199951601606,
-                "y_pos": -3.4639872961516582,
+                "x_pos": 3.5353318532759657,
+                "y_pos": -4.21324443715438,
                 "negatives_flag": false
             },
             {
                 "type": "PLAYER",
                 "text": "Player 8",
-                "x_pos": -6.250000000000005,
-                "y_pos": -11.691342951089922,
+                "x_pos": -5.034233010215448,
+                "y_pos": -8.056456913486047,
                 "negatives_flag": false
             },
             {
                 "type": "PLAYER",
                 "text": "Player 9",
-                "x_pos": 11.500000000000002,
-                "y_pos": 1.732050807568877,
+                "x_pos": 9.396926207859083,
+                "y_pos": -3.420201433256688,
                 "negatives_flag": false
             }
         ],
@@ -2977,7 +3089,7 @@
             "1": {
                 "0": 2,
                 "1": 2,
-                "2": 1,
+                "2": -1,
                 "3": 0,
                 "4": 0,
                 "5": 2,
@@ -2988,7 +3100,7 @@
             "2": {
                 "0": 2,
                 "1": 2,
-                "2": 1,
+                "2": -1,
                 "3": 0,
                 "4": 0,
                 "5": 2,
@@ -3090,66 +3202,73 @@
                 "negatives_flag": false
             },
             {
+                "type": "Cause",
+                "text": ".",
+                "x_pos": 0,
+                "y_pos": 0,
+                "negatives_flag": false
+            },
+            {
                 "type": "PLAYER",
                 "text": "Player 1",
-                "x_pos": -3.9999999999999973,
-                "y_pos": 7.794228634059948,
+                "x_pos": -2.749359130364462,
+                "y_pos": 5.333012691929541,
                 "negatives_flag": false
             },
             {
                 "type": "PLAYER",
                 "text": "Player 2",
-                "x_pos": -0.25000000000000067,
-                "y_pos": 0.43301270189221963,
+                "x_pos": -0.11363636363636409,
+                "y_pos": 0.19682395540555486,
                 "negatives_flag": false
             },
             {
                 "type": "PLAYER",
                 "text": "Player 3",
-                "x_pos": 0.9998679983866525,
-                "y_pos": -5.196050805147002,
+                "x_pos": 5.196152422706632,
+                "y_pos": -3.000000000000001,
                 "negatives_flag": false
             },
             {
                 "type": "PLAYER",
                 "text": "Player 4",
-                "x_pos": -3.249999999999999,
-                "y_pos": -0.43301270189221963,
+                "x_pos": -1.911764705882353,
+                "y_pos": -0.2547133540542468,
                 "negatives_flag": true
             },
             {
                 "type": "PLAYER",
                 "text": "Player 5",
-                "x_pos": -8.250000000000004,
-                "y_pos": -8.227241335952167,
+                "x_pos": -1.60863557706349,
+                "y_pos": -8.346393926733006,
                 "negatives_flag": false
             },
             {
                 "type": "PLAYER",
                 "text": "Player 6",
-                "x_pos": 0.24985699838665676,
-                "y_pos": 5.629044453921445,
+                "x_pos": 1.5593376811331976,
+                "y_pos": 7.336107005503542,
                 "negatives_flag": false
             },
             {
                 "type": "PLAYER",
                 "text": "Player 7",
-                "x_pos": -6.250000000000001,
-                "y_pos": 3.0310889132455356,
+                "x_pos": -6.9282032302755105,
+                "y_pos": 3.999999999999998,
                 "negatives_flag": false
             },
             {
                 "type": "PLAYER",
                 "text": "Player 8",
-                "x_pos": -2.5,
-                "y_pos": -1.7320508075688776,
+                "x_pos": -1.7857142857142856,
+                "y_pos": -1.237179148263484,
                 "negatives_flag": true
             },
             {
                 "type": "PLAYER",
                 "text": "Player 9",
-                "x_pos": 4.749878997418603,
-                "y_pos": 4.763133368284757,
+                "x_pos": 6.106482292022126,
+                "y_pos": 7.277422209630289,
                 "negatives_flag": false
             }
         ],
@@ -3281,66 +3400,73 @@
                 "negatives_flag": false
             },
             {
+                "type": "Cause",
+                "text": ".",
+                "x_pos": 0,
+                "y_pos": 0,
+                "negatives_flag": false
+            },
+            {
                 "type": "PLAYER",
                 "text": "Player 1",
-                "x_pos": 10.75,
-                "y_pos": -0.4330127018922194,
+                "x_pos": 9.447958005998597,
+                "y_pos": 0.9930204010427077,
                 "negatives_flag": false
             },
             {
                 "type": "PLAYER",
                 "text": "Player 2",
-                "x_pos": -0.75,
-                "y_pos": -0.4330127018922194,
+                "x_pos": -1.25,
+                "y_pos": -0.7216878364870323,
                 "negatives_flag": true
             },
             {
                 "type": "PLAYER",
                 "text": "Player 3",
-                "x_pos": 1.2500000000000002,
-                "y_pos": 1.299038105676658,
+                "x_pos": 1.7857142857142858,
+                "y_pos": 1.8557687223952257,
                 "negatives_flag": false
             },
             {
                 "type": "PLAYER",
                 "text": "Player 4",
-                "x_pos": 1.2497909966119414,
-                "y_pos": -8.227146068407144,
+                "x_pos": 8.227241335952167,
+                "y_pos": -4.750000000000001,
                 "negatives_flag": false
             },
             {
                 "type": "PLAYER",
                 "text": "Player 5",
-                "x_pos": -1.7499999999999996,
-                "y_pos": -0.43301270189221963,
+                "x_pos": -1.029411764705882,
+                "y_pos": -0.254713354054247,
                 "negatives_flag": true
             },
             {
                 "type": "PLAYER",
                 "text": "Player 6",
-                "x_pos": 5.499845996450574,
-                "y_pos": 6.06219052652029,
+                "x_pos": 7.277422209630293,
+                "y_pos": 6.106482292022121,
                 "negatives_flag": false
             },
             {
                 "type": "PLAYER",
                 "text": "Player 7",
-                "x_pos": -6.250000000000003,
-                "y_pos": -6.49519052838329,
+                "x_pos": -1.7101007166283468,
+                "y_pos": -4.698463103929541,
                 "negatives_flag": false
             },
             {
                 "type": "PLAYER",
                 "text": "Player 8",
-                "x_pos": -0.25,
-                "y_pos": -2.1650635094610973,
+                "x_pos": -0.14705882352941185,
+                "y_pos": -1.2735667702712334,
                 "negatives_flag": true
             },
             {
                 "type": "PLAYER",
                 "text": "Player 9",
-                "x_pos": 2.4998679979026313,
-                "y_pos": -5.1960889111031,
+                "x_pos": 4.178119462962505,
+                "y_pos": -4.979288880273358,
                 "negatives_flag": false
             }
         ],
@@ -3472,66 +3598,73 @@
                 "negatives_flag": false
             },
             {
+                "type": "Cause",
+                "text": ".",
+                "x_pos": 0,
+                "y_pos": 0,
+                "negatives_flag": false
+            },
+            {
                 "type": "PLAYER",
                 "text": "Player 1",
-                "x_pos": -4.0000000000000036,
-                "y_pos": -8.660254037844386,
+                "x_pos": -4.565710717565406,
+                "y_pos": -5.950150052184262,
                 "negatives_flag": false
             },
             {
                 "type": "PLAYER",
                 "text": "Player 2",
-                "x_pos": -0.5000000000000002,
-                "y_pos": -2.598076211353316,
+                "x_pos": -0.31250000000000017,
+                "y_pos": -1.6237976320958227,
                 "negatives_flag": true
             },
             {
                 "type": "PLAYER",
                 "text": "Player 3",
-                "x_pos": 0.500000000000001,
-                "y_pos": 1.732050807568877,
+                "x_pos": 0.6250000000000012,
+                "y_pos": 2.1650635094610964,
                 "negatives_flag": true
             },
             {
                 "type": "PLAYER",
                 "text": "Player 4",
-                "x_pos": 11.5,
-                "y_pos": 0.8660254037844382,
+                "x_pos": 8.950697058314459,
+                "y_pos": -0.940756169408881,
                 "negatives_flag": false
             },
             {
                 "type": "PLAYER",
                 "text": "Player 5",
-                "x_pos": -0.25,
-                "y_pos": -0.4330127018922194,
+                "x_pos": -0.5,
+                "y_pos": -0.8660254037844388,
                 "negatives_flag": true
             },
             {
                 "type": "PLAYER",
                 "text": "Player 6",
-                "x_pos": 1.9999119990319942,
-                "y_pos": 3.4640254021077563,
+                "x_pos": 3.250000000000002,
+                "y_pos": 5.62916512459885,
                 "negatives_flag": false
             },
             {
                 "type": "PLAYER",
                 "text": "Player 7",
-                "x_pos": -6.500000000000004,
-                "y_pos": -10.392304845413262,
+                "x_pos": -4.182508548393922,
+                "y_pos": -7.969104230878886,
                 "negatives_flag": false
             },
             {
                 "type": "PLAYER",
                 "text": "Player 8",
-                "x_pos": -3.2500000000000036,
-                "y_pos": -8.227241335952167,
+                "x_pos": -4.761209164396438,
+                "y_pos": -5.131363102808782,
                 "negatives_flag": false
             },
             {
                 "type": "PLAYER",
                 "text": "Player 9",
-                "x_pos": -8.0,
-                "y_pos": 1.1102230246251565e-16,
+                "x_pos": -9.0,
+                "y_pos": -1.102182119232618e-15,
                 "negatives_flag": false
             }
         ],
@@ -3663,66 +3796,73 @@
                 "negatives_flag": false
             },
             {
+                "type": "Cause",
+                "text": ".",
+                "x_pos": 0,
+                "y_pos": 0,
+                "negatives_flag": false
+            },
+            {
                 "type": "PLAYER",
                 "text": "Player 1",
-                "x_pos": 0.49999999999999933,
-                "y_pos": -0.8660254037844384,
+                "x_pos": 0.7142857142857133,
+                "y_pos": -1.2371791482634835,
                 "negatives_flag": false
             },
             {
                 "type": "PLAYER",
                 "text": "Player 2",
-                "x_pos": 13.25,
-                "y_pos": 0.43301270189221874,
+                "x_pos": 9.49421285668141,
+                "y_pos": -0.33154521867375913,
                 "negatives_flag": false
             },
             {
                 "type": "PLAYER",
                 "text": "Player 3",
-                "x_pos": -3.4999999999999982,
-                "y_pos": 6.062177826491071,
+                "x_pos": -2.9999999999999987,
+                "y_pos": 5.196152422706632,
                 "negatives_flag": false
             },
             {
                 "type": "PLAYER",
                 "text": "Player 4",
-                "x_pos": -1.7763568394002505e-15,
-                "y_pos": -2.598076211353315,
+                "x_pos": -1.1102230246251565e-15,
+                "y_pos": -1.2371791482634833,
                 "negatives_flag": false
             },
             {
                 "type": "PLAYER",
                 "text": "Player 5",
-                "x_pos": 3.4999999999999996,
-                "y_pos": 0.8660254037844388,
+                "x_pos": 2.1874999999999996,
+                "y_pos": 0.5412658773652743,
                 "negatives_flag": false
             },
             {
                 "type": "PLAYER",
                 "text": "Player 6",
-                "x_pos": -7.0,
-                "y_pos": 2.598076211353316,
+                "x_pos": -7.36121593216773,
+                "y_pos": 4.249999999999997,
                 "negatives_flag": false
             },
             {
                 "type": "PLAYER",
                 "text": "Player 7",
-                "x_pos": -4.250000000000003,
-                "y_pos": -6.49519052838329,
+                "x_pos": -2.291132608637053,
+                "y_pos": -4.444177243274617,
                 "negatives_flag": false
             },
             {
                 "type": "PLAYER",
                 "text": "Player 8",
-                "x_pos": -3.5000000000000044,
-                "y_pos": -10.392304845413264,
+                "x_pos": -5.520632091856898,
+                "y_pos": -5.789872304840559,
                 "negatives_flag": false
             },
             {
                 "type": "PLAYER",
                 "text": "Player 9",
-                "x_pos": 4.440892098500626e-16,
-                "y_pos": -0.8660254037844388,
+                "x_pos": 3.3306690738754696e-16,
+                "y_pos": -0.5773502691896262,
                 "negatives_flag": true
             }
         ],
@@ -3740,7 +3880,7 @@
             },
             "1": {
                 "0": 2,
-                "1": -1,
+                "1": 0,
                 "2": 1,
                 "3": 2,
                 "4": 2,
@@ -3751,7 +3891,7 @@
             },
             "2": {
                 "0": 2,
-                "1": -1,
+                "1": 0,
                 "2": 1,
                 "3": 2,
                 "4": 2,

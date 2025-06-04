@@ -394,51 +394,62 @@ class Social_Choice_Sim:
         self.current_options_matrix = self.create_options_matrix() # cause we have to create groups.
         self.current_options_matrix = [
             [
-                3,
-                -1,
-                -8
-            ],
-            [
-                5,
+                -3,
                 -5,
-                -7
+                5
+            ],
+            [
+                -6,
+                -8,
+                -2
+            ],
+            [
+                -2,
+                -1,
+                -5
+            ],
+            [
+                2,
+                -4,
+                -6
+            ],
+            [
+                -2,
+                -2,
+                -1
             ],
             [
                 5,
-                1,
-                9
+                5,
+                -3
             ],
             [
                 -7,
                 -6,
-                -4
+                2
             ],
             [
+                -2,
+                -5,
+                6
+            ],
+            [
+                -8,
                 2,
-                -2,
-                5
-            ],
-            [
-                -2,
-                7,
-                -9
-            ],
-            [
-                1,
-                1,
-                1
-            ],
-            [
-                0,
-                -6,
-                -4
-            ],
-            [
-                -1,
-                4,
-                -9
+                2
             ]
         ]
+        #     [
+        #     [-4, -8,-2],
+        #     [6,-7,1],
+        #     [7,-5,0],
+        #     [2,-7,1],
+        #     [-2,2,8],
+        #     [-4,-7,5],
+        #     [-8,-2,-7],
+        #     [1,-1,5],
+        #     [-3,-1,-3],
+        # ]
         # self.current_options_matrix = [
         #     [5,2,-5],
         #     [-2,-5,4],
@@ -580,7 +591,7 @@ class Social_Choice_Sim:
         total = sum(values)
         return [v / total for v in values] if total != 0 else values
 
-    # take in our values, and our negatives, if we are using one negative or two negatives, and our starting position radians. 
+    # take in our values, and our negatives, if we are using one negative or two negatives, and our starting position radians.
     def compute_flipped_coordinates(self, values, negatives, flip_type, causes_rads):
         index_of_interest = 0 # just so it has a starting point
         inner_magnitude = 0 # just as an initialization
@@ -594,12 +605,12 @@ class Social_Choice_Sim:
                 else: # append the fetcher to our list
                     spin_components.append(values[idx])
             spin_components = self.safe_normalize(spin_components) # normalize them so caring matters
-            outer_magnitude = spin_components[0] - spin_components[1] # get it as a number between 0 and 1 for spin 
-            new_rads = -(outer_magnitude * math.pi) / 6 # pi/3 for whole range -1 to 1, so pi/6 for indivudal components also pay attention to negative. 
+            outer_magnitude = spin_components[0] - spin_components[1] # get it as a number between 0 and 1 for spin
+            new_rads = (outer_magnitude * math.pi) / 6 # pi/3 for whole range -1 to 1, so pi/6 for indivudal components also pay attention to negative.
             base_rads = causes_rads[index_of_interest] - math.pi # subtract because we are coming from the wrong direction
             final_mag = 5 + 0.5 * inner_magnitude # how powered the vector is from the center
 
-        else:  # flip_type == 2 # Much the same as the flip type of 1, just with some stuff reversed. 
+        else:  # flip_type == 2 # Much the same as the flip type of 1, just with some stuff reversed.
             for idx in range(3):
                 if negatives[idx] == 0:
                     index_of_interest = idx
@@ -610,16 +621,22 @@ class Social_Choice_Sim:
             outer_magnitude = spin_components[0] - spin_components[1]
             new_rads = (outer_magnitude * math.pi) / 6
             base_rads = causes_rads[index_of_interest]
-            final_mag = 10 - 0.5 * inner_magnitude # notice the minus 10 instead of the polus 10 here. 
+            final_mag = 10 - 0.5 * inner_magnitude # notice the minus 10 instead of the polus 10 here.
 
-        final_rads = base_rads + new_rads # calcualte new poisition
+
+
+        if base_rads <= -math.pi  or base_rads >= 0: # we are in the top half of the circle, requires counter clockwise
+            final_rads = base_rads - new_rads
+        else: # we are in the bottom half of the circle, requires clockwise.
+            final_rads = base_rads + new_rads # calcualte new poisition
+
         x = final_mag * math.cos(final_rads) # x and y components fo the new vector
         y = final_mag * math.sin(final_rads)
-        return x, y # return the new vector as a tuple. 
+        return x, y # return the new vector as a tuple.
 
-    # funciton to create the player nodes positions based on teh current optiosn matrix. 
+    # funciton to create the player nodes positions based on teh current optiosn matrix.
     def create_player_nodes(self):
-        player_nodes = [] 
+        player_nodes = []
         for i in range(self.total_players): # iterate through all players
             current_x, current_y = 0, 0 # gotta start somewhere
             curr_values = self.current_options_matrix[i] # get our row bc thats all we care about
@@ -631,7 +648,7 @@ class Social_Choice_Sim:
                 norm_matrix = self.normalize_current_options_matrix()
                 current_x, current_y = self.normal_coordinates_generation(i, norm_matrix)
 
-            elif num_negatives == 3: # normal case flipped over origin; set flag as well. 
+            elif num_negatives == 3: # normal case flipped over origin; set flag as well.
                 all_negatives_flag = True
                 norm_matrix = self.normalize_current_options_matrix()
                 current_x, current_y = self.normal_coordinates_generation(i, norm_matrix)
