@@ -33,7 +33,7 @@ class optimalHuman:
         col_probs = [sum(col) for col in zip(*matrix)] # how likely everything is to pass given what they like.
         total = sum(col_probs)
         col_probs = [val/total for val in col_probs]
-
+        print("here are the col probs ", col_probs)
         cause_sums = None # used for generating bayseian prior - otherwise alwyas have col sums
 
         our_row = current_options_matrix[self.self_id]
@@ -48,7 +48,7 @@ class optimalHuman:
 
         # create bayseian prior
         for i, player in enumerate(current_options_matrix): # can cycle through every vote, will disregard our own later.
-            player_vote = self.calculate_vote_row(player, col_probs, cause_sums, risk_aversion, majority_factor)
+            player_vote = self.calculate_vote_row(player, col_probs, cause_sums, risk_aversion, majority_factor, current_options_matrix)
             current_vote = self.choose_best_vote(player_vote, cause_sums)
             new_votes[i] = current_vote
 
@@ -56,7 +56,7 @@ class optimalHuman:
 
         cause_sums = self.apply_previous_votes(matrix, previous_votes) # get the cause sums given our padded matrix and previous votes
 
-        new_row = self.calculate_vote_row(our_row, col_probs, cause_sums, risk_aversion, majority_factor) # creates expected values list.
+        new_row = self.calculate_vote_row(our_row, col_probs, cause_sums, risk_aversion, majority_factor, current_options_matrix) # creates expected values list.
         current_vote = self.choose_best_vote(new_row, cause_sums) # pick the best vote from our expected values
 
         #print("this is the id ", self.self_id, " and this is the curr option row ", current_options_matrix[self.self_id], " and our current vote ", current_vote)
@@ -134,9 +134,9 @@ class optimalHuman:
         return cause_sums
 
     # where the magic happens - given our real utilities, col probs, the cuase_sums and our two chromosome factors, create an expected value list.
-    def calculate_vote_row(self, our_row, col_probs, cause_sums, risk_aversion, majority_factor):
+    def calculate_vote_row(self, our_row, col_probs, cause_sums, risk_aversion, majority_factor, current_options_matrix):
         new_row = [0] # just create an empty row with a zero spot.
-        total_voters = len(our_row) # canNOT be hardcoded. that will make everything blow up.
+        total_voters = len(current_options_matrix) # canNOT be hardcoded. that will make everything blow up.
 
         for i, val in enumerate(our_row): # our row is the players row within current option matrix.
             if val > 0: # if the value is non negative, then we cna be allowed to consider it.

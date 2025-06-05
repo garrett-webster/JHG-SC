@@ -16,7 +16,7 @@ OPTIONS = {
 
     # Generator options
     "OPTION_GENERATOR": 2, # Defines what behavior the options generator should use. See Server.OptionsGenerators.generators for the full list
-    "NOISE_MAGNITUDE": 2, # Maximum noise to add to a generated number
+    "NOISE_MAGNITUDE": 5, # Maximum noise to add to a generated number
     "MAX_UTILITY": 10, # The max number that a utility can be. Any utility generated higher will be snapped to this number
     "MIN_UTILITY": -10, # The min number that a utility can be. Any utility generated lower will be snapped to this number
     "NUM_OPTIONS": 3
