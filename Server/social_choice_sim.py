@@ -392,53 +392,6 @@ class Social_Choice_Sim:
         #if sc_groups != None:
             #self.sc_groups = sc_groups
         self.current_options_matrix = self.create_options_matrix() # cause we have to create groups.
-        self.current_options_matrix = [
-            [
-                -3,
-                -5,
-                5
-            ],
-            [
-                -6,
-                -8,
-                -2
-            ],
-            [
-                -2,
-                -1,
-                -5
-            ],
-            [
-                2,
-                -4,
-                -6
-            ],
-            [
-                -2,
-                -2,
-                -1
-            ],
-            [
-                5,
-                5,
-                -3
-            ],
-            [
-                -7,
-                -6,
-                2
-            ],
-            [
-                -2,
-                -5,
-                6
-            ],
-            [
-                -8,
-                2,
-                2
-            ]
-        ]
         #     [
         #     [-4, -8,-2],
         #     [6,-7,1],
@@ -450,6 +403,55 @@ class Social_Choice_Sim:
         #     [1,-1,5],
         #     [-3,-1,-3],
         # ]
+
+        self.current_options_matrix = [
+            [
+                -5,
+                9,
+                7
+            ],
+            [
+                2,
+                0,
+                2
+            ],
+            [
+                3,
+                9,
+                -1
+            ],
+            [
+                -1,
+                -6,
+                9
+            ],
+            [
+                -6,
+                -9,
+                1
+            ],
+            [
+                3,
+                -7,
+                -9
+            ],
+            [
+                4,
+                -1,
+                1
+            ],
+            [
+                6,
+                4,
+                3
+            ],
+            [
+                -7,
+                2,
+                -1
+            ]
+        ]
+
         # self.current_options_matrix = [
         #     [5,2,-5],
         #     [-2,-5,4],

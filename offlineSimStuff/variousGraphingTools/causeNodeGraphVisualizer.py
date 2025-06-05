@@ -208,7 +208,7 @@ class causeNodeGraphVisualizer:
                     ax.add_patch(arrow)
 
             fig.suptitle(
-                f"Round: {str(int(curr_round))}   Situation: {scenario}   Cycle: {str(cycle_key)}    Group: {group}",
+                f"Round: {str(int(curr_round))}   Situation: {scenario}   Cycle: {str(int(cycle_key)+1)}    Group: {group}",
                 fontsize=16, fontweight='bold', y=0.98)
 
             # creates a legend that allows us to see which bot types are active, and which ones are what

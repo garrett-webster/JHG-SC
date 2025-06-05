@@ -31,6 +31,8 @@ class optimalHuman:
         matrix = self.initialize_matrix(current_options_matrix) # creates no negatives w/ a positive shift
         self.normalize_rows(matrix) # normalizes the rows and creates a probability distro.
         col_probs = [sum(col) for col in zip(*matrix)] # how likely everything is to pass given what they like.
+        total = sum(col_probs)
+        col_probs = [val/total for val in col_probs]
 
         cause_sums = None # used for generating bayseian prior - otherwise alwyas have col sums
 
