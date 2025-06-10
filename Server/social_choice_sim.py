@@ -25,9 +25,12 @@ NUM_CAUSES = 3
 class Social_Choice_Sim:
     def __init__(self, total_players, num_causes, num_humans, options_generator, cycle=0, round=0, chromosomes="", scenario="", group="", total_order=None):
         self.options_generator = options_generator
-
+        if total_order == None: # generating it non server side
+            self.total_order = self.create_total_order(total_players, num_humans)
+        else: # if created with server, spoon feed it.
+            self.total_order = total_order
         # just a bunch of base setters.
-        self.total_order = total_order
+
         self.total_players = total_players
         self.num_humans = num_humans
         self.num_bots = total_players - num_humans
@@ -52,7 +55,7 @@ class Social_Choice_Sim:
 
         # create the bots, first getting number and type from scenario and then setting the chromosomes from the chromsomes.
         self.bot_type = self.set_bot_list(scenario)
-        self.bots = self.create_bots(total_order)
+        self.bots = self.create_bots(self.total_order) # make sure to pull this from the right spot.
         self.bot_list_as_string = self.create_bot_list_as_string(self.bots)
         self.set_bot_chromosomes(self.chromosomes)
 

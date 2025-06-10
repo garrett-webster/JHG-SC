@@ -12,6 +12,7 @@ import numpy as np # for col sums
 
 from matplotlib.patches import Circle
 from itertools import combinations
+from pathlib import Path
 
 class causeNodeGraphVisualizer:
     def __init__(self):
@@ -30,7 +31,7 @@ class causeNodeGraphVisualizer:
 
     def create_graph_given_file(self, dict):
         all_votes = dict["all_votes"]
-        #all_nodes = dict["all_nodes"]
+        all_nodes = dict["all_nodes"]
         winning_vote = dict["winning_vote"]
         current_options_matrix = dict["current_options_matrix"]
         scenario = dict["scenario"]
@@ -47,17 +48,40 @@ class causeNodeGraphVisualizer:
             total_order.append("B" + str(bot))
         for human in range(num_humans):
             total_order.append("P" + str(human))
-        fake_scenario = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\offlineSimStuff\scenarioIndicator\humanAttempt3"
-        fake_chromosome = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\offlineSimStuff\chromosomes\experiment"
+        self.create_graph(all_nodes, all_votes, winning_vote, current_options_matrix, types_list, scenario, group, curr_round, cycle, chromosome)
 
-        new_sim = Social_Choice_Sim(9, 3, 0, None, 0,0,fake_chromosome, fake_scenario, None, total_order)
-        new_sim.set_new_options_matrix(current_options_matrix)
-        new_sim.create_player_nodes()
-        all_nodes = new_sim.get_nodes()
-        new_nodes = []
-        for node in all_nodes:
-            new_nodes.append(node.to_json())
-        self.create_graph(new_nodes, all_votes, winning_vote, current_options_matrix, types_list, scenario, group, curr_round, cycle, chromosome)
+    # so this was legacy code to remap node graph positions from a sim. used to bring really old legacy code into something more modern. no longer used.
+    # feel free to pull this out if you ever need to convert the odl human results into the actual mathmatical format.
+    # def create_graph_given_file(self, dict):
+    #     all_votes = dict["all_votes"]
+    #     #all_nodes = dict["all_nodes"]
+    #     winning_vote = dict["winning_vote"]
+    #     current_options_matrix = dict["current_options_matrix"]
+    #     scenario = dict["scenario"]
+    #     group = dict["group"]
+    #     curr_round = dict["curr_round"]
+    #     cycle = dict["cycle"]
+    #     types_list = dict["types_list"]
+    #     chromosome = dict["chromosome"]
+    #     #print("This is the curr_round we are passing in under cuaseNODeGraph", curr_round)
+    #     num_bots = 9
+    #     num_humans = 0
+    #     total_order = []
+    #     for bot in range(num_bots):
+    #         total_order.append("B" + str(bot))
+    #     for human in range(num_humans):
+    #         total_order.append("P" + str(human))
+    #     fake_scenario = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\offlineSimStuff\scenarioIndicator\humanAttempt3"
+    #     fake_chromosome = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\offlineSimStuff\chromosomes\experiment"
+    #
+    #     new_sim = Social_Choice_Sim(9, 3, 0, None, 0,0,fake_chromosome, fake_scenario, None, total_order)
+    #     new_sim.set_new_options_matrix(current_options_matrix)
+    #     new_sim.create_player_nodes()
+    #     all_nodes = new_sim.get_nodes()
+    #     new_nodes = []
+    #     for node in all_nodes:
+    #         new_nodes.append(node.to_json())
+    #     self.create_graph(new_nodes, all_votes, winning_vote, current_options_matrix, types_list, scenario, group, curr_round, cycle, chromosome)
 
 
     def create_graph(self, all_nodes, all_votes, winning_vote_list, current_options_matrix, types_list, scenario, group, curr_round, cycle, chromosome):

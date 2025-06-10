@@ -3,6 +3,7 @@ import time
 from Server.social_choice_sim import Social_Choice_Sim
 from tqdm import tqdm
 import statistics
+import os
 
 from offlineSimStuff.variousGraphingTools.causeNodeGraphVisualizer import causeNodeGraphVisualizer
 from offlineSimStuff.variousGraphingTools.longTermGrapher import longTermGrapher
@@ -71,23 +72,26 @@ def create_sim(scenario=None, chromosomes=None, group=""):
         chromosomes = r"C:/Users/Sean/Documents/GitHub/OtherGarrettStuff/JHG-SC/offlineSimStuff/chromosomes/highestFromTesting.csv"
     cycle = -1 # a negative cycle indicates to me that this is a test - that, or something is really really wrong.
     curr_round = -1
-    total_order = []
     total_players = 9
     num_causes = 3
     num_humans = 0
+    # total_order = create_total_order(total_players, num_humans)
+
+    generator = generator_factory(2, total_players, 5, 10, -10, 3, None, None)
+
+    sim = Social_Choice_Sim(total_players, num_causes, num_humans, generator, cycle, curr_round, chromosomes, scenario, group)
+
+    return sim
+
+def create_total_order(total_players, num_humans):
+    total_order = []
     num_bots = total_players - num_humans
     total_order = []
     for bot in range(num_bots):
         total_order.append("B" + str(bot))
     for human in range(num_humans):
         total_order.append("P" + str(human))
-
-    generator = generator_factory(2, total_players, 5, 10, -10, 3, None, None)
-
-    sim = Social_Choice_Sim(total_players, num_causes, num_humans, generator, cycle, curr_round, chromosomes, scenario, group, total_order)
-
-    return sim
-
+    return total_order
 
 
 if __name__ == "__main__":
@@ -97,8 +101,10 @@ if __name__ == "__main__":
     total_groups = ["", 0, 1, 2]
     chromosomes_directory = "testChromosome"
     group = ""
-    scenario = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\offlineSimStuff\scenarioIndicator\cheetahAttempt"
-    chromosome = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\offlineSimStuff\chromosomes\experiment"
+    # these paths are relative to the file location, so as long as you don't move the file it can and will run from anywhere.
+    scenario = "scenarioIndicator/cheetahAttempt"
+    chromosome = "chromosomes/experiment"
+
 
     current_sim = create_sim(scenario, chromosome, group)
     updated_sim = run_trial(current_sim, num_rounds, num_cycles, create_graphs, group)
