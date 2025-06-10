@@ -102,18 +102,18 @@ if __name__ == "__main__":
     chromosomes_directory = "testChromosome"
     group = ""
     # these paths are relative to the file location, so as long as you don't move the file it can and will run from anywhere.
-    scenario = "scenarioIndicator/cheetahAttempt"
+    scenario = "scenarioIndicator/humanAttempt3"
     chromosome = "chromosomes/experiment"
 
 
     current_sim = create_sim(scenario, chromosome, group)
     updated_sim = run_trial(current_sim, num_rounds, num_cycles, create_graphs, group)
     probs_list = updated_sim.get_winning_probabilities()
-    print("Average winning probs ", sum(probs_list) / num_rounds)
-    print("min winning probs ", min(probs_list))
-    print("max winning probs ", max(probs_list))
-    print("median winning probs ", statistics.median(probs_list))
-    print("here was the winning probability ", sum(updated_sim.get_winning_probabilities()) / num_rounds)
+    # print("Average winning probs ", sum(probs_list) / num_rounds)
+    # print("min winning probs ", min(probs_list))
+    # print("max winning probs ", max(probs_list))
+    # print("median winning probs ", statistics.median(probs_list))
+    # print("here was the winning probability ", sum(updated_sim.get_winning_probabilities()) / num_rounds)
     #current_visualizer = longTermGrapher()
     #current_visualizer.draw_graph_from_sim(updated_sim)
 

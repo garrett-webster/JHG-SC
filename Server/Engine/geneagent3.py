@@ -154,7 +154,7 @@ class GeneAgent3(AbstractAgent):
             fp = open("Server/Engine/rnums.txt", "r")
         except FileNotFoundError:
             try:
-                fp = open("C:/Users/Sean/Documents/GitHub/OtherGarrettStuff/JHG-SC/Server/Engine/rnums.txt")
+                fp = open("../Server/Engine/rnums.txt")
             except FileNotFoundError:
                 return "man you stupid"
 
@@ -178,7 +178,7 @@ class GeneAgent3(AbstractAgent):
         try:
             f = open("Server/Engine/theTracked.txt", "r")
         except FileNotFoundError:
-            f = open("C:/Users/Sean/Documents/GitHub/OtherGarrettStuff/JHG-SC/Server/Engine/theTracked.txt")
+            f = open("../Server/Engine/theTracked.txt")
 
         val = int(f.readline())
         f.close()

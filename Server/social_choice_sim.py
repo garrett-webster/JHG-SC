@@ -69,6 +69,7 @@ class Social_Choice_Sim:
 
         # holds all the results from all the games we have played with this current sim
         self.results = {} # holds all of our results from long term simulations before graphing.
+        self.results_sums = [] # holds the SUM of all player results, so we can easily access and return them as necessary.
         self.cooperation_score = 0
         self.num_rounds = 0 # used in various spots for graphing and whatnot. not terribly important.
         self.current_results = [] # holds the results from the last "return win" call, which we can access later.
@@ -344,6 +345,7 @@ class Social_Choice_Sim:
 
     def save_results(self):
         for player in range(len(self.current_results)):
+            self.results_sums[player] += self.current_results[player] # should keep a running total.
             self.results[player].append(self.current_results[player])
 
     def get_new_utilities(self):
@@ -767,4 +769,16 @@ class Social_Choice_Sim:
     def get_winning_probabilities(self):
         return self.winning_probability
 
+    def get_highest_utility_player(self):
+        # this is going to be a problem. I need to create a current scoreborad, that should be heplful.
+        if len(self.results_sums) == 0: # no utility? thats fine, pick a random player
+            return self.total_order[random.randint(0, self.total_players)]
+        else: # utility time. return the highest.
+            return self.total_order[self.results_sums.index(max(self.results_sums))] # return the index of the highest utility player.
 
+
+
+    def let_others_create_options_matrix(self, possible_peeps):
+        for peep in possible_peeps:
+            if peep[0] == "B":
+                self.bots[peep[1]].create_column(self.total_players)

@@ -18,6 +18,11 @@ class cheetahBot:
     def get_number_type(self): # used for logging.
         return self.number_type
 
+    def create_column(self, total_players):
+        new_column = []
+        for i in range(total_players):
+            new_column[i] = random.randint(-1, 4)
+        return new_column
 
     # returns the bots vote given the current option matrix and previous votes.
     def get_vote(self, current_options_matrix, previous_votes, cycle=0, max_cycle=3):
@@ -212,9 +217,9 @@ class cheetahBot:
         for val in current_options_matrix[self.self_id]:
             if val < 0:
                 cur_negatives += 1
-        if cur_negatives == len(current_options_matrix[self.self_id]):
+        if cur_negatives == len(current_options_matrix[self.self_id]): # this is where the old one stopped
             return True
-        else:
+        else: # possible improvement for outgroup recognition.
             current_tallies = 0 # strike system. measures positive options and thinks about them.
             for i, val in enumerate(current_options_matrix[self.self_id]):
                 if val > 0:
@@ -222,8 +227,7 @@ class cheetahBot:
                         current_tallies += 1
             if current_tallies == len(current_options_matrix[self.self_id]) - cur_negatives:
                 return True # there is no good cause for us to vote for, give up.
-            #print("possible number of votes ", current_tallies + cur_negatives) # not including abstention, which means posturing.
-        return False
+        return False # there is a positive utility, likely cause that we can (and will) vote for.
 
 
 

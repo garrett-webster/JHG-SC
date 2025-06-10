@@ -190,6 +190,8 @@ class JHG_simulator():
     def individual_round_deets_for_logger(self):
         return self.sim.get_transaction(), self.sim.get_popularity(), self.sim.get_influence()
 
+    def get_highest_popularity_player(self):
+        return (self.total_order[(list(self.sim.get_popularity())).index([max(list(self.sim.get_popularity()))])])
 
 def loadPopulationFromFile(popSize, generationFolder, startIndex, num_gene_pools):
     fnombre = "Kill me"
@@ -198,7 +200,7 @@ def loadPopulationFromFile(popSize, generationFolder, startIndex, num_gene_pools
         fp = open(fnombre, "r")
     except FileNotFoundError:
         try:
-            fnombre = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\Server\Engine\gen_199.csv"
+            fnombre = "../Server/Engine/gen_199.csv"
             fp = open(fnombre, "r")
         except FileNotFoundError:
             print(fnombre + " not found")
