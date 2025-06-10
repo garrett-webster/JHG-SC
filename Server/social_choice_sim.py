@@ -17,6 +17,7 @@ from Server.SC_Bots.Random import RandomBot
 from Server.SC_Bots.somewhatMoreAwareGreedy import somewhatMoreAwarenessGreedy
 from Server.SC_Bots.optimalHuman import optimalHuman
 from Server.SC_Bots.reorganizedHuman import reorganizedHuman
+from Server.SC_Bots.possibleCheetahBot import cheetahBot
 
 NUM_CAUSES = 3
 
@@ -74,11 +75,7 @@ class Social_Choice_Sim:
         self.last_option = 0
         # self.all_numbers_matrix = [0] * 21
         self.all_votes = {}
-        self.midpoints_dict = { # maps causes to midpoints - so slap the cause number in and get the midpoint out.
-            2 : 0,
-            0 : 1,
-            1 : 2,
-        }
+        self.winning_probability = []
 
     def create_total_order(self, total_players, num_humans):
         num_bots = total_players - num_humans
@@ -163,6 +160,8 @@ class Social_Choice_Sim:
             new_bot = (humanAttempt2(index))
         if bot_type == 9:
             new_bot = (reorganizedHuman(index))
+        if bot_type == 10:
+            new_bot = (cheetahBot(index))
 
 
         return new_bot # the matched bot that we were looking for.
@@ -308,6 +307,10 @@ class Social_Choice_Sim:
                 self.current_results.append(0)
 
 
+        choice_list = self.create_choice_matrix(self.current_options_matrix)
+        self.winning_probability.append(choice_list[winning_vote+1])
+
+
         return winning_vote, self.current_results
 
     # this one has one goal. is there a winning vote.
@@ -404,16 +407,72 @@ class Social_Choice_Sim:
         #     [-3,-1,-3],
         # ]
         # self.current_options_matrix = [
-        #     [5,2,-5],
-        #     [-2,-5,4],
-        #     [2,6,1],
-        #     [-4,6,7],
-        #     [6,6,-8],
-        #     [-9,-3,2],
-        #     [2,0,1],
-        #     [-6,2,1],
-        #     [2,-5,-4],
-        # ]
+        #     [-3,5,10],
+        #     [10,0,0],
+        #     [10,0,0],
+        #     [10,0,0],
+        #     [10,0,0],
+        #     [10,0,0],
+        #     [10, 0, 0],
+        #     [10, 0, 0],
+        #     [10,0,0]]
+        self.current_options_matrix = [
+            [
+                3,
+                -1,
+                -8
+            ],
+            [
+                5,
+                -5,
+                -7
+            ],
+            [
+                5,
+                1,
+                9
+            ],
+            [
+                -7,
+                -6,
+                -4
+            ],
+            [
+                2,
+                -2,
+                5
+            ],
+            [
+                -2,
+                7,
+                -9
+            ],
+            [
+                1,
+                1,
+                1
+            ],
+            [
+                0,
+                -6,
+                -4
+            ],
+            [
+                -1,
+                4,
+                -9
+            ]
+        ]
+        # self.current_options_matrix = [
+        #     [-2,2,-6],
+        #     [-2,5,-4],
+        #     [-9,1,-1],
+        #     [-4,1,7],
+        #     [7,5,4],
+        #     [-2,-3,0],
+        #     [-3,-1,-2],
+        #     [-1,0,9],
+        #     [-2,-3,-1]]
 
         self.set_new_options_matrix(self.current_options_matrix)
         self.player_nodes = self.create_player_nodes()
@@ -685,43 +744,24 @@ class Social_Choice_Sim:
                 new_options_matrix.append(row) # all zeros, just chill
         return new_options_matrix
 
-    def slope(self, x1, y1, x2, y2):
-        if x2 - x1 == 0:
-            return float('inf')
-        return (y2 - y1) / (x2 - x1)
+
+    def create_choice_matrix(self, current_options_matrix):
+        current_options_matrix = [[0] + row for row in current_options_matrix] # append a 0 to it
+        choice_list = [0] * len(current_options_matrix[0])
+        for i, row in enumerate(current_options_matrix):
+            min_val = min(row) # lets avoid clamping for now IG.
+            adjusted_row = [x - min_val for x in row]
+            total = sum(adjusted_row)
+            if total == 0:
+                normalized_row = [0 for _ in adjusted_row]
+            else:
+                normalized_row = [x / total for x in adjusted_row]
+            choice_list = [choice_list[i] + normalized_row[i] for i in range(len(choice_list))]
+        total = sum(choice_list)
+        choice_list = [val / total for val in choice_list]
+        return choice_list
+
+    def get_winning_probabilities(self):
+        return self.winning_probability
 
 
-    def perpendicular_slope(self, m):
-        if m == 0:
-            return float('inf')
-        if m == float('inf'):
-            return 0.0
-        else:
-            return -1 / m
-
-
-    # point 1 is the point we want to flip, point 2 is the point we are flipping over
-    def flip_point(self, point_1_x, point_1_y, point_2_x, point_2_y):
-        reflected_x = 2 * point_2_x - point_1_x
-        reflected_y = 2 * point_2_y - point_1_y
-        return reflected_x, reflected_y
-
-
-    def flip_point_over_line(self, point_x, point_y, line_point1_x, line_point1_y, line_point2_x, line_point2_y):
-        m = self.slope(line_point1_x, line_point1_y, line_point2_x, line_point2_y)
-        m_perp = self.perpendicular_slope(m)
-
-        if m == float('inf'):
-            x_intersect = line_point1_x
-            y_intersect = point_y
-        elif m == (0):
-            x_intersect = point_x
-            y_intersect = line_point1_y
-        else:
-            x_intersect = (m * line_point1_x - m_perp * point_x - line_point1_y + point_y) / (m - m_perp)
-            y_intersect = m * (x_intersect - line_point1_x) + line_point1_y
-
-        x_reflected = 2 * x_intersect - point_x
-        y_reflected = 2 * y_intersect - point_y
-
-        return x_reflected, y_reflected

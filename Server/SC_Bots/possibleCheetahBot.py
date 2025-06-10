@@ -2,7 +2,7 @@
 import random
 import copy
 
-class reorganizedHuman:
+class cheetahBot:
     def __init__(self, self_id):
         self.self_id = self_id # the id of ourself in realtion to other bots.
         self.type = "BG" # used for graphing purposes
@@ -21,13 +21,16 @@ class reorganizedHuman:
 
     # returns the bots vote given the current option matrix and previous votes.
     def get_vote(self, current_options_matrix, previous_votes, cycle=0, max_cycle=3):
-
-
-        matrix = self.initialize_matrix(current_options_matrix)  # creates no negatives w/ a positive shift
-        self.normalize_rows(matrix)  # normalizes the rows and creates a probability distro.
-        col_probs = [sum(col) for col in zip(*matrix)]  # how likely everything is to pass given what they like.
+        col_probs_matrix = self.global_shift(current_options_matrix)
+        col_probs = [sum(col) for col in zip(*col_probs_matrix)]  # how likely everything is to pass given what they like.
         total = sum(col_probs)
         col_probs = [val / total for val in col_probs]
+
+
+
+        matrix = self.add_padding(col_probs_matrix)  # creates no negatives w/ a positive shift
+        self.normalize_rows(matrix)  # normalizes the rows and creates a probability distro.
+
         choice_list, choice_matrix = self.create_choice_matrix(current_options_matrix)
         total = sum(choice_list)
         choice_list = [val / total for val in choice_list]
@@ -58,6 +61,9 @@ class reorganizedHuman:
         #print("Here ar ethe expected previous votes ", previous_votes)
 
         cause_sums = self.apply_previous_votes(matrix, previous_votes)  # get the cause sums given our padded matrix and previous votes
+
+        if self.self_id == 6:
+            pass
 
         #print(self.self_id, " and the cause sums ", cause_sums)
         if self.identify_outgroup(current_options_matrix, cause_sums, cycle, col_probs, max_cycle):
@@ -184,7 +190,7 @@ class reorganizedHuman:
     # are chromosome stuffs, current_optinos matrix is there for fun and the cycle and max cycle are for social lubrication disabiling.
     def get_vote_positive(self, our_row, col_probs, cause_sums, risk_aversion, majority_factor, current_options_matrix, cycle, max_cycle, previous_votes_list):
 
-        if self.self_id == 3:
+        if self.self_id == 5:
             pass
         new_row = self.calculate_vote_row(our_row, col_probs, cause_sums, risk_aversion, majority_factor, current_options_matrix, previous_votes_list)  # creates expected values list.
         # if self.self_id == 3:
@@ -209,19 +215,31 @@ class reorganizedHuman:
         if cur_negatives == len(current_options_matrix[self.self_id]):
             return True
         else:
-            return False
+            current_tallies = 0 # strike system. measures positive options and thinks about them.
+            for i, val in enumerate(current_options_matrix[self.self_id]):
+                if val > 0:
+                    if col_probs[i] < min(col_probs): # give him a littel more wiggle room
+                        current_tallies += 1
+            if current_tallies == len(current_options_matrix[self.self_id]) - cur_negatives:
+                return True # there is no good cause for us to vote for, give up.
+            #print("possible number of votes ", current_tallies + cur_negatives) # not including abstention, which means posturing.
+        return False
 
 
 
-    def initialize_matrix(self, current_options_matrix): # completely changed this to better deal with negatives.
+
+
+    def global_shift(self, current_options_matrix): # completely changed this to better deal with negatives.
         flat = [val for row in current_options_matrix for val in row] # flatten the matrix so its easier to work with
         global_min = min(flat) # find the smallest number (likely -10 or -9)
         shift = -global_min if global_min < 0 else 0 # create the shift as the inverse of that number
         return [ # create the new, padded matrix with the shift and a new 0 entry as well, that is then also shifted.
-            [val + shift for val in [0] + row]
+            [val + shift for val in row]
             for row in current_options_matrix
         ]
 
+    def add_padding(self, matrix):
+        return [[0] + row for row in matrix]
 
     def normalize_rows(self, matrix): # create probability distribution
         for row in matrix:
@@ -265,6 +283,8 @@ class reorganizedHuman:
             for i, vote in enumerate(player_dict[key]):
                 index = vote + 1
                 if key != self.self_id:
+                    if index == 4:
+                        print("what the fetcH")
                     cause_sums[index] += 1
 
         length = len(player_dict[next(iter(player_dict))]) # could I hard code this? yes. Did I? nope.
@@ -281,9 +301,9 @@ class reorganizedHuman:
         total_voters = len(current_options_matrix) # canNOT be hardcoded. that will make everything blow up.
         my_influence = 1 / total_voters # how much our vote affects majoirty math.
         for i, val in enumerate(our_row): # our row is the players row within current option matrix.
-            if val > 0: # if the value is non negative, then we cna be allowed to consider it.
+            if val > 0 and col_probs[i] > min(col_probs): # if the value is non negative, then we cna be allowed to consider it.
                 #new_prob = col_probs[i+1] ** (1 / risk_aversion) # higher risk aversion means we care more about passing than actual value.
-                new_prob = (col_probs[i+1] * risk_aversion) ** risk_aversion # higher risk aversion means we care more about passing than actual value.
+                new_prob = ((col_probs[i] - min(col_probs)) * 100) ** risk_aversion # higher risk aversion means we care more about passing than actual value.
                 if cause_sums: # if we have some prior information
                     # that plus is to say, "if we throw our vote this way, how many votes will there be?". to counteract the previous if self.self_id stuff we saw earlier.
                     alignment_ratio = (cause_sums[i + 1]) / total_voters # consider how alinged we are with overall majority and if we tip it or not. no top means no jump

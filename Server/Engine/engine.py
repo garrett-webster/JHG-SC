@@ -125,7 +125,7 @@ class JHGEngine():
 
     ## weight of player's actions at time tau based on i's populatiry at time tau - 1 and t - 1
     def W(self, tau, t):
-        # experiment so that we don't ruin explode exponential in fame networks
+        # mostHumanFromTesting so that we don't ruin explode exponential in fame networks
         eta = sum(self.P[tau - 1]) / sum(self.P[t-1])
         # print("eta at " + str(tau) + ": " + str(eta))
         # eta = 1

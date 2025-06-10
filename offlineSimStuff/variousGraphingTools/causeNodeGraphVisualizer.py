@@ -62,7 +62,7 @@ class causeNodeGraphVisualizer:
 
     def create_graph(self, all_nodes, all_votes, winning_vote_list, current_options_matrix, types_list, scenario, group, curr_round, cycle, chromosome):
         bot_color_map = {
-            # -1 is player, 0 is random, 1 is socialWelfare, 2 is greedy, 3 is betterGreedy, 4 is limitedAwareness, 5 is secondChoice
+            # -1 is player, 0 is random, 1 is socialWelfare, 2 is greediest, 3 is betterGreedy, 4 is limitedAwareness, 5 is secondChoice
             "-1": "lightgreen",
             "0": "purple",
             "1": "black",
@@ -74,6 +74,7 @@ class causeNodeGraphVisualizer:
             "7" : "darkgreen",
             "8" : "green",
             "9" : "orange",
+            "10" : "violet",
             "default": "gray"
         }
 
@@ -89,6 +90,7 @@ class causeNodeGraphVisualizer:
             "7": "optimalHuman",
             "8": "humanAttempt2",
             "9": "humanAttempt3",
+            "10" : "cheetahBot",
         }
 
 

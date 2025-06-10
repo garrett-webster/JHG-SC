@@ -2,6 +2,7 @@
 import time
 from Server.social_choice_sim import Social_Choice_Sim
 from tqdm import tqdm
+import statistics
 
 from offlineSimStuff.variousGraphingTools.causeNodeGraphVisualizer import causeNodeGraphVisualizer
 from offlineSimStuff.variousGraphingTools.longTermGrapher import longTermGrapher
@@ -18,15 +19,15 @@ def run_trial(sim, num_rounds, num_cycles, create_graphs, group):
     start_time = time.time() # so we can calculate total time. not entirely necessary.
     sim.set_group(group)
 
-    #for curr_round in tqdm(range(1, num_rounds+1)): # do this outside the sim, could make it inside but I like it outside.
-    for curr_round in (range(1, num_rounds+1)): # do this outside the sim, could make it inside but I like it outside.
+    for curr_round in tqdm(range(1, num_rounds+1)): # do this outside the sim, could make it inside but I like it outside.
+    #for curr_round in (range(1, num_rounds+1)): # do this outside the sim, could make it inside but I like it outside.
         # force it to start at 1 instead of 0 -- helps prevent off by one errors later in the code.
     #for curr_round in (range(num_rounds)): # do this outside the sim, could make it inside but I like it outside.
 
         sim.start_round() # creates the current current options matrix, makes da player nodes, sets up causes, etc.
         bot_votes = {}
         for cycle in range(num_cycles):
-            print("*****************STARTING CYCLE " + str(cycle+1) + "************************")
+            #print("*****************STARTING CYCLE " + str(cycle+1) + "************************")
             bot_votes[cycle] = sim.get_votes(bot_votes, curr_round, cycle, num_cycles)
             sim.record_votes(bot_votes[cycle], cycle)
 
@@ -96,11 +97,17 @@ if __name__ == "__main__":
     total_groups = ["", 0, 1, 2]
     chromosomes_directory = "testChromosome"
     group = ""
-    scenario = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\offlineSimStuff\scenarioIndicator\humanAttempt3"
+    scenario = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\offlineSimStuff\scenarioIndicator\cheetahAttempt"
     chromosome = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\offlineSimStuff\chromosomes\experiment"
 
     current_sim = create_sim(scenario, chromosome, group)
     updated_sim = run_trial(current_sim, num_rounds, num_cycles, create_graphs, group)
+    probs_list = updated_sim.get_winning_probabilities()
+    print("Average winning probs ", sum(probs_list) / num_rounds)
+    print("min winning probs ", min(probs_list))
+    print("max winning probs ", max(probs_list))
+    print("median winning probs ", statistics.median(probs_list))
+    print("here was the winning probability ", sum(updated_sim.get_winning_probabilities()) / num_rounds)
     #current_visualizer = longTermGrapher()
     #current_visualizer.draw_graph_from_sim(updated_sim)
 

@@ -41,6 +41,7 @@ class longTermGrapher():
             "7": "hA1",
             "8": "hA2",
             "9": "hA3",
+            "10" : "cH",
         }
 
 

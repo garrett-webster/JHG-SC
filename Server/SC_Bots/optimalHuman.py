@@ -160,5 +160,5 @@ class optimalHuman:
             # consider the probability of that cuase passing with the expected value
             expected_values = [new_row[i] * cause_sums.get(i, 0) for i in range(len(new_row))]
             return expected_values.index(max(expected_values)) - 1 # off by one error
-        else: # no prior information, just return the greedy solution.
+        else: # no prior information, just return the greediest solution.
             return new_row.index(max(new_row)) - 1

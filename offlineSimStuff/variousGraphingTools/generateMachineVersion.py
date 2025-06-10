@@ -57,7 +57,7 @@ if __name__ == "__main__":
             print("Aight this is the round ", round)
 
     chromosomes = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\offlineSimStuff\chromosomes\experiment"
-    scenario = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\offlineSimStuff\scenarioIndicator\humanAttempt3"
+    scenario = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\offlineSimStuff\scenarioIndicator\cheetahAttempt"
 
     total_players = 9
     num_causes = 3
