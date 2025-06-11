@@ -2,12 +2,9 @@
 import time
 from Server.social_choice_sim import Social_Choice_Sim
 from tqdm import tqdm
-import statistics
-import os
 
-from offlineSimStuff.variousGraphingTools.causeNodeGraphVisualizer import causeNodeGraphVisualizer
-from offlineSimStuff.variousGraphingTools.longTermGrapher import longTermGrapher
-from offlineSimStuff.variousGraphingTools.simLogger import simLogger
+from offlineSimStuff.variousGraphingTools.sc_tools.causeNodeGraphVisualizer import causeNodeGraphVisualizer
+from offlineSimStuff.variousGraphingTools.sc_tools.simLogger import simLogger
 from Server.OptionGenerators.generators import generator_factory
 
 

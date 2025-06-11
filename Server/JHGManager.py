@@ -68,3 +68,9 @@ class JHGManager:
     def log_jhg_overview(self):
         if self.jhg_logging:
             self.currentLogger.conclude_overview()
+
+    def get_highest_popularity_player(self):
+        return self.jhg_sim.get_highest_popularity_player()
+
+    def get_influence_matrix(self):
+        return self.jhg_sim.get_influence()

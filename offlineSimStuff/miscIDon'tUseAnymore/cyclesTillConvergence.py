@@ -3,10 +3,10 @@ import time
 from Server.social_choice_sim import Social_Choice_Sim
 from tqdm import tqdm
 import statistics
-from offlineSimStuff.variousGraphingTools.causeNodeGraphVisualizer import causeNodeGraphVisualizer
-from offlineSimStuff.variousGraphingTools.longTermGrapher import longTermGrapher
-from offlineSimStuff.variousGraphingTools.simLogger import simLogger
-import os
+from offlineSimStuff.variousGraphingTools.sc_tools.causeNodeGraphVisualizer import causeNodeGraphVisualizer
+from offlineSimStuff.variousGraphingTools.sc_tools.longTermGrapher import longTermGrapher
+from offlineSimStuff.variousGraphingTools.sc_tools.simLogger import simLogger
+
 
 # starts the sim, could make this take command line arguments
 # takes in a bot type, a number of rounds, and then runs it and plots the results. plans for expansion coming soon.

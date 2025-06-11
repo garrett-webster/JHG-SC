@@ -5,7 +5,7 @@
 # so lets get it
 import json
 from Server.social_choice_sim import Social_Choice_Sim # gets me the actual sim
-from offlineSimStuff.variousGraphingTools.simLogger import simLogger
+from offlineSimStuff.variousGraphingTools.sc_tools.simLogger import simLogger
 
 if __name__ == "__main__":
 

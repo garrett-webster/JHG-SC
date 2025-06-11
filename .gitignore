@@ -177,9 +177,9 @@ offlineSimStuff/Bots/logs
 offlineSimStuff/Bots/chromosomeRepo
 offlineSimStuff/Bots/chromosomesToKeepAround
 .idea
-offlineSimStuff/variousGraphingTools/individualRoundGraphs
+offlineSimStuff/variousGraphingTools/sc_tools/individualRoundGraphs
 /Server/sc_logs_repo/
-/offlineSimStuff/variousGraphingTools/longTermGrapherFolder/
-/offlineSimStuff/variousGraphingTools/longTermGrapherFolder/
+/offlineSimStuff/variousGraphingTools/sc_tools/longTermGrapherFolder/
+/offlineSimStuff/variousGraphingTools/sc_tools/longTermGrapherFolder/
 /offlineSimStuff/testChromosome/
 /Server/jhg_logs_repo/

@@ -1,3 +1,6 @@
+import copy
+import random
+
 from Server.JHGManager import JHGManager
 from Server.OptionGenerators.generators import generator_factory
 from Server.SCManager import SCManager
@@ -6,7 +9,7 @@ from Server.ServerConnectionManager import ServerConnectionManager
 OPTIONS = {
     #General settings
     "NUM_HUMANS": 1,
-    "TOTAL_PLAYERS": 11,
+    "TOTAL_PLAYERS": 3,
     "JHG_ROUNDS_PER_SC_ROUND" : 1, # Number of JHG rounds to play between each social choice round
     "MAX_ROUNDS": 10, # Max number of JHG rounds to play. Game ends after the nth round
     "SC_GROUP_OPTION": 0, # See options_creation.py -> group_size_options to understand what this means
@@ -61,7 +64,10 @@ class Server():
 
     def play_game(self):
         # Main game loop -- Play as many rounds as specified in OPTIONS
-        self.SC_manager.init_next_round()
+        peeps = self.generate_peeps(self.total_order)
+        influence_matrix = self.JHG_manager.get_influence_matrix()
+        current_options_matrix = self.SC_manager.server_side_options_matrix(peeps, influence_matrix)
+        self.SC_manager.init_next_round(current_options_matrix)
         while self.JHG_manager.current_round <= self.max_rounds:
             is_last_jhg_round = False
             for i in range(self.jhg_rounds_per_sc_round): # This range says how many jhg rounds to play between sc rounds
@@ -71,6 +77,18 @@ class Server():
         self.JHG_manager.log_jhg_overview()
 
         print("game over")
+
+    def generate_peeps(self, total_order):
+        highest_utility = self.SC_manager.get_highest_utility_player()
+        highest_pop = self.JHG_manager.get_highest_popularity_player()
+        possible_players = copy.deepcopy(total_order)
+        for player in {highest_utility,highest_pop}:  # lets me use a set to make sure that I only erase it once. This should allow for both to be the same thing in the list and have the same player make 2 things.
+            if player in possible_players:
+                possible_players.remove(player)
+        random_player = random.choice(possible_players)
+        peeps = [highest_utility, highest_pop, random_player]
+        return peeps
+
 
 
 if __name__ == "__main__":

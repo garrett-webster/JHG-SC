@@ -88,7 +88,7 @@ class simLogger:
     def finish_json(self, filename):
         self.big_boy_data["Conclusion"] = self.record_big_picture()
         self.write_a_json_to_file(self.big_boy_data)
-        file_path = "../sc_logs_repo/"
+        file_path = "../../sc_logs_repo/"
         file_path += filename + ".json"
         my_path = os.path.dirname(os.path.abspath(__file__))
         file_path = os.path.join(my_path, file_path)

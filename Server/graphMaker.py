@@ -1,8 +1,8 @@
 # the purpose of this thing is to repurpose the json logs and turn them into something that makes sense. Will likely be leveraging a crap ton of code from
 # the offlineSim graphers. lets get it.
 import json
-from offlineSimStuff.variousGraphingTools.causeNodeGraphVisualizer import causeNodeGraphVisualizer
-from offlineSimStuff.variousGraphingTools.longTermGrapher import longTermGrapher
+from offlineSimStuff.variousGraphingTools.sc_tools.causeNodeGraphVisualizer import causeNodeGraphVisualizer
+from offlineSimStuff.variousGraphingTools.sc_tools.longTermGrapher import longTermGrapher
 
 class graphMaker():
     def __init__(self):

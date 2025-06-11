@@ -13,7 +13,7 @@ def resource_path(relative_path):
         return os.path.join(sys._MEIPASS, relative_path)
     return os.path.join(os.path.abspath("Client"), relative_path)
 
-import pyqtgraph
+# import pyqtgraph
 
 
 # --- Everything above this line is necessary for building the executable --- #

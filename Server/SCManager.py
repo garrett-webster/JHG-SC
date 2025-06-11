@@ -1,5 +1,7 @@
 import time
 
+import numpy as np
+
 from Server.social_choice_sim import Social_Choice_Sim
 
 import copy
@@ -38,10 +40,10 @@ class SCManager:
         self.sc_logger = sc_logging
         self.total_order = total_order # keeps track of which are players and which are bots.
 
-    def init_next_round(self):
+    def init_next_round(self, current_options_matrix):
         # Initialize the round
-        self.sc_sim.start_round() # I don't want there to be groups. A mi no me gusta. for now.
-        self.current_options_matrix = self.sc_sim.get_current_options_matrix()
+        self.sc_sim.start_round()
+        self.current_options_matrix = current_options_matrix
         self.options_history[self.round_num] = self.current_options_matrix
         self.player_nodes = self.sc_sim.get_player_nodes()
         self.causes = self.sc_sim.get_causes()
@@ -50,6 +52,8 @@ class SCManager:
         self.connection_manager.distribute_message("SC_INIT", self.round_num, self.current_options_matrix,
                                                    [node.to_json() for node in self.all_nodes],
                                                    self.current_options_matrix)
+
+
 
     def play_social_choice_round(self):
         # Run the voting and collect the votes
@@ -142,3 +146,31 @@ class SCManager:
 
     def finish_results(self, filename):
         self.current_logger.finish_json(filename)
+
+    def get_highest_utility_player(self):
+        return self.sc_sim.get_highest_utility_player()
+
+    def server_side_options_matrix(self, peeps, influence_matrix):
+        player_peeps = []
+        bot_peeps = []
+        total_columns = []
+        player_columns = []
+        for peep in peeps: # find all player peeps first
+            if peep[0] == "B": bot_peeps.append(peep)
+            else: player_peeps.append(peep)
+        # gets the bots part of the influence matrix
+        if len(player_peeps) > 0:
+            self.connection_manager.distribute_message("CREATION", player_peeps)
+        total_columns.append(self.sc_sim.let_others_create_options_matrix(bot_peeps, influence_matrix))
+        # now we have to get teh player input. I don't know how to handle this as well to be entirely honesty.
+        player_columns = []
+        while len(player_columns) < len(player_peeps):
+            responses = self.connection_manager.custom_get_responses(len(player_peeps), player_peeps)
+            for response in responses.values():
+                player_columns[response["CLIENT_ID"]] = response["NEW_COLUMN"]
+
+        # now we just need to combine the coluns
+        total_columns.append(player_columns)
+        # we gotta hope this works
+        total_columns = np.concatenate(total_columns, axis=1)
+        return total_columns # this should be the new current options matix. maybe.

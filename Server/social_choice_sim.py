@@ -30,7 +30,7 @@ class Social_Choice_Sim:
         else: # if created with server, spoon feed it.
             self.total_order = total_order
         # just a bunch of base setters.
-
+        self.bot_index_dict = {}
         self.total_players = total_players
         self.num_humans = num_humans
         self.num_bots = total_players - num_humans
@@ -69,7 +69,7 @@ class Social_Choice_Sim:
 
         # holds all the results from all the games we have played with this current sim
         self.results = {} # holds all of our results from long term simulations before graphing.
-        self.results_sums = [] # holds the SUM of all player results, so we can easily access and return them as necessary.
+        self.results_sums = [0] * total_players # holds the SUM of all player results, so we can easily access and return them as necessary.
         self.cooperation_score = 0
         self.num_rounds = 0 # used in various spots for graphing and whatnot. not terribly important.
         self.current_results = [] # holds the results from the last "return win" call, which we can access later.
@@ -79,6 +79,7 @@ class Social_Choice_Sim:
         self.last_option = 0
         # self.all_numbers_matrix = [0] * 21
         self.all_votes = {}
+
         self.winning_probability = []
 
     def create_total_order(self, total_players, num_humans):
@@ -130,10 +131,13 @@ class Social_Choice_Sim:
     def create_bots(self, total_order):
         bots_array = []
         bot_indexes = []
+        self.bot_index_dict = {}
         if total_order is not None:
             for index, object in enumerate(total_order):
                 if object.startswith("B"):
                     bot_indexes.append(index)
+                    # make sure this is doing whta you think its doing.
+                    self.bot_index_dict[object] = index
 
         if len(self.bot_type) != self.num_bots:
             # lets fix this logic right here and now.
@@ -396,10 +400,13 @@ class Social_Choice_Sim:
         return chromosomes_list
 
     # default to groups being None,
-    def start_round(self, sc_groups=None):
+    def start_round(self, current_options_matrix=None):
         #if sc_groups != None:
             #self.sc_groups = sc_groups
-        self.current_options_matrix = self.create_options_matrix() # cause we have to create groups.
+        if current_options_matrix is not None:
+            self.current_options_matrix = current_options_matrix
+        else:
+            self.current_options_matrix = self.create_options_matrix() # cause we have to create groups.
         #     [
         #     [-4, -8,-2],
         #     [6,-7,1],
@@ -421,53 +428,7 @@ class Social_Choice_Sim:
         #     [10, 0, 0],
         #     [10, 0, 0],
         #     [10,0,0]]
-        self.current_options_matrix = [
-            [
-                3,
-                -1,
-                -8
-            ],
-            [
-                5,
-                -5,
-                -7
-            ],
-            [
-                5,
-                1,
-                9
-            ],
-            [
-                -7,
-                -6,
-                -4
-            ],
-            [
-                2,
-                -2,
-                5
-            ],
-            [
-                -2,
-                7,
-                -9
-            ],
-            [
-                1,
-                1,
-                1
-            ],
-            [
-                0,
-                -6,
-                -4
-            ],
-            [
-                -1,
-                4,
-                -9
-            ]
-        ]
+
         # self.current_options_matrix = [
         #     [-2,2,-6],
         #     [-2,5,-4],
@@ -772,13 +733,14 @@ class Social_Choice_Sim:
     def get_highest_utility_player(self):
         # this is going to be a problem. I need to create a current scoreborad, that should be heplful.
         if len(self.results_sums) == 0: # no utility? thats fine, pick a random player
-            return self.total_order[random.randint(0, self.total_players)]
+            return self.total_order[random.randint(0, self.total_players-1)]
         else: # utility time. return the highest.
             return self.total_order[self.results_sums.index(max(self.results_sums))] # return the index of the highest utility player.
 
 
 
-    def let_others_create_options_matrix(self, possible_peeps):
-        for peep in possible_peeps:
-            if peep[0] == "B":
-                self.bots[peep[1]].create_column(self.total_players)
+    def let_others_create_options_matrix(self, bot_peeps, influence_matrix):
+        list_of_columns = []
+        for peep in bot_peeps:
+            list_of_columns.append(self.bots[self.bot_index_dict[peep]].create_column(self.total_players))
+        return list_of_columns

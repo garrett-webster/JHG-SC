@@ -19,7 +19,7 @@ class cheetahBot:
         return self.number_type
 
     def create_column(self, total_players):
-        new_column = []
+        new_column = [0] * total_players
         for i in range(total_players):
             new_column[i] = random.randint(-1, 4)
         return new_column

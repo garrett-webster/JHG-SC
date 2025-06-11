@@ -1,16 +1,12 @@
 # so this allows me to run the fetcher and create visualizations based off of scenarios and whatnot.
 import copy
 import random
-import time
+
 from Server.social_choice_sim import Social_Choice_Sim
 from Server.JHGManager import JHG_simulator
 from tqdm import tqdm
-import statistics
-import os
 
-from offlineSimStuff.variousGraphingTools.causeNodeGraphVisualizer import causeNodeGraphVisualizer
-from offlineSimStuff.variousGraphingTools.longTermGrapher import longTermGrapher
-from offlineSimStuff.variousGraphingTools.simLogger import simLogger
+from offlineSimStuff.variousGraphingTools.sc_tools.causeNodeGraphVisualizer import causeNodeGraphVisualizer
 from Server.OptionGenerators.generators import generator_factory
 
 
@@ -27,24 +23,39 @@ def run_trial(sc_sim, jhg_sim, num_rounds, num_cycles, create_graphs, group, tot
     # sc_sim.set_round(num_rounds)
     sc_sim.set_group(group)
     for curr_round in tqdm(range(0, num_rounds)):
-        jhg_sim.execute_round(None, curr_round) # no client input, thats crazy talk here.
-        possible_peeps = generate_peeps(sc_sim, jhg_sim, total_order)
+        jhg_sim.execute_round(None, curr_round) # no client input, thats crazy talk here. run a JHG round.
+        influence_matrix = jhg_sim.get_influence_matrix() # need this for friend recognition and whatnot.
+        possible_peeps = generate_peeps(sc_sim, jhg_sim, total_order) # people who are needed to create the matrix
+        # should I make this, you know, an entirely different bot? having them in the same file feels wrong becuase they are doing differen things.
+        current_options_matrix = sc_sim.let_others_create_options_matrix(possible_peeps, influence_matrix) # actually creates the matrix
+        sc_sim.start_round(current_options_matrix)
 
-        current_options_matrix = sc_sim.let_others_create_options_matrix(possible_peeps)
+        bot_votes = {}
+        for cycle in range(num_cycles):
+            bot_votes[cycle] = sc_sim.get_votes(bot_votes, curr_round, cycle, num_cycles)
+            sc_sim.record_votes(bot_votes[cycle], cycle)
 
-
-
+        if create_graphs:
+            graph_nodes(sc_sim)
+        sc_sim.save_results()
 
     return sc_sim, jhg_sim
+
+
 
 def generate_peeps(sc_sim, jhg_sim, total_order):
     highest_utility = sc_sim.get_highest_utility_player()
     highest_pop = jhg_sim.get_highest_popularity_player()
+    if highest_utility == highest_pop:
+        pass # well fetch, what DO we do here? let them create it twice?
     possible_players = copy.deepcopy(total_order)
-    possible_players.erase(highest_utility)
-    possible_players.erase(highest_pop)
+    for player in {highest_utility, highest_pop}: # lets me use a set to make sure that I only erase it once. This should allow for both to be the same thing in the list and have the same player make 2 things.
+        if player in possible_players:
+            possible_players.remove(player)
     random_player = random.choice(possible_players)
     peeps = [highest_utility, highest_pop, random_player]
+    return peeps
+
 
 def graph_nodes(sim):
     currVisualizer = causeNodeGraphVisualizer()
@@ -78,7 +89,7 @@ def create_total_order(total_players, num_humans):
 
 
 if __name__ == "__main__":
-    num_rounds = 1
+    num_rounds = 3
     num_cycles = 3
     num_players = 9
     num_humans = 0
@@ -87,7 +98,7 @@ if __name__ == "__main__":
     chromosomes_directory = "testChromosome"
     group = ""
     # these paths are relative to the file location, so as long as you don't move the file it can and will run from anywhere.
-    scenario = "scenarioIndicator/humanAttempt3"
+    scenario = "scenarioIndicator/cheetahAttempt"
     chromosome = "chromosomes/experiment"
     total_order = create_total_order(num_players, num_humans)
 
