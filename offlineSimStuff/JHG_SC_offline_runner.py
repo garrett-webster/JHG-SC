@@ -24,7 +24,7 @@ def run_trial(sc_sim, jhg_sim, num_rounds, num_cycles, create_graphs, group, tot
     sc_sim.set_group(group)
     for curr_round in tqdm(range(0, num_rounds)):
         jhg_sim.execute_round(None, curr_round) # no client input, thats crazy talk here. run a JHG round.
-        influence_matrix = jhg_sim.get_influence_matrix() # need this for friend recognition and whatnot.
+        influence_matrix = jhg_sim.get_influence() # need this for friend recognition and whatnot.
         possible_peeps = generate_peeps(sc_sim, jhg_sim, total_order) # people who are needed to create the matrix
         # should I make this, you know, an entirely different bot? having them in the same file feels wrong becuase they are doing differen things.
         current_options_matrix = sc_sim.let_others_create_options_matrix(possible_peeps, influence_matrix) # actually creates the matrix

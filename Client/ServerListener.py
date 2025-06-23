@@ -24,6 +24,7 @@ class ServerListener(QObject):
         self.response_functions = defaultdict(lambda: self.unknown_message_type_handler, {
             "JHG_OVER": self.JHG_OVER,
             "SC_INIT": self.SC_INIT,
+            "SC_OPTIONS_CREATE": self.SC_CREATE,
             "SC_VOTES": self.SC_VOTES,
             "SC_OVER": self.SC_OVER,
         })
@@ -70,6 +71,10 @@ class ServerListener(QObject):
 
         self.update_sc_round_signal.emit()
 
+    def SC_CREATE(self, message):
+        client_ids = message["CLIENT_IDS"]
+        if self.round_state.client_id in client_ids:
+            print("AIGHT we have work to do")
 
     def SC_VOTES(self, message):
         self.round_state.current_votes = message["VOTES"]

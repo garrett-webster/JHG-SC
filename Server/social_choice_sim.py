@@ -742,5 +742,7 @@ class Social_Choice_Sim:
     def let_others_create_options_matrix(self, bot_peeps, influence_matrix):
         list_of_columns = []
         for peep in bot_peeps:
+            print("This is the peep ", peep, " and this is the missing thing ", self.bot_index_dict[peep])
             list_of_columns.append(self.bots[self.bot_index_dict[peep]].create_column(self.total_players))
-        return list_of_columns
+        current_options_matrix = np.transpose(list_of_columns).tolist()
+        return current_options_matrix

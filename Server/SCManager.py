@@ -19,7 +19,7 @@ class SCManager:
         self.utilities = {i: 0 for i in range(num_humans)}
         # num_humans, bot_type
         # so the arguments here are total_players, likely type bot and group option, if I had to guess.
-        scenario = "../JHG-SC/offlineSimStuff/scenarioIndicator/somewhatMoreAwareGreedy"
+        scenario = "../JHG-SC/offlineSimStuff/scenarioIndicator/cheetahAttempt"
         chromosomes = "../JHG-SC/offlineSimStuff/chromosomes/highestFromTesting"
         #print("this is the total ordering ", total_order)
         self.sc_sim = Social_Choice_Sim(num_players, 3, num_humans, options_generator, 3, 0, chromosomes, scenario, "", total_order)
