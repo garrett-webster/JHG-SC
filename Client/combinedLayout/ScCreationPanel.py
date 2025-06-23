@@ -60,7 +60,7 @@ class ScCreationPanel(QWidget):
 
         # round_state.num_players + 4 accounts for the header and the spacer lines.
         player_panel.addWidget(submitButton, round_state.num_players + 4, 0, 1, 3)
-       # player_panel.addWidget(token_counter, round_state.num_players + 4, 3, 1, 3)
+        player_panel.addWidget(token_counter, round_state.num_players + 4, 3, 1, 3)
 
 
         self.setLayout(player_panel)
