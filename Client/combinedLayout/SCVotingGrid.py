@@ -100,5 +100,4 @@ class SCVotingGrid(SCGrid):
     def submit_clicked(self, main_window, submit_button):
         from ui_functions.SC_functions import sc_submit
         sc_submit(main_window, self)
-
         submit_button.setText(f"Resubmit Vote")

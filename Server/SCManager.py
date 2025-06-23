@@ -55,7 +55,10 @@ class SCManager:
 
 
 
-    def play_social_choice_round(self):
+    def play_social_choice_round(self, jhg_sim):
+        # first we gotta GET the new current options matrix. thats a pain.
+        peeps = self.generate_peeps(self.sc_sim, jhg_sim, self.total_order)
+        self.server_side_options_matrix(peeps, jhg_sim.get_influence())
         # Run the voting and collect the votes
         player_votes = self.run_sc_voting()
         # this is the line where we get the bot votes as well.
@@ -160,8 +163,8 @@ class SCManager:
             else: player_peeps.append(peep)
         # gets the bots part of the influence matrix
         if len(player_peeps) > 0:
-            self.connection_manager.distribute_message("CREATION", player_peeps)
-        total_columns.append(self.sc_sim.let_others_create_options_matrix(bot_peeps, influence_matrix))
+            self.connection_manager.distribute_message("SC_OPTIONS_CREATE", player_peeps)
+        #total_columns.append(self.sc_sim.let_others_create_options_matrix(bot_peeps, influence_matrix))
         # now we have to get teh player input. I don't know how to handle this as well to be entirely honesty.
         player_columns = []
         while len(player_columns) < len(player_peeps):
@@ -174,3 +177,17 @@ class SCManager:
         # we gotta hope this works
         total_columns = np.concatenate(total_columns, axis=1)
         return total_columns # this should be the new current options matix. maybe.
+
+    def generate_peeps(self, sc_sim, jhg_sim, total_order):
+        highest_utility = sc_sim.get_highest_utility_player()
+        highest_pop = jhg_sim.get_highest_popularity_player()
+        if highest_utility == highest_pop:
+            pass  # well fetch, what DO we do here? let them create it twice?
+        possible_players = copy.deepcopy(total_order)
+        for player in {highest_utility,
+                       highest_pop}:  # lets me use a set to make sure that I only erase it once. This should allow for both to be the same thing in the list and have the same player make 2 things.
+            if player in possible_players:
+                possible_players.remove(player)
+        random_player = random.choice(possible_players)
+        peeps = [highest_utility, highest_pop, random_player]
+        return peeps

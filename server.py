@@ -73,20 +73,18 @@ class Server():
             for i in range(self.jhg_rounds_per_sc_round): # This range says how many jhg rounds to play between sc rounds
                 if i == self.jhg_rounds_per_sc_round - 1: is_last_jhg_round = True
                 self.JHG_manager.play_jhg_round(self.JHG_manager.current_round, is_last_jhg_round)
-            self.SC_manager.play_social_choice_round()
+            self.SC_manager.play_social_choice_round(self.JHG_manager.get_sim())
         self.JHG_manager.log_jhg_overview()
 
         print("game over")
 
     def generate_peeps(self, total_order):
-        highest_utility = self.SC_manager.get_highest_utility_player()
-        highest_pop = self.JHG_manager.get_highest_popularity_player()
-        possible_players = copy.deepcopy(total_order)
-        for player in {highest_utility,highest_pop}:  # lets me use a set to make sure that I only erase it once. This should allow for both to be the same thing in the list and have the same player make 2 things.
-            if player in possible_players:
-                possible_players.remove(player)
-        random_player = random.choice(possible_players)
-        peeps = [highest_utility, highest_pop, random_player]
+        peeps = []
+        for i in range(3):
+            peep = random.choice(total_order)
+            while peep in set(peeps):
+                peep = random.choice(total_order)
+            peeps.append(peep)
         return peeps
 
 

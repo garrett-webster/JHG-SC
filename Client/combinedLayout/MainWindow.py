@@ -34,7 +34,8 @@ class MainWindow(QMainWindow):
         self.SC_cause_graph = SCCausesGraph(num_cycles)
         self.player_labels = {}
         self.jhg_buttons = []
-        self.round_state = RoundState(client_id, num_players, self.jhg_buttons)
+        self.sc_buttons = []
+        self.round_state = RoundState(client_id, num_players)
         self.connection_manager = connection_manager
         self.num_cycles = num_cycles
         # /1#
@@ -44,6 +45,7 @@ class MainWindow(QMainWindow):
 
         # Dynamically updated elements
         self.token_label = QLabel()
+        self.sc_allocations_label = QLabel()
         self.jhg_popularity_graph = pg.PlotWidget()
         self.jhg_popularity_graph.setXRange(0, 2)
         self.jhg_popularity_graph.setYRange(0, 120)
@@ -92,15 +94,12 @@ class MainWindow(QMainWindow):
         self.JHG_panel = QWidget()
         self.JHG_panel.setMinimumWidth(400)
         self.JHG_panel.setMinimumHeight(2400)
-        self.JHG_panel.setLayout(JhgPanel(self.round_state, connection_manager, self.token_label,
-                                          self.jhg_popularity_graph, self.jhg_network, self.jhg_buttons))
+        round_state = self.round_state
+        self.JHG_panel.setLayout(JhgPanel(round_state, connection_manager, self.token_label,
+                                          self.jhg_popularity_graph, self.jhg_network))
         self.JHG_panel.setObjectName("JHG_Panel")
         self.JHG_panel.setProperty("min-height", 80 + 40 * self.round_state.num_players)
 
-        self.SC_panel = QTabWidget()
-        self.SC_panel.setObjectName("SC_Panel")
-        self.SC_panel.setProperty("min-height", 200 + 20 * self.round_state.num_players)
-        self.SC_panel.setLayout(QVBoxLayout())
 
         self.JHG_tornado_graph = JhgTornadoGraph(num_players)
 
@@ -109,6 +108,13 @@ class MainWindow(QMainWindow):
         plots_panel.addTab(self.jhg_popularity_graph, "Popularity over time")
         plots_panel.addTab(self.jhg_network, "Network graph")
         plots_panel.addTab(self.JHG_tornado_graph, "Tornado Graph")
+
+
+
+        self.SC_panel = QTabWidget()
+        self.SC_panel.setObjectName("SC_Panel")
+        self.SC_panel.setProperty("min-height", 200 + 20 * self.round_state.num_players)
+        self.SC_panel.setLayout(QVBoxLayout())
 
         create_sc_ui_elements(self)
         self.SC_cause_graph.init_sc_nodes_graph(self.round_state)
@@ -125,11 +131,20 @@ class MainWindow(QMainWindow):
                                              self.SC_cause_graph)
         self.SC_panel.addTab(self.sc_history_grid, "History")
         self.SC_panel.currentChanged.connect(self.SC_tab_changed)
+        self.SC_creations_panel = ScCreationPanel(self.round_state, self.connection_manager, self.sc_allocations_label,
+                                                  self.sc_buttons)
+        self.SC_panel.addTab(self.SC_creations_panel, "Allocations")
+
+
+
+
+
 
         self.dockWidget = CornerContainer(self.JHG_panel, plots_panel, self.SC_panel, sc_graph_tabs)
 
         self.setWindowTitle("JHG: Round 1")
         self.setCentralWidget(self.dockWidget)
+
 
     # /4#
 
@@ -139,6 +154,7 @@ class MainWindow(QMainWindow):
         # pyqt signal hook-ups
         self.ServerListener.update_jhg_round_signal.connect(partial(update_jhg_ui_elements, self))
         self.ServerListener.update_sc_round_signal.connect(partial(SC_round_init, self))
+        self.ServerListener.create_options_interface.connect(partial(self.options_interface_create))
         self.ServerListener.disable_sc_buttons_signal.connect(partial(disable_sc_buttons, self))
         self.ServerListener.update_sc_utilities_labels_signal.connect(self.update_sc_utilities_labels)
         self.ServerListener.update_tornado_graph_signal.connect(self.update_tornado_graph)
@@ -182,3 +198,5 @@ class MainWindow(QMainWindow):
     def jhg_over(self, is_last, init_pop_influence):
         jhg_over(self, is_last, init_pop_influence)
 
+    def options_interface_create(self):
+        print("Need to enable it here somehow")

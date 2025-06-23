@@ -9,6 +9,7 @@ from matplotlib.axes import Axes
 class ServerListener(QObject):
     update_jhg_round_signal = pyqtSignal()
     update_sc_round_signal = pyqtSignal()
+    create_options_interface = pyqtSignal()
     disable_sc_buttons_signal = pyqtSignal()
     enable_jhg_buttons_signal = pyqtSignal()
     jhg_over_signal = pyqtSignal(bool, float)
@@ -73,8 +74,8 @@ class ServerListener(QObject):
 
     def SC_CREATE(self, message):
         client_ids = message["CLIENT_IDS"]
-        if self.round_state.client_id in client_ids:
-            print("AIGHT we have work to do")
+        if "P" + str(self.round_state.client_id) in client_ids:
+            self.create_options_interface.emit()
 
     def SC_VOTES(self, message):
         self.round_state.current_votes = message["VOTES"]

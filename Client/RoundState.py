@@ -1,6 +1,6 @@
 import numpy as np
 
-from Player import Player
+from Player import PlayerState
 
 
 class RoundState:
@@ -18,11 +18,12 @@ class RoundState:
 
 
     # Stuff for sc
+    utility = 0 # total utilty
     options = []
     nodes = {}
     utilities = []
 
-    def __init__(self, id, num_players, jhg_buttons):
+    def __init__(self, id, num_players):
         self.num_players = num_players
         self.client_id = id
         self.tokens = 2 * num_players  # Number of tokens remaining for the current round
@@ -34,14 +35,18 @@ class RoundState:
         self.relationships_mat = np.array([[0 for _ in range(num_players)] for _ in range(num_players)])
         self.current_votes = [-1 for _ in range(num_players)]
         self.sc_cycle = None
+        self.utilities = [0 for _ in range(num_players)]
 
 
         for i in range(num_players):
-            self.players.append(Player(i))
-            jhg_buttons.append(self.players[-1].minus_button)
-            jhg_buttons.append(self.players[-1].plus_button)
+            self.players.append(PlayerState(i))
+
 
 
     def get_allocations_list(self):
         self.allocations[int(self.client_id)] = self.tokens
         return self.allocations
+
+    def get_utilities_list(self):
+        self.utilities[int(self.client_id)] = self.utility # no clue what this is for
+        return self.utilities

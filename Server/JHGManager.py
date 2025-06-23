@@ -74,3 +74,6 @@ class JHGManager:
 
     def get_influence_matrix(self):
         return self.jhg_sim.get_influence()
+
+    def get_sim(self):
+        return self.jhg_sim
