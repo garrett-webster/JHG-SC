@@ -10,7 +10,7 @@ class JHGPlayerWidget(QWidget):
         self.player_state = player_state
         self.allocation_box = QLabel("0")
         # Label to display total utilities
-        # PyQt elements that make up the rows of the JHG_panel. Contained in the Player class for ease of access/tying them to the player
+        # PyQt elements that make up the rows of the JHG_panel. now is a super class of player, but having them both in the same spot was doing weird things.
         self.id_label = QLabel(str(self.player_state.id + 1))
         self.popularity_label = QLabel(str(self.player_state.popularity))
         self.sent_label = QLabel(str(self.player_state.received_from_player))

@@ -1,4 +1,4 @@
-from PyQt6.QtWidgets import QVBoxLayout, QTabWidget, QHBoxLayout
+from PyQt6.QtWidgets import QVBoxLayout, QTabWidget, QHBoxLayout, QLabel
 
 from Client.combinedLayout.sc_tornado_graph import sc_create_tornado_graph
 from Client.combinedLayout.SCVotingGrid import SCVotingGrid
@@ -65,10 +65,10 @@ def tab_changed(main_window, index):
         cause_graph.update_sc_nodes_graph(selected_round)
         cause_graph.update_arrows(votes)
 
-def create_options_interface(main_window):
-    sc_token_counter = None
-    sc_buttons = []
-    main_window.Options_Creation = ScCreationPanel(main_window.round_state, main_window.connection_manager, sc_token_counter, sc_buttons)  # Create the layout
+# def create_options_interface(main_window):
+#     sc_token_counter = QLabel()
+#     sc_buttons = []
+#     main_window.Options_Creation = ScCreationPanel(main_window.round_state, main_window.connection_manager, sc_token_counter, sc_buttons)  # Create the layout
 
 
 

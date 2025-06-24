@@ -18,7 +18,7 @@ class SCPlayerWidget(QWidget):
         self.utility_minus_button = MinusButtonUtility()
         #self.utility_minus_button = self.player_state.utility_minus_button
         #self.utility_plus_button = self.player_state.utility_plus_button
-        self.utility_label = QLabel("0")
+
 
         # these will need more testing later, when I know that everything works.
 
@@ -26,8 +26,7 @@ class SCPlayerWidget(QWidget):
         if round_state.utility >= 0:
             round_state.utilities[player] = round_state.utilities[player] - 1
             round_state.utility += 1  # they get one for the negative
-        print("THis should nwo fire!")
-        self.utility_label.setText(str(round_state.utilities[player]))
+        self.utility_box.setText(str(round_state.utilities[player]))
         tokens_label.setText("Utility: " + str(round_state.utility))
 
     def update_utility_plus(self, round_state, tokens_label, player):
@@ -35,5 +34,5 @@ class SCPlayerWidget(QWidget):
             round_state.utilities[player] = round_state.utilities[player] + 1
             round_state.utility -= 1
         print("PLEASE fire")
-        self.utility_label.setText(str(round_state.utilities[player]))
+        self.utility_box.setText(str(round_state.utilities[player]))
         tokens_label.setText("Utility: " + str(round_state.utility))

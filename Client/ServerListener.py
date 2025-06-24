@@ -20,7 +20,7 @@ class ServerListener(QObject):
     switch_to_jhg_signal = pyqtSignal()
 
 
-    def __init__(self, main_window, connection_manager, round_state, round_counter, token_label, jhg_popularity_graph, tabs, utility_qlabels):
+    def __init__(self, main_window, connection_manager, round_state, round_counter, token_label, allocations_label, jhg_popularity_graph, tabs):
         super().__init__()
         self.response_functions = defaultdict(lambda: self.unknown_message_type_handler, {
             "JHG_OVER": self.JHG_OVER,
@@ -35,9 +35,9 @@ class ServerListener(QObject):
         self.round_counter = round_counter
         self.main_window = main_window
         self.token_label = token_label
+        self.allocations_label = allocations_label
         self.jhg_popularity_graph = jhg_popularity_graph
         self.tabs = tabs
-        self.utility_qlabels = utility_qlabels
 
 
     # Once connected to the server, this method is called on a threaded object. Once the thread calls it, it

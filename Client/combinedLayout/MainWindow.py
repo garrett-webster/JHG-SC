@@ -80,8 +80,8 @@ class MainWindow(QMainWindow):
         # 3# Block three: Sets up the server listener, which depends on blocks 1&2.
         # Server Listener setup
         self.ServerListener = ServerListener(self, connection_manager, self.round_state, self.round_counter,
-                                             self.token_label,
-                                             self.jhg_popularity_graph, tabs, self.utility_qlabels)
+                                             self.token_label, self.sc_allocations_label,
+                                             self.jhg_popularity_graph, tabs)
         self.ServerListener_thread = QThread()
         self.ServerListener.moveToThread(self.ServerListener_thread)
 
