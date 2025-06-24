@@ -34,7 +34,7 @@ class JhgVotingPanel(QVBoxLayout):
         # Creates a row in the gui for each player to display the popularity, tokens sent to, and tokens received from
         # that player the last round. Also adds the elements to allow for token allocations
         row_index = 1
-        jhg_widgets = [JHGPlayerWidget(ps) for ps in round_state.players]
+        jhg_widgets = round_state.jhg_widgets
         for i in range(round_state.num_players):
             if i == int(round_state.client_id):
                 # --- Line above ---

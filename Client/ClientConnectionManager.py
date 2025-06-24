@@ -12,6 +12,7 @@ class ClientConnectionManager(ConnectionManager):
         self.message_type_names = {
             "SUBMIT_JHG": ["CLIENT_ID", "ROUND_NUMBER", "ALLOCATIONS"],
             "SUBMIT_SC": ["CLIENT_ID", "FINAL_VOTE"],
+            "SUBMIT_UTILITY": ["CLIENT_ID", "ROUND_NUMBER", "UTILITIES"]
         }
 
     def initialize_connection(self):

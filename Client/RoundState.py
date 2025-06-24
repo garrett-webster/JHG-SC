@@ -1,7 +1,8 @@
 import numpy as np
 
 from Player import PlayerState
-
+from Client.combinedLayout.JHGPlayerWidget import JHGPlayerWidget
+from Client.combinedLayout.SCPlayerWidget import SCPlayerWidget
 
 class RoundState:
     players = []
@@ -42,6 +43,9 @@ class RoundState:
         for i in range(num_players):
             self.players.append(PlayerState(i))
 
+        self.jhg_widgets = [JHGPlayerWidget(ps) for ps in self.players]
+        self.sc_widgets = [SCPlayerWidget(ps) for ps in self.players]
+
 
 
     def get_allocations_list(self):
@@ -49,5 +53,5 @@ class RoundState:
         return self.allocations
 
     def get_utilities_list(self):
-        self.utilities[int(self.client_id)] = self.utility # no clue what this is for
+        #self.utilities[int(self.client_id)] = self.utility # this was to find out self utilities. not sueful for allocations
         return self.utilities

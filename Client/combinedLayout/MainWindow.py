@@ -8,6 +8,7 @@ from Client.RoundState import RoundState
 from Client.ServerListener import ServerListener
 from matplotlib.figure import Figure
 
+from Client.combinedLayout.JHGPlayerWidget import JHGPlayerWidget
 from Client.combinedLayout.JhgPanel import JhgPanel
 from Client.combinedLayout.JhgTornadoGraph import JhgTornadoGraph
 
@@ -15,6 +16,7 @@ from Client.combinedLayout.SCHistoryGrid import SCHistoryGrid
 
 from Client.combinedLayout.MainDocks import CornerContainer
 from Client.combinedLayout.SCCausesGraph import SCCausesGraph
+from Client.combinedLayout.SCPlayerWidget import SCPlayerWidget
 from Client.combinedLayout.ui_functions.SC_functions import *
 from Client.combinedLayout.ui_functions.JHG_functions import *
 
@@ -38,6 +40,9 @@ class MainWindow(QMainWindow):
         self.round_state = RoundState(client_id, num_players)
         self.connection_manager = connection_manager
         self.num_cycles = num_cycles
+
+
+
         # /1#
 
         # 2# Block two: Creates the elements that will be passed to the server listener for dynamic updating. Must happen before the server listener is created

@@ -1,3 +1,4 @@
+import random
 import time
 
 import numpy as np
@@ -167,15 +168,19 @@ class SCManager:
         #total_columns.append(self.sc_sim.let_others_create_options_matrix(bot_peeps, influence_matrix))
         # now we have to get teh player input. I don't know how to handle this as well to be entirely honesty.
         player_columns = []
-        while len(player_columns) < len(player_peeps):
-            responses = self.connection_manager.custom_get_responses(len(player_peeps), player_peeps)
-            for response in responses.values():
-                player_columns[response["CLIENT_ID"]] = response["NEW_COLUMN"]
+        while True:
+            client_input = self.connection_manager.get_responses()
+            try:
+                first_key = next(iter(client_input))
+                player_columns.append(client_input[first_key]["UTILITIES"])
+                #player_columns[response["CLIENT_ID"]] = response["NEW_COLUMN"]
+                break
+            except KeyError:
+                print("Error processing client_input: " , client_input)
 
-        # now we just need to combine the coluns
-        total_columns.append(player_columns)
+
         # we gotta hope this works
-        total_columns = np.concatenate(total_columns, axis=1)
+        total_columns = np.concatenate(player_columns, axis=1)
         return total_columns # this should be the new current options matix. maybe.
 
     def generate_peeps(self, sc_sim, jhg_sim, total_order):

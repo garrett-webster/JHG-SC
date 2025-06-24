@@ -35,6 +35,7 @@ class ServerConnectionManager(ConnectionManager):
             "JHG_ALLOCATIONS": ["ROUND_NUMBER", "ALLOCATIONS"],
             "SUBMIT_JHG": ["ROUND_NUMBER", "ALLOCATIONS"],
             "SUBMIT_SC": ["FINAL_VOTE"],
+            "SUBMIT_UTILITY": ["ROUND_NUMBER", "UTILITY"],
         }
 
     def create_total_order(self, num_players, num_bots):
@@ -118,28 +119,28 @@ class ServerConnectionManager(ConnectionManager):
 
         return responses
 
-    ''' Custom function to get reponses from only a selected number of players. used for creating the options matrix '''
-    def custom_get_responses(self, num_expecting, client_ids_expected, continuous_distribution_type = None):
-        responses = {}
-        num_received = 0
-        while num_received < num_expecting:
-            data = self.read_responses()
-            for client, received_json in data.items():
-                message_type = received_json["TYPE"]
-                client_id = received_json["CLIENT_ID"]
-                if client_id in client_ids_expected:
-                    if client_id not in responses:
-                        num_received += 1
-                response = {"TYPE": message_type, "CLIENT_ID": client_id}
-                for name in self.received_message_type_names[message_type]:
-                    response[name] = received_json[name]
-
-                responses[client_id] = response
-
-            if continuous_distribution_type is not None:
-                self.distribute_message(continuous_distribution_type, responses)
-
-        return responses
+    # ''' Custom function to get reponses from only a selected number of players. used for creating the options matrix '''
+    # def custom_get_responses(self, num_expecting, client_ids_expected, continuous_distribution_type = None):
+    #     responses = {}
+    #     num_received = 0
+    #     while num_received < num_expecting:
+    #         data = self.read_responses()
+    #         for client, received_json in data.items():
+    #             message_type = received_json["TYPE"]
+    #             client_id = received_json["CLIENT_ID"]
+    #             if client_id in client_ids_expected:
+    #                 if client_id not in responses:
+    #                     num_received += 1
+    #             response = {"TYPE": message_type, "CLIENT_ID": client_id}
+    #             for name in self.received_message_type_names[message_type]:
+    #                 response[name] = received_json[name]
+    #
+    #             responses[client_id] = response
+    #
+    #         if continuous_distribution_type is not None:
+    #             self.distribute_message(continuous_distribution_type, responses)
+    #
+    #     return responses
 
 
 

@@ -9,5 +9,5 @@ class SubmitUtilityButton(QPushButton):
 
 
     def submit(self, round_state, connection_manager):
-        connection_manager.send_message("SUBMIT_SC", round_state.client_id, round_state.jhg_round_num, round_state.get_utilities_list())
+        connection_manager.send_message("SUBMIT_UTILITY", round_state.client_id, round_state.jhg_round_num, round_state.get_utilities_list())
         self.setText('Resubmit')

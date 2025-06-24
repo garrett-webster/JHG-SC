@@ -34,7 +34,7 @@ class ScCreationPanel(QWidget):
         # Creates a row in the gui for each player to display the popularity, tokens sent to, and tokens received from
         # that player the last round. Also adds the elements to allow for token allocations
         row_index = 1
-        sc_widgets = [SCPlayerWidget(ps) for ps in round_state.players]
+        sc_widgets = round_state.sc_widgets
         for i in range(round_state.num_players):
             # everyone else (only worried abotu everyone else in this iteration)
             player_panel.addWidget(sc_widgets[i].id_label, row_index, 0)

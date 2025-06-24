@@ -35,18 +35,19 @@ class HoverScatter(pg.ScatterPlotItem):
 
 
 def update_jhg_ui_elements(main_window):
+    jhg_widgets = main_window.round_state.jhg_widgets
     for i in range(main_window.round_state.num_players):
         if i == int(main_window.round_state.client_id):
-            main_window.round_state.players[i].kept_number_label.setText(str(int(main_window.round_state.received[i])))
+            jhg_widgets[i].kept_number_label.setText(str(int(main_window.round_state.received[i])))
         else:
-            main_window.round_state.players[i].received_label.setText(str(int(main_window.round_state.received[i])))
-            main_window.round_state.players[i].sent_label.setText(str(int(main_window.round_state.sent[i])))
+            jhg_widgets[i].received_label.setText(str(int(main_window.round_state.received[i])))
+            jhg_widgets[i].sent_label.setText(str(int(main_window.round_state.sent[i])))
 
         main_window.round_state.allocations[i] = 0
-        main_window.round_state.players[i].popularity_label.setText(
+        jhg_widgets[i].popularity_label.setText(
             str(round(main_window.round_state.message["POPULARITY"][i])))
         main_window.round_state.players[i].popularity_over_time.append(main_window.round_state.message["POPULARITY"][i])
-        main_window.round_state.players[i].allocation_box.setText("0")
+        jhg_widgets[i].allocation_box.setText("0")
 
         update_jhg_popularity_graph(main_window.round_state, main_window.jhg_popularity_graph)
 
