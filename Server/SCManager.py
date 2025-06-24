@@ -21,7 +21,7 @@ class SCManager:
         # num_humans, bot_type
         # so the arguments here are total_players, likely type bot and group option, if I had to guess.
         scenario = "../JHG-SC/offlineSimStuff/scenarioIndicator/cheetahAttempt"
-        chromosomes = "../JHG-SC/offlineSimStuff/chromosomes/highestFromTesting"
+        chromosomes = "../JHG-SC/offlineSimStuff/chromosomes/experiment"
         #print("this is the total ordering ", total_order)
         self.sc_sim = Social_Choice_Sim(num_players, 3, num_humans, options_generator, 3, 0, chromosomes, scenario, "", total_order)
         #self.sc_groups = generate_two_plus_one_groups(num_players, sc_group_option)
@@ -59,12 +59,14 @@ class SCManager:
     def play_social_choice_round(self, jhg_sim):
         # first we gotta GET the new current options matrix. thats a pain.
         peeps = self.generate_peeps(self.sc_sim, jhg_sim, self.total_order)
-        self.server_side_options_matrix(peeps, jhg_sim.get_influence())
+        #self.server_side_options_matrix(peeps, jhg_sim.get_influence())
         # Run the voting and collect the votes
         player_votes = self.run_sc_voting()
         # this is the line where we get the bot votes as well.
         previous_votes = {}
-        zero_idx_votes, one_idx_votes = self.compile_sc_votes(player_votes, self.round_num, self.vote_cycles, previous_votes) # no clue what cycle this is or why this runs.
+        print("Here is self.vote cycles, might be wrong", self.vote_cycles)
+        # always start from cycle 0, don't use the max one. methinks.
+        zero_idx_votes, one_idx_votes = self.compile_sc_votes(player_votes, self.round_num, 0, previous_votes) # no clue what cycle this is or why this runs.
         self.sc_sim.set_final_votes(zero_idx_votes)
         # this is weird garrett stuff Imma not touch it.
         self.update_vote_effects(zero_idx_votes, self.current_options_matrix,
@@ -94,7 +96,8 @@ class SCManager:
             #print("this is round ", self.round_num)
             #self.current_logger.add_round_to_sim(self.round_num)
         self.round_num += 1
-        self.init_next_round()
+        # I don't know when we are going to want to generate this, but likely at the start of the next round.
+        #self.init_next_round()
 
     def run_sc_voting(self):
         player_votes = {}
@@ -102,6 +105,7 @@ class SCManager:
         previous_votes = {}
 
         for cycle in range(self.vote_cycles):
+            print("Cycle under run sc voting ", cycle)
             player_votes.clear()
             # Waits for a vote from each client
             while len(player_votes) < self.connection_manager.num_clients:
@@ -118,6 +122,7 @@ class SCManager:
         return player_votes
 
     def compile_sc_votes(self, player_votes, round_num, cycle, previous_votes):
+        print("Here is teh cycle that we are inputting here ", cycle)
         bot_votes = self.sc_sim.get_votes(previous_votes, round_num, cycle, self.vote_cycles)
 
         all_votes = {**bot_votes, **player_votes}
@@ -163,24 +168,44 @@ class SCManager:
             if peep[0] == "B": bot_peeps.append(peep)
             else: player_peeps.append(peep)
         # gets the bots part of the influence matrix
-        if len(player_peeps) > 0:
-            self.connection_manager.distribute_message("SC_OPTIONS_CREATE", player_peeps)
+        if len(player_peeps) > 0: # how should this get interpreted? IDK.
+            self.connection_manager.distribute_message("SC_OPTIONS_CREATE", player_peeps) # reset all the utilities and whatnot, just in case.
         #total_columns.append(self.sc_sim.let_others_create_options_matrix(bot_peeps, influence_matrix))
         # now we have to get teh player input. I don't know how to handle this as well to be entirely honesty.
         player_columns = []
-        while True:
-            client_input = self.connection_manager.get_responses()
-            try:
-                first_key = next(iter(client_input))
-                player_columns.append(client_input[first_key]["UTILITIES"])
-                #player_columns[response["CLIENT_ID"]] = response["NEW_COLUMN"]
-                break
-            except KeyError:
-                print("Error processing client_input: " , client_input)
+        bot_columns = []
+        if len(player_peeps) > 0:  # only enter this loop if there are clients to question.
+            while True:
+                client_input = self.connection_manager.get_responses()
+                try:
+                    first_key = next(iter(client_input))
+                    player_columns.append(client_input[first_key]["UTILITIES"])
+                    #player_columns[response["CLIENT_ID"]] = response["NEW_COLUMN"]
+                    break
+                except KeyError:
+                    print("Error processing client_input: " , client_input)
+        for bot in self.sc_sim.bots:
+            bot_columns.append(bot.create_column(len(self.total_order)))
+
+        final_bot_columns = {}
+        for bot, i in enumerate(bot_peeps):
+            final_bot_columns[i] = bot_columns[bot] # hopefully
+        final_player_columns = {}
+        for player, i in enumerate(player_peeps):
+            final_player_columns[i] = player_columns[player]
+
+        # should do all the orginization of the final columns and leave it in the original peeps thing.
+        for peep in peeps:
+            if peep[0] == "B":
+                total_columns.append(final_bot_columns[peep])
+            else:
+                total_columns.append(final_player_columns[peep])
+
 
 
         # we gotta hope this works
-        total_columns = np.concatenate(player_columns, axis=1)
+        total_columns = (np.array(total_columns).transpose()).tolist()
+
         return total_columns # this should be the new current options matix. maybe.
 
     def generate_peeps(self, sc_sim, jhg_sim, total_order):

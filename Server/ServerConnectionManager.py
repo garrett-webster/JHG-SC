@@ -28,6 +28,7 @@ class ServerConnectionManager(ConnectionManager):
             "SC_VOTES": ["VOTES", "CYCLE", "IS_LAST_CYCLE"],
             "SC_OVER": ["ROUND_NUM", "WINNING_VOTE", "NEW_UTILITIES", "POSITIVE_VOTE_EFFECTS",
                         "NEGATIVE_VOTE_EFFECTS", "VOTES", "UTILITIES"],
+
         }
 
         # NOTE: All messages also receive the CLIENT_ID, but it is not included in the message_type specification
@@ -35,7 +36,8 @@ class ServerConnectionManager(ConnectionManager):
             "JHG_ALLOCATIONS": ["ROUND_NUMBER", "ALLOCATIONS"],
             "SUBMIT_JHG": ["ROUND_NUMBER", "ALLOCATIONS"],
             "SUBMIT_SC": ["FINAL_VOTE"],
-            "SUBMIT_UTILITY": ["ROUND_NUMBER", "UTILITY"],
+            "SUBMIT_UTILITY": ["ROUND_NUMBER", "UTILITIES"],
+
         }
 
     def create_total_order(self, num_players, num_bots):

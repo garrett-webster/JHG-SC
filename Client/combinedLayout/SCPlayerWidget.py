@@ -24,15 +24,17 @@ class SCPlayerWidget(QWidget):
 
     def update_utility_minus(self, round_state, tokens_label, player):
         if round_state.utility >= 0:
-            round_state.utilities[player] = round_state.utilities[player] - 1
+            print("this is what round state utilities at player looks like ", round_state.utilities[player])
+            round_state.allocations[player] = round_state.allocations[player] - 1
             round_state.utility += 1  # they get one for the negative
-        self.utility_box.setText(str(round_state.utilities[player]))
+        self.utility_box.setText(str(round_state.allocations[player]))
         tokens_label.setText("Utility: " + str(round_state.utility))
 
     def update_utility_plus(self, round_state, tokens_label, player):
         if round_state.utility > 0:
-            round_state.utilities[player] = round_state.utilities[player] + 1
+            print("this is what round state utilities at player looks like ", round_state.utilities[player])
+            round_state.allocations[player] = round_state.allocations[player] + 1
             round_state.utility -= 1
         print("PLEASE fire")
-        self.utility_box.setText(str(round_state.utilities[player]))
+        self.utility_box.setText(str(round_state.allocations[player]))
         tokens_label.setText("Utility: " + str(round_state.utility))

@@ -9,7 +9,7 @@ from matplotlib.axes import Axes
 class ServerListener(QObject):
     update_jhg_round_signal = pyqtSignal()
     update_sc_round_signal = pyqtSignal()
-    create_options_interface = pyqtSignal()
+    enable_allocations_interface = pyqtSignal()
     disable_sc_buttons_signal = pyqtSignal()
     enable_jhg_buttons_signal = pyqtSignal()
     jhg_over_signal = pyqtSignal(bool, float)
@@ -69,13 +69,19 @@ class ServerListener(QObject):
         self.round_state.options = message["OPTIONS"]
         self.round_state.nodes[self.round_state.sc_round_num] = message["NODES"]
         self.round_state.utilities = message["UTILITIES"]
+        self.main_window.SC_panel.setCurrentIndex(0) # make sure to move the fetcher back to the first panel here, regardless of where they were.
+        self.main_window.SC_panel.setTabEnabled(2, False) # should disable it for everyone
 
         self.update_sc_round_signal.emit()
 
     def SC_CREATE(self, message):
-        client_ids = message["CLIENT_IDS"]
-        if "P" + str(self.round_state.client_id) in client_ids:
-            self.create_options_interface.emit()
+        print("This is the message ", message)
+        if "P" + str(self.main_window.round_state.client_id+1) in message["CLIENT_IDS"]:
+            self.enable_allocations_interface.emit()
+        self.round_state.reset_everything()
+        self.main_window.sc_allocations_label.setText("0") # here's hoping. add the rest of the enabling and checkingf later. one block at a time.
+        self.main_window.token_label.setText("0")
+
 
     def SC_VOTES(self, message):
         self.round_state.current_votes = message["VOTES"]

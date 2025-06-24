@@ -45,8 +45,8 @@ class cheetahBot:
         our_row = current_options_matrix[self.self_id]
         risk_aversion = self.chromosome[0]  # how likely we are to stay selfish
         majority_factor = self.chromosome[1]  # how much we care about majorities.
-        posturing_optimism = self.chromosome[2] # how hopeful we are about being able to pull people over
-        stickiness_factor = self.chromosome[3] # how much we stick to our old votes.
+        #posturing_optimism = self.chromosome[2] # how hopeful we are about being able to pull people over
+        #stickiness_factor = self.chromosome[3] # how much we stick to our old votes.
 
 
         if len(previous_votes) == 0:  # if we have nothing passed in, we need to pass it in as SOMETHING.
@@ -76,6 +76,7 @@ class cheetahBot:
             return self.get_vote_negative(our_row, col_probs, cause_sums, risk_aversion, majority_factor, current_options_matrix, cycle, max_cycle, choice_list, choice_matrix)
         else:
             #print(self.self_id, "has entered positive voting phase")
+            print("THIS is the current cycle ", cycle, " and here is the max cycle ", max_cycle)
             return self.get_vote_positive(our_row, col_probs, cause_sums, risk_aversion, majority_factor, current_options_matrix, cycle, max_cycle, previous_votes[cycle-1])
 
     def get_vote_negative(self, our_row, col_probs, cause_sums, risk_aversion, majority_factor, current_options_matrix, cycle, max_cycle, choice_list, choice_matrix):

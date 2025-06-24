@@ -37,6 +37,7 @@ class MainWindow(QMainWindow):
         self.player_labels = {}
         self.jhg_buttons = []
         self.sc_buttons = []
+        self.num_players = num_players
         self.round_state = RoundState(client_id, num_players)
         self.connection_manager = connection_manager
         self.num_cycles = num_cycles
@@ -135,6 +136,7 @@ class MainWindow(QMainWindow):
         self.sc_history_grid = SCHistoryGrid(self.round_state.num_players, self.round_state.client_id, "Voted for",
                                              self.SC_cause_graph)
         self.SC_panel.addTab(self.sc_history_grid, "History")
+        self.SC_panel.setTabEnabled(2, False) # disable the tab unless you need it
         self.SC_panel.currentChanged.connect(self.SC_tab_changed)
         self.SC_creations_panel = ScCreationPanel(self.round_state, self.connection_manager, self.sc_allocations_label,
                                                   self.sc_buttons)
@@ -159,7 +161,7 @@ class MainWindow(QMainWindow):
         # pyqt signal hook-ups
         self.ServerListener.update_jhg_round_signal.connect(partial(update_jhg_ui_elements, self))
         self.ServerListener.update_sc_round_signal.connect(partial(SC_round_init, self))
-        self.ServerListener.create_options_interface.connect(partial(self.options_interface_create))
+        self.ServerListener.enable_allocations_interface.connect(partial(self.enable_allocations_interface))
         self.ServerListener.disable_sc_buttons_signal.connect(partial(disable_sc_buttons, self))
         self.ServerListener.update_sc_utilities_labels_signal.connect(self.update_sc_utilities_labels)
         self.ServerListener.update_tornado_graph_signal.connect(self.update_tornado_graph)
@@ -203,5 +205,6 @@ class MainWindow(QMainWindow):
     def jhg_over(self, is_last, init_pop_influence):
         jhg_over(self, is_last, init_pop_influence)
 
-    def options_interface_create(self):
-        print("Need to enable it here somehow")
+    def enable_allocations_interface(self):
+        self.SC_panel.setTabEnabled(2, True)  # shoudl now enable it for those that need it.
+        self.SC_panel.setCurrentIndex(2) # should force the third tab to open.
