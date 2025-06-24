@@ -164,12 +164,14 @@ class SCManager:
         bot_peeps = []
         total_columns = []
         player_columns = []
+        total_order_index = []
         for peep in peeps: # find all player peeps first
             if peep[0] == "B": bot_peeps.append(peep)
-            else: player_peeps.append(peep)
+            else: player_peeps.append(peep), total_order_index.append(self.total_order.index(peep)) # actual client ID.
+
         # gets the bots part of the influence matrix
         if len(player_peeps) > 0: # how should this get interpreted? IDK.
-            self.connection_manager.distribute_message("SC_OPTIONS_CREATE", player_peeps) # reset all the utilities and whatnot, just in case.
+            self.connection_manager.distribute_message("SC_OPTIONS_CREATE", total_order_index) # reset all the utilities and whatnot, just in case.
         #total_columns.append(self.sc_sim.let_others_create_options_matrix(bot_peeps, influence_matrix))
         # now we have to get teh player input. I don't know how to handle this as well to be entirely honesty.
         player_columns = []

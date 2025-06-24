@@ -76,8 +76,9 @@ class ServerListener(QObject):
 
     def SC_CREATE(self, message):
         print("This is the message ", message)
-        if "P" + str(self.main_window.round_state.client_id+1) in message["CLIENT_IDS"]:
-            self.enable_allocations_interface.emit()
+        if self.main_window.round_state.client_id in message["CLIENT_IDS"]:
+            #self.enable_allocations_interface.emit()
+            self.main_window.enable_allocations_interface()
         self.round_state.reset_everything()
         self.main_window.sc_allocations_label.setText("0") # here's hoping. add the rest of the enabling and checkingf later. one block at a time.
         self.main_window.token_label.setText("0")
