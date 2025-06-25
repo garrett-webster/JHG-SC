@@ -29,7 +29,7 @@ class ScCreationPanel(QWidget):
 
         # Headers for the table
         player_panel.addWidget(QLabel("Player"), 0, 0, alignment=Qt.AlignmentFlag.AlignCenter)
-        player_panel.addWidget(QLabel("Allocations"), 0, 1, alignment=Qt.AlignmentFlag.AlignCenter)
+        player_panel.addWidget(QLabel("Allocations"), 0, 2, alignment=Qt.AlignmentFlag.AlignCenter)
 
         # Creates a row in the gui for each player to display the popularity, tokens sent to, and tokens received from
         # that player the last round. Also adds the elements to allow for token allocations

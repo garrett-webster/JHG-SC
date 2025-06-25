@@ -8,8 +8,8 @@ from Server.ServerConnectionManager import ServerConnectionManager
 
 OPTIONS = {
     #General settings
-    "NUM_HUMANS": 2,
-    "TOTAL_PLAYERS": 5,
+    "NUM_HUMANS": 1,
+    "TOTAL_PLAYERS": 3,
     "JHG_ROUNDS_PER_SC_ROUND" : 1, # Number of JHG rounds to play between each social choice round
     "MAX_ROUNDS": 10, # Max number of JHG rounds to play. Game ends after the nth round
     "SC_GROUP_OPTION": 0, # See options_creation.py -> group_size_options to understand what this means
@@ -64,15 +64,16 @@ class Server():
 
     def play_game(self):
         # Main game loop -- Play as many rounds as specified in OPTIONS
-        peeps = self.generate_peeps(self.total_order)
-        influence_matrix = self.JHG_manager.get_influence_matrix()
+
 
         while self.JHG_manager.current_round <= self.max_rounds:
             is_last_jhg_round = False
             for i in range(self.jhg_rounds_per_sc_round): # This range says how many jhg rounds to play between sc rounds
                 if i == self.jhg_rounds_per_sc_round - 1: is_last_jhg_round = True
                 self.JHG_manager.play_jhg_round(self.JHG_manager.current_round, is_last_jhg_round)
-
+            # yeah we need ot remake this every time, that wa
+            peeps = self.generate_peeps(self.total_order)
+            influence_matrix = self.JHG_manager.get_influence_matrix()
             current_options_matrix = self.SC_manager.server_side_options_matrix(peeps, influence_matrix)
             self.SC_manager.init_next_round(current_options_matrix)
             self.SC_manager.play_social_choice_round(self.JHG_manager.get_sim())
