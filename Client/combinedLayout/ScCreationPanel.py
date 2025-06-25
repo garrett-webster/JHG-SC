@@ -53,6 +53,8 @@ class ScCreationPanel(QWidget):
                 partial(sc_widgets[i].update_utility_minus, round_state, token_counter, i))
             sc_widgets[i].utility_plus_button.updateUtility.connect(
                 partial(sc_widgets[i].update_utility_plus, round_state, token_counter, i))
+            # need to somehow connect this button do an entirely different function. so that it updates the graph.
+
 
             player_panel.addLayout(allocations_row, row_index, 2)
 

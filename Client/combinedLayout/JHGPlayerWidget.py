@@ -1,4 +1,4 @@
-from PyQt6.QtCore import Qt
+from PyQt6.QtCore import Qt, pyqtSignal
 from PyQt6.QtWidgets import QWidget, QLabel
 from Client.Player import PlayerState
 from Client.combinedLayout.allocation_buttons import MinusButton, PlusButton
@@ -34,6 +34,7 @@ class JHGPlayerWidget(QWidget):
         # should now give us a means to interact with these buttons. now I just gotta connect the signals somehwer.e
         self.minus_button.setMinimumWidth(self.minus_button.fontMetrics().horizontalAdvance("-") + 20)
         self.plus_button.setMinimumWidth(self.plus_button.fontMetrics().horizontalAdvance("+") + 20)
+        self.update_allocations_graph = pyqtSignal()
 
     # just updates all the backround stuff and whatnot.
     def update_allocation_minus(self, round_state, tokens_label, player):
@@ -49,6 +50,7 @@ class JHGPlayerWidget(QWidget):
 
         self.allocation_box.setText(str(round_state.allocations[player]))
         tokens_label.setText("Tokens: " + str(round_state.tokens))
+        #self.update_allocations_graph(round_state.allocations[player])
 
 
     # Handle updating the sent, received, and tokens remaining fields after the plus button is pressed
@@ -65,3 +67,4 @@ class JHGPlayerWidget(QWidget):
 
         self.allocation_box.setText(str(round_state.allocations[player]))
         tokens_label.setText("Tokens: " + str(round_state.tokens))
+        #self.update_allocations_graph(round_state.allocations[player])

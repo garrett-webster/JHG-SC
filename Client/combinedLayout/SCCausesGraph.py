@@ -6,6 +6,8 @@ from Client.combinedLayout.colors import COLORS
 
 from Client.combinedLayout.Arrow import Arrow
 
+from Server.social_choice_sim import Social_Choice_Sim
+
 
 class SCCausesGraph(QWidget):
     def __init__(self, num_cycles):
@@ -203,3 +205,16 @@ class SCCausesGraph(QWidget):
                 bbox=dict(boxstyle='round,pad=0.3', facecolor='#444444', edgecolor='none')
             )
         self.nodes_canvas.draw()
+
+    def update_sc_nodes_given_allocations(self, utility_list):
+        new_sc_sim = Social_Choice_Sim(1, 3, 0, None, 0, 0, "", "", "", ["P1"])
+        new_sc_sim.set_new_options_matrix(utility_list)
+        player_node = new_sc_sim.get_player_nodes()
+        cause_nodes = new_sc_sim.get_causes() # do not be deceived, those are the cause nodes.
+        total_nodes = player_node + cause_nodes
+        self.round_state.nodes[-1] = total_nodes # no clue if this will work.
+        self.update_sc_nodes_graph(-1)
+
+
+
+

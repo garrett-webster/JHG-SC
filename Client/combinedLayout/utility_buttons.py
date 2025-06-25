@@ -4,10 +4,11 @@ from PyQt6.QtWidgets import QPushButton
 
 class MinusButtonUtility(QWidget):
     updateUtility = pyqtSignal()
+    updateGraph = pyqtSignal()
 
     def on_minus_button_clicked(self, event):
         self.updateUtility.emit()
-
+        self.updateGraph.emit()
 
     def __init__(self):
         super().__init__()
@@ -24,10 +25,11 @@ class MinusButtonUtility(QWidget):
 
 class PlusButtonUtility(QWidget):
     updateUtility = pyqtSignal()
+    updateGraph = pyqtSignal()
 
     def on_plus_button_clicked(self, event):
         self.updateUtility.emit()
-
+        self.updateGraph.emit()
 
     def __init__(self):
         super().__init__()

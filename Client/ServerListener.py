@@ -17,8 +17,8 @@ class ServerListener(QObject):
     update_sc_votes_signal = pyqtSignal(dict, int, bool)
     update_sc_utilities_labels_signal = pyqtSignal(int, dict, int, dict, list)
     update_tornado_graph_signal = pyqtSignal(Axes, list, list)
-    update_sc_nodes_graph_signal = pyqtSignal(int)
     switch_to_jhg_signal = pyqtSignal()
+    update_sc_nodes_graph_signal = pyqtSignal(int)
 
 
     def __init__(self, main_window, connection_manager, round_state, round_counter, token_label, allocations_label, jhg_popularity_graph, tabs):

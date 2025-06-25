@@ -142,6 +142,7 @@ class MainWindow(QMainWindow):
         self.SC_panel.currentChanged.connect(self.SC_tab_changed)
         self.SC_creations_panel = ScCreationPanel(self.round_state, self.connection_manager, self.sc_allocations_label,
                                                   self.sc_buttons)
+        self.attach_sc_buttons()
         self.SC_panel.addTab(self.SC_creations_panel, "Allocations")
         self.SC_panel.setTabEnabled(2, False)  # disable the tab unless you need it
 
@@ -153,7 +154,7 @@ class MainWindow(QMainWindow):
 
         self.setWindowTitle("JHG: Round 1")
         self.setCentralWidget(self.dockWidget)
-
+        #self.SC_cause_graph.update_sc_nodes_given_allocations.connect(self.update_sc_graph)
 
     # /4#
 
@@ -227,3 +228,10 @@ class MainWindow(QMainWindow):
         for i, button in enumerate(self.SC_voting_grid.buttons):
             if button.text().startswith("Cause"):
                 button.setText("Cause " + str(i+1) + " (" + str(new_total_ids.pop(0)+1) + ")")
+
+    def update_sc_graph(self, utility):
+        self.SC_cause_graph.update_sc_nodes_given_allocations(utility)
+
+    def attach_sc_buttons(self):
+        for widget in self.round_state.sc_widgets:
+            widget.utility_minus_button.connnect() # THAT SHOUDL DO IT

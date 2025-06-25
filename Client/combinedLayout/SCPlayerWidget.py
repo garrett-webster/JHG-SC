@@ -28,6 +28,9 @@ class SCPlayerWidget(QWidget):
             round_state.utility += 1  # they get one for the negative
         self.utility_box.setText(str(round_state.allocations[player]))
         tokens_label.setText("Utility: " + str(round_state.utility))
+        
+
+
 
     def update_utility_plus(self, round_state, tokens_label, player):
         if round_state.utility > 0:
