@@ -1,3 +1,4 @@
+import copy
 from functools import partial
 
 import numpy as np
@@ -221,3 +222,8 @@ class MainWindow(QMainWindow):
     def enable_jhg_buttons(self, panel):
         panel.setEnabled(True)
 
+    def change_cause_labels(self, total_ids):
+        new_total_ids = copy.deepcopy(total_ids)
+        for i, button in enumerate(self.SC_voting_grid.buttons):
+            if button.text().startswith("Cause"):
+                button.setText("Cause " + str(i+1) + " (" + str(new_total_ids.pop(0)+1) + ")")

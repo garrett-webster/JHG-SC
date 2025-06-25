@@ -22,7 +22,7 @@ class ServerConnectionManager(ConnectionManager):
         self.message_type_names = {
             "SC_INIT": ["ROUND_NUM", "OPTIONS", "NODES", "UTILITIES"],
             "SETUP": ["CLIENT_ID", "NUM_PLAYERS", "NUM_CYCLES"],
-            "SC_OPTIONS_CREATE": ["CLIENT_IDS"],
+            "SC_OPTIONS_CREATE": ["CLIENT_IDS", "TOTAL_IDS"],
             "JHG": ["CURRENT_VOTES"],
             "JHG_OVER": ["ROUND", "POPULARITY", "INFLUENCE_MAT", "INIT_POP_INFLUENCE", "IS_LAST", "RECEIVED", "SENT"],
             "SC_VOTES": ["VOTES", "CYCLE", "IS_LAST_CYCLE"],
