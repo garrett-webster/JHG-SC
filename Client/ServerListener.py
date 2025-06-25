@@ -12,6 +12,7 @@ class ServerListener(QObject):
     enable_allocations_interface = pyqtSignal()
     disable_sc_buttons_signal = pyqtSignal()
     enable_jhg_buttons_signal = pyqtSignal()
+    disable_jhg_buttons_signal = pyqtSignal()
     jhg_over_signal = pyqtSignal(bool, float)
     update_sc_votes_signal = pyqtSignal(dict, int, bool)
     update_sc_utilities_labels_signal = pyqtSignal(int, dict, int, dict, list)
@@ -69,19 +70,19 @@ class ServerListener(QObject):
         self.round_state.options = message["OPTIONS"]
         self.round_state.nodes[self.round_state.sc_round_num] = message["NODES"]
         self.round_state.utilities = message["UTILITIES"]
-        self.main_window.SC_panel.setCurrentIndex(0) # make sure to move the fetcher back to the first panel here, regardless of where they were.
-        self.main_window.SC_panel.setTabEnabled(2, False) # should disable it for everyone
 
-        self.update_sc_round_signal.emit()
+        self.update_sc_round_signal.emit()  # go ahead and adjust all the SC stuff appropriately as well.
+        #self.disable_jhg_buttons_signal.emit() # this is now under the SC round signal thingyt. mayebn.
+
 
     def SC_CREATE(self, message):
-        print("This is the message ", message)
         if self.main_window.round_state.client_id in message["CLIENT_IDS"]:
-            #self.enable_allocations_interface.emit()
-            self.main_window.enable_allocations_interface()
+            self.enable_allocations_interface.emit()
+            #self.main_window.enable_allocations_interface()
         self.round_state.reset_everything()
-        self.main_window.sc_allocations_label.setText("0") # here's hoping. add the rest of the enabling and checkingf later. one block at a time.
-        self.main_window.token_label.setText("0")
+        # should no longer be necessary, as per testing, but just in case they pop up later here they are.
+        # self.main_window.sc_allocations_label.setText("Utility: " + str(self.round_state.utility)) # here's hoping. add the rest of the enabling and checkingf later. one block at a time.
+        # self.main_window.token_label.setText("Tokens: " + str(self.round_state.tokens))
 
 
     def SC_VOTES(self, message):

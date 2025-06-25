@@ -55,7 +55,6 @@ class JHGPlayerWidget(QWidget):
     def update_allocation_plus(self, round_state, tokens_label, player):
         # If the client player has not decided to steal tokens, then one should be added to the associated player's
         # allocation, and one subtracted from tokens available for the client player
-        print("if this fires i;ll end up on the news")
         if round_state.allocations[player] >= 0:
             if round_state.tokens > 0:
                 round_state.allocations[player] = round_state.allocations[player] + 1

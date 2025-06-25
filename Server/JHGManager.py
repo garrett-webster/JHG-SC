@@ -45,8 +45,9 @@ class JHGManager:
                                                    self.jhg_sim.get_influence().tolist(), init_pop_influence, is_last_jhg_round,
                                                    unique_messages=unique_messages)
 
-        self.current_round += 1
 
+        self.current_round += 1
+        print("JHG IS NOW OEVER. EVERYTHING ASSOCIATED WITH THAT SHOULD FIRE AT THIS TIME> ")
         return client_input
 
 

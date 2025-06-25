@@ -30,6 +30,9 @@ def create_sc_ui_elements(main_window):
 # Triggered by SC_INIT
 def SC_round_init(main_window):
     # Update sc ui elements
+    main_window.SC_panel.setTabEnabled(0, True) # I think? this is whwere this needs to happen? Maybe?
+    main_window.SC_panel.setCurrentIndex(0)  # make sure to move the fetcher back to the first panel here, regardless of where they were.
+    main_window.SC_panel.setTabEnabled(2, False)  # should disable it for everyone
     main_window.SC_voting_grid.update_utilities(main_window.round_state.utilities)
     if main_window.round_state.sc_round_num == 1:
         main_window.SC_cause_graph.update_sc_nodes_graph(main_window.round_state.sc_round_num)

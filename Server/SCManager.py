@@ -43,7 +43,7 @@ class SCManager:
 
     def init_next_round(self, current_options_matrix):
         # Initialize the round
-        self.sc_sim.start_round()
+        self.sc_sim.start_round(current_options_matrix) # make sure this actually gets hard set.
         self.current_options_matrix = current_options_matrix
         self.options_history[self.round_num] = self.current_options_matrix
         self.player_nodes = self.sc_sim.get_player_nodes()
@@ -111,7 +111,11 @@ class SCManager:
             while len(player_votes) < self.connection_manager.num_clients:
                 responses = self.connection_manager.get_responses()
                 for response in responses.values():
-                    player_votes[response["CLIENT_ID"]] = response["FINAL_VOTE"]
+                    try:
+                        player_votes[response["CLIENT_ID"]] = response["FINAL_VOTE"]
+                    except KeyError:
+                        print("SOMEONE SHOULDN't BE ALLOWED TO TOUCH THIS YET. FIX THAT")
+
 
             zero_idx_votes, one_idx_votes = self.compile_sc_votes(player_votes,
                                                                   self.round_num, cycle, previous_votes)
@@ -189,23 +193,21 @@ class SCManager:
         for bot in self.sc_sim.bots:
             bot_columns.append(bot.create_column(len(self.total_order)))
 
-        final_bot_columns = {}
+        final_columns = {}
         for bot, i in enumerate(bot_peeps):
-            final_bot_columns[i] = bot_columns[bot] # hopefully
-        final_player_columns = {}
+            final_columns[i] = bot_columns[bot] # hopefully
         for player, i in enumerate(player_peeps):
-            final_player_columns[i] = player_columns[player]
+            final_columns[i] = player_columns[player]
 
         # should do all the orginization of the final columns and leave it in the original peeps thing.
         for peep in peeps:
-            if peep[0] == "B":
-                total_columns.append(final_bot_columns[peep])
-            else:
-                total_columns.append(final_player_columns[peep])
+            total_columns.append(final_columns[peep])
 
 
 
         # we gotta hope this works
+        print("Here is the total order ", self.total_order)
+        print("Here are the total columns" , total_columns)
         total_columns = (np.array(total_columns).transpose()).tolist()
 
         return total_columns # this should be the new current options matix. maybe.

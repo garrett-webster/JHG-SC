@@ -3,7 +3,7 @@ from functools import partial
 import numpy as np
 from PyQt6.QtCore import QThread
 from PyQt6.QtGui import QFont
-from PyQt6.QtWidgets import QMainWindow, QHBoxLayout, QLabel, QWidget
+from PyQt6.QtWidgets import QMainWindow, QHBoxLayout, QLabel, QWidget, QPushButton
 from Client.RoundState import RoundState
 from Client.ServerListener import ServerListener
 from matplotlib.figure import Figure
@@ -11,6 +11,7 @@ from matplotlib.figure import Figure
 from Client.combinedLayout.JHGPlayerWidget import JHGPlayerWidget
 from Client.combinedLayout.JhgPanel import JhgPanel
 from Client.combinedLayout.JhgTornadoGraph import JhgTornadoGraph
+from Client.combinedLayout.JhgVotingPanel import JhgVotingPanel
 
 from Client.combinedLayout.SCHistoryGrid import SCHistoryGrid
 
@@ -136,12 +137,12 @@ class MainWindow(QMainWindow):
         self.sc_history_grid = SCHistoryGrid(self.round_state.num_players, self.round_state.client_id, "Voted for",
                                              self.SC_cause_graph)
         self.SC_panel.addTab(self.sc_history_grid, "History")
-        self.SC_panel.setTabEnabled(2, False) # disable the tab unless you need it
+
         self.SC_panel.currentChanged.connect(self.SC_tab_changed)
         self.SC_creations_panel = ScCreationPanel(self.round_state, self.connection_manager, self.sc_allocations_label,
                                                   self.sc_buttons)
         self.SC_panel.addTab(self.SC_creations_panel, "Allocations")
-
+        self.SC_panel.setTabEnabled(2, False)  # disable the tab unless you need it
 
 
 
@@ -170,6 +171,7 @@ class MainWindow(QMainWindow):
         self.ServerListener.update_sc_nodes_graph_signal.connect(self.update_sc_nodes_graph)
         self.ServerListener.switch_to_jhg_signal.connect(self.start_jhg_round)
         self.ServerListener_thread.started.connect(self.ServerListener.start_listening)
+        self.ServerListener.disable_jhg_buttons_signal.connect(self.disable_jhg_buttons)
 
     def update_sc_votes(self, votes, cycle, is_last_cycle):
         self.round_state.sc_cycle = cycle
@@ -200,11 +202,22 @@ class MainWindow(QMainWindow):
         tab_changed(self, index)
 
     def start_jhg_round(self):
+        self.enable_jhg_buttons(self.JHG_panel)
         start_jhg_round(self)
 
     def jhg_over(self, is_last, init_pop_influence):
+        self.disable_jhg_buttons(self.JHG_panel)
+        print("Ayo is this firing at all ")
         jhg_over(self, is_last, init_pop_influence)
 
     def enable_allocations_interface(self):
         self.SC_panel.setTabEnabled(2, True)  # shoudl now enable it for those that need it.
         self.SC_panel.setCurrentIndex(2) # should force the third tab to open.
+        self.SC_panel.setTabEnabled(0, False) # make sure they HAVE to allocate before they can vote.
+
+    def disable_jhg_buttons(self, panel):
+        panel.setEnabled(False)
+
+    def enable_jhg_buttons(self, panel):
+        panel.setEnabled(True)
+
