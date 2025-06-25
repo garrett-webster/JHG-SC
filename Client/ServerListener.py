@@ -78,7 +78,11 @@ class ServerListener(QObject):
     def SC_CREATE(self, message):
         if self.main_window.round_state.client_id in message["CLIENT_IDS"]:
             self.enable_allocations_interface.emit()
-            #self.main_window.enable_allocations_interface()
+        else:
+            utilities_list = [0 for _ in range(self.round_state.num_players)]
+            # go ahead and just send back and empty list of 0's for our repsonse so its all good to go. shouldn't actually touch anything.
+            self.connection_manager.send_message("SUBMIT_UTILITY", self.round_state.client_id, self.round_state.jhg_round_num, utilities_list)
+
         self.round_state.reset_everything()
         self.main_window.change_cause_labels(message["TOTAL_IDS"])
         # should no longer be necessary, as per testing, but just in case they pop up later here they are.

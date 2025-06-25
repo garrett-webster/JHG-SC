@@ -189,9 +189,12 @@ class SCManager:
                     first_key = next(iter(client_input))
                     player_columns.append(client_input[first_key]["UTILITIES"])
                     #player_columns[response["CLIENT_ID"]] = response["NEW_COLUMN"]
-                    break
+                    print("here is the len of the player columns ", len(player_columns))
+                    if len(player_columns) == len(player_peeps):
+                        break
                 except KeyError:
                     print("Error processing client_input: " , client_input)
+        print("here are the client columns ", player_columns)
         for bot in self.sc_sim.bots:
             bot_columns.append(bot.create_column(len(self.total_order)))
 
