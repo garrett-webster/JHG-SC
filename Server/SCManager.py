@@ -175,26 +175,23 @@ class SCManager:
             if peep[0] == "B": bot_peeps.append(peep)
             else: player_peeps.append(peep), total_order_index.append(self.total_order.index(peep)) # actual client ID.
 
-        # gets the bots part of the influence matrix
-        if len(player_peeps) > 0: # how should this get interpreted? IDK.
-            self.connection_manager.distribute_message("SC_OPTIONS_CREATE", total_order_index, actual_total_order_index)  # reset all the utilities and whatnot, just in case.
         #total_columns.append(self.sc_sim.let_others_create_options_matrix(bot_peeps, influence_matrix))
         # now we have to get teh player input. I don't know how to handle this as well to be entirely honesty.
-        player_columns = []
-        bot_columns = []
         if len(player_peeps) > 0:  # only enter this loop if there are clients to question.
-            while True:
-                client_input = self.connection_manager.get_responses()
+            print("player peeps are non zero. engaging target.")
+            self.connection_manager.distribute_message("SC_OPTIONS_CREATE", total_order_index, actual_total_order_index)  # reset all the utilities and whatnot, just in case.
+            print("Starting to wait for lcient input....")
+            client_input = self.connection_manager.get_responses()
+            print("we are pretty sure we have recieved all client input. Doing math....")
+            player_columns = []
+            for client_id, response in client_input.items():
                 try:
-                    first_key = next(iter(client_input))
-                    player_columns.append(client_input[first_key]["UTILITIES"])
-                    #player_columns[response["CLIENT_ID"]] = response["NEW_COLUMN"]
-                    print("here is the len of the player columns ", len(player_columns))
-                    if len(player_columns) == len(player_peeps):
-                        break
+                    player_columns.append(response["UTILITIES"])
                 except KeyError:
-                    print("Error processing client_input: " , client_input)
+                    print("Error processing client_input (yes where you think it is): " , client_input)
         print("here are the client columns ", player_columns)
+
+        bot_columns = []
         for bot in self.sc_sim.bots:
             bot_columns.append(bot.create_column(len(self.total_order)))
 
