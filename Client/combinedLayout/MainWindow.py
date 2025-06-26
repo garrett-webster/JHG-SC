@@ -244,9 +244,6 @@ class MainWindow(QMainWindow):
                 partial(self.update_sc_graph))
 
 
-
-            #widget.utility_minus_button.updateGraph.connect(self.update_sc_graph) # THAT SHOUDL DO IT
-
     def sc_create_allocations(self, client_id_list, total_id_list):
         if self.round_state.client_id in client_id_list:
             self.enable_allocations_interface()
@@ -254,7 +251,7 @@ class MainWindow(QMainWindow):
             utilities_list = [0 for _ in range(self.round_state.num_players)]
             # go ahead and just send back and empty list of 0's for our repsonse so its all good to go. shouldn't actually touch anything.
             self.connection_manager.send_message("SUBMIT_UTILITY", self.round_state.client_id, self.round_state.jhg_round_num, utilities_list)
-            self.SC_voting_grid.setTabEnabled(0, False) # that should do the trick.
+            self.SC_voting_grid.setEnabled(False) # turn this off. Should become reenabled when all is said and done. 
 
         self.round_state.reset_everything()
         self.change_cause_labels(total_id_list)

@@ -69,13 +69,6 @@ def tab_changed(main_window, index):
         cause_graph.update_sc_nodes_graph(selected_round)
         cause_graph.update_arrows(votes)
 
-# def create_options_interface(main_window):
-#     sc_token_counter = QLabel()
-#     sc_buttons = []
-#     main_window.Options_Creation = ScCreationPanel(main_window.round_state, main_window.connection_manager, sc_token_counter, sc_buttons)  # Create the layout
-
-
-
 def sc_vote(main_window, vote):
     main_window.SC_voting_grid.current_vote = vote
 
