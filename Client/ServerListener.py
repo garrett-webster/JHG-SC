@@ -85,6 +85,8 @@ class ServerListener(QObject):
 
         self.round_state.reset_everything()
         self.main_window.change_cause_labels(message["TOTAL_IDS"])
+        print("This is the current utilitis list ", self.main_window.round_state.get_utilities_list())
+        self.main_window.update_sc_graph(self.main_window.round_state.get_utilities_list())  # go ahead and refresh the origin thing as well.
         # should no longer be necessary, as per testing, but just in case they pop up later here they are.
         # self.main_window.sc_allocations_label.setText("Utility: " + str(self.round_state.utility)) # here's hoping. add the rest of the enabling and checkingf later. one block at a time.
         # self.main_window.token_label.setText("Tokens: " + str(self.round_state.tokens))

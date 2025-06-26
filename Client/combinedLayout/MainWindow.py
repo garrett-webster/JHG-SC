@@ -230,8 +230,16 @@ class MainWindow(QMainWindow):
                 button.setText("Cause " + str(i+1) + " (" + str(new_total_ids.pop(0)+1) + ")")
 
     def update_sc_graph(self, utility):
+        print("PLEASE FIRE for all that is good")
         self.SC_cause_graph.update_sc_nodes_given_allocations(utility)
 
     def attach_sc_buttons(self):
         for widget in self.round_state.sc_widgets:
-            widget.utility_minus_button.connnect() # THAT SHOUDL DO IT
+            widget.utility_minus_button.updateUtility.connect(  # this is going to need to get changed as well.
+                partial(self.update_sc_graph, self.round_state.get_utilities_list()))
+            widget.utility_plus_button.updateUtility.connect(  # this is going to need to get changed as well.
+                partial(self.update_sc_graph, self.round_state.get_utilities_list()))
+
+
+
+            #widget.utility_minus_button.updateGraph.connect(self.update_sc_graph) # THAT SHOUDL DO IT

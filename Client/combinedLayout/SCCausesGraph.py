@@ -207,11 +207,12 @@ class SCCausesGraph(QWidget):
         self.nodes_canvas.draw()
 
     def update_sc_nodes_given_allocations(self, utility_list):
-        new_sc_sim = Social_Choice_Sim(1, 3, 0, None, 0, 0, "", "", "", ["P1"])
-        new_sc_sim.set_new_options_matrix(utility_list)
-        player_node = new_sc_sim.get_player_nodes()
+        new_sc_sim = Social_Choice_Sim(1, 3, 0, None, 0, 0, "", "", "", ["B1"])
+        new_sc_sim.set_new_options_matrix([utility_list, []])
+        player_node = new_sc_sim.create_player_nodes()
         cause_nodes = new_sc_sim.get_causes() # do not be deceived, those are the cause nodes.
         total_nodes = player_node + cause_nodes
+        total_nodes = [node.to_json() for node in total_nodes]
         self.round_state.nodes[-1] = total_nodes # no clue if this will work.
         self.update_sc_nodes_graph(-1)
 
