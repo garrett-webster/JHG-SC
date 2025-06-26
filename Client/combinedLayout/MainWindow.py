@@ -211,6 +211,7 @@ class MainWindow(QMainWindow):
         self.disable_jhg_buttons(self.JHG_panel)
         print("Ayo is this firing at all ")
         jhg_over(self, is_last, init_pop_influence)
+        self.update_sc_graph([]) # doesn't actually need to contain anyhting. 
 
     def enable_allocations_interface(self):
         self.SC_panel.setTabEnabled(2, True)  # shoudl now enable it for those that need it.
@@ -231,7 +232,7 @@ class MainWindow(QMainWindow):
 
     def update_sc_graph(self, utility):
         print("PLEASE FIRE for all that is good")
-        self.SC_cause_graph.update_sc_nodes_given_allocations(utility)
+        self.SC_cause_graph.update_sc_nodes_given_allocations(self.round_state.utilities)
 
     def attach_sc_buttons(self):
         for widget in self.round_state.sc_widgets:

@@ -54,7 +54,7 @@ class RoundState:
 
     def get_utilities_list(self):
         #self.utilities[int(self.client_id)] = self.utility # this was to find out self utilities. not sueful for allocations
-        return self.allocations # this might have broken everything. lets find out.
+        return self.utilities # this might have broken everything. lets find out.
 
     def reset_everything(self):
         self.utilities = [0 for _ in range(len(self.players))] # reset the utilities to all 0's
