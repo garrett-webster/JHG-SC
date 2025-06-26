@@ -8,7 +8,7 @@ from Server.ServerConnectionManager import ServerConnectionManager
 
 OPTIONS = {
     #General settings
-    "NUM_HUMANS": 3,
+    "NUM_HUMANS": 1,
     "TOTAL_PLAYERS": 4,
     "JHG_ROUNDS_PER_SC_ROUND" : 1, # Number of JHG rounds to play between each social choice round
     "MAX_ROUNDS": 10, # Max number of JHG rounds to play. Game ends after the nth round
@@ -73,6 +73,7 @@ class Server():
                 self.JHG_manager.play_jhg_round(self.JHG_manager.current_round, is_last_jhg_round)
             # yeah we need ot remake this every time, that wa
             peeps = self.generate_peeps(self.total_order)
+            print("These are the currently toggled peeps", peeps)
             influence_matrix = self.JHG_manager.get_influence_matrix()
             current_options_matrix = self.SC_manager.server_side_options_matrix(peeps, influence_matrix)
             self.SC_manager.init_next_round(current_options_matrix)

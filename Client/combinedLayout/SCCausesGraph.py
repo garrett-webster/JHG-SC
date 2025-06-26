@@ -204,9 +204,12 @@ class SCCausesGraph(QWidget):
                 color='white',  # adjust for contrast; white looks good on dark bg
                 bbox=dict(boxstyle='round,pad=0.3', facecolor='#444444', edgecolor='none')
             )
-        self.nodes_canvas.draw()
+        if self.nodes_canvas.figure: # make sure this exists before attempting to draw on it.
+            self.nodes_canvas.draw()
 
-    def update_sc_nodes_given_allocations(self, utility_list):
+    def update_sc_nodes_given_allocations(self):
+        utility_list = self.round_state.get_utilities_list()
+        print("Aight this is the utility list. if its more than just a list it WILL affect the trout population. ", utility_list)
         new_sc_sim = Social_Choice_Sim(1, 3, 0, None, 0, 0, "", "", "", ["B1"])
         new_sc_sim.set_new_options_matrix([utility_list, []])
         player_node = new_sc_sim.create_player_nodes()

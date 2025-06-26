@@ -174,6 +174,7 @@ class MainWindow(QMainWindow):
         self.ServerListener.switch_to_jhg_signal.connect(self.start_jhg_round)
         self.ServerListener_thread.started.connect(self.ServerListener.start_listening)
         self.ServerListener.disable_jhg_buttons_signal.connect(self.disable_jhg_buttons)
+        self.ServerListener.sc_create_stuff.connect(self.sc_create_allocations)
 
     def update_sc_votes(self, votes, cycle, is_last_cycle):
         self.round_state.sc_cycle = cycle
@@ -211,7 +212,8 @@ class MainWindow(QMainWindow):
         self.disable_jhg_buttons(self.JHG_panel)
         print("Ayo is this firing at all ")
         jhg_over(self, is_last, init_pop_influence)
-        self.update_sc_graph([]) # doesn't actually need to contain anyhting.
+        self.round_state.utilities = [0 for _ in range(self.round_state.num_players)] # reset this bc this isn't happening quick enough.
+        self.update_sc_graph() # hard coding this bc I want to see somethign real quick.
 
     def enable_allocations_interface(self):
         self.SC_panel.setTabEnabled(2, True)  # shoudl now enable it for those that need it.
@@ -230,17 +232,31 @@ class MainWindow(QMainWindow):
             if button.text().startswith("Cause"):
                 button.setText("Cause " + str(i+1) + " (" + str(new_total_ids.pop(0)+1) + ")")
 
-    def update_sc_graph(self, utility):
+    def update_sc_graph(self):
         print("PLEASE FIRE for all that is good")
-        self.SC_cause_graph.update_sc_nodes_given_allocations(self.round_state.utilities)
+        self.SC_cause_graph.update_sc_nodes_given_allocations() # get it farm fresh, see what happens.
 
     def attach_sc_buttons(self):
         for widget in self.round_state.sc_widgets:
             widget.utility_minus_button.updateUtility.connect(  # this is going to need to get changed as well.
-                partial(self.update_sc_graph, self.round_state.get_utilities_list()))
+                partial(self.update_sc_graph))
             widget.utility_plus_button.updateUtility.connect(  # this is going to need to get changed as well.
-                partial(self.update_sc_graph, self.round_state.get_utilities_list()))
+                partial(self.update_sc_graph))
 
 
 
             #widget.utility_minus_button.updateGraph.connect(self.update_sc_graph) # THAT SHOUDL DO IT
+
+    def sc_create_allocations(self, client_id_list, total_id_list):
+        if self.round_state.client_id in client_id_list:
+            self.enable_allocations_interface()
+        else:
+            utilities_list = [0 for _ in range(self.round_state.num_players)]
+            # go ahead and just send back and empty list of 0's for our repsonse so its all good to go. shouldn't actually touch anything.
+            self.connection_manager.send_message("SUBMIT_UTILITY", self.round_state.client_id, self.round_state.jhg_round_num, utilities_list)
+            self.SC_voting_grid.setTabEnabled(0, False) # that should do the trick.
+
+        self.round_state.reset_everything()
+        self.change_cause_labels(total_id_list)
+        print("This is the current utilitis list ", self.round_state.get_utilities_list())
+        self.update_sc_graph()  # go ahead and refresh the origin thing as well.

@@ -23,6 +23,7 @@ class RoundState:
     options = []
     nodes = {}
     utilities = []
+    utilities_mat = []
 
     def __init__(self, id, num_players):
         self.num_players = num_players

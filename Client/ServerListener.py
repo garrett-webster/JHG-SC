@@ -19,6 +19,7 @@ class ServerListener(QObject):
     update_tornado_graph_signal = pyqtSignal(Axes, list, list)
     switch_to_jhg_signal = pyqtSignal()
     update_sc_nodes_graph_signal = pyqtSignal(int)
+    sc_create_stuff = pyqtSignal(list, list)
 
 
     def __init__(self, main_window, connection_manager, round_state, round_counter, token_label, allocations_label, jhg_popularity_graph, tabs):
@@ -69,28 +70,15 @@ class ServerListener(QObject):
         self.round_state.sc_round_num = message["ROUND_NUM"]
         self.round_state.options = message["OPTIONS"]
         self.round_state.nodes[self.round_state.sc_round_num] = message["NODES"]
-        self.round_state.utilities = message["UTILITIES"]
+        self.round_state.utilities_mat = message["UTILITIES"]
 
         self.update_sc_round_signal.emit()  # go ahead and adjust all the SC stuff appropriately as well.
         #self.disable_jhg_buttons_signal.emit() # this is now under the SC round signal thingyt. mayebn.
 
 
     def SC_CREATE(self, message):
-        if self.main_window.round_state.client_id in message["CLIENT_IDS"]:
-            self.enable_allocations_interface.emit()
-        else:
-            utilities_list = [0 for _ in range(self.round_state.num_players)]
-            # go ahead and just send back and empty list of 0's for our repsonse so its all good to go. shouldn't actually touch anything.
-            self.connection_manager.send_message("SUBMIT_UTILITY", self.round_state.client_id, self.round_state.jhg_round_num, utilities_list)
-
-        self.round_state.reset_everything()
-        self.main_window.change_cause_labels(message["TOTAL_IDS"])
-        print("This is the current utilitis list ", self.main_window.round_state.get_utilities_list())
-        self.main_window.update_sc_graph(self.main_window.round_state.get_utilities_list())  # go ahead and refresh the origin thing as well.
-        # should no longer be necessary, as per testing, but just in case they pop up later here they are.
-        # self.main_window.sc_allocations_label.setText("Utility: " + str(self.round_state.utility)) # here's hoping. add the rest of the enabling and checkingf later. one block at a time.
-        # self.main_window.token_label.setText("Tokens: " + str(self.round_state.tokens))
-
+        self.sc_create_stuff.emit(message["CLIENT_IDS"], message["TOTAL_IDS"])
+        # this actually does a lot of stuff, its just all hidden under main window.
 
     def SC_VOTES(self, message):
         self.round_state.current_votes = message["VOTES"]
