@@ -37,7 +37,11 @@ class ScCreationPanel(QWidget):
         sc_widgets = round_state.sc_widgets
         for i in range(round_state.num_players):
             # everyone else (only worried abotu everyone else in this iteration)
+            if i == round_state.client_id: # if this is us, adjust the text accordingly and go from there.
+                sc_widgets[i].id_label.setText("You " + "(" + str(i+1) + ")")
+
             player_panel.addWidget(sc_widgets[i].id_label, row_index, 0)
+
             sc_widgets[i].id_label.setStyleSheet(f"color: " + COLORS[i])
             # player_panel.addWidget(round_state.players[i].popularity_label, row_index, 1)
             # player_panel.addWidget(round_state.players[i].sent_label, row_index, 2)

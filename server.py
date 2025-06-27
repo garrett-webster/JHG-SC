@@ -8,7 +8,7 @@ from Server.ServerConnectionManager import ServerConnectionManager
 
 OPTIONS = {
     #General settings
-    "NUM_HUMANS": 2,
+    "NUM_HUMANS": 1,
     "TOTAL_PLAYERS": 5,
     "JHG_ROUNDS_PER_SC_ROUND" : 1, # Number of JHG rounds to play between each social choice round
     "MAX_ROUNDS": 10, # Max number of JHG rounds to play. Game ends after the nth round
