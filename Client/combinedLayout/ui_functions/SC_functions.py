@@ -32,7 +32,7 @@ def SC_round_init(main_window):
     # Update sc ui elements
     main_window.SC_panel.setTabEnabled(0, True) # I think? this is whwere this needs to happen? Maybe?
     main_window.SC_panel.setCurrentIndex(0)  # make sure to move the fetcher back to the first panel here, regardless of where they were.
-    main_window.SC_panel.setTabEnabled(2, False)  # should disable it for everyone
+    main_window.SC_panel.setTabVisible(2, False)  # should disable it for everyone
     main_window.SC_voting_grid.update_utilities(main_window.round_state.utilities_mat)
    # print("This si the main_window_round staet round num thingy ", main_window.round_state.sc_round_num)
     # I think this just needs to always go off now in this branch, at least.

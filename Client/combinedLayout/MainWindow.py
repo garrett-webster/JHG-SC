@@ -145,7 +145,7 @@ class MainWindow(QMainWindow):
                                                   self.sc_buttons)
         # self.attach_sc_buttons() no longer does waht we want it to do, no gurantee of 3 diemsinons, scrapping that whole thing.
         self.SC_panel.addTab(self.SC_creations_panel, "Allocations")
-        self.SC_panel.setTabEnabled(2, False)  # disable the tab unless you need it
+        self.SC_panel.setTabVisible(2, False)  # disable the tab unless you need it
 
 
 
@@ -218,7 +218,7 @@ class MainWindow(QMainWindow):
         self.update_sc_graph() # hard coding this bc I want to see somethign real quick.
 
     def enable_allocations_interface(self):
-        self.SC_panel.setTabEnabled(2, True)  # shoudl now enable it for those that need it.
+        self.SC_panel.setTabVisible(2, True)  # shoudl now enable it for those that need it.
         self.SC_panel.setCurrentIndex(2) # should force the third tab to open.
         self.SC_panel.setTabEnabled(0, False) # make sure they HAVE to allocate before they can vote.
 
