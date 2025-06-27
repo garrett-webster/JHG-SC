@@ -180,7 +180,7 @@ class MainWindow(QMainWindow):
     def update_sc_votes(self, votes, cycle, is_last_cycle):
         self.round_state.sc_cycle = cycle
         # print("here are hte votes when it crashes ", votes, " bc cycle doesn't appear to be an issue")
-        time.sleep(0.01)
+        time.sleep(0.1)
         self.SC_cause_graph.update_arrows(votes, True)
         self.SC_voting_grid.set_selected_button_style_to_border()
 
