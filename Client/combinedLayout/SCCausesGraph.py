@@ -207,17 +207,88 @@ class SCCausesGraph(QWidget):
         if self.nodes_canvas.figure: # make sure this exists before attempting to draw on it.
             self.nodes_canvas.draw()
 
-    def update_sc_nodes_given_allocations(self):
-        utility_list = self.round_state.get_utilities_list()
-        new_sc_sim = Social_Choice_Sim(1, 3, 0, None, 0, 0, "", "", "", ["B1"])
-        new_sc_sim.set_new_options_matrix([utility_list, []])
-        player_node = new_sc_sim.create_player_nodes()
-        cause_nodes = new_sc_sim.get_causes() # do not be deceived, those are the cause nodes.
-        total_nodes = player_node + cause_nodes
-        total_nodes = [node.to_json() for node in total_nodes]
-        self.round_state.nodes[-1] = total_nodes # no clue if this will work.
-        self.update_sc_nodes_graph(-1)
+    # no longer used. replacing it with something different, maybe. hard to say.
+    # def update_sc_nodes_given_allocations(self):
+    #     utility_list = self.round_state.get_utilities_list()
+    #     new_sc_sim = Social_Choice_Sim(1, 3, 0, None, 0, 0, "", "", "", ["B1"])
+    #     new_sc_sim.set_new_options_matrix([utility_list, []])
+    #     player_node = new_sc_sim.create_player_nodes()
+    #     cause_nodes = new_sc_sim.get_causes() # do not be deceived, those are the cause nodes.
+    #     total_nodes = player_node + cause_nodes
+    #     total_nodes = [node.to_json() for node in total_nodes]
+    #     self.round_state.nodes[-1] = total_nodes # no clue if this will work.
+    #     self.update_sc_nodes_graph(-1)
+
+    def draw_allocations_graph(self, new_nodes, new_arrows):
+        # Clear graph
+        self.nodes_ax.cla()
+        self.arrows.clear()
+        self.nodes_x.clear()
+        self.nodes_y.clear()
+        self.nodes_type.clear()
+        self.nodes_text.clear()
+        self.node_flag.clear()
+        self.player_alphas.clear()
 
 
+        # Update node data
+        for node in new_nodes: # we are exteralizing this fetcher.
+            mini_dict = {"x_pos": float(node["x_pos"]), "y_pos": float(node["y_pos"])}
+            self.nodes_dict[node["text"]] = mini_dict
+            self.nodes_x.append(float(node["x_pos"]))
+            self.nodes_y.append(float(node["y_pos"]))
+            self.nodes_type.append(node["type"])
+            self.nodes_text.append(node["text"])
+            self.node_flag.append(node["negatives_flag"])
 
+        # Lists to store node info based on type
+        player_x, player_y, player_colors, player_texts, player_text_colors, player_alphas = [], [], [], [], [], []
 
+        for i, (x_val, y_val) in enumerate(zip(self.nodes_x, self.nodes_y)):
+            full_text = self.nodes_text[i]
+            display_text = full_text
+            flag = self.node_flag[i]
+            alpha = 0.2 if flag else 1.0
+            text_color = 'black'  # default
+
+            if full_text.startswith("Player"):
+                player_num = int(full_text.split()[1])
+                display_text = str(player_num)
+                color = COLORS[player_num - 1]
+
+                player_x.append(x_val)
+                player_y.append(y_val)
+                player_colors.append(color)
+                player_texts.append(display_text)
+                player_text_colors.append(text_color)
+                player_alphas.append(alpha)
+
+        # Draw annotations
+        for x, y, text, color, alpha in zip(player_x, player_y, player_texts, player_text_colors, player_alphas):
+            self.nodes_ax.annotate(text, (x - 0.05, y - 0.1), ha='center', va='center',
+                                   fontsize=10, color=color, weight='bold', zorder=587, alpha=alpha)
+
+        # Draw nodes: players as circles, causes as triangles
+        for x, y, c, a in zip(player_x, player_y, player_colors, player_alphas):  # players
+            self.nodes_ax.scatter(x, y, marker='o', c=c, s=150, zorder=500, alpha=a)
+
+        max_x = max(abs(x) for x in self.nodes_x)
+        max_y = max(abs(y) for y in self.nodes_y)
+        max_range = max(max_x, max_y) + 1  # Add some padding if you like
+
+        self.nodes_ax.set_xlim(-max_range, max_range)
+        self.nodes_ax.set_ylim(-max_range, max_range)
+
+        self.nodes_ax.set_aspect('equal', adjustable='box')
+
+        # aight now we do the arrow portion
+        for arrow in self.arrows:  # if there is anything in there.
+            arrow.remove()
+
+        self.arrows = new_arrows
+
+        for arrow in self.arrows:
+            arrow.draw(self.nodes_ax)
+
+        # Redraw the canvas
+        self.nodes_canvas.draw()

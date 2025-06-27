@@ -12,6 +12,7 @@ class Arrow:
         self.start = start
         self.end = end
         self.color = kwargs.pop('color', 'black')  # Default to black if not provided
+        self.line_thickness = kwargs.pop('line_thickness', 1)  # Default thickness
 
         self.kwargs = kwargs
 
@@ -26,7 +27,7 @@ class Arrow:
             posA=self.start, posB=self.end,
             arrowstyle='->', color=self.color,
             mutation_scale=self.kwargs.get('mutation_scale', 15),  # Adjust arrowhead size
-            linewidth=self.kwargs.get('linewidth', 1), # Arrow line thickness
+            linewidth=self.line_thickness, # Arrow line thickness
             zorder=10,
             **self.kwargs
         )

@@ -556,10 +556,11 @@ class Social_Choice_Sim:
             new_y = math.sin(displacement * i) * self.rad
             causes.append(Node(new_x, new_y, "CAUSE", "Cause " + str(i+1), False))
             self.causes_rads.append(i * displacement)
-        for i in range(NUM_CAUSES): #3 is the number of causes
-            new_x = math.cos(displacement * i) * self.rad * 2
-            new_y = math.sin(displacement * i) * self.rad * 2
-            self.outer_points.append(Node(new_x, new_y, "CAUSE", "Cause " + str(i+1), False))
+        # totally forgot I added this, but its not necessary. leaving it in in case I want to use it later.
+        # for i in range(NUM_CAUSES): #3 is the number of causes
+        #     new_x = math.cos(displacement * i) * self.rad * 2
+        #     new_y = math.sin(displacement * i) * self.rad * 2
+        #     self.outer_points.append(Node(new_x, new_y, "CAUSE", "Cause " + str(i+1), False))
 
         causes.append(Node(0,0,"Cause", ".", False))
         return causes # no need to return the midpoints

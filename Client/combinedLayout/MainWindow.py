@@ -22,6 +22,7 @@ from Client.combinedLayout.SCCausesGraph import SCCausesGraph
 from Client.combinedLayout.SCPlayerWidget import SCPlayerWidget
 from Client.combinedLayout.ui_functions.SC_functions import *
 from Client.combinedLayout.ui_functions.JHG_functions import *
+from Client.combinedLayout.SC_Allocations_Grapher import SC_Allocations_Grapher
 
 from Client.combinedLayout.sc_tornado_graph import update_sc_tornado_graph
 
@@ -143,19 +144,17 @@ class MainWindow(QMainWindow):
         self.SC_panel.currentChanged.connect(self.SC_tab_changed)
         self.SC_creations_panel = ScCreationPanel(self.round_state, self.connection_manager, self.sc_allocations_label,
                                                   self.sc_buttons)
-        # self.attach_sc_buttons() no longer does waht we want it to do, no gurantee of 3 diemsinons, scrapping that whole thing.
+        self.attach_sc_buttons() #no longer does waht we want it to do, no gurantee of 3 diemsinons, scrapping that whole thing.
         self.SC_panel.addTab(self.SC_creations_panel, "Allocations")
         self.SC_panel.setTabVisible(2, False)  # disable the tab unless you need it
 
-
-
-
+        self.SC_Allocations_grapher = SC_Allocations_Grapher(self.round_state.client_id) # idc how tempting it is do NOT throw main window in here.
 
         self.dockWidget = CornerContainer(self.JHG_panel, plots_panel, self.SC_panel, sc_graph_tabs)
 
         self.setWindowTitle("JHG: Round 1")
         self.setCentralWidget(self.dockWidget)
-        #self.SC_cause_graph.update_sc_nodes_given_allocations.connect(self.update_sc_graph)
+        #self.SC_cause_graph.update_sc_nodes_given_allocations.connect(self.SC_Allocations_grapher.create_graph())
 
     # /4#
 
@@ -221,6 +220,7 @@ class MainWindow(QMainWindow):
         self.SC_panel.setTabVisible(2, True)  # shoudl now enable it for those that need it.
         self.SC_panel.setCurrentIndex(2) # should force the third tab to open.
         self.SC_panel.setTabEnabled(0, False) # make sure they HAVE to allocate before they can vote.
+        self.SC_Allocations_grapher.create_graph(self.round_state.get_utilities_list()) # should be all 0's. s
 
     def disable_jhg_buttons(self, panel):
         panel.setEnabled(False)
@@ -235,7 +235,9 @@ class MainWindow(QMainWindow):
                 button.setText("Cause " + str(i+1) + " (" + str(new_total_ids.pop(0)+1) + ")")
 
     def update_sc_graph(self):
-        self.SC_cause_graph.update_sc_nodes_given_allocations() # get it farm fresh, see what happens.
+        print("How often is this going off? ")
+        new_nodes, new_arrows = self.SC_Allocations_grapher.create_graph(self.round_state.utilities)
+        self.SC_cause_graph.draw_allocations_graph(new_nodes, new_arrows)
 
     def attach_sc_buttons(self):
         for widget in self.round_state.sc_widgets:
