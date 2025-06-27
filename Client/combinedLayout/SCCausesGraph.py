@@ -219,7 +219,7 @@ class SCCausesGraph(QWidget):
     #     self.round_state.nodes[-1] = total_nodes # no clue if this will work.
     #     self.update_sc_nodes_graph(-1)
 
-    def draw_allocations_graph(self, new_nodes, new_arrows):
+    def draw_allocations_graph(self, new_nodes):
         # Clear graph
         self.nodes_ax.cla()
         self.arrows.clear()
@@ -281,7 +281,11 @@ class SCCausesGraph(QWidget):
 
         self.nodes_ax.set_aspect('equal', adjustable='box')
 
-        # aight now we do the arrow portion
+        # Redraw the canvas
+        self.nodes_canvas.draw()
+
+
+    def update_allocation_arrows(self, new_arrows):
         for arrow in self.arrows:  # if there is anything in there.
             arrow.remove()
 
@@ -290,5 +294,5 @@ class SCCausesGraph(QWidget):
         for arrow in self.arrows:
             arrow.draw(self.nodes_ax)
 
-        # Redraw the canvas
-        self.nodes_canvas.draw()
+
+        self.nodes_canvas.draw() # I think?

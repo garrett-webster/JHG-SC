@@ -15,10 +15,9 @@ class SC_Allocations_Grapher:
     def create_graph(self, new_vector):
         self.create_node_to_index_dict(new_vector) # figure out where We stand specifically.
         self.create_nodes(new_vector)
-        self.create_arrows(new_vector)
         self.nodes.append(Node(0, 0, "PLAYER", "Self", False))  # add your own tag # only at the end or it might mess with the arrows.
         new_nodes = [node.to_json() for node in self.nodes] # I understand this but still come on why must I do this
-        return new_nodes, self.arrows
+        return new_nodes
         # ok now that we have these, we need to graph them somehow. we will need to just pass these nodes into the
         # existing SC canvas, so lets figure out the best way to do that.
 
@@ -59,10 +58,12 @@ class SC_Allocations_Grapher:
                 color = "Red"
                 start, end = end, start # swaps the values for me
 
-            new_magnitude = abs(new_magnitude / self.rad) # there is no reason to use that value there, it just feels right ig.
+            new_magnitude = abs(new_magnitude) # there is no reason to use that value there, it just feels right ig.
             new_arrow = Arrow(start, end, color=color, line_thickness=new_magnitude / self.rad) # don't worry about it, should be fine.
             self.arrows.append(new_arrow)
             # Only one problem -- magnitude is not properly addressed, neither is the other stuff. will likely need to make a new class.
+
+        return self.arrows
 
 
 

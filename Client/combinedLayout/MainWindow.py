@@ -214,13 +214,14 @@ class MainWindow(QMainWindow):
         self.disable_jhg_buttons(self.JHG_panel)
         jhg_over(self, is_last, init_pop_influence)
         self.round_state.utilities = [0 for _ in range(self.round_state.num_players)] # reset this bc this isn't happening quick enough.
-        self.update_sc_graph() # hard coding this bc I want to see somethign real quick.
+        # self.update_sc_graph() # hard coding this bc I want to see somethign real quick.
 
     def enable_allocations_interface(self):
         self.SC_panel.setTabVisible(2, True)  # shoudl now enable it for those that need it.
         self.SC_panel.setCurrentIndex(2) # should force the third tab to open.
         self.SC_panel.setTabEnabled(0, False) # make sure they HAVE to allocate before they can vote.
-        self.SC_Allocations_grapher.create_graph(self.round_state.get_utilities_list()) # should be all 0's. s
+        new_nodes = self.SC_Allocations_grapher.create_graph(self.round_state.get_utilities_list()) # should be all 0's. s
+        self.SC_cause_graph.draw_allocations_graph(new_nodes)
 
     def disable_jhg_buttons(self, panel):
         panel.setEnabled(False)
@@ -236,8 +237,8 @@ class MainWindow(QMainWindow):
 
     def update_sc_graph(self):
         print("How often is this going off? ")
-        new_nodes, new_arrows = self.SC_Allocations_grapher.create_graph(self.round_state.utilities)
-        self.SC_cause_graph.draw_allocations_graph(new_nodes, new_arrows)
+        new_arrows = self.SC_Allocations_grapher.create_arrows(self.round_state.utilities)
+        self.SC_cause_graph.update_allocation_arrows(new_arrows)
 
     def attach_sc_buttons(self):
         for widget in self.round_state.sc_widgets:
@@ -258,4 +259,4 @@ class MainWindow(QMainWindow):
 
         self.round_state.reset_everything()
         self.change_cause_labels(total_id_list)
-        self.update_sc_graph()  # go ahead and refresh the origin thing as well.
+        # self.update_sc_graph()  # go ahead and refresh the origin thing as well.
