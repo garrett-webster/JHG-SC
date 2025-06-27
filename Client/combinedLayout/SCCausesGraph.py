@@ -209,7 +209,6 @@ class SCCausesGraph(QWidget):
 
     def update_sc_nodes_given_allocations(self):
         utility_list = self.round_state.get_utilities_list()
-        print("Aight this is the utility list. if its more than just a list it WILL affect the trout population. ", utility_list)
         new_sc_sim = Social_Choice_Sim(1, 3, 0, None, 0, 0, "", "", "", ["B1"])
         new_sc_sim.set_new_options_matrix([utility_list, []])
         player_node = new_sc_sim.create_player_nodes()

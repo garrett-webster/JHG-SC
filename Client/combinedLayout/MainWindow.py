@@ -1,4 +1,5 @@
 import copy
+import time
 from functools import partial
 
 import numpy as np
@@ -142,7 +143,7 @@ class MainWindow(QMainWindow):
         self.SC_panel.currentChanged.connect(self.SC_tab_changed)
         self.SC_creations_panel = ScCreationPanel(self.round_state, self.connection_manager, self.sc_allocations_label,
                                                   self.sc_buttons)
-        self.attach_sc_buttons()
+        # self.attach_sc_buttons() no longer does waht we want it to do, no gurantee of 3 diemsinons, scrapping that whole thing.
         self.SC_panel.addTab(self.SC_creations_panel, "Allocations")
         self.SC_panel.setTabEnabled(2, False)  # disable the tab unless you need it
 
@@ -178,6 +179,8 @@ class MainWindow(QMainWindow):
 
     def update_sc_votes(self, votes, cycle, is_last_cycle):
         self.round_state.sc_cycle = cycle
+        # print("here are hte votes when it crashes ", votes, " bc cycle doesn't appear to be an issue")
+        time.sleep(0.01)
         self.SC_cause_graph.update_arrows(votes, True)
         self.SC_voting_grid.set_selected_button_style_to_border()
 
@@ -210,7 +213,6 @@ class MainWindow(QMainWindow):
 
     def jhg_over(self, is_last, init_pop_influence):
         self.disable_jhg_buttons(self.JHG_panel)
-        print("Ayo is this firing at all ")
         jhg_over(self, is_last, init_pop_influence)
         self.round_state.utilities = [0 for _ in range(self.round_state.num_players)] # reset this bc this isn't happening quick enough.
         self.update_sc_graph() # hard coding this bc I want to see somethign real quick.
@@ -233,7 +235,6 @@ class MainWindow(QMainWindow):
                 button.setText("Cause " + str(i+1) + " (" + str(new_total_ids.pop(0)+1) + ")")
 
     def update_sc_graph(self):
-        print("PLEASE FIRE for all that is good")
         self.SC_cause_graph.update_sc_nodes_given_allocations() # get it farm fresh, see what happens.
 
     def attach_sc_buttons(self):
@@ -251,9 +252,8 @@ class MainWindow(QMainWindow):
             utilities_list = [0 for _ in range(self.round_state.num_players)]
             # go ahead and just send back and empty list of 0's for our repsonse so its all good to go. shouldn't actually touch anything.
             self.connection_manager.send_message("SUBMIT_UTILITY", self.round_state.client_id, self.round_state.jhg_round_num, utilities_list)
-            self.SC_voting_grid.setEnabled(False) # turn this off. Should become reenabled when all is said and done. 
+            self.SC_voting_grid.setEnabled(False) # turn this off. Should become reenabled when all is said and done.
 
         self.round_state.reset_everything()
         self.change_cause_labels(total_id_list)
-        print("This is the current utilitis list ", self.round_state.get_utilities_list())
         self.update_sc_graph()  # go ahead and refresh the origin thing as well.

@@ -183,10 +183,10 @@ class SCManager:
             print("Starting to wait for lcient input....")
             client_input = self.connection_manager.get_responses()
             print("we are pretty sure we have recieved all client input. Doing math....")
-            player_columns = []
+            player_columns = {}
             for client_id, response in client_input.items():
                 try:
-                    player_columns.append(response["UTILITIES"])
+                    player_columns[self.total_order[client_id]] = (response["UTILITIES"])
                 except KeyError:
                     print("Error processing client_input (yes where you think it is): " , client_input)
         print("here are the client columns ", player_columns)
@@ -199,7 +199,7 @@ class SCManager:
         for bot, i in enumerate(bot_peeps):
             final_columns[i] = bot_columns[bot] # hopefully
         for player, i in enumerate(player_peeps):
-            final_columns[i] = player_columns[player]
+            final_columns[i] = player_columns[i]
 
         # should do all the orginization of the final columns and leave it in the original peeps thing.
         for peep in peeps:

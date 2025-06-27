@@ -28,7 +28,6 @@ class PlusButtonUtility(QWidget):
     updateGraph = pyqtSignal()
 
     def on_plus_button_clicked(self, event):
-        print("OK so this should be emitting")
         self.updateUtility.emit()
         self.updateGraph.emit()
 
