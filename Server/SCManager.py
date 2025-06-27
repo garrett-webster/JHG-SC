@@ -41,10 +41,10 @@ class SCManager:
         self.sc_logger = sc_logging
         self.total_order = total_order # keeps track of which are players and which are bots.
 
-    def init_next_round(self, current_options_matrix):
+    def init_next_round(self, current_options_matrix=None):
         # Initialize the round
         self.sc_sim.start_round(current_options_matrix) # make sure this actually gets hard set.
-        self.current_options_matrix = current_options_matrix
+        self.current_options_matrix = self.sc_sim.current_options_matrix
         self.options_history[self.round_num] = self.current_options_matrix
         self.player_nodes = self.sc_sim.get_player_nodes()
         self.causes = self.sc_sim.get_causes()
@@ -58,8 +58,6 @@ class SCManager:
 
     def play_social_choice_round(self, jhg_sim):
         # first we gotta GET the new current options matrix. thats a pain.
-        peeps = self.generate_peeps(self.sc_sim, jhg_sim, self.total_order)
-        #self.server_side_options_matrix(peeps, jhg_sim.get_influence())
         # Run the voting and collect the votes
         player_votes = self.run_sc_voting()
         # this is the line where we get the bot votes as well.

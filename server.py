@@ -17,6 +17,9 @@ OPTIONS = {
     "JHG_LOGGING": False,
     "SC_LOGGING": True,
 
+    #Misc (Wasn't sure where to put this)
+    "PLAYER_ALLOCATIONS" : True,
+
     # Generator options
     "OPTION_GENERATOR": 2, # Defines what behavior the options generator should use. See Server.OptionsGenerators.generators for the full list
     "NOISE_MAGNITUDE": 5, # Maximum noise to add to a generated number
@@ -38,6 +41,7 @@ class Server():
         self.sc_vote_cycles = options["SC_VOTE_CYCLES"]
         self.SC_logging = options["SC_LOGGING"]
         self.JHG_logging = options["JHG_LOGGING"]
+        self.player_allocations = options["PLAYER_ALLOCATIONS"]
         self.total_order = None
         self.generator = None
         self.SC_manager = None
@@ -72,11 +76,15 @@ class Server():
                 if i == self.jhg_rounds_per_sc_round - 1: is_last_jhg_round = True
                 self.JHG_manager.play_jhg_round(self.JHG_manager.current_round, is_last_jhg_round)
             # yeah we need ot remake this every time, that wa
-            peeps = self.generate_peeps(self.total_order)
-            print("These are the currently toggled peeps", peeps)
-            influence_matrix = self.JHG_manager.get_influence_matrix()
-            current_options_matrix = self.SC_manager.server_side_options_matrix(peeps, influence_matrix)
-            self.SC_manager.init_next_round(current_options_matrix)
+            if self.player_allocations == True:
+                peeps = self.generate_peeps(self.total_order)
+                print("These are the currently toggled peeps", peeps)
+                influence_matrix = self.JHG_manager.get_influence_matrix()
+                current_options_matrix = self.SC_manager.server_side_options_matrix(peeps, influence_matrix)
+                self.SC_manager.init_next_round(current_options_matrix)
+            else:
+                self.SC_manager.init_next_round() # give him nothing so he has to generate his own stuff.
+
             self.SC_manager.play_social_choice_round(self.JHG_manager.get_sim())
 
         self.JHG_manager.log_jhg_overview()
