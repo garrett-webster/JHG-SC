@@ -2,7 +2,7 @@ import copy
 import math
 from Server.Node import Node
 from Client.combinedLayout.Arrow import Arrow
-
+from Client.combinedLayout.Circle import Circle
 class SC_Allocations_Grapher:
 
     def __init__(self, self_id):
@@ -65,9 +65,23 @@ class SC_Allocations_Grapher:
             new_arrow = Arrow(start, end, color=color, line_thickness=new_magnitude / self.rad) # don't worry about it, should be fine.
             self.arrows.append(new_arrow)
             # Only one problem -- magnitude is not properly addressed, neither is the other stuff. will likely need to make a new class.
+        # this is gonna be a little fetcher but here he is.
 
+        self.add_circle(new_vector[self.self_id])
         return self.arrows
 
 
+    def add_circle(self, new_magnitude):
+        if new_magnitude < 0:
+            color = "Red"
+            radius = -0.5 + (new_magnitude / (self.rad*2))  # start there?
+        elif new_magnitude > 0:
+            color = "Green"
+            radius = 0.5 + (new_magnitude / (self.rad*2))  # start there?
+        else:
+            color = "Black" # just to give us a place to start.
+            radius = 0.5
 
 
+        new_circle = Circle((0, 0), radius, line_thickness=new_magnitude / self.rad, color=color)
+        self.arrows.append(new_circle)
