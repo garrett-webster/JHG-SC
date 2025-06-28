@@ -16,7 +16,7 @@ class SC_Allocations_Grapher:
     def create_graph(self, new_vector):
         self.create_node_to_index_dict(new_vector) # figure out where We stand specifically.
         self.create_nodes(new_vector)
-        self.nodes.append(Node(0, 0, "PLAYER", "Self", False))  # add your own tag # only at the end or it might mess with the arrows.
+        self.nodes.append(Node(0, 0, "PLAYER", "Player " + str(self.self_id+1), False))  # add your own tag # only at the end or it might mess with the arrows.
         new_nodes = [node.to_json() for node in self.nodes] # I understand this but still come on why must I do this
         return new_nodes
         # ok now that we have these, we need to graph them somehow. we will need to just pass these nodes into the
