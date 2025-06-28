@@ -10,7 +10,8 @@ class SC_Allocations_Grapher:
         self.nodes = []
         self.self_id = self_id
         self.arrows = []
-        self.node_to_index_dict = {}
+        self.node_to_index_dict = {} # this holds the adjusted number accounting for indexes
+        self.node_to_number_dict = {}  # holds the actual original index number (for output purposes)
 
     def create_graph(self, new_vector):
         self.create_node_to_index_dict(new_vector) # figure out where We stand specifically.
@@ -23,11 +24,13 @@ class SC_Allocations_Grapher:
 
     def create_node_to_index_dict(self, new_vector):
         self.node_to_index_dict = {}
+        self.node_to_number_dict = {}
         index_to_add = 0
         for i in range(len(new_vector)):
             if i != self.self_id:
                 self.node_to_index_dict[i] = index_to_add
                 index_to_add += 1
+                self.node_to_number_dict[i] = i # this isn't helpful I don't think
 
         return self.node_to_index_dict
 
@@ -39,7 +42,7 @@ class SC_Allocations_Grapher:
             curr_idx = self.node_to_index_dict[node]
             new_x = math.cos(dispalcement * curr_idx) * self.rad
             new_y = math.sin(dispalcement * curr_idx) * self.rad
-            self.nodes.append(Node(new_x, new_y, "PLAYER", "Player " + str(node + 1), False))
+            self.nodes.append(Node(new_x, new_y, "PLAYER", "Player " + str(self.node_to_number_dict[node] + 1), False))
 
     def create_arrows(self, new_vector):
         pass # so the arrows are categorized by 3 things - strength, color and angle. the angle is determined by
@@ -51,7 +54,7 @@ class SC_Allocations_Grapher:
         for node in self.node_to_index_dict: # cycle through all the relavent nodes.
             curr_idx = self.node_to_index_dict[node] # get the actual location of the node.
             end = self.nodes[curr_idx].get_x(), self.nodes[curr_idx].get_y() # just get the end position.
-            new_magnitude = new_vector[curr_idx] # i think? this should work?
+            new_magnitude = new_vector[node] # i think? this should work?
             color = "Green"
 
             if new_magnitude < 0:
