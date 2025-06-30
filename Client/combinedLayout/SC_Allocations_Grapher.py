@@ -55,7 +55,6 @@ class SC_Allocations_Grapher:
         self.arrows = [] # go ahead and reset it at the top level as well, makes my life easier.
         for node in self.node_to_index_dict: # cycle through all the relavent nodes.
             start = (0, 0)  # this assumption GREATLY simplifies a lot of the math. also make sure to reset this every time.
-            print("This is the start ", start)
             curr_idx = self.node_to_index_dict[node] # get the actual location of the node.
             end = self.nodes[curr_idx].get_x(), self.nodes[curr_idx].get_y() # just get the end position.
             new_magnitude = new_vector[node] # i think? this should work?
@@ -64,15 +63,9 @@ class SC_Allocations_Grapher:
             if new_magnitude < 0:
                 color = "Red"
                 start, end = end, start # swaps the values for me
-            print("this is the start ", start, " and the end ", end)
             new_magnitude = abs(new_magnitude) # there is no reason to use that value there, it just feels right ig.
-            # if start == (5.0, 0) and end == (-5.0, 6.123233995736766e-16):
-            #     print("AYO STOP HERE ")
-            print("Drawing a new arrow from ", start, " to ", end)
             new_arrow = Arrow(start, end, color=color, line_thickness=new_magnitude / self.rad) # don't worry about it, should be fine.
             self.arrows.append(new_arrow)
-            # Only one problem -- magnitude is not properly addressed, neither is the other stuff. will likely need to make a new class.
-        # this is gonna be a little fetcher but here he is.
 
         self.add_circle(new_vector[self.self_id])
         return self.arrows
