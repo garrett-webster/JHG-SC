@@ -27,7 +27,7 @@ class ServerConnectionManager(ConnectionManager):
             "JHG_OVER": ["ROUND", "POPULARITY", "INFLUENCE_MAT", "INIT_POP_INFLUENCE", "IS_LAST", "RECEIVED", "SENT"],
             "SC_VOTES": ["VOTES", "CYCLE", "IS_LAST_CYCLE"],
             "SC_OVER": ["ROUND_NUM", "WINNING_VOTE", "NEW_UTILITIES", "POSITIVE_VOTE_EFFECTS",
-                        "NEGATIVE_VOTE_EFFECTS", "VOTES", "UTILITIES"],
+                        "NEGATIVE_VOTE_EFFECTS", "VOTES", "UTILITIES", "INFLUENCE_MATRIX"],
 
         }
 

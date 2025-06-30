@@ -20,6 +20,7 @@ class ServerListener(QObject):
     switch_to_jhg_signal = pyqtSignal()
     update_sc_nodes_graph_signal = pyqtSignal(int)
     sc_create_stuff = pyqtSignal(list, list)
+    update_sc_influence = pyqtSignal(list, list)
 
 
     def __init__(self, main_window, connection_manager, round_state, round_counter, token_label, allocations_label, jhg_popularity_graph, tabs):
@@ -98,6 +99,8 @@ class ServerListener(QObject):
         self.update_tornado_graph_signal.emit(self.main_window.tornado_ax, message["POSITIVE_VOTE_EFFECTS"],
                                               message["NEGATIVE_VOTE_EFFECTS"])
         self.update_sc_nodes_graph_signal.emit(message["WINNING_VOTE"])
+
+        self.update_sc_influence.emit(message["INFLUENCE_MATRIX"], message["NEW_UTILITIES"])
 
         # Switch to JHG
         self.switch_to_jhg_signal.emit()

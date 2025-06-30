@@ -5,11 +5,9 @@ from collections import Counter
 from operator import index
 from pathlib import Path
 import numpy as np
-import matplotlib.pyplot as plt
-from matplotlib.collections import LineCollection
-from matplotlib.colors import to_rgba
 
-from Client.combinedLayout.colors import COLORS
+
+#from Client.combinedLayout.colors import COLORS
 from Server.Node import Node
 from Server.SC_Bots.humanAttempt2 import humanAttempt2
 from Server.OptionGenerators.options_creation import generate_two_plus_one_groups_options_best_of_three, generate_two_plus_one_groups
@@ -22,7 +20,7 @@ from Server.SC_Bots.reorganizedHuman import reorganizedHuman
 from Server.SC_Bots.possibleCheetahBot import cheetahBot
 
 # lets just see if this works.
-from Client.combinedLayout.ui_functions.StudyScripts.network import NodeNetwork # just for graphing the influence matrix node edges.
+
 
 NUM_CAUSES = 3
 
@@ -365,12 +363,17 @@ class Social_Choice_Sim:
         return winning_vote, self.current_results # literally just returns who won. thats it.
 
     def calculate_influence_matrix(self, new_v, curr_round):
+        if curr_round == 1: # no clue!
+            self.I[-1] = [[0 for _ in range(self.total_players)] for _ in range(self.total_players)] # give it something backwards to work with.
+            self.I[0] = [[0 for _ in range(self.total_players)] for _ in range(self.total_players)]  # give it something backwards to work with.
         self.I[curr_round] = [[0 for _ in range(self.total_players)] for _ in range(self.total_players)] # initalize it w/ something.
         for i in range(self.total_players):
             for j in range(self.total_players):
                 self.I[curr_round][i][j] = self.alpha * new_v[i][j] + (1 - self.alpha) * self.I[curr_round-1][i][j]
         return self.I[curr_round]
 
+    def get_influence_matrix(self, curr_round):
+        return self.I[curr_round] # because fetch it, we never need the entire thing.
 
     def set_choice_matrix(self, new_choice_matrix):
         self.choice_matrix = new_choice_matrix
@@ -775,50 +778,3 @@ class Social_Choice_Sim:
             list_of_columns.append(self.bots[self.bot_index_dict[peep]].create_column(self.total_players))
         current_options_matrix = np.transpose(list_of_columns).tolist()
         return current_options_matrix
-
-    def graphs_relations(self, curr_round): # imma want the curr_round at some point, and I'm pretty sure its around line 808 but I can't prove that yet!
-        # make sure that results sums is insialized to 0
-        curr_I = np.array(self.I[curr_round]) # make this an array as well.
-        net = NodeNetwork()
-        net.setupPlayers([f"{i}" for i in range(np.shape(self.results_sums)[0])])
-        net.initNodes(init_pops=self.results_sums)
-        net.update(curr_I, self.results_sums)
-
-        node_positions = np.array([node.position[-1] for node in net.nodes])
-
-        fig, ax = plt.subplots(figsize=(8,8))
-        for i, (x, y) in enumerate(node_positions):
-            color = COLORS[i % len(COLORS)]
-            ax.scatter(x, y, s=150, c=color, edgecolors="none", zorder=2)
-            ax.text(x, y, str(i), fontsize=10, ha="center", va="center", color="black", zorder=3)
-
-        min_weight = np.min(np.abs(curr_I))
-        max_weight = np.max(np.abs(curr_I))
-
-        def get_edge_color_and_opacity(weight):
-            if max_weight != min_weight:
-                normalized = (abs(weight) - min_weight) / (max_weight - min_weight)
-            else:
-                normalized = 0
-            color = (0, 1, 0) if weight > 0 else (1, 0, 0)
-            alpha = normalized
-            return color, alpha
-
-        segments = []
-        colors = []
-        for i, node in enumerate(net.nodes):
-            for j, weight in enumerate(curr_I[i]): # yeah I think this will graph to much, I htink I need to do this at just the mcfreakin uhh curr Round.
-                if weight != 0:
-                    x0, y0 = node_positions[i]
-                    x1, y1 = node_positions[j]
-                    color, alpha = get_edge_color_and_opacity(weight)
-                    segments.append([(x0, y0), (x1,y1)])
-                    colors.append(to_rgba(color, alpha))
-
-        lc = LineCollection(segments, colors=colors, zorder=1)
-        ax.add_collection(lc)
-
-        ax.set_aspect("equal")
-        ax.axis("off")
-        plt.tight_layout()
-        plt.show()

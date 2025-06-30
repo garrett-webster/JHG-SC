@@ -7,12 +7,13 @@ from Server.JHGManager import JHG_simulator
 from tqdm import tqdm
 
 from offlineSimStuff.variousGraphingTools.sc_tools.causeNodeGraphVisualizer import causeNodeGraphVisualizer
+from offlineSimStuff.variousGraphingTools.sc_tools.graph_influence_matrix import influenceGrapher
 from Server.OptionGenerators.generators import generator_factory
 
 
 # starts the sim, could make this take command line arguments
 # takes in a bot type, a number of rounds, and then runs it and plots the results. plans for expansion coming soon.
-def run_trial(sc_sim, jhg_sim, num_rounds, num_cycles, create_graphs, group, total_order):
+def run_trial(sc_sim, jhg_sim, num_rounds, num_cycles, create_graphs, group, total_order, create_influence):
     # ok so what do I actually want to happen in here
     # i need to run as many rounds as I want of JHG and SC-sim
     # i could allow for differing rounds? I will probably initalize that and pass it into run trial
@@ -35,12 +36,17 @@ def run_trial(sc_sim, jhg_sim, num_rounds, num_cycles, create_graphs, group, tot
             bot_votes[cycle] = sc_sim.get_votes(bot_votes, curr_round, cycle, num_cycles)
             sc_sim.record_votes(bot_votes[cycle], cycle)
 
+        # make sure that this happens IMMEDIATELY afterward.
+        winning_vote, round_results = sc_sim.return_win(
+            bot_votes[num_cycles - 1])  # we need this to run, even if we don't need the results HERE per se
+        sc_sim.save_results()
+
         if create_graphs:
             graph_nodes(sc_sim)
-        winning_vote, round_results = sc_sim.return_win(bot_votes[num_cycles-1]) # we need this to run, even if we don't need the results HERE per se.
-        sc_sim.print_influence_matrix(curr_round)
-        sc_sim.save_results()
-        sc_sim.graphs_relations(curr_round)
+        if create_influence:
+            graph_influence(sc_sim)
+
+        # sc_sim.graphs_relations(curr_round)
 
     return sc_sim, jhg_sim
 
@@ -63,6 +69,10 @@ def generate_peeps(sc_sim, jhg_sim, total_order):
 def graph_nodes(sim):
     currVisualizer = causeNodeGraphVisualizer()
     currVisualizer.create_graph_with_sim(sim)
+
+def graph_influence(sim):
+    curr_influence_grapher = influenceGrapher(sim.total_players) # gotta be a smarter way for this to read it so it doesn't get passed all teh way down.
+    curr_influence_grapher.create_graph(sim.I, sim.results_sums, sim.round)
 
 
 def create_sim(total_players, scenario=None, chromosomes=None, group="", total_order=None):
@@ -97,6 +107,7 @@ if __name__ == "__main__":
     num_players = 9
     num_humans = 0
     create_graphs = True
+    create_influence = True
     total_groups = ["", 0, 1, 2]
     chromosomes_directory = "testChromosome"
     group = ""
@@ -107,7 +118,7 @@ if __name__ == "__main__":
 
     current_jhg_sim = create_jhg_sim(num_humans, num_players, total_order)
     current_sc_sim = create_sim(num_players, scenario, chromosome, group, total_order)
-    sc_sim, jhg_sim = run_trial(current_sc_sim, current_jhg_sim, num_rounds, num_cycles, create_graphs, group, total_order)
+    sc_sim, jhg_sim = run_trial(current_sc_sim, current_jhg_sim, num_rounds, num_cycles, create_graphs, group, total_order, create_influence)
     # probs_list = sc_sim.get_winning_probabilities()
     # print("Average winning probs ", sum(probs_list) / num_rounds)
     # print("min winning probs ", min(probs_list))

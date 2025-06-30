@@ -86,7 +86,7 @@ class SCManager:
         self.connection_manager.distribute_message("SC_OVER", self.round_num, winning_vote, new_utilities,
                                                    self.positive_vote_effects_history,
                                                    self.negative_vote_effects_history, zero_idx_votes,
-                                                   self.current_options_matrix)
+                                                   self.current_options_matrix, self.sc_sim.get_influence_matrix(self.round_num))
 
         time.sleep(.5)  # Without this, messages get sent out of order, and the sc_history gets screwed up.
         if self.sc_logger:

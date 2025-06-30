@@ -25,6 +25,7 @@ from Client.combinedLayout.ui_functions.JHG_functions import *
 from Client.combinedLayout.SC_Allocations_Grapher import SC_Allocations_Grapher
 
 from Client.combinedLayout.sc_tornado_graph import update_sc_tornado_graph
+from Client.combinedLayout.SCInfluenceGrapher import update_sc_network_graph
 
 
 class MainWindow(QMainWindow):
@@ -77,6 +78,9 @@ class MainWindow(QMainWindow):
         self.utility_qlabels = []
         self.SC_voting_grid = QTabWidget()
         self.cause_table = QWidget()
+
+        self.sc_influence = pg.PlotWidget() # just so we have it
+        self.sc_influence.setBackground("#282828ff") # same as the above.
 
         # Header for JHG tab
         self.headerLayout = QHBoxLayout()
@@ -134,6 +138,7 @@ class MainWindow(QMainWindow):
         sc_graph_tabs = QTabWidget()
         sc_graph_tabs.addTab(self.SC_cause_graph, "Causes Graph")
         sc_graph_tabs.addTab(self.tornado_canvas, "Effect of past votes")
+        sc_graph_tabs.addTab(self.sc_influence, "Influence Graph") # not running yet but should! appear.
 
         graphs_layout.addWidget(sc_graph_tabs)
 
@@ -175,6 +180,7 @@ class MainWindow(QMainWindow):
         self.ServerListener_thread.started.connect(self.ServerListener.start_listening)
         self.ServerListener.disable_jhg_buttons_signal.connect(self.disable_jhg_buttons)
         self.ServerListener.sc_create_stuff.connect(self.sc_create_allocations)
+        self.ServerListener.update_sc_influence.connect(self.sc_update_influence)
 
     def update_sc_votes(self, votes, cycle, is_last_cycle):
         self.round_state.sc_cycle = cycle
@@ -259,3 +265,7 @@ class MainWindow(QMainWindow):
         self.round_state.reset_everything()
         self.change_cause_labels(total_id_list)
         # self.update_sc_graph()  # go ahead and refresh the origin thing as well.
+
+    def sc_update_influence(self, Influence, new_utilities):
+        # ok what did this need to do
+        update_sc_network_graph(self, Influence, new_utilities, self.round_state.sc_round_num) # yeah sure why not

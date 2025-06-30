@@ -1,4 +1,9 @@
 import numpy as np
+from Client.combinedLayout.ui_functions.StudyScripts.network import NodeNetwork # just for graphing the influence matrix node edges.
+from Client.combinedLayout.colors import COLORS
+import matplotlib.pyplot as plt
+from matplotlib.collections import LineCollection
+from matplotlib.colors import to_rgba
 
 class influenceGrapher:
     def __init__(self, num_players):
@@ -8,9 +13,9 @@ class influenceGrapher:
         # make sure that results sums is insialized to 0
         curr_I = np.array(I[curr_round])  # make this an array as well.
         net = NodeNetwork()
-        net.setupPlayers([f"{i}" for i in range(np.shape(self.results_sums)[0])])
-        net.initNodes(init_pops=self.results_sums)
-        net.update(curr_I, self.results_sums)
+        net.setupPlayers([f"{i}" for i in range(np.shape(results_sums)[0])])
+        net.initNodes(init_pops=results_sums) # not sure if this is actually getting used the way that I think its getting used, but we are sure trying.
+        net.update(curr_I, results_sums)
 
         node_positions = np.array([node.position[-1] for node in net.nodes])
 
