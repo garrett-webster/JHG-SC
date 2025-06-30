@@ -76,7 +76,6 @@ class cheetahBot:
             return self.get_vote_negative(our_row, col_probs, cause_sums, risk_aversion, majority_factor, current_options_matrix, cycle, max_cycle, choice_list, choice_matrix)
         else:
             #print(self.self_id, "has entered positive voting phase")
-            print("THIS is the current cycle ", cycle, " and here is the max cycle ", max_cycle)
             return self.get_vote_positive(our_row, col_probs, cause_sums, risk_aversion, majority_factor, current_options_matrix, cycle, max_cycle, previous_votes[cycle-1])
 
     def get_vote_negative(self, our_row, col_probs, cause_sums, risk_aversion, majority_factor, current_options_matrix, cycle, max_cycle, choice_list, choice_matrix):

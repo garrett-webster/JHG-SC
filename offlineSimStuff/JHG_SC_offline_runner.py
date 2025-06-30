@@ -22,7 +22,7 @@ def run_trial(sc_sim, jhg_sim, num_rounds, num_cycles, create_graphs, group, tot
     # should be fun.
     # sc_sim.set_round(num_rounds)
     sc_sim.set_group(group)
-    for curr_round in tqdm(range(0, num_rounds)):
+    for curr_round in tqdm(range(0, num_rounds)): # everything NEEDS to start at 1, PLEASE.
         jhg_sim.execute_round(None, curr_round) # no client input, thats crazy talk here. run a JHG round.
         influence_matrix = jhg_sim.get_influence() # need this for friend recognition and whatnot.
         possible_peeps = generate_peeps(sc_sim, jhg_sim, total_order) # people who are needed to create the matrix
@@ -37,7 +37,10 @@ def run_trial(sc_sim, jhg_sim, num_rounds, num_cycles, create_graphs, group, tot
 
         if create_graphs:
             graph_nodes(sc_sim)
+        winning_vote, round_results = sc_sim.return_win(bot_votes[num_cycles-1]) # we need this to run, even if we don't need the results HERE per se.
+        sc_sim.print_influence_matrix(curr_round)
         sc_sim.save_results()
+        sc_sim.graphs_relations(curr_round)
 
     return sc_sim, jhg_sim
 
