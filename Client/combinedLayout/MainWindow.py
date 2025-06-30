@@ -236,7 +236,6 @@ class MainWindow(QMainWindow):
                 button.setText("Cause " + str(i+1) + " (" + str(new_total_ids.pop(0)+1) + ")")
 
     def update_sc_graph(self):
-        print("How often is this going off? ")
         new_arrows = self.SC_Allocations_grapher.create_arrows(self.round_state.utilities)
         self.SC_cause_graph.update_allocation_arrows(new_arrows)
 
