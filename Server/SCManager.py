@@ -175,19 +175,16 @@ class SCManager:
 
         #total_columns.append(self.sc_sim.let_others_create_options_matrix(bot_peeps, influence_matrix))
         # now we have to get teh player input. I don't know how to handle this as well to be entirely honesty.
-        if len(player_peeps) > 0:  # only enter this loop if there are clients to question.
-            print("player peeps are non zero. engaging target.")
-            self.connection_manager.distribute_message("SC_OPTIONS_CREATE", total_order_index, actual_total_order_index)  # reset all the utilities and whatnot, just in case.
-            print("Starting to wait for lcient input....")
-            client_input = self.connection_manager.get_responses()
-            print("we are pretty sure we have recieved all client input. Doing math....")
-            player_columns = {}
-            for client_id, response in client_input.items():
-                try:
-                    player_columns[self.total_order[client_id]] = (response["UTILITIES"])
-                except KeyError:
-                    print("Error processing client_input (yes where you think it is): " , client_input)
-        print("here are the client columns ", player_columns)
+
+        self.connection_manager.distribute_message("SC_OPTIONS_CREATE", total_order_index, actual_total_order_index)  # reset all the utilities and whatnot, just in case.
+        client_input = self.connection_manager.get_responses()
+        player_columns = {}
+        for client_id, response in client_input.items():
+            try:
+                player_columns[self.total_order[client_id]] = (response["UTILITIES"])
+            except KeyError:
+                print("Error processing client_input (yes where you think it is): " , client_input)
+
 
         bot_columns = []
         for bot in self.sc_sim.bots:
