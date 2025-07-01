@@ -226,7 +226,7 @@ class MainWindow(QMainWindow):
     def enable_allocations_interface(self):
         self.SC_panel.setTabVisible(2, True)  # shoudl now enable it for those that need it.
         self.SC_panel.setCurrentIndex(2) # should force the third tab to open.
-        self.SC_panel.setTabEnabled(0, False) # make sure they HAVE to allocate before they can vote.
+        #self.SC_panel.setTabEnabled(0, False) # make sure they HAVE to allocate before they can vote.
         new_nodes = self.SC_Allocations_grapher.create_graph(self.round_state.get_utilities_list()) # should be all 0's. s
         self.SC_cause_graph.draw_allocations_graph(new_nodes)
 
@@ -247,6 +247,7 @@ class MainWindow(QMainWindow):
         self.SC_cause_graph.update_allocation_arrows(new_arrows)
 
     def attach_sc_buttons(self):
+        print("Bleh")
         for widget in self.round_state.sc_widgets:
             widget.utility_minus_button.updateUtility.connect(  # this is going to need to get changed as well.
                 partial(self.update_sc_graph))
@@ -261,7 +262,8 @@ class MainWindow(QMainWindow):
             utilities_list = [0 for _ in range(self.round_state.num_players)]
             # go ahead and just send back and empty list of 0's for our repsonse so its all good to go. shouldn't actually touch anything.
             self.connection_manager.send_message("SUBMIT_UTILITY", self.round_state.client_id, self.round_state.jhg_round_num, utilities_list)
-            self.SC_voting_grid.setEnabled(False) # turn this off. Should become reenabled when all is said and done.
+            # IF BRICK COME BACK HERE
+            #self.SC_voting_grid.setEnabled(False) # turn this off. Should become reenabled when all is said and done.
 
         self.round_state.reset_everything()
         self.change_cause_labels(total_id_list)

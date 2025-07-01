@@ -73,7 +73,7 @@ class Server():
         while self.JHG_manager.current_round <= self.max_rounds:
             for round in range(self.max_rounds):
 
-                if self.player_allocations == True:
+                if self.player_allocations:
                     peeps = self.generate_peeps(self.total_order)
                     print("These are the currently toggled peeps", peeps)
                     influence_matrix = self.JHG_manager.get_influence_matrix()
@@ -82,7 +82,7 @@ class Server():
                 else:
                     self.SC_manager.init_next_round() # give him nothing so he has to generate his own stuff.
 
-            self.SC_manager.play_social_choice_round()
+                self.SC_manager.play_social_choice_round()
 
         print("game over")
 

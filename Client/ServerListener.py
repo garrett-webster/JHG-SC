@@ -67,6 +67,7 @@ class ServerListener(QObject):
 
 
     def SC_INIT(self, message):
+        print("so when is this going off")
         # self.tabs.setCurrentIndex(1)
         self.round_state.sc_round_num = message["ROUND_NUM"]
         self.round_state.options = message["OPTIONS"]
