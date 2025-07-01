@@ -75,7 +75,6 @@ class Server():
 
                 if self.player_allocations:
                     peeps = self.generate_peeps(self.total_order)
-                    print("These are the currently toggled peeps", peeps)
                     influence_matrix = self.JHG_manager.get_influence_matrix()
                     current_options_matrix = self.SC_manager.server_side_options_matrix(peeps, influence_matrix)
                     self.SC_manager.init_next_round(current_options_matrix)
@@ -86,7 +85,7 @@ class Server():
 
         print("game over")
 
-    def generate_peeps(self, total_order):
+    def generate_peeps(self, total_order): # this should no longer be random, not sure why it is rn.
         peeps = []
         for i in range(3):
             peep = random.choice(total_order)

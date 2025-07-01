@@ -266,7 +266,7 @@ class MainWindow(QMainWindow):
             #self.SC_voting_grid.setEnabled(False) # turn this off. Should become reenabled when all is said and done.
 
         self.round_state.reset_everything()
-        self.change_cause_labels(total_id_list)
+        self.change_cause_labels(total_id_list) # this should help update it. just movign the thing to ping everyone.
         # self.update_sc_graph()  # go ahead and refresh the origin thing as well.
 
     def sc_update_influence(self, Influence, new_utilities):
