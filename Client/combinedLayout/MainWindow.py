@@ -155,7 +155,7 @@ class MainWindow(QMainWindow):
 
         self.SC_Allocations_grapher = SC_Allocations_Grapher(self.round_state.client_id) # idc how tempting it is do NOT throw main window in here.
 
-        self.dockWidget = CornerContainer(self.JHG_panel, plots_panel, self.SC_panel, sc_graph_tabs)
+        self.dockWidget = CornerContainer(self.SC_panel, sc_graph_tabs)
 
         self.setWindowTitle("JHG: Round 1")
         self.setCentralWidget(self.dockWidget)

@@ -56,7 +56,7 @@ class SCManager:
 
 
 
-    def play_social_choice_round(self, jhg_sim):
+    def play_social_choice_round(self):
         # first we gotta GET the new current options matrix. thats a pain.
         # Run the voting and collect the votes
         player_votes = self.run_sc_voting()
