@@ -203,8 +203,6 @@ class SCManager:
 
 
         # we gotta hope this works
-        print("Here is the total order ", self.total_order)
-        print("Here are the total columns" , total_columns)
         total_columns = (np.array(total_columns).transpose()).tolist()
 
         return total_columns # this should be the new current options matix. maybe.
@@ -222,3 +220,10 @@ class SCManager:
         random_player = random.choice(possible_players)
         peeps = [highest_utility, highest_pop, random_player]
         return peeps
+
+    # pretty sure I don't every use this actually.
+    # def get_sim(self):
+    #     return self
+
+    def get_results_sums(self):
+        return self.sc_sim.results_sums

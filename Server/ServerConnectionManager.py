@@ -52,11 +52,11 @@ class ServerConnectionManager(ConnectionManager):
         total_list = client_list + bots_list
         random.shuffle(total_list)  # bars
         self.total_order = total_list
-        print("This is the total order ", self.total_order)
+        #print("This is the total order ", self.total_order)
         # now we need to list out hte player ID's.
         self.player_only_ids = [self.total_order.index(val) for val in total_list if
                                 val.startswith("P")]  # this ID is zero indexed.
-        print("these are the player only ID's ", self.player_only_ids)
+        # print("these are the player only ID's ", self.player_only_ids)
 
     def get_total_list(self):
         return self.total_order

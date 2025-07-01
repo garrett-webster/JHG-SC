@@ -5,6 +5,8 @@ from Server.JHGManager import JHGManager
 from Server.OptionGenerators.generators import generator_factory
 from Server.SCManager import SCManager
 from Server.ServerConnectionManager import ServerConnectionManager
+import numpy as np
+
 
 OPTIONS = {
     #General settings
@@ -76,8 +78,9 @@ class Server():
                 if i == self.jhg_rounds_per_sc_round - 1: is_last_jhg_round = True
                 self.JHG_manager.play_jhg_round(self.JHG_manager.current_round, is_last_jhg_round)
             # yeah we need ot remake this every time, that wa
-            if self.player_allocations == True:
-                peeps = self.generate_peeps(self.total_order)
+            if self.player_allocations:
+                # do this at the beginning fo this bc it is imperative that their popularities be updated before anythign else can happen. 
+                peeps = self.generate_peeps(self.total_order, self.JHG_manager, self.SC_manager)
                 print("These are the currently toggled peeps", peeps)
                 influence_matrix = self.JHG_manager.get_influence_matrix()
                 current_options_matrix = self.SC_manager.server_side_options_matrix(peeps, influence_matrix)
@@ -91,14 +94,28 @@ class Server():
 
         print("game over")
 
-    def generate_peeps(self, total_order):
-        peeps = []
-        for i in range(3):
-            peep = random.choice(total_order)
-            while peep in set(peeps):
-                peep = random.choice(total_order)
-            peeps.append(peep)
-        return peeps
+    def generate_peeps(self, total_order, jhg_manager, sc_manager):
+        popularity_array = jhg_manager.get_popularity_array(total_order)
+        total = sum(popularity_array)
+        # this is easy bc this will always be positive
+        normalized_popularity_array = [val / total for val in popularity_array]
+        # THIS IS WORSE.
+        utilities_array = sc_manager.sc_sim.results_sums
+        global_shift = min(0, min(utilities_array))
+        # shift everything over. subtract bc its either 0 or a negative number.
+        utilities_array = [val - global_shift for val in utilities_array]
+        total = sum(utilities_array) # yeah override this why not.
+        normalized_utility_array = [val / total if total != 0 else 1 / len(total_order) for val in utilities_array]
+        # new goal -- figure out how zip works
+        overall_probability_array = [(p + u) / 2 for p, u in zip(normalized_popularity_array, normalized_utility_array)]
+        probabilities = np.array(overall_probability_array)
+        new_world_order = np.array(total_order)
+        # shoudl pull without replacement from total order using the overall probability array, gives 3 choies without replacement.
+        print("here are the probabilties ", overall_probability_array)
+        new_peeps = np.random.choice(new_world_order, p=probabilities, size=3, replace=False)
+        return new_peeps
+
+
 
 
 

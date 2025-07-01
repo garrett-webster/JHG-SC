@@ -12,7 +12,7 @@ class HumanAgent(AbstractAgent):
         super().__init__()
         self.whoami = "Human"
         if platform.system() == "Windows":
-            print("Running on Windows...")
+            # print("Running on Windows...")
 
             # Define the files to be deleted
             human_allocations_file = "../State/HumanAllocations.txt"
@@ -26,7 +26,8 @@ class HumanAgent(AbstractAgent):
                 except Exception as e:
                     print(f"Failed to delete HumanAllocations.txt: {e}")
             else:
-                print("HumanAllocations.txt does not exist.")
+                pass
+                #print("HumanAllocations.txt does not exist.")
 
             # Attempt to delete visualTraits.txt
             if os.path.exists(visual_traits_file):
@@ -36,7 +37,8 @@ class HumanAgent(AbstractAgent):
                 except Exception as e:
                     print(f"Failed to delete visualTraits.txt: {e}")
             else:
-                print("visualTraits.txt does not exist.")
+                pass
+                #print("visualTraits.txt does not exist.")
         self.gameParams = {}
 
 

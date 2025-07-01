@@ -47,7 +47,6 @@ class JHGManager:
 
 
         self.current_round += 1
-        print("JHG IS NOW OEVER. EVERYTHING ASSOCIATED WITH THAT SHOULD FIRE AT THIS TIME> ")
         return client_input
 
 
@@ -78,3 +77,6 @@ class JHGManager:
 
     def get_sim(self):
         return self.jhg_sim
+
+    def get_popularity_array(self, total_order):
+        return self.jhg_sim.get_popularities()

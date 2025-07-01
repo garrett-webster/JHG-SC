@@ -187,6 +187,9 @@ class JHG_simulator():
     def get_influence(self):
         return self.sim.get_influence()
 
+    def get_popularities(self):
+        return self.sim.get_popularity()
+
     def individual_round_deets_for_logger(self):
         return self.sim.get_transaction(), self.sim.get_popularity(), self.sim.get_influence()
 
