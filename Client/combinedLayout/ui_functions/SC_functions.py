@@ -31,6 +31,9 @@ def create_sc_ui_elements(main_window):
 def SC_round_init(main_window):
     # Update sc ui elements
     print("SC INITN Should have gone off here. prolly")
+    for button in main_window.SC_voting_grid.buttons: # WHEE
+        if button.objectName() != "clear_button":
+            button.setEnabled(True)
     main_window.SC_panel.setTabEnabled(0, True) # I think? this is whwere this needs to happen? Maybe?
     main_window.SC_panel.setCurrentIndex(0)  # make sure to move the fetcher back to the first panel here, regardless of where they were.
     main_window.SC_panel.setTabVisible(2, False)  # should disable it for everyone
