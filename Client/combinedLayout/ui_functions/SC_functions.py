@@ -34,6 +34,7 @@ def SC_round_init(main_window):
     main_window.SC_panel.setCurrentIndex(0)  # make sure to move the fetcher back to the first panel here, regardless of where they were.
     main_window.SC_panel.setTabVisible(2, False)  # should disable it for everyone
     main_window.SC_voting_grid.update_utilities(main_window.round_state.utilities_mat)
+    main_window.SC_panel.setCurrentIndex(0) # should forcefully move them over if they aren't there already.
    # print("This si the main_window_round staet round num thingy ", main_window.round_state.sc_round_num)
     # I think this just needs to always go off now in this branch, at least.
     main_window.SC_cause_graph.update_sc_nodes_graph(main_window.round_state.sc_round_num)

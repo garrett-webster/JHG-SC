@@ -220,6 +220,7 @@ class MainWindow(QMainWindow):
         self.disable_jhg_buttons(self.JHG_panel)
         jhg_over(self, is_last, init_pop_influence)
         self.round_state.utilities = [0 for _ in range(self.round_state.num_players)] # reset this bc this isn't happening quick enough.
+        self.SC_panel.setCurrentIndex(0)  # should forcefully move them over if they aren't there already.
         # self.update_sc_graph() # hard coding this bc I want to see somethign real quick.
 
     def enable_allocations_interface(self):
