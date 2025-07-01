@@ -19,6 +19,9 @@ from Server.SC_Bots.optimalHuman import optimalHuman
 from Server.SC_Bots.reorganizedHuman import reorganizedHuman
 from Server.SC_Bots.possibleCheetahBot import cheetahBot
 
+from Server.allocation_bots.socialWelfare import SocialWelfare
+from Server.allocation_bots.random import Random
+
 # lets just see if this works.
 
 
@@ -26,7 +29,7 @@ NUM_CAUSES = 3
 
 
 class Social_Choice_Sim:
-    def __init__(self, total_players, num_causes, num_humans, options_generator, cycle=0, round=0, chromosomes="", scenario="", group="", total_order=None):
+    def __init__(self, total_players, num_causes, num_humans, options_generator, cycle=0, round=0, chromosomes="", scenario="", group="", total_order=None, allocation_scenario=""):
         self.options_generator = options_generator
         if total_order == None: # generating it non server side
             self.total_order = self.create_total_order(total_players, num_humans)
@@ -58,9 +61,12 @@ class Social_Choice_Sim:
 
         # create the bots, first getting number and type from scenario and then setting the chromosomes from the chromsomes.
         self.bot_type = self.set_bot_list(scenario)
+        self.allocation_bot_type = self.set_bot_list(allocation_scenario)
         self.bots = self.create_bots(self.total_order) # make sure to pull this from the right spot.
+        self.allocation_bots = self.create_allocation_bots(self.total_order)
         self.bot_list_as_string = self.create_bot_list_as_string(self.bots)
-        self.set_bot_chromosomes(self.chromosomes)
+        #self.allocation_bot_list_as_string = self.create_bot_list_as_string(self.allocation_bots)
+        self.set_bot_chromosomes(self.chromosomes) # no chromosomes for allocaiton bots.
 
         # group stuff - all used under set group, and then there are defualts just in case.
         self.group = -1 # doesn't exist, let me know it hasn't been set.
@@ -160,6 +166,28 @@ class Social_Choice_Sim:
 
         return bots_array
 
+    def create_allocation_bots(self, total_order):
+        bots_array = []
+        bot_indexes = []
+        self.allocation_bots_index = {}
+        if total_order is not None:
+            for index, object in enumerate(total_order):
+                if object.startswith("B"):
+                    bot_indexes.append(index)
+                    # make sure this is doing whta you think its doing.
+                    self.allocation_bots_index[object] = index
+
+        if len(self.allocation_bot_type) != self.num_bots:
+            # lets fix this logic right here and now.
+            self.allocation_bot_type = [self.allocation_bot_type[0]] * self.num_bots
+
+        for i, bot_type in enumerate(self.allocation_bot_type):
+            current_index = bot_indexes.pop(0)
+            #print("this the bot index that we are adding ", current_index)
+            bots_array.append(self.match_allocation_bot_type(bot_type, current_index))
+
+        return bots_array
+
     # I am not changing this. I don't bother with it. It does what it does and I don't want to refactor all the stubbins.
     def match_bot_type(self, bot_type, index):
         new_bot = None
@@ -183,6 +211,19 @@ class Social_Choice_Sim:
 
 
         return new_bot # the matched bot that we were looking for.
+
+
+    def match_allocation_bot_type(self, bot_type, index):
+        new_bot = None
+        bot_type = int(bot_type)
+        if bot_type == 0:
+            new_bot = (Random(index))
+        if bot_type == 1:
+            new_bot = (SocialWelfare(index))
+
+
+        return new_bot # the matched bot that we were looking for.
+
 
     def create_players(self):
         players = {}

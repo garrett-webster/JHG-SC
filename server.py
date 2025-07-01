@@ -79,7 +79,7 @@ class Server():
                 self.JHG_manager.play_jhg_round(self.JHG_manager.current_round, is_last_jhg_round)
             # yeah we need ot remake this every time, that wa
             if self.player_allocations:
-                # do this at the beginning fo this bc it is imperative that their popularities be updated before anythign else can happen. 
+                # do this at the beginning fo this bc it is imperative that their popularities be updated before anythign else can happen.
                 peeps = self.generate_peeps(self.total_order, self.JHG_manager, self.SC_manager)
                 print("These are the currently toggled peeps", peeps)
                 influence_matrix = self.JHG_manager.get_influence_matrix()

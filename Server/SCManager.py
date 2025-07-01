@@ -22,8 +22,9 @@ class SCManager:
         # so the arguments here are total_players, likely type bot and group option, if I had to guess.
         scenario = "../JHG-SC/offlineSimStuff/scenarioIndicator/cheetahAttempt"
         chromosomes = "../JHG-SC/offlineSimStuff/chromosomes/experiment"
+        allocation_scenario = "../JHG-SC/offlineSimStuff/allocations_scenarios/social_welfare"
         #print("this is the total ordering ", total_order)
-        self.sc_sim = Social_Choice_Sim(num_players, 3, num_humans, options_generator, 3, 0, chromosomes, scenario, "", total_order)
+        self.sc_sim = Social_Choice_Sim(num_players, 3, num_humans, options_generator, 3, 0, chromosomes, scenario, "", total_order, allocation_scenario)
         #self.sc_groups = generate_two_plus_one_groups(num_players, sc_group_option)
         self.num_players = num_players
         self.num_bots = num_bots
@@ -187,8 +188,8 @@ class SCManager:
 
 
         bot_columns = []
-        for bot in self.sc_sim.bots:
-            bot_columns.append(bot.create_column(len(self.total_order)))
+        for bot in self.sc_sim.allocation_bots:
+            bot_columns.append(bot.create_column(len(self.total_order))) # something like that?
 
         final_columns = {}
         for bot, i in enumerate(bot_peeps):
