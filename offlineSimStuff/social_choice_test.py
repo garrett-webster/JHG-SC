@@ -44,7 +44,6 @@ def run_trial(sim, num_rounds, num_cycles, create_graphs, group):
         sim.save_results()
         #print("this is the round numb we are adding ", int(curr_round))
         #current_logger.add_round_to_sim(int(curr_round)) # make it start at one instead of zero.
-        #current_logger.record_individual_round()
 
     end_time = time.time()
     #sim.print_col_passing() # this shows us the breakdown of the number distro. incredibly fascinating! look at it later.

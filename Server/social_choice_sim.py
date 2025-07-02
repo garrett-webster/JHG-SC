@@ -94,7 +94,7 @@ class Social_Choice_Sim:
         self.alpha = 0.2 # whatever we are hard coding this fetcher. I'll work with it more later.
         # this is a 3 dimensional list of lists. we have a list for every round, and within that we have a list of lists that represents a 2d vector.
         # not sure if this will help. lets find out.
-        self.I = {-1: [[0 for _ in range(total_players)] for _ in range(total_players)]}  # square matrix of 0's for all player relations
+        self.I = {0: [[0 for _ in range(total_players)] for _ in range(total_players)]}  # square matrix of 0's for all player relations
         # this needs to be a square matrix for reasons. thats cool I guess.
         # self.v = [[0 for _ in range(total_players)] for _ in range(total_players)]  # represents the change in utility at that round.
 
@@ -404,17 +404,16 @@ class Social_Choice_Sim:
         return winning_vote, self.current_results # literally just returns who won. thats it.
 
     def calculate_influence_matrix(self, new_v, curr_round):
-        if curr_round == 1: # no clue!
-            self.I[-1] = [[0 for _ in range(self.total_players)] for _ in range(self.total_players)] # give it something backwards to work with.
-            self.I[0] = [[0 for _ in range(self.total_players)] for _ in range(self.total_players)]  # give it something backwards to work with.
-        self.I[curr_round] = [[0 for _ in range(self.total_players)] for _ in range(self.total_players)] # initalize it w/ something.
+        new_index = len(self.I) # lets see if this works any better.
+        self.I[new_index] = [[0 for _ in range(self.total_players)] for _ in range(self.total_players)] # initalize it w/ something.
         for i in range(self.total_players):
             for j in range(self.total_players):
-                self.I[curr_round][i][j] = self.alpha * new_v[i][j] + (1 - self.alpha) * self.I[curr_round-1][i][j]
-        return self.I[curr_round]
+                self.I[new_index][i][j] = self.alpha * new_v[i][j] + (1 - self.alpha) * self.I[new_index-1][i][j]
+        return self.I[new_index] # swap it from rounds based to an index based approach.
 
-    def get_influence_matrix(self, curr_round):
-        return self.I[curr_round] # because fetch it, we never need the entire thing.
+    def get_influence_matrix(self):
+        last_key = next(reversed(self.I.keys()))
+        return self.I[last_key] # because fetch it, we never need the entire thing.
 
     def set_choice_matrix(self, new_choice_matrix):
         self.choice_matrix = new_choice_matrix

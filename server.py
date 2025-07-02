@@ -81,7 +81,6 @@ class Server():
             if self.player_allocations:
                 # do this at the beginning fo this bc it is imperative that their popularities be updated before anythign else can happen.
                 peeps = self.generate_peeps(self.total_order, self.JHG_manager, self.SC_manager)
-                print("These are the currently toggled peeps", peeps)
                 influence_matrix = self.JHG_manager.get_influence_matrix()
                 current_options_matrix = self.SC_manager.server_side_options_matrix(peeps, influence_matrix)
                 self.SC_manager.init_next_round(current_options_matrix)

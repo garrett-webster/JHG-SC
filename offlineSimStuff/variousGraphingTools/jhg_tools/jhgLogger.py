@@ -22,9 +22,9 @@ class JHGLogger():
     def record_individual_round(self):
         T, popularity, influence = self.jhg_sim.individual_round_deets_for_logger()
         total_data = {}
-        total_data["T"] = T.tolist()
-        total_data["popularity"] = popularity.tolist()
-        total_data["influence"] = influence.tolist()
+        total_data["T"] = T
+        total_data["popularity"] = popularity
+        total_data["influence"] = influence
         now = datetime.now()
         timestamp = now.strftime("%Y%m%d_%H%M%S")
 
@@ -38,16 +38,22 @@ class JHGLogger():
         # gonna keep with with round first, then key. just becuase, why not.
         T, popularity, influence = self.jhg_sim.individual_round_deets_for_logger()
         self.big_boy_data[round_num] = {}
-        self.big_boy_data[round_num]["Popularity"] = popularity.tolist()
-        self.big_boy_data[round_num]["Influence"] = influence.tolist()
-        self.big_boy_data[round_num]["T"] = T.tolist()
-        # self.big_boy_data["Popularity"][round_num] = popularity.tolist()
-        # self.big_boy_data["Influence"][round_num] = influence.tolist()
-        # self.big_boy_data["T"][round_num] = T.tolist()
+        self.big_boy_data[round_num]["Popularity"] = popularity
+        self.big_boy_data[round_num]["Influence"] = influence
+        self.big_boy_data[round_num]["T"] = T # this should be the allocaitons matrix.
+
+    def return_round_for_writing(self):
+        T, popularity, influence = self.jhg_sim.individual_round_deets_for_logger()
+        new_dict = {}
+        new_dict["Popularity"] = popularity
+        new_dict["Influence"] = influence
+        new_dict["T"] = T
+        return new_dict # just gets the deets so we can write with them elsewhere.
+
 
     def conclude_overview(self):
         my_path = os.path.dirname(os.path.abspath(__file__))
-        filename = "jhg_logs_repo/conclude.json"
+        filename = "../../../Server/jhg_logs_repo/conclude.json"
         file_path = os.path.join(my_path, filename)
         with open(file_path, "w") as file:
             json.dump(self.big_boy_data, file, indent=4)
@@ -55,7 +61,7 @@ class JHGLogger():
 
 
     def record_longer_vision(self, popularity_lists):
-        file_path = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\Server\jhg_logs_repo"
+        file_path = r"/Server/jhg_logs_repo"
         file_name = datetime.now().strftime("%Y%m%d_%H%M%S") + " biggerBoy.json"
         file_path = os.path.join(file_path, file_name)
         for round in popularity_lists:
@@ -64,12 +70,12 @@ class JHGLogger():
         with open(file_path, "w") as file:
             json.dump(popularity_lists, file, indent=4)
 
+    def record_big_picture(self):
+        pass # I don't know what I want this to look like yet. will likely just be the popularity over time, maybe? IDK. 
 
 
-
+    # this is supposed to be for garretts logger. I should probably ask him wha ti nee dto include in this json.
     def write_official_version(self):
-
-
         total_data = {}
         total_data["status"] = "started"
         # set up the lobby dict
@@ -241,7 +247,7 @@ class JHGLogger():
         total_data["colorGroups"] = []
 
         my_path = os.path.dirname(os.path.abspath(__file__))
-        file_name = "formalStyleConclusion.json"
+        file_name = "../../../Server/formalStyleConclusion.json"
         file_path = os.path.join(my_path, file_name)
         with open(file_path, "w") as outfile:
             json.dump(total_data, outfile, indent=4)

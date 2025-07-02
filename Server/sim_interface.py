@@ -187,14 +187,18 @@ class JHG_simulator():
     def get_influence(self):
         return self.sim.get_influence()
 
-    def get_popularities(self):
-        return self.sim.get_popularity()
+    def get_popularities(self, curr_round):
+        return self.sim.get_popularity(curr_round)
 
     def individual_round_deets_for_logger(self):
-        return self.sim.get_transaction(), self.sim.get_popularity(), self.sim.get_influence()
+        return self.sim.get_transaction().tolist(), self.sim.get_popularity().tolist(), self.sim.get_influence().tolist()
 
     def get_highest_popularity_player(self):
         return (self.total_order[(list(self.sim.get_popularity())).index([max(list(self.sim.get_popularity()))])])
+
+
+
+
 
 def loadPopulationFromFile(popSize, generationFolder, startIndex, num_gene_pools):
     fnombre = "Kill me"
