@@ -28,7 +28,7 @@ class CompleteGrapher():
             allocations, popularity, influence = jhg_sim.individual_round_deets_for_logger()
             print("here are the allocataions ", allocations)
             old_popularity = jhg_sim.get_popularities(curr_round-1)
-            self.create_jhg_graphs(allocations, popularity, influence, curr_round, old_popularity)
+            #self.create_jhg_graphs(allocations, popularity, influence, curr_round, old_popularity)
 
 
         if sc_played:
@@ -42,7 +42,256 @@ class CompleteGrapher():
 
 
     def create_sc_graphs(self, all_nodes, all_votes, winning_vote_list, current_options_matrix, types_list, scenario, group, curr_round, cycle, chromosome, influence_matrix, results_sums, results):
+        bot_color_map, bot_name_map = self.build_bot_mappings()
         influence_matrix = np.array(influence_matrix)
+
+        for cycle_key in all_votes.keys():
+            curr_votes = all_votes[cycle_key]
+            winning_vote = winning_vote_list[cycle_key]
+
+            fig = plt.figure(figsize=(13, 6)) # not entirely sure what those numbers mean.
+            gs = gridspec.GridSpec(1, 3, width_ratios=[0.8, 3.0, 1.5])
+
+            ax_matrix = fig.add_subplot(gs[0])
+            self.draw_matrix_panel(ax_matrix, current_options_matrix, curr_votes, winning_vote)
+
+            ax_graph = fig.add_subplot(gs[1])
+            self.draw_node_graph(ax_graph, all_nodes, curr_votes, winning_vote, types_list, bot_color_map, bot_name_map)
+
+            ax_inf = fig.add_subplot(gs[2])
+            self.draw_influence_panel(ax_inf, influence_matrix, results_sums)
+
+            # hopefully this is the exactly the same as before. if not I can check and restore as necessary.
+            fig.suptitle(f"Round: {curr_round}  Situation: {scenario}  Cycle: {int(cycle_key) + 1}  Group: {group}", fontsize=16, fontweight='bold', y=0.98)
+            # Reduce space between matrix and graph and the overall layout
+            fig.subplots_adjust(wspace=0.01, left=0.05, right=0.95, top=0.95, bottom=0.15)  # Adjust bottom margin
+
+            path = self.build_save_path(scenario, group, curr_round, cycle_key)
+            self.save_figure(fig, path)
+
+    def create_jhg_graphs(self, allocations, popularity, influence, curr_round, old_popularities):
+
+        fig = plt.figure(figsize=(15, 5))
+        gs = gridspec.GridSpec(1, 3, width_ratios=[1.2, 2, 2.2])  # L, C, R
+
+        ax_popularity = fig.add_subplot(gs[0])
+        self.plot_popularity_changes(ax_popularity, popularity, old_popularities)
+
+        ax_allocations = fig.add_subplot(gs[1])
+        self.plot_allocations_matrix(ax_allocations, allocations)
+
+        ax_influence = fig.add_subplot(gs[2])
+        self.plot_influence_graph(ax_influence, influence, popularity)
+
+        fig.suptitle(f"Round {curr_round}: Popularity, Allocations, Influence", fontsize=16, weight="bold")
+        plt.tight_layout()
+        plt.show()
+
+    def draw_matrix_panel(self, ax_matrix, current_options_matrix, curr_votes, winning_vote):
+        ax_matrix.axis('off')
+
+        num_rows = len(current_options_matrix)
+        matrix_array = np.array(current_options_matrix)
+        col_sums = matrix_array.sum(axis=0)
+        best_option = int(np.argmax(col_sums)) + 1  # gets the index of the best option and adds one to it
+        x_start = 4
+        spacing = 3
+
+        for i in range(num_rows):
+            vote = curr_votes.get(i)  # tries to get it through an int first, from real time execution
+            if vote is None:  # if that fails, might be string
+                vote = curr_votes.get(str(i), "?")  # if the string fails, we're fetched.
+
+            player_id = i + 1
+            options = current_options_matrix[i]
+
+            # Use fixed-width formatting for alignment
+            ax_matrix.text(0, -i, f"{player_id:>2} |", ha='left', va='center', fontsize=12,
+                           fontfamily='monospace')
+
+            formatted_options = ""
+            for k, opt in enumerate(options):
+                x = x_start + k * spacing
+                color = "black"
+                if k == winning_vote:
+                    color = "green" if opt > 0 else "red"
+                ax_matrix.text(x, -i, f"{opt:>2}", ha='center', va='center', fontsize=12,
+                               fontfamily='monospace', color=color)
+
+            ax_matrix.text(x_start + len(options) * spacing, -i, f"| {int(vote + 1):>2}", ha='left', va='center',
+                           fontsize=12, fontfamily='monospace', fontweight='bold')
+
+        # code to add teh column sums
+        sum_y = -num_rows  # y-coordinate below the last row
+        for k, val in enumerate(col_sums):
+            x = x_start + k * spacing
+            ax_matrix.text(x, sum_y, f"{int(val):>2}", ha='center', va='center',
+                           fontsize=12, fontfamily='monospace')
+
+        ax_matrix.text(x_start - spacing, sum_y, " Σ  |", ha='center', va='center',
+                       fontsize=12, fontfamily='monospace', fontweight='bold')
+
+        # Update the plot limits to make space for the sum row + winning vote
+        ax_matrix.set_xlim(-1, 10)
+        ax_matrix.set_ylim(-num_rows - 3, 1)
+
+        # --- Add Winning Vote Text Below Matrix ---
+        ax_matrix.text(1, -num_rows - 1, f"Winning vote: {winning_vote + 1}", ha='left', va='center',
+                       fontsize=12, color='red')
+
+
+    def draw_node_graph(self, ax, all_nodes, curr_votes, winning_vote, types_list, bot_color_map, bot_name_map):
+        ax.set_xlim(-12, 12)
+        ax.set_ylim(-12, 12)
+        ax.set_aspect('equal')
+        ax.axis('off')
+
+        node_positions = {node["text"]: (node["x_pos"], node["y_pos"]) for node in all_nodes}
+        node_types = {node["text"]: node["type"] for node in all_nodes}
+        used_bot_types = set()
+
+        cause_nodes = [node for node in all_nodes if node["type"] == "CAUSE"]
+        cause_positions = [(node["x_pos"], node["y_pos"]) for node in cause_nodes]
+
+        # Draw lines between every pair of cause nodes
+        for (x1, y1), (x2, y2) in combinations(cause_positions, 2):
+            ax.plot([x1, x2], [y1, y2], color='black', linewidth=2, alpha=0.8, zorder=1)
+
+        for node in all_nodes:
+            x, y = node["x_pos"], node["y_pos"]
+            label = node["text"]
+            node_type = node["type"]
+            alpha = 0.5 if node["negatives_flag"] else 1.0
+
+            try:
+                number = int(label.split()[-1])
+            except ValueError:
+                number = label
+
+            if node_type == "CAUSE":
+                color = 'red' if label == "Cause " + str(winning_vote + 1) else 'darkgrey'
+                shape = patches.RegularPolygon((x, y), numVertices=3, radius=1.0, orientation=0,
+                                               color=color, ec='black', zorder=2)
+                ax.add_patch(shape)
+            elif node_type == "PLAYER":
+                string = node["text"].split(" ")
+                id = types_list[int(string[1]) - 1]
+                used_bot_types.add(str(id))
+                color = bot_color_map[str(id)]
+
+                shape = plt.Circle((x, y), 0.7, color=color, ec='black', zorder=2, alpha=alpha)
+                ax.add_patch(shape)
+
+            ax.text(x, y, str(number), ha='center', va='center', fontsize=14, weight='bold', zorder=3,
+                    alpha=alpha)
+
+        for player_index, vote in curr_votes.items():
+            player_label = f"Player {int(player_index) + 1}"
+            cause_label = f"Cause {vote + 1}"  # for the off-by-one issue present in the votes.
+
+            if player_label in node_positions and cause_label in node_positions:
+                x_start, y_start = node_positions[player_label]
+                x_end, y_end = node_positions[cause_label]
+
+                is_winning_vote = cause_label == "Cause " + str(winning_vote + 1)
+                arrow_color = 'red' if is_winning_vote else 'gray'
+
+                arrow = FancyArrowPatch((x_start, y_start), (x_end, y_end),
+                                        arrowstyle='->', color=arrow_color,
+                                        mutation_scale=15, lw=2, zorder=1)
+                ax.add_patch(arrow)
+
+        # creates a legend that allows us to see which bot types are active, and which ones are what
+        legend_elements = []
+
+        for bot_type in sorted(used_bot_types):
+            label = bot_name_map.get(bot_type, f"Type {bot_type}")
+            color = bot_color_map.get(bot_type, bot_color_map["default"])
+            legend_elements.append(Patch(facecolor=color, edgecolor='black', label=label))
+
+        # You can put the legend on the right side of the graph area
+        ax.legend(handles=legend_elements, loc='lower right', bbox_to_anchor=(1.0, -0.05),
+                  ncol=2, fontsize=10, frameon=True, title="Bot Types")
+
+
+        # print("This is the round at the end!! ", curr_round)
+
+        # Add circle patch behind nodes/arrows
+        circle_patch = Circle((0, 0), radius=5, edgecolor='black', facecolor='none', linewidth=1,
+                              linestyle='--',
+                              zorder=0)
+        ax.add_patch(circle_patch)
+        circle_patch = Circle((0, 0), radius=10, edgecolor='black', facecolor='none', linewidth=1,
+                              linestyle='--',
+                              zorder=0)
+        ax.add_patch(circle_patch)
+
+        # Add dotted line "spokes" every 60 degrees
+        for angle_deg in range(30, 390, 60):  # 30, 90, 150, ..., 330
+            angle_rad = np.deg2rad(angle_deg)
+            x = 10 * np.cos(angle_rad)
+            y = 10 * np.sin(angle_rad)
+            ax.plot([0, x], [0, y], color='black', linestyle=':', linewidth=1, zorder=0)
+
+    def draw_influence_panel(self, ax, influence_matrix, results_sums):
+        net = NodeNetwork()
+        net.setupPlayers([f"{i}" for i in range(np.shape(results_sums)[0])])
+        net.initNodes(
+            init_pops=results_sums)  # not sure if this is actually getting used the way that I think its getting used, but we are sure trying.
+        net.update(influence_matrix, results_sums)
+
+        node_positions = np.array([node.position[-1] for node in net.nodes])
+
+        ax.set_aspect("equal")
+        ax.axis("off")
+        for i, (x, y) in enumerate(node_positions):
+            color = COLORS[i % len(COLORS)]
+            ax.scatter(x, y, s=150, c=color, edgecolors="none", zorder=2)
+            ax.text(x, y, str(i), fontsize=10, ha="center", va="center", color="black", zorder=3)
+
+        min_weight = np.min(np.abs(influence_matrix))
+        max_weight = np.max(np.abs(influence_matrix))
+
+        def get_edge_color_and_opacity(weight):
+            if max_weight != min_weight:
+                normalized = (abs(weight) - min_weight) / (max_weight - min_weight)
+            else:
+                normalized = 0
+            color = (0, 1, 0) if weight > 0 else (1, 0, 0)
+            alpha = normalized
+            return color, alpha
+
+        segments = []
+        colors = []
+        for i, node in enumerate(net.nodes):
+            for j, weight in enumerate(influence_matrix[
+                                           i]):  # yeah I think this will graph to much, I htink I need to do this at just the mcfreakin uhh curr Round.
+                if weight != 0:
+                    x0, y0 = node_positions[i]
+                    x1, y1 = node_positions[j]
+                    color, alpha = get_edge_color_and_opacity(weight)
+                    segments.append([(x0, y0), (x1, y1)])
+                    colors.append(to_rgba(color, alpha))
+
+        lc = LineCollection(segments, colors=colors, zorder=1)
+        ax.add_collection(lc)
+
+    def build_save_path(self, scenario, group, curr_round, cycle_key):
+        my_path = os.path.dirname(os.path.abspath(__file__))
+        scenario_str = f"scenario_{scenario}"
+        group_str = f"group_{group}"
+        file_name = f"round_{str(int(curr_round))}_cycle_{str(cycle_key)}.png"
+        dir_path = os.path.join(my_path, "individualRoundGraphs", scenario_str, group_str)
+        os.makedirs(dir_path, exist_ok=True)
+        full_path = os.path.join(dir_path, file_name)
+        return full_path
+
+    def save_figure(self, fig, path):
+        fig.subplots_adjust(wspace=0.01, left=0.05, right=0.95, top=0.95, bottom=0.15)
+        fig.savefig(path, dpi=300)
+        plt.show()
+
+    def build_bot_mappings(self):
         bot_color_map = {
             # -1 is player, 0 is random, 1 is socialWelfare, 2 is greediest, 3 is betterGreedy, 4 is limitedAwareness, 5 is secondChoice
             "-1": "lightgreen",
@@ -74,244 +323,7 @@ class CompleteGrapher():
             "9": "humanAttempt3",
             "10": "cheetahBot",
         }
-
-        for cycle_key in all_votes.keys():
-            curr_votes = all_votes[cycle_key]
-            winning_vote = winning_vote_list[cycle_key]
-
-            fig = plt.figure(figsize=(13, 6))  # Compact figure size
-            gs = gridspec.GridSpec(1, 3, width_ratios=[0.8, 3.0, 1.5])  # add a third section  # tighter left:right ratio
-
-            # --- LEFT PANEL: Matrix + Vote (tight & aligned) ---
-            ax_matrix = fig.add_subplot(gs[0])
-            ax_matrix.axis('off')
-
-            num_rows = len(current_options_matrix)
-            matrix_array = np.array(current_options_matrix)
-            col_sums = matrix_array.sum(axis=0)
-            best_option = int(np.argmax(col_sums)) + 1  # gets the index of the best option and adds one to it
-            x_start = 4
-            spacing = 3
-
-
-            for i in range(num_rows):
-                vote = curr_votes.get(i)  # tries to get it through an int first, from real time execution
-                if vote is None:  # if that fails, might be string
-                    vote = curr_votes.get(str(i), "?")  # if the string fails, we're fetched.
-
-                player_id = i + 1
-                options = current_options_matrix[i]
-
-                # Use fixed-width formatting for alignment
-                ax_matrix.text(0, -i, f"{player_id:>2} |", ha='left', va='center', fontsize=12,
-                               fontfamily='monospace')
-
-                formatted_options = ""
-                for k, opt in enumerate(options):
-                    x = x_start + k * spacing
-                    color = "black"
-                    if k == winning_vote:
-                        color = "green" if opt > 0 else "red"
-                    ax_matrix.text(x, -i, f"{opt:>2}", ha='center', va='center', fontsize=12,
-                                   fontfamily='monospace', color=color)
-
-                ax_matrix.text(x_start + len(options) * spacing, -i, f"| {int(vote+1):>2}", ha='left', va='center',
-                               fontsize=12, fontfamily='monospace', fontweight='bold')
-
-
-            # code to add teh column sums
-            best_option = int(np.argmax(col_sums)) + 1  # +1 to match display indexing
-            formatted_sums = " ".join(f"{val:>2}" for val in col_sums)
-            sum_text = f"Σ  | {formatted_sums} | {best_option:>2}"
-
-            ax_matrix.text(0, -num_rows, sum_text, ha='left', va='center', fontsize=12,
-                           fontfamily='monospace',
-                           bbox=dict(boxstyle='round,pad=0.2', facecolor='#e6f2ff', edgecolor='gray'))
-
-            # Update the plot limits to make space for the sum row + winning vote
-            ax_matrix.set_xlim(-1, 10)
-            ax_matrix.set_ylim(-num_rows - 3, 1)
-
-            # --- Add Winning Vote Text Below Matrix ---
-            ax_matrix.text(1, -num_rows - 1, f"Winning vote: {winning_vote + 1}", ha='left', va='center',
-                           fontsize=12, color='red')
-
-            # --- MIDDLE PANEL: Graph ---
-            ax = fig.add_subplot(gs[1])
-            ax.set_xlim(-12, 12)
-            ax.set_ylim(-12, 12)
-            ax.set_aspect('equal')
-            ax.axis('off')
-
-            node_positions = {node["text"]: (node["x_pos"], node["y_pos"]) for node in all_nodes}
-            node_types = {node["text"]: node["type"] for node in all_nodes}
-            used_bot_types = set()
-
-            cause_nodes = [node for node in all_nodes if node["type"] == "CAUSE"]
-            cause_positions = [(node["x_pos"], node["y_pos"]) for node in cause_nodes]
-
-            # Draw lines between every pair of cause nodes
-            for (x1, y1), (x2, y2) in combinations(cause_positions, 2):
-                ax.plot([x1, x2], [y1, y2], color='black', linewidth=2, alpha=0.8, zorder=1)
-
-            for node in all_nodes:
-                x, y = node["x_pos"], node["y_pos"]
-                label = node["text"]
-                node_type = node["type"]
-                alpha = 0.5 if node["negatives_flag"] else 1.0
-
-                try:
-                    number = int(label.split()[-1])
-                except ValueError:
-                    number = label
-
-                if node_type == "CAUSE":
-                    color = 'red' if label == "Cause " + str(winning_vote + 1) else 'darkgrey'
-                    shape = patches.RegularPolygon((x, y), numVertices=3, radius=1.0, orientation=0,
-                                                   color=color, ec='black', zorder=2)
-                    ax.add_patch(shape)
-                elif node_type == "PLAYER":
-                    string = node["text"].split(" ")
-                    id = types_list[int(string[1]) - 1]
-                    used_bot_types.add(str(id))
-                    color = bot_color_map[str(id)]
-
-                    shape = plt.Circle((x, y), 0.7, color=color, ec='black', zorder=2, alpha=alpha)
-                    ax.add_patch(shape)
-
-                ax.text(x, y, str(number), ha='center', va='center', fontsize=14, weight='bold', zorder=3,
-                        alpha=alpha)
-
-            for player_index, vote in curr_votes.items():
-                player_label = f"Player {int(player_index) + 1}"
-                cause_label = f"Cause {vote + 1}"  # for the off-by-one issue present in the votes.
-
-                if player_label in node_positions and cause_label in node_positions:
-                    x_start, y_start = node_positions[player_label]
-                    x_end, y_end = node_positions[cause_label]
-
-                    is_winning_vote = cause_label == "Cause " + str(winning_vote + 1)
-                    arrow_color = 'red' if is_winning_vote else 'gray'
-
-                    arrow = FancyArrowPatch((x_start, y_start), (x_end, y_end),
-                                            arrowstyle='->', color=arrow_color,
-                                            mutation_scale=15, lw=2, zorder=1)
-                    ax.add_patch(arrow)
-
-            fig.suptitle(
-                f"Round: {str(int(curr_round))}   Situation: {scenario}   Cycle: {str(int(cycle_key) + 1)}    Group: {group}",
-                fontsize=16, fontweight='bold', y=0.98)
-
-            # creates a legend that allows us to see which bot types are active, and which ones are what
-            legend_elements = []
-
-            for bot_type in sorted(used_bot_types):
-                label = bot_name_map.get(bot_type, f"Type {bot_type}")
-                color = bot_color_map.get(bot_type, bot_color_map["default"])
-                legend_elements.append(Patch(facecolor=color, edgecolor='black', label=label))
-
-            # You can put the legend on the right side of the graph area
-            ax.legend(handles=legend_elements, loc='lower right', bbox_to_anchor=(1.0, -0.05),
-                      ncol=2, fontsize=10, frameon=True, title="Bot Types")
-
-            # Reduce space between matrix and graph and the overall layout
-            fig.subplots_adjust(wspace=0.01, left=0.05, right=0.95, top=0.95, bottom=0.15)  # Adjust bottom margin
-            # print("This is the round at the end!! ", curr_round)
-
-            # Add circle patch behind nodes/arrows
-            circle_patch = Circle((0, 0), radius=5, edgecolor='black', facecolor='none', linewidth=1,
-                                  linestyle='--',
-                                  zorder=0)
-            ax.add_patch(circle_patch)
-            circle_patch = Circle((0, 0), radius=10, edgecolor='black', facecolor='none', linewidth=1,
-                                  linestyle='--',
-                                  zorder=0)
-            ax.add_patch(circle_patch)
-
-            # Add dotted line "spokes" every 60 degrees
-            for angle_deg in range(30, 390, 60):  # 30, 90, 150, ..., 330
-                angle_rad = np.deg2rad(angle_deg)
-                x = 10 * np.cos(angle_rad)
-                y = 10 * np.sin(angle_rad)
-                ax.plot([0, x], [0, y], color='black', linestyle=':', linewidth=1, zorder=0)
-
-
-            # --- RIGHT PANEL --- Influence stuff
-            # ax = fig.add_subplot(gs[1])
-            # ax.set_aspect("equal")
-            # ax.axis("off")
-            net = NodeNetwork()
-            net.setupPlayers([f"{i}" for i in range(np.shape(results_sums)[0])])
-            net.initNodes(
-                init_pops=results_sums)  # not sure if this is actually getting used the way that I think its getting used, but we are sure trying.
-            net.update(influence_matrix, results_sums)
-
-            node_positions = np.array([node.position[-1] for node in net.nodes])
-
-            ax = fig.add_subplot(gs[2])
-            ax.set_aspect("equal")
-            ax.axis("off")
-            for i, (x, y) in enumerate(node_positions):
-                color = COLORS[i % len(COLORS)]
-                ax.scatter(x, y, s=150, c=color, edgecolors="none", zorder=2)
-                ax.text(x, y, str(i), fontsize=10, ha="center", va="center", color="black", zorder=3)
-
-            min_weight = np.min(np.abs(influence_matrix))
-            max_weight = np.max(np.abs(influence_matrix))
-
-            def get_edge_color_and_opacity(weight):
-                if max_weight != min_weight:
-                    normalized = (abs(weight) - min_weight) / (max_weight - min_weight)
-                else:
-                    normalized = 0
-                color = (0, 1, 0) if weight > 0 else (1, 0, 0)
-                alpha = normalized
-                return color, alpha
-
-            segments = []
-            colors = []
-            for i, node in enumerate(net.nodes):
-                for j, weight in enumerate(influence_matrix[i]):  # yeah I think this will graph to much, I htink I need to do this at just the mcfreakin uhh curr Round.
-                    if weight != 0:
-                        x0, y0 = node_positions[i]
-                        x1, y1 = node_positions[j]
-                        color, alpha = get_edge_color_and_opacity(weight)
-                        segments.append([(x0, y0), (x1, y1)])
-                        colors.append(to_rgba(color, alpha))
-
-            lc = LineCollection(segments, colors=colors, zorder=1)
-            ax.add_collection(lc)
-
-            my_path = os.path.dirname(os.path.abspath(__file__))
-            scenario_str = f"scenario_{scenario}"
-            group_str = f"group_{group}"
-            file_name = f"round_{str(int(curr_round))}_cycle_{str(cycle_key)}.png"
-            dir_path = os.path.join(my_path, "individualRoundGraphs", scenario_str, group_str)
-            os.makedirs(dir_path, exist_ok=True)
-            full_path = os.path.join(dir_path, file_name)
-
-            plt.savefig(full_path, dpi=300)  # I want it to have the round, and cycle, and that shoudl do it
-            plt.show()
-            plt.close(fig)  # make sure the fetcher dissapears, thats what I am saying.
-
-
-    def create_jhg_graphs(self, allocations, popularity, influence, curr_round, old_popularities):
-
-        fig = plt.figure(figsize=(15, 5))
-        gs = gridspec.GridSpec(1, 3, width_ratios=[1.2, 2, 2.2])  # L, C, R
-
-        ax_popularity = fig.add_subplot(gs[0])
-        self.plot_popularity_changes(ax_popularity, popularity, old_popularities)
-
-        ax_allocations = fig.add_subplot(gs[1])
-        self.plot_allocations_matrix(ax_allocations, allocations)
-
-        ax_influence = fig.add_subplot(gs[2])
-        self.plot_influence_graph(ax_influence, influence, popularity)
-
-        fig.suptitle(f"Round {curr_round}: Popularity, Allocations, Influence", fontsize=16, weight="bold")
-        plt.tight_layout()
-        plt.show()
+        return bot_color_map, bot_name_map
 
     def plot_popularity_changes(self, ax_popularity, popularity, old_popularities):
         ax_popularity.clear()
