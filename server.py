@@ -18,6 +18,7 @@ OPTIONS = {
     "SC_GROUP_OPTION": 0, # See options_creation.py -> group_size_options to understand what this means
     "SC_VOTE_CYCLES": 3, # Number of cycles to play each social choice round. Players will vote this many times, with the nth vote being final.
     "LOGGING" : True,
+    # TODO: MOve the utility and toekn allocation from 2 different spots server and client side and make them options that we can mess with here.
 
     #Misc (Wasn't sure where to put this)
     "PLAYER_ALLOCATIONS" : True,

@@ -130,14 +130,14 @@ def graphEverything(sc_sim, jhg_sim, curr_round, played_sc, played_jhg):
     curr_everything_grapher.create_graph_with_sims(curr_round, sc_sim, jhg_sim, played_sc, played_jhg)
 
 
-def create_sim(total_players, scenario=None, chromosomes=None, group="", total_order=None):
+def create_sim(total_players, scenario=None, chromosomes=None, group="", total_order=None, allocation_scenario=None):
 
     cycle = -1 # a negative cycle indicates to me that this is a test - that, or something is really really wrong.
     curr_round = -1
     num_causes = 3
 
     generator = generator_factory(2, total_players, 5, 10, -10, 3, None, None)
-    sc_sim = Social_Choice_Sim(total_players, num_causes, num_humans, generator, cycle, curr_round, chromosomes, scenario, group, total_order)
+    sc_sim = Social_Choice_Sim(total_players, num_causes, num_humans, generator, cycle, curr_round, chromosomes, scenario, group, total_order, allocation_scenario)
     return sc_sim
 
 def create_jhg_sim(num_humans, num_players, total_order):
@@ -169,9 +169,10 @@ if __name__ == "__main__":
     # these paths are relative to the file location, so as long as you don't move the file it can and will run from anywhere.
     scenario = "scenarioIndicator/cheetahAttempt"
     chromosome = "chromosomes/experiment"
+    allocation_bot_type = "allocations_scenarios/social_welfare"
     total_order = create_total_order(num_players, num_humans)
 
     current_jhg_sim = create_jhg_sim(num_humans, num_players, total_order)
-    current_sc_sim = create_sim(num_players, scenario, chromosome, group, total_order)
+    current_sc_sim = create_sim(num_players, scenario, chromosome, group, total_order, allocation_bot_type)
     current_logger = CompleteLogger(current_sc_sim, current_jhg_sim)
     sc_sim, jhg_sim = run_trial(current_sc_sim, current_jhg_sim, num_rounds, num_cycles, create_graphs, group, total_order, create_influence, current_logger)

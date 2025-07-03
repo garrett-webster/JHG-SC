@@ -484,38 +484,7 @@ class Social_Choice_Sim:
             self.peeps = options_and_peeps[1]
         else:
             self.current_options_matrix = self.create_options_matrix() # cause we have to create groups.
-        #     [
-        #     [-4, -8,-2],
-        #     [6,-7,1],
-        #     [7,-5,0],
-        #     [2,-7,1],
-        #     [-2,2,8],
-        #     [-4,-7,5],
-        #     [-8,-2,-7],
-        #     [1,-1,5],
-        #     [-3,-1,-3],
-        # ]
-        # self.current_options_matrix = [
-        #     [-3,5,10],
-        #     [10,0,0],
-        #     [10,0,0],
-        #     [10,0,0],
-        #     [10,0,0],
-        #     [10,0,0],
-        #     [10, 0, 0],
-        #     [10, 0, 0],
-        #     [10,0,0]]
 
-        # self.current_options_matrix = [
-        #     [-2,2,-6],
-        #     [-2,5,-4],
-        #     [-9,1,-1],
-        #     [-4,1,7],
-        #     [7,5,4],
-        #     [-2,-3,0],
-        #     [-3,-1,-2],
-        #     [-1,0,9],
-        #     [-2,-3,-1]]
 
         self.set_new_options_matrix(self.current_options_matrix)
         self.player_nodes = self.create_player_nodes()
@@ -825,9 +794,11 @@ class Social_Choice_Sim:
     def let_others_create_options_matrix(self, bot_peeps, influence_matrix):
         list_of_columns = []
         for peep in bot_peeps:
-            list_of_columns.append(self.bots[self.bot_index_dict[peep]].create_column(self.total_players))
+            list_of_columns.append(self.allocation_bots[self.bot_index_dict[peep]].create_column(self.total_players))
         current_options_matrix = np.transpose(list_of_columns).tolist()
         indexes = []
         for peep in bot_peeps:
             indexes.append(bot_peeps.index(peep)+1)
+        self.current_options_matrix = current_options_matrix
+        print("this is the current optiosn matrix ", self.current_options_matrix)
         return current_options_matrix, indexes

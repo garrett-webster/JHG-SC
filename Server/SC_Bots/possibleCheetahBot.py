@@ -18,11 +18,12 @@ class cheetahBot:
     def get_number_type(self): # used for logging.
         return self.number_type
 
-    def create_column(self, total_players):
-        new_column = [0] * total_players
-        for i in range(total_players):
-            new_column[i] = random.randint(-1, 4)
-        return new_column
+    # this needs to get neutered so it doesn't accidentally get called.
+    # def create_column(self, total_players):
+    #     new_column = [0] * total_players
+    #     for i in range(total_players):
+    #         new_column[i] = random.randint(-1, 4)
+    #     return new_column
 
     # returns the bots vote given the current option matrix and previous votes.
     def get_vote(self, current_options_matrix, previous_votes, cycle=0, max_cycle=3):

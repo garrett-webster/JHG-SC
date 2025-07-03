@@ -9,8 +9,9 @@ class SocialWelfare():
         return self.number_type
 
     def create_column(self, total_players):
-        new_column = [0] * total_players
-        for i in range(total_players):
-            new_column[i] = random.randint(-1, 4)
+        # so we have a couple of options on how we decide to represent this.
+
+        new_column = [3] * total_players # bit of a jump here but whatever. allocates everything evenly. never tested actually, kinda curious to see hwwat happens.
+        # get rid of all the random stuff, Just want a utility score.
         return new_column
 
