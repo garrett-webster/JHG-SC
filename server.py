@@ -80,10 +80,10 @@ class Server():
             # yeah we need ot remake this every time, that wa
             if self.player_allocations:
                 # do this at the beginning fo this bc it is imperative that their popularities be updated before anythign else can happen.
-                peeps = self.generate_peeps(self.total_order, self.JHG_manager, self.SC_manager)
+                peeps, total_order_index = self.generate_peeps(self.total_order, self.JHG_manager, self.SC_manager)
                 influence_matrix = self.JHG_manager.get_influence_matrix()
                 current_options_matrix = self.SC_manager.server_side_options_matrix(peeps, influence_matrix)
-                self.SC_manager.init_next_round(current_options_matrix)
+                self.SC_manager.init_next_round((current_options_matrix, total_order_index))
             else:
                 self.SC_manager.init_next_round() # give him nothing so he has to generate his own stuff.
 
@@ -110,9 +110,16 @@ class Server():
         probabilities = np.array(overall_probability_array)
         new_world_order = np.array(total_order)
         # shoudl pull without replacement from total order using the overall probability array, gives 3 choies without replacement.
-        print("here are the probabilties ", overall_probability_array)
         new_peeps = np.random.choice(new_world_order, p=probabilities, size=3, replace=False)
-        return new_peeps
+        indexes = self.peeps_to_total_order(new_peeps, self.total_order)
+        return new_peeps, indexes
+
+    # takes in a list of peeps (player or bot or both) and returns their player indexes as per total order
+    def peeps_to_total_order(self, peeps, total_order):
+        indexes = []
+        for peep in peeps:
+            indexes.append(total_order.index(peep)+1)
+        return indexes
 
 
 

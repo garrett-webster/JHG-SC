@@ -10,7 +10,7 @@ class simLogger:
         self.big_boy_data = {}
 
     def record_individual_round(self):
-        all_nodes, all_votes, winning_vote_list, current_options_matrix, types_list, scenario, group, curr_round, cycle, chromosome = self.sim.prepare_graph()
+        all_nodes, all_votes, winning_vote_list, current_options_matrix, types_list, scenario, group, curr_round, cycle, chromosome, influence_matrix, results_sums, results, peeps = self.sim.prepare_graph()
         total_data = {}
         total_data["types_list"] = types_list
         total_data["all_nodes"] = all_nodes
@@ -23,15 +23,13 @@ class simLogger:
         total_data["curr_round"] = curr_round
         total_data["cycle"] = cycle
         total_data["chromosome"] = chromosome
+        total_data["influence_matrix"] = influence_matrix
+        total_data["results_sums"] = results_sums
+        total_data["results"] = results
+        total_data["peeps"] = peeps
 
         return total_data
-        # my_path = os.path.dirname(os.path.abspath(__file__))
-        # filename = "sc_logs_repo/individual_round/" + " scenario" + str(scenario) + "groups" + str(group) + "round" + str(
-        #     curr_round) + "cycle" + str(cycle) + "chromosome" + str(chromosome) + ".json"
-        # file_path = os.path.join(my_path, filename)
-        #
-        # with open(file_path, "w") as file:
-        #     json.dump(total_data, file, indent=4)
+
 
     def record_big_picture(self):
         results, cooperation_score, bot_type, num_rounds, scenario, group, chromosome = self.sim.get_results()

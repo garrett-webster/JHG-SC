@@ -2,6 +2,8 @@ from Server.sim_interface import JHG_simulator
 from offlineSimStuff.variousGraphingTools.jhg_tools.jhgLogger import JHGLogger
 import time
 
+# this doesn't really get used anymore. it was a useful proof of concept but can now be ignored.
+
 def create_sim(num_players, num_humans):
     current_sim = JHG_simulator(num_humans, num_players)
     return current_sim
@@ -14,7 +16,7 @@ def run_trial(sim, num_rounds, create_graphs):
         big_boy_kush[round] = {}
         current_popularity = current_sim.execute_round(None, round)
         print("this is the current popularity ", current_popularity)
-        currentLogger.record_individual_round()
+        #currentLogger.record_individual_round()
         big_boy_kush[round]["Popularity"] = current_popularity
         time.sleep(1)
     currentLogger.record_longer_vision(big_boy_kush)

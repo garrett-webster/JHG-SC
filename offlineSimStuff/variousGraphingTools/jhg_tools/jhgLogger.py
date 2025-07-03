@@ -42,12 +42,13 @@ class JHGLogger():
         self.big_boy_data[round_num]["Influence"] = influence
         self.big_boy_data[round_num]["T"] = T # this should be the allocaitons matrix.
 
-    def return_round_for_writing(self):
-        T, popularity, influence = self.jhg_sim.individual_round_deets_for_logger()
+    def return_round_for_writing(self, curr_round):
+        T, popularity, influence, old_popularity = self.jhg_sim.individual_round_deets_for_logger(curr_round)
         new_dict = {}
         new_dict["Popularity"] = popularity
         new_dict["Influence"] = influence
         new_dict["T"] = T
+        new_dict["Old_Popularity"] = old_popularity
         return new_dict # just gets the deets so we can write with them elsewhere.
 
 

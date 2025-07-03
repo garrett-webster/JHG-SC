@@ -5,6 +5,8 @@ import random
 from Server.social_choice_sim import Social_Choice_Sim
 from Server.JHGManager import JHG_simulator
 from tqdm import tqdm
+import numpy as np
+
 
 from offlineSimStuff.variousGraphingTools.completeVersions.completeGrapher import CompleteGrapher
 from offlineSimStuff.variousGraphingTools.sc_tools.causeNodeGraphVisualizer import causeNodeGraphVisualizer
@@ -49,11 +51,11 @@ def run_trial(sc_sim, jhg_sim, num_rounds, num_cycles, create_graphs, group, tot
 
 def run_sc_stuff(sc_sim, jhg_sim, total_order, influence_matrix, curr_round, current_logger):
     sc_sim.set_rounds(curr_round)
-    possible_peeps = generate_peeps(sc_sim, jhg_sim, total_order)  # people who are needed to create the matrix
+    possible_peeps, indexes = generate_peeps(total_order, jhg_sim, sc_sim)  # people who are needed to create the matrix
     # should I make this, you know, an entirely different bot? having them in the same file feels wrong becuase they are doing differen things.
-    current_options_matrix = sc_sim.let_others_create_options_matrix(possible_peeps,
+    current_options_matrix, peeps = sc_sim.let_others_create_options_matrix(possible_peeps.tolist(),
                                                                      influence_matrix)  # actually creates the matrix
-    sc_sim.start_round(current_options_matrix)
+    sc_sim.start_round((current_options_matrix, indexes))
 
     bot_votes = {}
     for cycle in range(num_cycles):
@@ -72,18 +74,47 @@ def run_jhg_stuff(jhg_sim, curr_round, current_logger):
     current_logger.save_jhg_round(curr_round)
 
 
-def generate_peeps(sc_sim, jhg_sim, total_order):
-    highest_utility = sc_sim.get_highest_utility_player()
-    highest_pop = jhg_sim.get_highest_popularity_player()
-    if highest_utility == highest_pop:
-        pass # well fetch, what DO we do here? let them create it twice?
-    possible_players = copy.deepcopy(total_order)
-    for player in {highest_utility, highest_pop}: # lets me use a set to make sure that I only erase it once. This should allow for both to be the same thing in the list and have the same player make 2 things.
-        if player in possible_players:
-            possible_players.remove(player)
-    random_player = random.choice(possible_players)
-    peeps = [highest_utility, highest_pop, random_player]
-    return peeps
+# def generate_peeps(sc_sim, jhg_sim, total_order):
+#     highest_utility = sc_sim.get_highest_utility_player()
+#     highest_pop = jhg_sim.get_highest_popularity_player()
+#     if highest_utility == highest_pop:
+#         pass # well fetch, what DO we do here? let them create it twice?
+#     possible_players = copy.deepcopy(total_order)
+#     for player in {highest_utility, highest_pop}: # lets me use a set to make sure that I only erase it once. This should allow for both to be the same thing in the list and have the same player make 2 things.
+#         if player in possible_players:
+#             possible_players.remove(player)
+#     random_player = random.choice(possible_players)
+#     peeps = [highest_utility, highest_pop, random_player]
+#     return peeps
+
+def generate_peeps(total_order, jhg_sim, sc_sim):
+    popularity_array = (jhg_sim.get_popularities()) # huh
+    total = sum(popularity_array)
+    # this is easy bc this will always be positive
+    normalized_popularity_array = [val / total for val in popularity_array]
+    # THIS IS WORSE.
+    utilities_array = sc_sim.results_sums
+    global_shift = min(0, min(utilities_array))
+    # shift everything over. subtract bc its either 0 or a negative number.
+    utilities_array = [val - global_shift for val in utilities_array]
+    total = sum(utilities_array) # yeah override this why not.
+    normalized_utility_array = [val / total if total != 0 else 1 / len(total_order) for val in utilities_array]
+    # new goal -- figure out how zip works
+    overall_probability_array = [(p + u) / 2 for p, u in zip(normalized_popularity_array, normalized_utility_array)]
+    probabilities = np.array(overall_probability_array)
+    new_world_order = np.array(total_order)
+    # shoudl pull without replacement from total order using the overall probability array, gives 3 choies without replacement.
+    new_peeps = np.random.choice(new_world_order, p=probabilities, size=3, replace=False)
+    indexes = peeps_to_total_order(new_peeps, total_order)
+    return new_peeps, indexes
+
+# takes in a list of peeps (player or bot or both) and returns their player indexes as per total order
+def peeps_to_total_order(peeps, total_order):
+    indexes = []
+    for peep in peeps:
+        indexes.append(total_order.index(peep)+1)
+    return indexes
+
 
 
 def graph_nodes(sim):

@@ -16,32 +16,41 @@ from Client.combinedLayout.colors import COLORS
 from matplotlib.collections import LineCollection
 from matplotlib.colors import to_rgba
 from matplotlib.colors import LinearSegmentedColormap, Normalize
-
+import json
 
 
 class CompleteGrapher():
     def __init__(self):
         pass
 
+    def create_graphs_with_file(self, file_path):
+        # so the JSON saves everything and this is sort fo supposed to get called round by round
+        # so breaking this down might be a little weird.
+        with open(file_path, "r") as f:
+            data = json.load(f)
+
+        for curr_round in data:
+            if "JHG_STUFF" in data[curr_round]:
+                jhg = data[curr_round].get("JHG_STUFF")
+                allocations, popularity, influence, old_popularity = self.extract_keys(jhg, ["T", "Popularity", "Influence", "Old_Popularity"])
+                self.create_jhg_graphs(allocations, popularity, influence, curr_round, old_popularity)
+            if "SC_STUFF" in data[curr_round]:
+                sc = data[curr_round].get("SC_STUFF")
+                all_nodes, all_votes, winning_vote_list, current_options_matrix, types_list, scenario, group, round, cycle, chromosome, influence_matrix, results_sums, results, peeps = (
+                    self.extract_keys(sc, ["all_nodes", "all_votes", "winning_vote_list", "current_options_matrix", "types_list", "scenario", "group", "round", "cycle", "chromosome", "influence_matrix", "results_sums", "results", "peeps"]))
+                self.create_sc_graphs(all_nodes, all_votes, winning_vote_list, current_options_matrix, types_list, scenario,  group, round, cycle, chromosome, influence_matrix, results_sums, results, peeps)
+
     def create_graph_with_sims(self, curr_round, sc_sim, jhg_sim, sc_played, jhg_played):
         if jhg_played:# very important that this comes first, as we alwas PLAY this one first, makes sure the graphs are printed in the right order. for now. might need to adjust some stuff.
-            allocations, popularity, influence = jhg_sim.individual_round_deets_for_logger()
-            print("here are the allocataions ", allocations)
-            old_popularity = jhg_sim.get_popularities(curr_round-1)
-            #self.create_jhg_graphs(allocations, popularity, influence, curr_round, old_popularity)
-
+            allocations, popularity, influence, old_popularity = jhg_sim.individual_round_deets_for_logger(curr_round)
+            self.create_jhg_graphs(allocations, popularity, influence, curr_round, old_popularity)
 
         if sc_played:
-            all_nodes, all_votes, winning_vote_list, current_options_matrix, types_list, scenario, group, round, cycle, chromosome = sc_sim.prepare_graph()
-            influence_matrix = sc_sim.get_influence_matrix()
-            results_sums = sc_sim.results_sums
-            results = sc_sim.results
-            self.create_sc_graphs(all_nodes, all_votes, winning_vote_list, current_options_matrix, types_list, scenario,  group, round, cycle, chromosome, influence_matrix, results_sums, results)
+            all_nodes, all_votes, winning_vote_list, current_options_matrix, types_list, scenario, group, round, cycle, chromosome, influence_matrix, results_sums, results, peeps = sc_sim.prepare_graph()
+            self.create_sc_graphs(all_nodes, all_votes, winning_vote_list, current_options_matrix, types_list, scenario,  group, round, cycle, chromosome, influence_matrix, results_sums, results, peeps)
 
 
-
-
-    def create_sc_graphs(self, all_nodes, all_votes, winning_vote_list, current_options_matrix, types_list, scenario, group, curr_round, cycle, chromosome, influence_matrix, results_sums, results):
+    def create_sc_graphs(self, all_nodes, all_votes, winning_vote_list, current_options_matrix, types_list, scenario, group, curr_round, cycle, chromosome, influence_matrix, results_sums, results, peeps):
         bot_color_map, bot_name_map = self.build_bot_mappings()
         influence_matrix = np.array(influence_matrix)
 
@@ -53,7 +62,7 @@ class CompleteGrapher():
             gs = gridspec.GridSpec(1, 3, width_ratios=[0.8, 3.0, 1.5])
 
             ax_matrix = fig.add_subplot(gs[0])
-            self.draw_matrix_panel(ax_matrix, current_options_matrix, curr_votes, winning_vote)
+            self.draw_matrix_panel(ax_matrix, current_options_matrix, curr_votes, winning_vote, peeps)
 
             ax_graph = fig.add_subplot(gs[1])
             self.draw_node_graph(ax_graph, all_nodes, curr_votes, winning_vote, types_list, bot_color_map, bot_name_map)
@@ -68,6 +77,9 @@ class CompleteGrapher():
 
             path = self.build_save_path(scenario, group, curr_round, cycle_key)
             self.save_figure(fig, path)
+
+    def extract_keys(self, d, keys, default=None):
+        return tuple(d.get(k, default) for k in keys)
 
     def create_jhg_graphs(self, allocations, popularity, influence, curr_round, old_popularities):
 
@@ -87,7 +99,7 @@ class CompleteGrapher():
         plt.tight_layout()
         plt.show()
 
-    def draw_matrix_panel(self, ax_matrix, current_options_matrix, curr_votes, winning_vote):
+    def draw_matrix_panel(self, ax_matrix, current_options_matrix, curr_votes, winning_vote, peeps):
         ax_matrix.axis('off')
 
         num_rows = len(current_options_matrix)
@@ -96,6 +108,17 @@ class CompleteGrapher():
         best_option = int(np.argmax(col_sums)) + 1  # gets the index of the best option and adds one to it
         x_start = 4
         spacing = 3
+
+        for k, creator in enumerate(peeps):
+            x = x_start + k * spacing
+            ax_matrix.text(x, 1, f"{creator}", ha='left', va='bottom',
+                           fontsize=12, fontfamily='monospace', fontweight='bold', color='black')
+
+        # lets put the peeps at the top
+        # for i in range(len(peeps)):
+        #     player_id = peeps[i]
+        #     ax_matrix.text(0, -i*spacing, f"{player_id}:>2 |", ha="left", va="center", fontsize=12, fontfamily='monospace')
+
 
         for i in range(num_rows):
             vote = curr_votes.get(i)  # tries to get it through an int first, from real time execution
@@ -125,15 +148,23 @@ class CompleteGrapher():
         sum_y = -num_rows  # y-coordinate below the last row
         for k, val in enumerate(col_sums):
             x = x_start + k * spacing
+            color = "black"
+            if winning_vote != 0 and k == winning_vote:
+                color = "green"
             ax_matrix.text(x, sum_y, f"{int(val):>2}", ha='center', va='center',
-                           fontsize=12, fontfamily='monospace')
+                           fontsize=12, fontfamily='monospace', color=color)
 
-        ax_matrix.text(x_start - spacing, sum_y, " Σ  |", ha='center', va='center',
+
+        ax_matrix.text(x_start - spacing, sum_y, "  Σ |", ha='center', va='center',
                        fontsize=12, fontfamily='monospace', fontweight='bold')
+
+        x += spacing
+        ax_matrix.text(x, -num_rows, "    |  " + str(winning_vote+1),
+                       ha='center', va='center', fontsize=12, fontfamily='monospace', fontweight='bold')
 
         # Update the plot limits to make space for the sum row + winning vote
         ax_matrix.set_xlim(-1, 10)
-        ax_matrix.set_ylim(-num_rows - 3, 1)
+        ax_matrix.set_ylim(-num_rows - 3, 2)
 
         # --- Add Winning Vote Text Below Matrix ---
         ax_matrix.text(1, -num_rows - 1, f"Winning vote: {winning_vote + 1}", ha='left', va='center',
@@ -141,6 +172,7 @@ class CompleteGrapher():
 
 
     def draw_node_graph(self, ax, all_nodes, curr_votes, winning_vote, types_list, bot_color_map, bot_name_map):
+        x_offset = 2
         ax.set_xlim(-12, 12)
         ax.set_ylim(-12, 12)
         ax.set_aspect('equal')
@@ -155,7 +187,7 @@ class CompleteGrapher():
 
         # Draw lines between every pair of cause nodes
         for (x1, y1), (x2, y2) in combinations(cause_positions, 2):
-            ax.plot([x1, x2], [y1, y2], color='black', linewidth=2, alpha=0.8, zorder=1)
+            ax.plot([x1+x_offset, x2+x_offset], [y1, y2], color='black', linewidth=2, alpha=0.8, zorder=1)
 
         for node in all_nodes:
             x, y = node["x_pos"], node["y_pos"]
@@ -170,7 +202,7 @@ class CompleteGrapher():
 
             if node_type == "CAUSE":
                 color = 'red' if label == "Cause " + str(winning_vote + 1) else 'darkgrey'
-                shape = patches.RegularPolygon((x, y), numVertices=3, radius=1.0, orientation=0,
+                shape = patches.RegularPolygon((x+x_offset, y), numVertices=3, radius=1.0, orientation=0,
                                                color=color, ec='black', zorder=2)
                 ax.add_patch(shape)
             elif node_type == "PLAYER":
@@ -179,10 +211,10 @@ class CompleteGrapher():
                 used_bot_types.add(str(id))
                 color = bot_color_map[str(id)]
 
-                shape = plt.Circle((x, y), 0.7, color=color, ec='black', zorder=2, alpha=alpha)
+                shape = plt.Circle((x+x_offset, y), 0.7, color=color, ec='black', zorder=2, alpha=alpha)
                 ax.add_patch(shape)
 
-            ax.text(x, y, str(number), ha='center', va='center', fontsize=14, weight='bold', zorder=3,
+            ax.text(x+x_offset, y, str(number), ha='center', va='center', fontsize=14, weight='bold', zorder=3,
                     alpha=alpha)
 
         for player_index, vote in curr_votes.items():
@@ -196,7 +228,7 @@ class CompleteGrapher():
                 is_winning_vote = cause_label == "Cause " + str(winning_vote + 1)
                 arrow_color = 'red' if is_winning_vote else 'gray'
 
-                arrow = FancyArrowPatch((x_start, y_start), (x_end, y_end),
+                arrow = FancyArrowPatch((x_start+x_offset, y_start), (x_end+x_offset, y_end),
                                         arrowstyle='->', color=arrow_color,
                                         mutation_scale=15, lw=2, zorder=1)
                 ax.add_patch(arrow)
@@ -217,11 +249,11 @@ class CompleteGrapher():
         # print("This is the round at the end!! ", curr_round)
 
         # Add circle patch behind nodes/arrows
-        circle_patch = Circle((0, 0), radius=5, edgecolor='black', facecolor='none', linewidth=1,
+        circle_patch = Circle((0+x_offset, 0), radius=5, edgecolor='black', facecolor='none', linewidth=1,
                               linestyle='--',
                               zorder=0)
         ax.add_patch(circle_patch)
-        circle_patch = Circle((0, 0), radius=10, edgecolor='black', facecolor='none', linewidth=1,
+        circle_patch = Circle((0+x_offset, 0), radius=10, edgecolor='black', facecolor='none', linewidth=1,
                               linestyle='--',
                               zorder=0)
         ax.add_patch(circle_patch)
@@ -231,7 +263,7 @@ class CompleteGrapher():
             angle_rad = np.deg2rad(angle_deg)
             x = 10 * np.cos(angle_rad)
             y = 10 * np.sin(angle_rad)
-            ax.plot([0, x], [0, y], color='black', linestyle=':', linewidth=1, zorder=0)
+            ax.plot([0+x_offset, x+x_offset], [0, y], color='black', linestyle=':', linewidth=1, zorder=0)
 
     def draw_influence_panel(self, ax, influence_matrix, results_sums):
         net = NodeNetwork()

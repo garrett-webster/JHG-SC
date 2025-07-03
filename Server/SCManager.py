@@ -42,9 +42,9 @@ class SCManager:
         self.sc_logger = sc_logging
         self.total_order = total_order # keeps track of which are players and which are bots.
 
-    def init_next_round(self, current_options_matrix=None):
+    def init_next_round(self, options_and_peeps=None):
         # Initialize the round
-        self.sc_sim.start_round(current_options_matrix) # make sure this actually gets hard set.
+        self.sc_sim.start_round(options_and_peeps) # make sure this actually gets hard set.
         self.current_options_matrix = self.sc_sim.current_options_matrix
         self.options_history[self.round_num] = self.current_options_matrix
         self.player_nodes = self.sc_sim.get_player_nodes()

@@ -97,6 +97,8 @@ class Social_Choice_Sim:
         self.I = {0: [[0 for _ in range(total_players)] for _ in range(total_players)]}  # square matrix of 0's for all player relations
         # this needs to be a square matrix for reasons. thats cool I guess.
         # self.v = [[0 for _ in range(total_players)] for _ in range(total_players)]  # represents the change in utility at that round.
+        self.peeps = None # just so we have it around
+
 
     def create_total_order(self, total_players, num_humans):
         num_bots = total_players - num_humans
@@ -474,11 +476,12 @@ class Social_Choice_Sim:
         return chromosomes_list
 
     # default to groups being None,
-    def start_round(self, current_options_matrix=None):
+    def start_round(self, options_and_peeps=None):
         #if sc_groups != None:
             #self.sc_groups = sc_groups
-        if current_options_matrix is not None:
-            self.current_options_matrix = current_options_matrix
+        if options_and_peeps is not None:
+            self.current_options_matrix = options_and_peeps[0]
+            self.peeps = options_and_peeps[1]
         else:
             self.current_options_matrix = self.create_options_matrix() # cause we have to create groups.
         #     [
@@ -556,7 +559,10 @@ class Social_Choice_Sim:
 
         group = self.get_group()
         # so now what we do instead is that we take in a winning vote list cycle by cycle and spit it out as necessary.
-        return current_node_json, self.all_votes, winning_vote_list, self.current_options_matrix, self.total_types, self.scenario_string, group, self.round, self.cycle, self.chromosome_string
+        # --- supplemental information required for allocations and more advanced graph --- #
+
+
+        return current_node_json, self.all_votes, winning_vote_list, self.current_options_matrix, self.total_types, self.scenario_string, group, self.round, self.cycle, self.chromosome_string, self.get_influence_matrix(), self.results_sums, self.results, self.peeps
 
     def get_results(self):
         #print("Aight were is the zero, its gotta be under num_rounds right?") literally zero clue whawt this print statement was supposed to be for.
@@ -616,6 +622,9 @@ class Social_Choice_Sim:
     #     #sns.heatmap(array, annot=True, cmap="YlGnBu", cbar=True)
     #     plt.title("Heatmap of Number Distribution")
     #     plt.show()
+
+    def get_peeps(self):
+        return
 
     ########################################################################
     ###--- NODE CREATION FOR FRONT END. NOT USEFUL FOR GENETIC STUFF. ---###
@@ -812,9 +821,13 @@ class Social_Choice_Sim:
             return self.total_order[self.results_sums.index(max(self.results_sums))] # return the index of the highest utility player.
 
 
+    # this functin is used for simulation purposes ONLY. should never be called with live players.
     def let_others_create_options_matrix(self, bot_peeps, influence_matrix):
         list_of_columns = []
         for peep in bot_peeps:
             list_of_columns.append(self.bots[self.bot_index_dict[peep]].create_column(self.total_players))
         current_options_matrix = np.transpose(list_of_columns).tolist()
-        return current_options_matrix
+        indexes = []
+        for peep in bot_peeps:
+            indexes.append(bot_peeps.index(peep)+1)
+        return current_options_matrix, indexes

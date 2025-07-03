@@ -21,11 +21,10 @@ class CompleteLogger():
     def save_jhg_round(self, curr_round):
         if curr_round not in self.big_boy_data: # make sure he exists.
             self.big_boy_data[curr_round] = {}
-        self.big_boy_data[curr_round]["JHG_STUFF"] = self.jhg_logger.return_round_for_writing()
+        self.big_boy_data[curr_round]["JHG_STUFF"] = self.jhg_logger.return_round_for_writing(curr_round)
 
     # this should close the json the way that I want it to. lets go ahead and build this into our offline version first and go from there.
     def close_json(self, filename): # not sure what to name these fetchers yet. Likely datetime again.
-        print("ayo is this going off'")
         self.big_boy_data["SC_CONCLUSION"] = self.sc_logger.record_big_picture() # gets the big stuff
         self.big_boy_data["JHG_CONCLUSION"] = self.jhg_logger.record_big_picture() # TODO: Doesn't actually do anything yet.
 
