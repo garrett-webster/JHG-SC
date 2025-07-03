@@ -68,9 +68,6 @@ class cheetahBot:
 
         cause_sums = self.apply_previous_votes(matrix, previous_votes)  # get the cause sums given our padded matrix and previous votes
 
-        if self.self_id == 6:
-            pass
-
         #print(self.self_id, " and the cause sums ", cause_sums)
         if self.identify_outgroup(current_options_matrix, cause_sums, cycle, col_probs, max_cycle):
             #print(self.self_id, " has entered negative voting phase")
@@ -196,12 +193,7 @@ class cheetahBot:
     # are chromosome stuffs, current_optinos matrix is there for fun and the cycle and max cycle are for social lubrication disabiling.
     def get_vote_positive(self, our_row, col_probs, cause_sums, risk_aversion, majority_factor, current_options_matrix, cycle, max_cycle, previous_votes_list):
 
-        if self.self_id == 5:
-            pass
         new_row = self.calculate_vote_row(our_row, col_probs, cause_sums, risk_aversion, majority_factor, current_options_matrix, previous_votes_list)  # creates expected values list.
-        # if self.self_id == 3:
-        #     print("this is the new row ", new_row)
-        #print(self.self_id, " and their new row ", new_row)
         current_vote = new_row.index(max(new_row))-1 # get rid of selecting the best vote, just select what we like most.
         if current_vote == -1 and max(current_options_matrix[self.self_id]) >= 0:  # if we can create some social lubrication here
             if self.social_lubrication == None:

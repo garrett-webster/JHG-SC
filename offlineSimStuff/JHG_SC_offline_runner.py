@@ -38,8 +38,8 @@ def run_trial(sc_sim, jhg_sim, num_rounds, num_cycles, create_graphs, group, tot
             run_sc_stuff(sc_sim, jhg_sim, total_order, influence_matrix, curr_round, current_logger)
             played_sc = True
 
-        run_jhg_stuff(jhg_sim, curr_round, current_logger)
-        played_jhg = True
+        #run_jhg_stuff(jhg_sim, curr_round, current_logger)
+        #played_jhg = True
 
         if create_graphs:
             pass
