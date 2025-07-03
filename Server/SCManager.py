@@ -12,7 +12,7 @@ def create_empty_vote_matrix(num_players):
 
 
 class SCManager:
-    def __init__(self, connection_manager, num_humans, options_generator, num_players, num_bots, sc_group_option, vote_cycles, sc_logging, total_order):
+    def __init__(self, connection_manager, num_humans, options_generator, num_players, num_bots, sc_group_option, vote_cycles, total_order):
         self.connection_manager = connection_manager
         self.round_num = 1
         self.save_dict = {}
@@ -39,7 +39,6 @@ class SCManager:
         self.positive_vote_effects_history = create_empty_vote_matrix(num_players)
         self.negative_vote_effects_history = create_empty_vote_matrix(num_players)
 
-        self.sc_logger = sc_logging
         self.total_order = total_order # keeps track of which are players and which are bots.
 
     def init_next_round(self, options_and_peeps=None):
@@ -87,16 +86,11 @@ class SCManager:
         self.connection_manager.distribute_message("SC_OVER", self.round_num, winning_vote, new_utilities,
                                                    self.positive_vote_effects_history,
                                                    self.negative_vote_effects_history, zero_idx_votes,
-                                                   self.current_options_matrix, self.sc_sim.get_influence_matrix(self.round_num))
+                                                   self.current_options_matrix, self.sc_sim.get_influence_matrix())
 
         time.sleep(.5)  # Without this, messages get sent out of order, and the sc_history gets screwed up.
-        if self.sc_logger:
-            pass
-            #print("this is round ", self.round_num)
-            #self.current_logger.add_round_to_sim(self.round_num)
         self.round_num += 1
-        # I don't know when we are going to want to generate this, but likely at the start of the next round.
-        #self.init_next_round()
+
 
     def run_sc_voting(self):
         player_votes = {}

@@ -24,14 +24,18 @@ class CompleteLogger():
         self.big_boy_data[curr_round]["JHG_STUFF"] = self.jhg_logger.return_round_for_writing(curr_round)
 
     # this should close the json the way that I want it to. lets go ahead and build this into our offline version first and go from there.
-    def close_json(self, filename): # not sure what to name these fetchers yet. Likely datetime again.
-        self.big_boy_data["SC_CONCLUSION"] = self.sc_logger.record_big_picture() # gets the big stuff
-        #self.big_boy_data["JHG_CONCLUSION"] = self.jhg_logger.record_big_picture() # TODO: Doesn't actually do anything yet.
+    def close_json(self, filename):
+        self.big_boy_data["SC_CONCLUSION"] = self.sc_logger.record_big_picture()
 
-        # in case you ever need it again, here is the code you like to use to look at where your current file path actually sends you
-        relative_path = "variousGraphingTools/completeVersions/completeLogs/" + filename + ".json"
-        absolute_path = os.path.abspath(relative_path)
+        # Get the directory of the current file (this script)
+        base_dir = os.path.dirname(os.path.abspath(__file__))
 
-        with open(absolute_path, "w") as file:
+        # Build the full path
+        relative_path = os.path.join(base_dir, "completeLogs", filename + ".json")
+
+        # Make sure the folder exists
+        os.makedirs(os.path.dirname(relative_path), exist_ok=True)
+
+        with open(relative_path, "w") as file:
             json.dump(self.big_boy_data, file, indent=4)
 

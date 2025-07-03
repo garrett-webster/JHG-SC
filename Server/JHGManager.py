@@ -3,18 +3,15 @@ from offlineSimStuff.variousGraphingTools.jhg_tools.jhgLogger import JHGLogger
 
 
 class JHGManager:
-    def __init__(self, connection_manager, num_humans, num_players, num_bots, jhg_logging, total_order):
+    def __init__(self, connection_manager, num_humans, num_players, num_bots, total_order):
         self.current_round = 1
         self.connection_manager = connection_manager
         self.num_players = num_players
         self.jhg_sim = JHG_simulator(num_humans, num_players, total_order)
         self.num_bots = num_bots
         self.currentLogger : JHGLogger = JHGLogger(self.jhg_sim)
-        self.jhg_logging = jhg_logging
         self.alpha = self.jhg_sim.sim.engine.alpha
         self.total_order = total_order
-        if self.jhg_logging:
-            self.currentLogger.add_round_to_overview(-1) # just throw the round num in, the sim is already in there
 
     def play_jhg_round(self, round_num, is_last_jhg_round):
         # Occasionally if the JHG round was played to quickly after the SC round, this would catch the SC vote and brick the server.
@@ -33,8 +30,6 @@ class JHGManager:
 
         # Creates a 2d array where each row corresponds to the allocation list of the player with the associated id
         allocations_matrix = self.jhg_sim.get_T()
-        if self.jhg_logging:
-            self.currentLogger.add_round_to_overview(round_num) # just throw the round num in, the sim is already in there
 
 
         sent_dict, received_dict = self.get_sent_and_received(allocations_matrix)
@@ -65,9 +60,6 @@ class JHGManager:
 
         return sent_dict, received_dict
 
-    def log_jhg_overview(self):
-        if self.jhg_logging:
-            self.currentLogger.conclude_overview()
 
     def get_highest_popularity_player(self):
         return self.jhg_sim.get_highest_popularity_player()

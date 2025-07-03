@@ -46,7 +46,7 @@ def run_trial(sc_sim, jhg_sim, num_rounds, num_cycles, create_graphs, group, tot
             graphEverything(sc_sim, jhg_sim, curr_round, played_sc, played_jhg)
 
 
-    current_logger.close_json("WHEEEE")
+    current_logger.close_json("TRIAL_TRIAL_TRIAL")
     return sc_sim, jhg_sim
 
 def run_sc_stuff(sc_sim, jhg_sim, total_order, influence_matrix, curr_round, current_logger):
