@@ -26,16 +26,10 @@ class CompleteLogger():
     # this should close the json the way that I want it to. lets go ahead and build this into our offline version first and go from there.
     def close_json(self, filename):
         self.big_boy_data["SC_CONCLUSION"] = self.sc_logger.record_big_picture()
+        base_dir = os.path.dirname(os.path.abspath(__file__)) # gets our current location
+        relative_path = os.path.join(base_dir, "completeLogs", filename + ".json") # assembles the full file path
+        os.makedirs(os.path.dirname(relative_path), exist_ok=True) # double check that we are free to boogy
 
-        # Get the directory of the current file (this script)
-        base_dir = os.path.dirname(os.path.abspath(__file__))
-
-        # Build the full path
-        relative_path = os.path.join(base_dir, "completeLogs", filename + ".json")
-
-        # Make sure the folder exists
-        os.makedirs(os.path.dirname(relative_path), exist_ok=True)
-
-        with open(relative_path, "w") as file:
+        with open(relative_path, "w") as file: # opens and then writes the file.
             json.dump(self.big_boy_data, file, indent=4)
 
