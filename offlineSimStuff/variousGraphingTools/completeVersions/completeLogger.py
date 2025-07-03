@@ -26,7 +26,7 @@ class CompleteLogger():
     # this should close the json the way that I want it to. lets go ahead and build this into our offline version first and go from there.
     def close_json(self, filename): # not sure what to name these fetchers yet. Likely datetime again.
         self.big_boy_data["SC_CONCLUSION"] = self.sc_logger.record_big_picture() # gets the big stuff
-        self.big_boy_data["JHG_CONCLUSION"] = self.jhg_logger.record_big_picture() # TODO: Doesn't actually do anything yet.
+        #self.big_boy_data["JHG_CONCLUSION"] = self.jhg_logger.record_big_picture() # TODO: Doesn't actually do anything yet.
 
         # in case you ever need it again, here is the code you like to use to look at where your current file path actually sends you
         relative_path = "variousGraphingTools/completeVersions/completeLogs/" + filename + ".json"

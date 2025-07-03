@@ -36,9 +36,9 @@ class CompleteGrapher():
                 self.create_jhg_graphs(allocations, popularity, influence, curr_round, old_popularity)
             if "SC_STUFF" in data[curr_round]:
                 sc = data[curr_round].get("SC_STUFF")
-                all_nodes, all_votes, winning_vote_list, current_options_matrix, types_list, scenario, group, round, cycle, chromosome, influence_matrix, results_sums, results, peeps = (
-                    self.extract_keys(sc, ["all_nodes", "all_votes", "winning_vote_list", "current_options_matrix", "types_list", "scenario", "group", "round", "cycle", "chromosome", "influence_matrix", "results_sums", "results", "peeps"]))
-                self.create_sc_graphs(all_nodes, all_votes, winning_vote_list, current_options_matrix, types_list, scenario,  group, round, cycle, chromosome, influence_matrix, results_sums, results, peeps)
+                all_nodes, all_votes, winning_vote_list, current_options_matrix, types_list, scenario, group, curr_round, cycle, chromosome, influence_matrix, results_sums, results, peeps = (
+                    self.extract_keys(sc, ["all_nodes", "all_votes", "winning_vote", "current_options_matrix", "types_list", "scenario", "group", "curr_round", "cycle", "chromosome", "influence_matrix", "results_sums", "results", "peeps"]))
+                self.create_sc_graphs(all_nodes, all_votes, winning_vote_list, current_options_matrix, types_list, scenario, group, curr_round, cycle, chromosome, influence_matrix, results_sums, results, peeps)
 
     def create_graph_with_sims(self, curr_round, sc_sim, jhg_sim, sc_played, jhg_played):
         if jhg_played:# very important that this comes first, as we alwas PLAY this one first, makes sure the graphs are printed in the right order. for now. might need to adjust some stuff.
