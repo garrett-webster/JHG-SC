@@ -62,7 +62,6 @@ class SCManager:
         player_votes = self.run_sc_voting()
         # this is the line where we get the bot votes as well.
         previous_votes = {}
-        print("Here is self.vote cycles, might be wrong", self.vote_cycles)
         # always start from cycle 0, don't use the max one. methinks.
         zero_idx_votes, one_idx_votes = self.compile_sc_votes(player_votes, self.round_num, 0, previous_votes) # no clue what cycle this is or why this runs.
         self.sc_sim.set_final_votes(zero_idx_votes)
@@ -98,7 +97,6 @@ class SCManager:
         previous_votes = {}
 
         for cycle in range(self.vote_cycles):
-            print("Cycle under run sc voting ", cycle)
             player_votes.clear()
             # Waits for a vote from each client
             while len(player_votes) < self.connection_manager.num_clients:
@@ -119,7 +117,6 @@ class SCManager:
         return player_votes
 
     def compile_sc_votes(self, player_votes, round_num, cycle, previous_votes):
-        print("Here is teh cycle that we are inputting here ", cycle)
         bot_votes = self.sc_sim.get_votes(previous_votes, round_num, cycle, self.vote_cycles)
 
         all_votes = {**bot_votes, **player_votes}

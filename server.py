@@ -13,8 +13,8 @@ OPTIONS = {
     #General settings
     "NUM_HUMANS": 1,
     "TOTAL_PLAYERS": 6,
-    "JHG_ROUNDS_PER_SC_ROUND" : 3, # Number of JHG rounds to play between each social choice round
-    "MAX_ROUNDS": 5, # Max number of JHG rounds to play. Game ends after the nth round
+    "JHG_ROUNDS_PER_SC_ROUND" : 2, # Number of JHG rounds to play between each social choice round
+    "NUM_CYCLES": 2, # Max number of JHG rounds to play. Game ends after the nth round
     "SC_GROUP_OPTION": 0, # See options_creation.py -> group_size_options to understand what this means
     "SC_VOTE_CYCLES": 3, # Number of cycles to play each social choice round. Players will vote this many times, with the nth vote being final.
     "LOGGING" : True,
@@ -40,7 +40,7 @@ class Server():
         self.num_bots = options["NUM_BOTS"]
         self.sc_group_option = options["SC_GROUP_OPTION"]
         self.jhg_rounds_per_sc_round = options["JHG_ROUNDS_PER_SC_ROUND"]
-        self.max_rounds = options["MAX_ROUNDS"]
+        self.num_cycles = options["NUM_CYCLES"]
         self.sc_vote_cycles = options["SC_VOTE_CYCLES"]
         self.logging = options["LOGGING"]
         self.player_allocations = options["PLAYER_ALLOCATIONS"]
@@ -50,6 +50,7 @@ class Server():
         self.JHG_manager = None
         self.connection_manager = None
         self.current_logger = None
+        self.max_rounds = self.determine_rounds()
 
 
     def start_server(self, host='0.0.0.0', port=12345):
@@ -76,7 +77,14 @@ class Server():
 
         for curr_round in range(self.max_rounds):
             is_last_jhg_round = False
-            if curr_round % self.jhg_rounds_per_sc_round == 0 and curr_round != 0:
+            # on hte last round, fire this so it goes off twice, else, don't have it go off.
+            print("this is the current round ", curr_round, " and this is the modulo ", curr_round % self.jhg_rounds_per_sc_round)
+            # DO the JHG STUFF FIRST.
+            if curr_round == self.max_rounds - 1: is_last_jhg_round = True
+            self.JHG_manager.play_jhg_round(self.JHG_manager.current_round, is_last_jhg_round)
+            self.current_logger.save_jhg_round(curr_round)
+            # THEN DECIDE IF YOU NEED TO RUN AN SC ROUND.
+            if (curr_round % self.jhg_rounds_per_sc_round) == self.jhg_rounds_per_sc_round -1:
                 if self.player_allocations:
                     peeps, total_order_index = self.generate_peeps(self.total_order, self.JHG_manager, self.SC_manager)
                     influence_matrix = self.JHG_manager.get_influence_matrix()
@@ -86,9 +94,7 @@ class Server():
                     self.SC_manager.init_next_round()
                 self.SC_manager.play_social_choice_round(self.JHG_manager.get_sim)
                 self.current_logger.save_sc_round(curr_round)
-            if curr_round == self.max_rounds - 1: is_last_jhg_round = True
-            self.JHG_manager.play_jhg_round(self.JHG_manager.current_round, is_last_jhg_round)
-            self.current_logger.save_jhg_round(curr_round)
+
 
         self.current_logger.close_json("TRIAL TRIAL TRIAL")
         print("game over")
@@ -121,6 +127,11 @@ class Server():
             indexes.append(total_order.index(peep)+1)
         return indexes
 
+    def determine_rounds(self):
+        num_cycles = self.num_cycles
+        num_games_in_cycle = self.jhg_rounds_per_sc_round
+        max_rounds = num_games_in_cycle * num_cycles
+        return max_rounds # for i in range this number
 
 
 
