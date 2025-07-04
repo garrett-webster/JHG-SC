@@ -12,7 +12,7 @@ def create_empty_vote_matrix(num_players):
 
 
 class SCManager:
-    def __init__(self, connection_manager, num_humans, options_generator, num_players, num_bots, sc_group_option, vote_cycles, total_order):
+    def __init__(self, connection_manager, num_humans, options_generator, num_players, num_bots, sc_group_option, vote_cycles, total_order, utility_per_player):
         self.connection_manager = connection_manager
         self.round_num = 1
         self.save_dict = {}
@@ -24,7 +24,7 @@ class SCManager:
         chromosomes = "../JHG-SC/offlineSimStuff/chromosomes/experiment"
         allocation_scenario = "../JHG-SC/offlineSimStuff/allocations_scenarios/social_welfare"
         #print("this is the total ordering ", total_order)
-        self.sc_sim = Social_Choice_Sim(num_players, 3, num_humans, options_generator, 3, 0, chromosomes, scenario, "", total_order, allocation_scenario)
+        self.sc_sim = Social_Choice_Sim(num_players, 3, num_humans, options_generator, 3, 0, chromosomes, scenario, "", total_order, allocation_scenario, utility_per_player)
         #self.sc_groups = generate_two_plus_one_groups(num_players, sc_group_option)
         self.num_players = num_players
         self.num_bots = num_bots

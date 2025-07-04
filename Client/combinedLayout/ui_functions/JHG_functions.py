@@ -114,7 +114,7 @@ def jhg_over(main_window, is_last, init_pop_influence):
 
 
 def start_jhg_round(main_window):
-    main_window.round_state.tokens = 2 * main_window.num_players
+    main_window.round_state.tokens = main_window.round_state.tokens_per_player * main_window.num_players
     main_window.round_state.allocations = [0 for _ in range(main_window.num_players)]
 
     main_window.dockWidget.top_left.start_flashing()

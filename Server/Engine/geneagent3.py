@@ -50,7 +50,7 @@ class CommunityEvaluation():
 
 class GeneAgent3(AbstractAgent):
 
-    def __init__(self, geneStr, _num_gene_copies):  # Change on Sep 21
+    def __init__(self, geneStr, _num_gene_copies, tokens_per_player):  # Change on Sep 21
         super().__init__()
         self.num_gene_copies = _num_gene_copies     # Change on Sep 21
         self.whoami = "gene"
@@ -58,6 +58,7 @@ class GeneAgent3(AbstractAgent):
         self.relativeFitness = 0.0
         self.absoluteFitness = 0.0
         self.gameParams = {}
+        self.tokens_per_player = tokens_per_player
 
         # Changes in May
         if geneStr == "":
@@ -268,7 +269,7 @@ class GeneAgent3(AbstractAgent):
         self.pop_history.append(popularities)
 
         num_players = len(popularities)
-        num_tokens = num_players * 2
+        num_tokens = num_players * self.tokens_per_player
 
         if player_idx == self.theTracked:
             print()

@@ -29,13 +29,14 @@ NUM_CAUSES = 3
 
 
 class Social_Choice_Sim:
-    def __init__(self, total_players, num_causes, num_humans, options_generator, cycle=0, round=0, chromosomes="", scenario="", group="", total_order=None, allocation_scenario=""):
+    def __init__(self, total_players, num_causes, num_humans, options_generator, cycle=0, round=0, chromosomes="", scenario="", group="", total_order=None, allocation_scenario="", utility_per_player=3):
         self.options_generator = options_generator
         if total_order == None: # generating it non server side
             self.total_order = self.create_total_order(total_players, num_humans)
         else: # if created with server, spoon feed it.
             self.total_order = total_order
         # just a bunch of base setters.
+        self.utility_per_player = utility_per_player
         self.bot_index_dict = {}
         self.total_players = total_players
         self.num_humans = num_humans
@@ -219,9 +220,9 @@ class Social_Choice_Sim:
         new_bot = None
         bot_type = int(bot_type)
         if bot_type == 0:
-            new_bot = (Random(index))
+            new_bot = (Random(index, self.utility_per_player))
         if bot_type == 1:
-            new_bot = (SocialWelfare(index))
+            new_bot = (SocialWelfare(index, self.utility_per_player))
 
 
         return new_bot # the matched bot that we were looking for.

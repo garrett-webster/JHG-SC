@@ -30,6 +30,8 @@ class RoundState:
         self.client_id = id
         self.tokens = num_tokens_per_player * num_players  # Number of tokens remaining for the current round
         self.utility = num_utility_per_player * num_players
+        self.utility_per_player = num_utility_per_player
+        self.tokens_per_player = num_tokens_per_player
         self.allocations = [0 for _ in range(num_players)]  # Represents the tokens that you will send to others
         self.received = [0 for _ in range(num_players)] # Each position in the list represents the number of tokens received from the player with id _
         self.sent = [0 for _ in range(num_players)]
@@ -59,12 +61,12 @@ class RoundState:
 
     def reset_everything(self):
         self.utilities = [0 for _ in range(len(self.players))] # reset the utilities to all 0's
-        self.utility = 3 * self.num_players # resets the actual utility
+        self.utility = self.utility_per_player * self.num_players # resets the actual utility
         #self.allocations = [0 for _ in range(len(self.players))] # and resets the allocations back to zeros as well.
         #self.tokens = 2 * self.num_players
         for widget in self.sc_widgets:
             widget.utility_box.setText("0")
-        self.tokens = 2 * self.num_players
+        self.tokens = self.tokens_per_player * self.num_players
         # for widget in self.jhg_widgets:
         #     widget.allocation_box.setText("0")
 

@@ -14,16 +14,17 @@ import random
 np.set_printoptions(precision=2, suppress=True)
 
 class JHG_simulator():
-    def __init__(self, num_human_players, num_players, total_order):
+    def __init__(self, num_human_players, num_players, total_order, tokens_per_player=2):
         self.num_players = num_players
         self.total_order = total_order
         self.sim = None
         self.players = None
-        self.start_game(num_human_players, num_players)
+        # went ahead and gave this a default. the currently trained agents have this baked into them that they need to have 2 tokens per player, curious in expanding that.
+        self.start_game(num_human_players, num_players, tokens_per_player)
         self.T = None
 
 
-    def start_game(self, num_human_players, num_players):
+    def start_game(self, num_human_players, num_players, tokens_per_player):
         init_pop = "equal"
 
         numAgents = num_players - num_human_players
@@ -42,7 +43,7 @@ class JHG_simulator():
         theGen = 199
         num_gene_copies = 3
 
-        theGenePools = loadPopulationFromFile(popSize, theFolder, theGen, num_gene_copies)
+        theGenePools = loadPopulationFromFile(popSize, theFolder, theGen, num_gene_copies, tokens_per_player)
 
 
         plyrs = []
@@ -200,7 +201,7 @@ class JHG_simulator():
 
 
 
-def loadPopulationFromFile(popSize, generationFolder, startIndex, num_gene_pools):
+def loadPopulationFromFile(popSize, generationFolder, startIndex, num_gene_pools, tokens_per_player):
     fnombre = "Kill me"
     try:
         fnombre = generationFolder + "/gen_" + str(startIndex) + ".csv"
@@ -219,7 +220,7 @@ def loadPopulationFromFile(popSize, generationFolder, startIndex, num_gene_pools
         line = fp.readline()
         words = line.split(",")
 
-        thePopulation.append(GeneAgent3(words[0], num_gene_pools))
+        thePopulation.append(GeneAgent3(words[0], num_gene_pools, tokens_per_player))
         thePopulation[i].count = float(words[1])
         thePopulation[i].relativeFitness = float(words[2])
         thePopulation[i].absoluteFitness = float(words[3])

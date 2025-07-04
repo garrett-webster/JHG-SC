@@ -117,7 +117,7 @@ class ServerListener(QObject):
         self.round_state.received = json_data["RECEIVED"]
         self.round_state.sent = json_data["SENT"]
         self.round_state.jhg_round_num = json_data["ROUND"]
-        self.round_state.tokens = self.round_state.num_players * 2
+        self.round_state.tokens = self.round_state.num_players * self.round_state.tokens_per_player
         self.round_state.current_popularities = json_data["POPULARITY"]
         self.jhg_popularity_graph.clear()
 
