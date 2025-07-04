@@ -6,8 +6,6 @@ from Client.combinedLayout.colors import COLORS
 
 from Client.combinedLayout.Arrow import Arrow
 
-from Server.social_choice_sim import Social_Choice_Sim
-
 
 class SCCausesGraph(QWidget):
     def __init__(self, num_cycles):

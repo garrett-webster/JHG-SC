@@ -1,6 +1,6 @@
 import copy
 import math
-from Server.Node import Node
+from Client.combinedLayout.Node import Node
 from Client.combinedLayout.Arrow import Arrow
 from Client.combinedLayout.Circle import Circle
 class SC_Allocations_Grapher:

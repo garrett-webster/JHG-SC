@@ -13,8 +13,8 @@ OPTIONS = {
     #General settings
     "NUM_HUMANS": 1,
     "TOTAL_PLAYERS": 6,
-    "JHG_ROUNDS_PER_SC_ROUND" : 1, # Number of JHG rounds to play between each social choice round
-    "MAX_ROUNDS": 3, # Max number of JHG rounds to play. Game ends after the nth round
+    "JHG_ROUNDS_PER_SC_ROUND" : 3, # Number of JHG rounds to play between each social choice round
+    "MAX_ROUNDS": 5, # Max number of JHG rounds to play. Game ends after the nth round
     "SC_GROUP_OPTION": 0, # See options_creation.py -> group_size_options to understand what this means
     "SC_VOTE_CYCLES": 3, # Number of cycles to play each social choice round. Players will vote this many times, with the nth vote being final.
     "LOGGING" : True,
@@ -52,7 +52,7 @@ class Server():
         self.current_logger = None
 
 
-    def start_server(self, host='0.0.0.0', port=12346):
+    def start_server(self, host='0.0.0.0', port=12345):
         self.connection_manager = ServerConnectionManager(host, port, OPTIONS["TOTAL_PLAYERS"], OPTIONS["NUM_BOTS"])
 
         self.total_order = self.connection_manager.get_total_list()

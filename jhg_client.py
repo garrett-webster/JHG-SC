@@ -32,8 +32,9 @@ if __name__ == "__main__":
 
     #host = '10.55.10.49'
     host = '127.0.0.1'
+    #host = '192.168.36.2'
     #port = 12346
-    port = 12346
+    port = 12345
 
     connection_manager = ClientConnectionManager(host, port)
 

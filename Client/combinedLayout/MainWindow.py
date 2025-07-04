@@ -217,7 +217,7 @@ class MainWindow(QMainWindow):
         start_jhg_round(self)
 
     def jhg_over(self, is_last, init_pop_influence):
-        self.disable_jhg_buttons(self.JHG_panel)
+        #self.disable_jhg_buttons(self.JHG_panel) Try not putting that there, let it get cancelled somewhere else.
         jhg_over(self, is_last, init_pop_influence)
         self.round_state.utilities = [0 for _ in range(self.round_state.num_players)] # reset this bc this isn't happening quick enough.
         self.SC_panel.setCurrentIndex(0)  # should forcefully move them over if they aren't there already.
