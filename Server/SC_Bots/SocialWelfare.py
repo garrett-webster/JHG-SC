@@ -1,10 +1,12 @@
 # social welfare bot - always picks whats best for everyone.
+from Server.SC_Bots.abstractVotingBot import AbstractVotingBot
 
-class SocialWelfareBot:
+class SocialWelfareBot(AbstractVotingBot):
     def __init__(self, self_id):
         self.self_id = self_id
         self.type = "P"
         self.number_type = 1
+        super(SocialWelfareBot, self).__init__()
 
     def set_chromosome(self, chromosome):
         self.chromosome = chromosome

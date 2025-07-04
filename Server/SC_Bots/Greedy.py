@@ -1,13 +1,14 @@
 # this brother doesn't even think, he just votes greediest. haven't implemented him yet though, at least in here. THere is a basic implementation under
 # the SOcial choice sim under get vote. just repurpose the code under this umbrella and go from there.
 import math
+from Server.SC_Bots.abstractVotingBot import AbstractVotingBot
 
-
-class GreedyBot():
+class GreedyBot(AbstractVotingBot):
     def __init__(self, self_id):
         self.self_id = self_id
         self.type = "G"
         self.number_type = 2
+        super(GreedyBot, self).__init__()
 
     def set_chromosome(self, chromosome):
         self.chromosome = chromosome

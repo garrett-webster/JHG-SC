@@ -2,6 +2,8 @@
 import random
 import copy
 
+
+
 class humanAttempt2:
     def __init__(self, self_id):
         self.self_id = self_id # the id of ourself in realtion to other bots.

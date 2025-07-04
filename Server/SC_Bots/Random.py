@@ -2,11 +2,14 @@ import random
 # I literally just want to see what happens when people play randomly. I am expecting a lot of nothing to happen.
 # low cooperation score, 0 slope at the end, low covariance as well (especialyl over repeated games)
 
-class RandomBot():
+from Server.SC_Bots.abstractVotingBot import AbstractVotingBot
+
+class RandomBot(AbstractVotingBot):
     def __init__(self, self_id):
         self.self_id = self_id
         self.type = "R"
         self.number_type = 0
+        super(RandomBot, self).__init__()
 
     def set_chromosome(self, chromosome): # doesn't actually get used, just for conveience sake
         self.chromosome = chromosome

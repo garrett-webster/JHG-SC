@@ -2,21 +2,20 @@ import copy
 import math
 import random
 from collections import Counter
-from operator import index
 from pathlib import Path
 import numpy as np
 
 
 #from Client.combinedLayout.colors import COLORS
 from Server.Node import Node
-from Server.SC_Bots.humanAttempt2 import humanAttempt2
-from Server.OptionGenerators.options_creation import generate_two_plus_one_groups_options_best_of_three, generate_two_plus_one_groups
+from Server.SC_Bots.legacyBots.humanAttempt2 import humanAttempt2
+from Server.OptionGenerators.options_creation import generate_two_plus_one_groups
 from Server.SC_Bots.Greedy import GreedyBot
 from Server.SC_Bots.SocialWelfare import SocialWelfareBot
 from Server.SC_Bots.Random import RandomBot
-from Server.SC_Bots.somewhatMoreAwareGreedy import somewhatMoreAwarenessGreedy
+from Server.SC_Bots.legacyBots.somewhatMoreAwareGreedy import somewhatMoreAwarenessGreedy
 from Server.SC_Bots.optimalHuman import optimalHuman
-from Server.SC_Bots.reorganizedHuman import reorganizedHuman
+from Server.SC_Bots.legacyBots.reorganizedHuman import reorganizedHuman
 from Server.SC_Bots.possibleCheetahBot import cheetahBot
 
 from Server.allocation_bots.socialWelfare import SocialWelfare

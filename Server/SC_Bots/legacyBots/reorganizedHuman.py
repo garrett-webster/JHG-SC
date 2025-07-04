@@ -1,8 +1,10 @@
 # same as optimal human, but now we are going to use a negative strategy as well.
 import random
 import copy
+from Server.SC_Bots.abstractVotingBot import AbstractVotingBot
 
-class reorganizedHuman:
+
+class reorganizedHuman(AbstractVotingBot):
     def __init__(self, self_id):
         self.self_id = self_id # the id of ourself in realtion to other bots.
         self.type = "BG" # used for graphing purposes
@@ -11,6 +13,8 @@ class reorganizedHuman:
         self.number_type = 6 # used for logging purposes.
         self.social_lubrication = None
         self.bad_vote = None # if we have a bad situation, we wnat our vote to be consistent between cycles. hold on to it.
+        super(reorganizedHuman, self).__init__()
+
 
     def set_chromosome(self, chromosome): # allows me to set the chromosome at will.
         self.chromosome = chromosome

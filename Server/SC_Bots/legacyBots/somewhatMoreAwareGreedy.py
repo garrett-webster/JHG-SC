@@ -1,6 +1,5 @@
 # Sean's Smartest Greedy Bot - for now. capable of switching and recognizing majorities. tiebreaksers still result in abstaining bc it doesn't have an idea of
 # social awareness. might be worth implmenenting in a later bot.
-from PyQt6.uic import compileUiDir
 
 
 class somewhatMoreAwarenessGreedy:
