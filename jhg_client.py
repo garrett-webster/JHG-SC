@@ -42,7 +42,9 @@ if __name__ == "__main__":
     client_id = init_vals["CLIENT_ID"]
     num_players = init_vals["NUM_PLAYERS"]
     num_cycles = init_vals["NUM_CYCLES"]
+    num_tokens_per_player = init_vals["TOKENS_PER_PLAYER"]
+    utility_per_player = init_vals["UTILITY_PER_PLAYER"]
 
-    window = MainWindow(connection_manager, num_players, client_id, num_cycles)
+    window = MainWindow(connection_manager, num_players, client_id, num_cycles, num_tokens_per_player, utility_per_player)
     window.show()
     app.exec()

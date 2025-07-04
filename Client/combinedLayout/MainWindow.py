@@ -29,7 +29,7 @@ from Client.combinedLayout.SCInfluenceGrapher import update_sc_network_graph
 
 
 class MainWindow(QMainWindow):
-    def __init__(self, connection_manager, num_players, client_id, num_cycles):
+    def __init__(self, connection_manager, num_players, client_id, num_cycles, num_tokens_per_player, utility_per_player):
         super().__init__()
         # This window is very dependent on things happening in the correct order.
         # If you mess with it, you might break a lot of things.
@@ -43,7 +43,7 @@ class MainWindow(QMainWindow):
         self.jhg_buttons = []
         self.sc_buttons = []
         self.num_players = num_players
-        self.round_state = RoundState(client_id, num_players)
+        self.round_state = RoundState(client_id, num_players, num_tokens_per_player, utility_per_player)
         self.connection_manager = connection_manager
         self.num_cycles = num_cycles
 

@@ -18,6 +18,8 @@ OPTIONS = {
     "SC_GROUP_OPTION": 0, # See options_creation.py -> group_size_options to understand what this means
     "SC_VOTE_CYCLES": 3, # Number of cycles to play each social choice round. Players will vote this many times, with the nth vote being final.
     "LOGGING" : True,
+    "NUM_TOKENS_PER_PLAYER": 2,
+    "UTILITY_PER_PLAYER": 3,
     # TODO: MOve the utility and toekn allocation from 2 different spots server and client side and make them options that we can mess with here.
 
     #Misc (Wasn't sure where to put this)
@@ -43,6 +45,8 @@ class Server():
         self.num_cycles = options["NUM_CYCLES"]
         self.sc_vote_cycles = options["SC_VOTE_CYCLES"]
         self.logging = options["LOGGING"]
+        self.tokens_per_player = options["NUM_TOKENS_PER_PLAYER"]
+        self.utility_per_player = options["UTILITY_PER_PLAYER"]
         self.player_allocations = options["PLAYER_ALLOCATIONS"]
         self.total_order = None
         self.generator = None
@@ -59,9 +63,9 @@ class Server():
         self.total_order = self.connection_manager.get_total_list()
         print("Server started")
         # Halts execution until enough players have joined
-        self.connection_manager.add_clients(OPTIONS["NUM_HUMANS"], OPTIONS["NUM_BOTS"], OPTIONS["SC_VOTE_CYCLES"])
+        self.connection_manager.add_clients(OPTIONS["NUM_HUMANS"], OPTIONS["NUM_BOTS"], OPTIONS["SC_VOTE_CYCLES"], OPTIONS["NUM_TOKENS_PER_PLAYER"], OPTIONS["UTILITY_PER_PLAYER"])
 
-
+        # we will get here in a minute.
         self.JHG_manager = JHGManager(self.connection_manager, self.num_humans, self.num_players, self.num_bots, self.total_order)
         self.generator = generator_factory(OPTIONS["OPTION_GENERATOR"], OPTIONS["TOTAL_PLAYERS"], OPTIONS["NOISE_MAGNITUDE"],
                                            OPTIONS["MAX_UTILITY"], OPTIONS["MIN_UTILITY"], OPTIONS["NUM_OPTIONS"],

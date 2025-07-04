@@ -25,11 +25,11 @@ class RoundState:
     utilities = []
     utilities_mat = []
 
-    def __init__(self, id, num_players):
+    def __init__(self, id, num_players, num_tokens_per_player, num_utility_per_player):
         self.num_players = num_players
         self.client_id = id
-        self.tokens = 2 * num_players  # Number of tokens remaining for the current round
-        self.utility = 3 * num_players
+        self.tokens = num_tokens_per_player * num_players  # Number of tokens remaining for the current round
+        self.utility = num_utility_per_player * num_players
         self.allocations = [0 for _ in range(num_players)]  # Represents the tokens that you will send to others
         self.received = [0 for _ in range(num_players)] # Each position in the list represents the number of tokens received from the player with id _
         self.sent = [0 for _ in range(num_players)]
