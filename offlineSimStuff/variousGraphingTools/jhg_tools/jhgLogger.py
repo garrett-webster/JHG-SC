@@ -7,6 +7,8 @@ from fontTools.pens.basePen import NullPen
 
 from Client.combinedLayout.colors import COLORS
 
+# Debug info
+import sys
 
 
 class JHGLogger():
@@ -44,13 +46,21 @@ class JHGLogger():
 
     def return_round_for_writing(self, curr_round):
         T, popularity, influence, old_popularity = self.jhg_sim.individual_round_deets_for_logger(curr_round)
-        new_dict = {}
-        new_dict["Popularity"] = popularity
-        new_dict["Influence"] = influence
-        new_dict["T"] = T
-        new_dict["Old_Popularity"] = old_popularity
-        return new_dict # just gets the deets so we can write with them elsewhere.
 
+        # print(f"[DEBUG] Round {curr_round}")
+        # print(f"  T size: {sys.getsizeof(T)}")
+        # print(f"  Popularity size: {sys.getsizeof(popularity)}")
+        # print(f"  Influence size: {sys.getsizeof(influence)}")
+        # print(f"  Old_Popularity size: {sys.getsizeof(old_popularity)}")
+
+        new_dict = {
+            "Popularity": popularity,
+            "Influence": influence,
+            "T": T,
+            "Old_Popularity": old_popularity
+        }
+
+        return new_dict
 
     def conclude_overview(self):
         my_path = os.path.dirname(os.path.abspath(__file__))

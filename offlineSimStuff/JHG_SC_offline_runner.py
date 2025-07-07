@@ -66,7 +66,7 @@ def run_sc_stuff(sc_sim, jhg_sim, total_order, influence_matrix, curr_round, cur
 def run_jhg_stuff(jhg_sim, curr_round, current_logger):
     jhg_sim.execute_round(None, curr_round)  # no client input, thats crazy talk here. run a JHG round.
     influence_matrix = jhg_sim.get_influence()  # need this for friend recognition and whatnot.
-    current_logger.save_jhg_round(curr_round)
+    current_logger.save_jhg_round(curr_round) # lets try not runing it wiht the logger.
 
 
 # def generate_peeps(sc_sim, jhg_sim, total_order):

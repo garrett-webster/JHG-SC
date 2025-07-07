@@ -1,6 +1,9 @@
 import os
 import json
 
+# Debug info
+import sys
+
 # class that contains various functions for saving stuff to jsons from old code.
 from offlineSimStuff.variousGraphingTools.sc_tools.simLogger import simLogger
 from offlineSimStuff.variousGraphingTools.jhg_tools.jhgLogger import JHGLogger
@@ -21,6 +24,9 @@ class CompleteLogger():
     def save_jhg_round(self, curr_round):
         if curr_round not in self.big_boy_data: # make sure he exists.
             self.big_boy_data[curr_round] = {}
+        new_var = self.jhg_logger.return_round_for_writing(curr_round)
+        #print("this is the total size ", sys.getsizeof(new_var))
+
         self.big_boy_data[curr_round]["JHG_STUFF"] = self.jhg_logger.return_round_for_writing(curr_round)
 
     # this should close the json the way that I want it to. lets go ahead and build this into our offline version first and go from there.
