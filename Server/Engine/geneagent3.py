@@ -59,6 +59,7 @@ class GeneAgent3(AbstractAgent):
         self.absoluteFitness = 0.0
         self.gameParams = {}
         self.tokens_per_player = tokens_per_player
+        self.pop_history = [] # just slap this up here.
 
         # Changes in May
         if geneStr == "":
@@ -257,15 +258,13 @@ class GeneAgent3(AbstractAgent):
 
     def play_round(self, player_idx, round_num, received, popularities, influence, extra_data):
         self.printT(player_idx, str(received))
-
+        print("this is the round number ", round_num)
         # set up some variables
         if self.theTracked != 99999:
             self.theTracked = self.getTracked()
 
         # self.printT(player_idx, str(influence))
 
-        if round_num == 0:
-            self.pop_history = []
         self.pop_history.append(popularities)
 
         num_players = len(popularities)

@@ -22,6 +22,7 @@ def run_trial(sc_sim, jhg_sim, rounds_list, num_cycles, create_graphs, group, to
     played_sc = False
     played_jhg = False
     influence_matrix = None # this should get overwritten pretty quick, but its there so there's no error.
+    curr_sc_round = 0
     for list_index in tqdm(range(0, len(round_list))): # everything NEEDS to start at 1, PLEASE.
 
         curr_round_identifier = round_list[list_index]
@@ -29,12 +30,13 @@ def run_trial(sc_sim, jhg_sim, rounds_list, num_cycles, create_graphs, group, to
         print("this is the curr round ", curr_round)
         sc_rounds = True if curr_round_identifier[1] == "*" else False
 
-        run_jhg_stuff(jhg_sim, curr_round, current_logger)
+        influence_matrix = run_jhg_stuff(jhg_sim, curr_round, current_logger)
         played_jhg = True
 
         if sc_rounds:
-            run_sc_stuff(sc_sim, jhg_sim, total_order, influence_matrix, curr_round, current_logger)
+            run_sc_stuff(sc_sim, jhg_sim, total_order, influence_matrix, curr_sc_round, current_logger)
             played_sc = True
+            curr_sc_round += 1
 
         if create_graphs:
             pass
@@ -49,7 +51,7 @@ def run_sc_stuff(sc_sim, jhg_sim, total_order, influence_matrix, curr_round, cur
     possible_peeps, indexes = generate_peeps(total_order, jhg_sim, sc_sim)  # people who are needed to create the matrix
     # should I make this, you know, an entirely different bot? having them in the same file feels wrong becuase they are doing differen things.
     current_options_matrix, peeps = sc_sim.let_others_create_options_matrix(possible_peeps.tolist(),
-                                                                     influence_matrix)  # actually creates the matrix
+                                                                     influence_matrix, curr_round)  # actually creates the matrix
     sc_sim.start_round((current_options_matrix, indexes))
 
     bot_votes = {}
@@ -64,10 +66,10 @@ def run_sc_stuff(sc_sim, jhg_sim, total_order, influence_matrix, curr_round, cur
     current_logger.save_sc_round(curr_round)
 
 def run_jhg_stuff(jhg_sim, curr_round, current_logger):
-    print("are we realliy running this ?")
     jhg_sim.execute_round(None, curr_round)  # no client input, thats crazy talk here. run a JHG round.
     influence_matrix = jhg_sim.get_influence()  # need this for friend recognition and whatnot.
     current_logger.save_jhg_round(curr_round) # lets try not runing it wiht the logger.
+    return influence_matrix
 
 
 def generate_peeps(total_order, jhg_sim, sc_sim):

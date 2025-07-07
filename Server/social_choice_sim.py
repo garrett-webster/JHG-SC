@@ -4,6 +4,9 @@ import random
 from collections import Counter
 from pathlib import Path
 import numpy as np
+from numpy.distutils.from_template import list_re
+
+from Server.Engine.geneagent3 import GeneAgent3
 
 # from Client.combinedLayout.colors import COLORS
 from Server.Node import Node
@@ -63,7 +66,8 @@ class Social_Choice_Sim:
         self.bot_type = self.set_bot_list(scenario)
         self.allocation_bot_type = self.set_bot_list(allocation_scenario)
         self.bots = self.create_bots(self.total_order)  # make sure to pull this from the right spot.
-        self.allocation_bots = self.create_allocation_bots(self.total_order)
+        #self.allocation_bots = self.create_allocation_bots(self.total_order) # old code, want to try something new
+        self.allocation_bots = self.use_gene_bots()
         self.bot_list_as_string = self.create_bot_list_as_string(self.bots)
         # self.allocation_bot_list_as_string = self.create_bot_list_as_string(self.allocation_bots)
         self.set_bot_chromosomes(self.chromosomes)  # no chromosomes for allocaiton bots.
@@ -99,6 +103,7 @@ class Social_Choice_Sim:
         # this needs to be a square matrix for reasons. thats cool I guess.
         # self.v = [[0 for _ in range(total_players)] for _ in range(total_players)]  # represents the change in utility at that round.
         self.peeps = None  # just so we have it around
+        self.new_v = None
 
     def create_total_order(self, total_players, num_humans):
         num_bots = total_players - num_humans
@@ -358,6 +363,7 @@ class Social_Choice_Sim:
                 new_v.append(current_options_matrix_columns[
                                  all_votes[plyr_idx]])  # add the column of what they did to the new v.
 
+        self.new_v = new_v
         self.calculate_influence_matrix(new_v, self.round)
         return winning_vote, self.current_results
 
@@ -563,8 +569,61 @@ class Social_Choice_Sim:
     #     plt.title("Heatmap of Number Distribution")
     #     plt.show()
 
-    def get_peeps(self):
-        return
+    def use_gene_bots(self):
+        num_agents = self.total_players
+        popSize = 60
+        player_idxs = list(np.arange(0, num_agents))
+        theFolder = "Server/Engine"
+        theGen = 199
+        num_gene_copies = 3
+        thePopulation = []
+        fnombre = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\Server\Engine\gen_199.csv"
+        fp = open(fnombre, "r")
+
+        for i in range(0, popSize):
+            line = fp.readline()
+            words = line.split(",")
+
+            thePopulation.append(GeneAgent3(words[0], num_gene_copies, self.utility_per_player))
+            thePopulation[i].count = float(words[1])
+            thePopulation[i].relativeFitness = float(words[2])
+
+        plyrs = []
+        for i in range(0, len(player_idxs)):
+            plyrs.append(thePopulation[player_idxs[i]])
+        players = np.array(plyrs)
+        agents = list(players)
+        initial_pops = [10 for _ in range(num_agents)]
+        poverty_line = 0
+        forcedRandom = False
+
+        players = [
+            *agents
+        ]
+
+        alpha_min, alpha_max = 0.20, 0.20
+        beta_min, beta_max = 0.5, 1.0
+        keep_min, keep_max = 0.95, 0.95
+        give_min, give_max = 1.30, 1.30
+        steal_min, steal_max = 1.6, 1.60
+
+        num_players = len(players)
+
+        game_params = {
+            "num_players": num_players,
+            "alpha": alpha_min,  # np.random.uniform(alpha_min, alpha_max),
+            "beta": beta_min,  # np.random.uniform(beta_min, beta_max),
+            "keep": keep_min,  # np.random.uniform(keep_min, keep_max),
+            "give": give_min,  # np.random.uniform(give_min, give_max),
+            "steal": steal_min,  # np.random.uniform(steal_min, steal_max),
+            "poverty_line": poverty_line,
+            "base_popularity": np.array(initial_pops)
+        }
+
+        for a in agents:  # sets the game params for all users.
+            a.setGameParams(game_params, forcedRandom)
+
+        return players # this SHOUDL do the trick.
 
     ########################################################################
     ###--- NODE CREATION FOR FRONT END. NOT USEFUL FOR GENETIC STUFF. ---###
@@ -761,14 +820,45 @@ class Social_Choice_Sim:
                 self.results_sums.index(max(self.results_sums))]  # return the index of the highest utility player.
 
     # this functin is used for simulation purposes ONLY. should never be called with live players.
-    def let_others_create_options_matrix(self, bot_peeps, influence_matrix):
-
-        list_of_columns = []
-        for peep in bot_peeps:
-            list_of_columns.append(self.allocation_bots[self.bot_index_dict[peep]].create_column(self.total_players))
-        current_options_matrix = np.transpose(list_of_columns).tolist()
-        indexes = []
+    def let_others_create_options_matrix(self, bot_peeps, influence_matrix, curr_round):
+        indexes = [] # this gest used regardless.
         for peep in bot_peeps:
             indexes.append(bot_peeps.index(peep) + 1)
-        self.current_options_matrix = current_options_matrix
-        return current_options_matrix, indexes
+
+        if isinstance(self.allocation_bots[0], GeneAgent3):
+            if self.new_v is not None:
+                T_prev = self.new_v # constructs the previous, like, received matrix. kind of.
+            else:
+                T_prev = [[0 for _ in range(self.total_players)] for _ in range(self.total_players)] # 2d nxn array filled w/ zeros.
+
+            T_prev = np.array(T_prev)
+            new_columns = []
+            extra_data = {}
+            for i in range(self.total_players):
+                extra_data[i] = None # we never use government or anything.
+            # go ahead and queyr everyone and then organize it later.
+            for i in range(len(self.allocation_bots)):
+                new_columns.append(self.allocation_bots[i].play_round(
+                    i,
+                    curr_round,
+                    T_prev[:, i], # should be a 9x9 ndarray (from numpy)
+                    self.results_sums,
+                    influence_matrix,
+                    extra_data, # yes this is blank. no I don't know why.
+                ))
+            total_columns = []
+            for peep in bot_peeps:
+                peep_index = peep[1]
+                total_columns.append(new_columns[int(peep_index)])
+            current_options_matrix = np.transpose(total_columns).tolist()
+            return current_options_matrix, indexes
+
+        else:
+            list_of_columns = []
+            for peep in bot_peeps:
+                list_of_columns.append(self.allocation_bots[self.bot_index_dict[peep]].create_column(self.total_players))
+            current_options_matrix = np.transpose(list_of_columns).tolist()
+
+
+            self.current_options_matrix = current_options_matrix
+            return current_options_matrix, indexes
