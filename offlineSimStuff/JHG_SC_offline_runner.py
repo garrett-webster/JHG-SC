@@ -64,23 +64,11 @@ def run_sc_stuff(sc_sim, jhg_sim, total_order, influence_matrix, curr_round, cur
     current_logger.save_sc_round(curr_round)
 
 def run_jhg_stuff(jhg_sim, curr_round, current_logger):
+    print("are we realliy running this ?")
     jhg_sim.execute_round(None, curr_round)  # no client input, thats crazy talk here. run a JHG round.
     influence_matrix = jhg_sim.get_influence()  # need this for friend recognition and whatnot.
     current_logger.save_jhg_round(curr_round) # lets try not runing it wiht the logger.
 
-
-# def generate_peeps(sc_sim, jhg_sim, total_order):
-#     highest_utility = sc_sim.get_highest_utility_player()
-#     highest_pop = jhg_sim.get_highest_popularity_player()
-#     if highest_utility == highest_pop:
-#         pass # well fetch, what DO we do here? let them create it twice?
-#     possible_players = copy.deepcopy(total_order)
-#     for player in {highest_utility, highest_pop}: # lets me use a set to make sure that I only erase it once. This should allow for both to be the same thing in the list and have the same player make 2 things.
-#         if player in possible_players:
-#             possible_players.remove(player)
-#     random_player = random.choice(possible_players)
-#     peeps = [highest_utility, highest_pop, random_player]
-#     return peeps
 
 def generate_peeps(total_order, jhg_sim, sc_sim):
     popularity_array = (jhg_sim.get_popularities()) # huh

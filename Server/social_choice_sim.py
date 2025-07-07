@@ -5,8 +5,7 @@ from collections import Counter
 from pathlib import Path
 import numpy as np
 
-
-#from Client.combinedLayout.colors import COLORS
+# from Client.combinedLayout.colors import COLORS
 from Server.Node import Node
 from Server.SC_Bots.legacyBots.humanAttempt2 import humanAttempt2
 from Server.OptionGenerators.options_creation import generate_two_plus_one_groups
@@ -28,11 +27,12 @@ NUM_CAUSES = 3
 
 
 class Social_Choice_Sim:
-    def __init__(self, total_players, num_causes, num_humans, options_generator, cycle=0, round=0, chromosomes="", scenario="", group="", total_order=None, allocation_scenario="", utility_per_player=3):
+    def __init__(self, total_players, num_causes, num_humans, options_generator, cycle=0, round=0, chromosomes="",
+                 scenario="", group="", total_order=None, allocation_scenario="", utility_per_player=3):
         self.options_generator = options_generator
-        if total_order == None: # generating it non server side
+        if total_order == None:  # generating it non server side
             self.total_order = self.create_total_order(total_players, num_humans)
-        else: # if created with server, spoon feed it.
+        else:  # if created with server, spoon feed it.
             self.total_order = total_order
         # just a bunch of base setters.
         self.utility_per_player = utility_per_player
@@ -41,20 +41,20 @@ class Social_Choice_Sim:
         self.num_humans = num_humans
         self.num_bots = total_players - num_humans
         self.num_causes = num_causes
-        self.cycle = cycle # set these for graphing and logging purposes, we usually set these round by round and cycle by cycle for logging purposes.
+        self.cycle = cycle  # set these for graphing and logging purposes, we usually set these round by round and cycle by cycle for logging purposes.
         self.round = round
         self.rad = 5  # used for graphing the dots on the board.
 
-
-        self.players = self.create_players() # ??? This might be used for multiplayer functionality.
+        self.players = self.create_players()  # ??? This might be used for multiplayer functionality.
         self.outer_points = []
         self.causes_rads = []
-        self.causes = self.create_cause_nodes() # graphing stuff.
+        self.causes = self.create_cause_nodes()  # graphing stuff.
 
-        self.player_nodes = [] # also graphing stuff.
+        self.player_nodes = []  # also graphing stuff.
 
-        self.chromosome_string = "" # holds the file name of the chromosome baering file.
-        self.chromosomes = self.set_chromosomes(chromosomes) # self.chromosomes contains the full list of all chromosomes.
+        self.chromosome_string = ""  # holds the file name of the chromosome baering file.
+        self.chromosomes = self.set_chromosomes(
+            chromosomes)  # self.chromosomes contains the full list of all chromosomes.
 
         # sets the scenario
         self.scenario_string = Path(scenario).name
@@ -62,28 +62,28 @@ class Social_Choice_Sim:
         # create the bots, first getting number and type from scenario and then setting the chromosomes from the chromsomes.
         self.bot_type = self.set_bot_list(scenario)
         self.allocation_bot_type = self.set_bot_list(allocation_scenario)
-        self.bots = self.create_bots(self.total_order) # make sure to pull this from the right spot.
+        self.bots = self.create_bots(self.total_order)  # make sure to pull this from the right spot.
         self.allocation_bots = self.create_allocation_bots(self.total_order)
         self.bot_list_as_string = self.create_bot_list_as_string(self.bots)
-        #self.allocation_bot_list_as_string = self.create_bot_list_as_string(self.allocation_bots)
-        self.set_bot_chromosomes(self.chromosomes) # no chromosomes for allocaiton bots.
+        # self.allocation_bot_list_as_string = self.create_bot_list_as_string(self.allocation_bots)
+        self.set_bot_chromosomes(self.chromosomes)  # no chromosomes for allocaiton bots.
 
         # group stuff - all used under set group, and then there are defualts just in case.
-        self.group = -1 # doesn't exist, let me know it hasn't been set.
-        self.sc_groups = -1 # no group exists, can ignore.
+        self.group = -1  # doesn't exist, let me know it hasn't been set.
+        self.sc_groups = -1  # no group exists, can ignore.
         self.group_option = group
 
         # the bread and butter of the sim. set under start round.
         self.current_options_matrix = {}
 
         # holds all the results from all the games we have played with this current sim
-        self.results = {} # holds all of our results from long term simulations before graphing.
-        self.results_sums = [0] * total_players # holds the SUM of all player results, so we can easily access and return them as necessary.
+        self.results = {}  # holds all of our results from long term simulations before graphing.
+        self.results_sums = [10] * total_players  # holds the SUM of all player results, so we can easily access and return them as necessary.
         self.cooperation_score = 0
-        self.num_rounds = 0 # used in various spots for graphing and whatnot. not terribly important.
-        self.current_results = [] # holds the results from the last "return win" call, which we can access later.
+        self.num_rounds = 0  # used in various spots for graphing and whatnot. not terribly important.
+        self.current_results = []  # holds the results from the last "return win" call, which we can access later.
         self.results = self.create_results()  # dict key: player id, attribute: list of all utility changes per round.
-        self.total_types = self.create_total_types() # holds EVERYONE. now we gotta do a significant amount of refactoring.
+        self.total_types = self.create_total_types()  # holds EVERYONE. now we gotta do a significant amount of refactoring.
         self.choice_matrix = [0] * (self.num_causes + 1)
         self.last_option = 0
         # self.all_numbers_matrix = [0] * 21
@@ -91,14 +91,14 @@ class Social_Choice_Sim:
 
         self.winning_probability = []
 
-        self.alpha = 0.2 # whatever we are hard coding this fetcher. I'll work with it more later.
+        self.alpha = 0.2  # whatever we are hard coding this fetcher. I'll work with it more later.
         # this is a 3 dimensional list of lists. we have a list for every round, and within that we have a list of lists that represents a 2d vector.
         # not sure if this will help. lets find out.
-        self.I = {0: [[0 for _ in range(total_players)] for _ in range(total_players)]}  # square matrix of 0's for all player relations
+        self.I = {0: [[0 for _ in range(total_players)] for _ in
+                      range(total_players)]}  # square matrix of 0's for all player relations
         # this needs to be a square matrix for reasons. thats cool I guess.
         # self.v = [[0 for _ in range(total_players)] for _ in range(total_players)]  # represents the change in utility at that round.
-        self.peeps = None # just so we have it around
-
+        self.peeps = None  # just so we have it around
 
     def create_total_order(self, total_players, num_humans):
         num_bots = total_players - num_humans
@@ -110,14 +110,11 @@ class Social_Choice_Sim:
 
         return new_list
 
-
-
     def create_results(self):
         self.results = {}
         for i in range(self.total_players):  # total_players
-            self.results[i] = []  # just throw in all the utilites
+            self.results[i] = [10]  # just throw in all the utilites
         return self.results
-
 
     def set_chromosome(self, chromosomes):
         self.chromosome_string = Path(chromosomes).name
@@ -128,13 +125,12 @@ class Social_Choice_Sim:
         if self.total_order is None:
             return self.bot_type
         self.total_types = self.bot_type
-        if self.total_players != self.num_humans or self.total_players != self.num_bots: # if there is a mistmatch
+        if self.total_players != self.num_humans or self.total_players != self.num_bots:  # if there is a mistmatch
             for index, player in enumerate(self.total_order):
                 if player.startswith("P"):
                     self.total_types.insert(index, -1)
-        #print("these are the new total types ", self.total_types)
+        # print("these are the new total types ", self.total_types)
         return self.total_types
-
 
     def set_group(self, group_option):
         if group_option == "":
@@ -143,8 +139,6 @@ class Social_Choice_Sim:
         else:
             self.group = group_option
             self.sc_groups = generate_two_plus_one_groups(self.total_players, group_option)
-
-
 
     def create_bots(self, total_order):
         bots_array = []
@@ -163,7 +157,7 @@ class Social_Choice_Sim:
 
         for i, bot_type in enumerate(self.bot_type):
             current_index = bot_indexes.pop(0)
-            #print("this the bot index that we are adding ", current_index)
+            # print("this the bot index that we are adding ", current_index)
             bots_array.append(self.match_bot_type(bot_type, current_index))
 
         return bots_array
@@ -185,7 +179,7 @@ class Social_Choice_Sim:
 
         for i, bot_type in enumerate(self.allocation_bot_type):
             current_index = bot_indexes.pop(0)
-            #print("this the bot index that we are adding ", current_index)
+            # print("this the bot index that we are adding ", current_index)
             bots_array.append(self.match_allocation_bot_type(bot_type, current_index))
 
         return bots_array
@@ -211,9 +205,7 @@ class Social_Choice_Sim:
         if bot_type == 10:
             new_bot = (cheetahBot(index))
 
-
-        return new_bot # the matched bot that we were looking for.
-
+        return new_bot  # the matched bot that we were looking for.
 
     def match_allocation_bot_type(self, bot_type, index):
         new_bot = None
@@ -223,9 +215,7 @@ class Social_Choice_Sim:
         if bot_type == 1:
             new_bot = (SocialWelfare(index, self.utility_per_player))
 
-
-        return new_bot # the matched bot that we were looking for.
-
+        return new_bot  # the matched bot that we were looking for.
 
     def create_players(self):
         players = {}
@@ -233,20 +223,16 @@ class Social_Choice_Sim:
             players[str(i)] = 0
         return players
 
-
     def set_bot_chromosomes(self, chromosomes):
         if len(chromosomes) != len(self.bots):
             chromosomes = [chromosomes[0]] * len(self.bots)
 
-
         for i in range(len(self.bots)):
             self.bots[i].set_chromosome(chromosomes[i])
-
 
     def apply_vote(self, winning_vote):
         for i in range(self.total_players):
             self.players[str(i)] += self.current_options_matrix[i][int(winning_vote)]
-
 
     def create_options_matrix(self):
         # if self.sc_groups != -1:
@@ -260,7 +246,7 @@ class Social_Choice_Sim:
         #     ]
 
         self.current_options_matrix = self.options_generator.generateOptions()
-        return self.current_options_matrix # because why not
+        return self.current_options_matrix  # because why not
 
     def get_scenario(self):
         return self.scenario_string
@@ -271,18 +257,14 @@ class Social_Choice_Sim:
     def get_causes(self):
         return self.causes
 
-
     def get_current_options_matrix(self):
         return self.current_options_matrix
-
 
     def get_player_nodes(self):
         return self.player_nodes
 
-
     def get_nodes(self):
         return self.player_nodes + self.causes
-
 
     def get_player_utility(self):
         return self.players
@@ -290,13 +272,11 @@ class Social_Choice_Sim:
     def get_cycle(self):
         return self.cycle
 
-
     def get_bot_type(self):
         return self.bot_type
 
     def set_final_votes(self, zero_idx_votes):
         self.final_votes = zero_idx_votes
-
 
     def set_rounds(self, num_rounds):
         self.num_rounds = num_rounds
@@ -307,30 +287,28 @@ class Social_Choice_Sim:
     def set_coop_score(self, coop_score):
         self.cooperation_score = coop_score
 
-
     def get_group(self):
         return self.group
 
-
-    def get_votes(self, previous_votes=None, round=0, cycle=0, max_cycle=3): # generic get votes for all bot types. Not optimized for a single chromosome
+    def get_votes(self, previous_votes=None, round=0, cycle=0,
+                  max_cycle=3):  # generic get votes for all bot types. Not optimized for a single chromosome
         self.round = round
         self.cycle = cycle
         all_votes = {}
         bot_indexes = []
         for i, thing in enumerate(self.total_types):
-            all_votes[i] = -1 # just assume they are all abstaining
+            all_votes[i] = -1  # just assume they are all abstaining
             if thing != -1:
                 bot_indexes.append(i)
 
         bot_votes = {}
         final_votes = None
         for i, bot in enumerate(self.bots):
-            #print("this is the bot id ", bot.self_id, " an dthis is the i index ", i)
+            # print("this is the bot id ", bot.self_id, " an dthis is the i index ", i)
             final_votes = bot.get_vote(self.current_options_matrix, previous_votes, cycle, max_cycle)
             all_votes[bot_indexes.pop(0)] = final_votes
 
         self.final_votes = all_votes
-
 
         return all_votes
 
@@ -342,7 +320,7 @@ class Social_Choice_Sim:
     def return_win(self, all_votes):
         self.current_results = []
         total_votes = all_votes
-        #self.final_votes = all_votes
+        # self.final_votes = all_votes
         winning_vote_count = Counter(total_votes.values()).most_common(1)[0][1]
         winning_vote = Counter(total_votes.values()).most_common(1)[0][0]
 
@@ -355,11 +333,10 @@ class Social_Choice_Sim:
         self.choice_matrix[sorted_column_sums.index(col_sums[index])] += 1
         self.last_option = sorted_column_sums.index(col_sums[index])
 
-
         if not (winning_vote_count > len(total_votes) // 2):
             winning_vote = -1
 
-        if winning_vote != -1: # if its -1, then nothing happend. NOT the last entry in the fetcher. that was a big bug that flew under the radar.
+        if winning_vote != -1:  # if its -1, then nothing happend. NOT the last entry in the fetcher. that was a big bug that flew under the radar.
             for i in range(len(total_votes)):
                 self.current_results.append(self.current_options_matrix[i][winning_vote])
             self.add_coop_score()
@@ -367,18 +344,19 @@ class Social_Choice_Sim:
             for i in range(len(total_votes)):
                 self.current_results.append(0)
 
-
         choice_list = self.create_choice_matrix(self.current_options_matrix)
-        self.winning_probability.append(choice_list[winning_vote+1])
+        self.winning_probability.append(choice_list[winning_vote + 1])
 
         # creates the new utilty effort matrix based on the actual votes. Doesn't matter what actually won, just what you voted for in the end.
         new_v = []
-        current_options_matrix_columns = columns = list(zip(*self.current_options_matrix)) # get the columns.
+        current_options_matrix_columns = columns = list(zip(*self.current_options_matrix))  # get the columns.
         for plyr_idx in range(self.total_players):
             if all_votes[plyr_idx] == -1:
-                new_v.append([0 for _ in range(self.total_players)]) # if abstain, 0's across the board. probably. I might rework this later.
+                new_v.append([0 for _ in range(
+                    self.total_players)])  # if abstain, 0's across the board. probably. I might rework this later.
             else:
-                new_v.append(current_options_matrix_columns[all_votes[plyr_idx]]) # add the column of what they did to the new v.
+                new_v.append(current_options_matrix_columns[
+                                 all_votes[plyr_idx]])  # add the column of what they did to the new v.
 
         self.calculate_influence_matrix(new_v, self.round)
         return winning_vote, self.current_results
@@ -396,26 +374,27 @@ class Social_Choice_Sim:
         if not (winning_vote_count > len(total_votes) // 2):
             winning_vote = -1
 
-        if winning_vote != -1: # if its -1, then nothing happend. NOT the last entry in the fetcher. that was a big bug that flew under the radar.
+        if winning_vote != -1:  # if its -1, then nothing happend. NOT the last entry in the fetcher. that was a big bug that flew under the radar.
             for i in range(len(total_votes)):
                 self.current_results.append(self.current_options_matrix[i][winning_vote])
         else:
             for i in range(len(total_votes)):
                 self.current_results.append(0)
 
-        return winning_vote, self.current_results # literally just returns who won. thats it.
+        return winning_vote, self.current_results  # literally just returns who won. thats it.
 
     def calculate_influence_matrix(self, new_v, curr_round):
-        new_index = len(self.I) # lets see if this works any better.
-        self.I[new_index] = [[0 for _ in range(self.total_players)] for _ in range(self.total_players)] # initalize it w/ something.
+        new_index = len(self.I)  # lets see if this works any better.
+        self.I[new_index] = [[0 for _ in range(self.total_players)] for _ in
+                             range(self.total_players)]  # initalize it w/ something.
         for i in range(self.total_players):
             for j in range(self.total_players):
-                self.I[new_index][i][j] = self.alpha * new_v[i][j] + (1 - self.alpha) * self.I[new_index-1][i][j]
-        return self.I[new_index] # swap it from rounds based to an index based approach.
+                self.I[new_index][i][j] = self.alpha * new_v[i][j] + (1 - self.alpha) * self.I[new_index - 1][i][j]
+        return self.I[new_index]  # swap it from rounds based to an index based approach.
 
     def get_influence_matrix(self):
         last_key = next(reversed(self.I.keys()))
-        return self.I[last_key] # because fetch it, we never need the entire thing.
+        return self.I[last_key]  # because fetch it, we never need the entire thing.
 
     def set_choice_matrix(self, new_choice_matrix):
         self.choice_matrix = new_choice_matrix
@@ -425,13 +404,11 @@ class Social_Choice_Sim:
 
     def save_results(self):
         for player in range(len(self.current_results)):
-            self.results_sums[player] += self.current_results[player] # should keep a running total.
+            self.results_sums[player] += self.current_results[player]  # should keep a running total.
             self.results[player].append(self.current_results[player])
 
     def get_new_utilities(self):
         return self.results
-
-
 
     # SUM: sets up the bot list with a current file. Will override any potential single types as those seem to be more important. will likely be refactored.
     def set_bot_list(self, current_file):
@@ -439,9 +416,9 @@ class Social_Choice_Sim:
             with open(current_file, "r") as file:
                 for line in file:
                     if line.startswith("#"):
-                        continue # skip the comment lines
+                        continue  # skip the comment lines
                     bot_types = [int(x) for x in line.strip().split(",")]
-                    break # stop when teh numbers are over.
+                    break  # stop when teh numbers are over.
 
         else:
             num_bots = self.total_players - self.num_humans
@@ -468,7 +445,7 @@ class Social_Choice_Sim:
                             except ValueError:
                                 pass  # skip lines that don't have valid integers
             else:
-                    chromosomes_list = [[1]] * self.num_bots
+                chromosomes_list = [[1]] * self.num_bots
 
         else:
             chromosomes_list = current_file
@@ -477,14 +454,13 @@ class Social_Choice_Sim:
 
     # default to groups being None,
     def start_round(self, options_and_peeps=None):
-        #if sc_groups != None:
-            #self.sc_groups = sc_groups
+        # if sc_groups != None:
+        # self.sc_groups = sc_groups
         if options_and_peeps is not None:
             self.current_options_matrix = options_and_peeps[0]
             self.peeps = options_and_peeps[1]
         else:
-            self.current_options_matrix = self.create_options_matrix() # cause we have to create groups.
-
+            self.current_options_matrix = self.create_options_matrix()  # cause we have to create groups.
 
         self.set_new_options_matrix(self.current_options_matrix)
         self.player_nodes = self.create_player_nodes()
@@ -512,8 +488,6 @@ class Social_Choice_Sim:
                 votes[str(i)] = player.getVote(current_options_matrix, i)
         return votes
 
-
-
     def prepare_graph(self):
         self.create_player_nodes()
         current_nodes = self.compile_nodes()
@@ -521,20 +495,18 @@ class Social_Choice_Sim:
         for node in current_nodes:
             current_node_json.append(node.to_json())
 
-        winning_vote_list = {} # key is the cycle, and the attribute is the winning vote of that cycle.
+        winning_vote_list = {}  # key is the cycle, and the attribute is the winning vote of that cycle.
         for cycle in self.all_votes:
             winning_vote_list[cycle], _ = self.return_win_without_silly(self.all_votes[cycle])
-
 
         group = self.get_group()
         # so now what we do instead is that we take in a winning vote list cycle by cycle and spit it out as necessary.
         # --- supplemental information required for allocations and more advanced graph --- #
 
-
         return current_node_json, self.all_votes, winning_vote_list, self.current_options_matrix, self.total_types, self.scenario_string, group, self.round, self.cycle, self.chromosome_string, self.get_influence_matrix(), self.results_sums, self.results, self.peeps
 
     def get_results(self):
-        #print("Aight were is the zero, its gotta be under num_rounds right?") literally zero clue whawt this print statement was supposed to be for.
+        # print("Aight were is the zero, its gotta be under num_rounds right?") literally zero clue whawt this print statement was supposed to be for.
         cooperation_score = self.cooperation_score / self.num_rounds  # as a percent, how often we cooperated. (had a non negative cause pass)
         return self.results, cooperation_score, self.total_types, self.num_rounds, self.scenario_string, self.group, self.chromosome_string
 
@@ -551,7 +523,6 @@ class Social_Choice_Sim:
         self.choice_matrix = current_choice_matrix
         self.set_coop_score(current_cooperation_score)  # reset it bc the above does silly things.
         cooperation_score = self.cooperation_score / self.num_rounds  # as a percent, how often we cooperated. (had a non negative cause pass)
-
 
         return current_node_json, self.final_votes, winning_vote, self.current_options_matrix, self.results, cooperation_score, self.total_types, self.num_rounds, self.scenario_string, self.group, self.cycle, self.round
 
@@ -600,12 +571,12 @@ class Social_Choice_Sim:
     ########################################################################
 
     def create_cause_nodes(self):
-        displacement = (2 * math.pi) / NUM_CAUSES # need an additional "0" cause.
+        displacement = (2 * math.pi) / NUM_CAUSES  # need an additional "0" cause.
         causes = []
-        for i in range(NUM_CAUSES): #3 is the number of causes
+        for i in range(NUM_CAUSES):  # 3 is the number of causes
             new_x = math.cos(displacement * i) * self.rad
             new_y = math.sin(displacement * i) * self.rad
-            causes.append(Node(new_x, new_y, "CAUSE", "Cause " + str(i+1), False))
+            causes.append(Node(new_x, new_y, "CAUSE", "Cause " + str(i + 1), False))
             self.causes_rads.append(i * displacement)
         # totally forgot I added this, but its not necessary. leaving it in in case I want to use it later.
         # for i in range(NUM_CAUSES): #3 is the number of causes
@@ -613,8 +584,8 @@ class Social_Choice_Sim:
         #     new_y = math.sin(displacement * i) * self.rad * 2
         #     self.outer_points.append(Node(new_x, new_y, "CAUSE", "Cause " + str(i+1), False))
 
-        causes.append(Node(0,0,"Cause", ".", False))
-        return causes # no need to return the midpoints
+        causes.append(Node(0, 0, "Cause", ".", False))
+        return causes  # no need to return the midpoints
 
     # This has now been completely refactored, so thats nice. Read the comments.
     def safe_normalize(self, values):
@@ -623,22 +594,24 @@ class Social_Choice_Sim:
 
     # take in our values, and our negatives, if we are using one negative or two negatives, and our starting position radians.
     def compute_flipped_coordinates(self, values, negatives, flip_type, causes_rads):
-        index_of_interest = 0 # just so it has a starting point
-        inner_magnitude = 0 # just as an initialization
-        spin_components = [] # magnitudes of the other 2 vectors we will need
+        index_of_interest = 0  # just so it has a starting point
+        inner_magnitude = 0  # just as an initialization
+        spin_components = []  # magnitudes of the other 2 vectors we will need
 
-        if flip_type == 1: # one negativce, use the positive vectors for spin and negative for magnitude
-            for idx in range(3): # hard coded for 3, could change
-                if negatives[idx] == 1: # find the negative and track it
+        if flip_type == 1:  # one negativce, use the positive vectors for spin and negative for magnitude
+            for idx in range(3):  # hard coded for 3, could change
+                if negatives[idx] == 1:  # find the negative and track it
                     index_of_interest = idx
                     inner_magnitude = abs(values[idx])
-                else: # append the fetcher to our list
+                else:  # append the fetcher to our list
                     spin_components.append(values[idx])
-            spin_components = self.safe_normalize(spin_components) # normalize them so caring matters
-            outer_magnitude = spin_components[0] - spin_components[1] # get it as a number between 0 and 1 for spin
-            new_rads = (outer_magnitude * math.pi) / 6 # pi/3 for whole range -1 to 1, so pi/6 for indivudal components also pay attention to negative.
-            base_rads = causes_rads[index_of_interest] - math.pi # subtract because we are coming from the wrong direction
-            final_mag = 5 + 0.5 * inner_magnitude # how powered the vector is from the center
+            spin_components = self.safe_normalize(spin_components)  # normalize them so caring matters
+            outer_magnitude = spin_components[0] - spin_components[1]  # get it as a number between 0 and 1 for spin
+            new_rads = (
+                                   outer_magnitude * math.pi) / 6  # pi/3 for whole range -1 to 1, so pi/6 for indivudal components also pay attention to negative.
+            base_rads = causes_rads[
+                            index_of_interest] - math.pi  # subtract because we are coming from the wrong direction
+            final_mag = 5 + 0.5 * inner_magnitude  # how powered the vector is from the center
 
         else:  # flip_type == 2 # Much the same as the flip type of 1, just with some stuff reversed.
             for idx in range(3):
@@ -651,41 +624,39 @@ class Social_Choice_Sim:
             outer_magnitude = spin_components[0] - spin_components[1]
             new_rads = (outer_magnitude * math.pi) / 6
             base_rads = causes_rads[index_of_interest]
-            final_mag = 10 - 0.5 * inner_magnitude # notice the minus 10 instead of the polus 10 here.
+            final_mag = 10 - 0.5 * inner_magnitude  # notice the minus 10 instead of the polus 10 here.
 
-
-
-        if base_rads <= -math.pi  or base_rads >= 0: # we are in the top half of the circle, requires counter clockwise
+        if base_rads <= -math.pi or base_rads >= 0:  # we are in the top half of the circle, requires counter clockwise
             final_rads = base_rads - new_rads
-        else: # we are in the bottom half of the circle, requires clockwise.
-            final_rads = base_rads + new_rads # calcualte new poisition
+        else:  # we are in the bottom half of the circle, requires clockwise.
+            final_rads = base_rads + new_rads  # calcualte new poisition
 
-        x = final_mag * math.cos(final_rads) # x and y components fo the new vector
+        x = final_mag * math.cos(final_rads)  # x and y components fo the new vector
         y = final_mag * math.sin(final_rads)
-        return x, y # return the new vector as a tuple.
+        return x, y  # return the new vector as a tuple.
 
     # funciton to create the player nodes positions based on teh current optiosn matrix.
     def create_player_nodes(self):
         player_nodes = []
-        for i in range(self.total_players): # iterate through all players
-            current_x, current_y = 0, 0 # gotta start somewhere
-            curr_values = self.current_options_matrix[i] # get our row bc thats all we care about
-            curr_negatives = [1 if v < 0 else 0 for v in curr_values] # keeps track of how many negs and where they are
-            num_negatives = sum(curr_negatives) # to prevent constant reaccessing
-            all_negatives_flag = False # incase we need to up transparency
+        for i in range(self.total_players):  # iterate through all players
+            current_x, current_y = 0, 0  # gotta start somewhere
+            curr_values = self.current_options_matrix[i]  # get our row bc thats all we care about
+            curr_negatives = [1 if v < 0 else 0 for v in curr_values]  # keeps track of how many negs and where they are
+            num_negatives = sum(curr_negatives)  # to prevent constant reaccessing
+            all_negatives_flag = False  # incase we need to up transparency
 
-            if num_negatives == 0:#  normal case, no modificatinos
+            if num_negatives == 0:  # normal case, no modificatinos
                 norm_matrix = self.normalize_current_options_matrix()
                 current_x, current_y = self.normal_coordinates_generation(i, norm_matrix)
 
-            elif num_negatives == 3: # normal case flipped over origin; set flag as well.
+            elif num_negatives == 3:  # normal case flipped over origin; set flag as well.
                 all_negatives_flag = True
                 norm_matrix = self.normalize_current_options_matrix()
                 current_x, current_y = self.normal_coordinates_generation(i, norm_matrix)
                 current_x *= -1
                 current_y *= -1
 
-            elif num_negatives in (1, 2): # silly billy logic. we need to flip outside unit circle and go from there
+            elif num_negatives in (1, 2):  # silly billy logic. we need to flip outside unit circle and go from there
                 current_x, current_y = self.compute_flipped_coordinates(
                     curr_values, curr_negatives, num_negatives, self.causes_rads
                 )
@@ -695,15 +666,16 @@ class Social_Choice_Sim:
         self.player_nodes = player_nodes
         return player_nodes
 
-
     # generates sum(curr_negs == 0 or 3) to have that dot within the simplex. Does leave a deadzone.
     def normal_coordinates_generation(self, player_id, normalized_current_options_matrix):
         curr_x = 0
         curr_y = 0
         for cause_index in range(NUM_CAUSES):
             position_x, position_y = (self.causes[cause_index].get_x()), self.causes[cause_index].get_y()
-            position_x = ((position_x * abs(normalized_current_options_matrix[player_id][cause_index])) / (2 * self.rad))
-            position_y = ((position_y * abs(normalized_current_options_matrix[player_id][cause_index])) / (2 * self.rad))
+            position_x = (
+                        (position_x * abs(normalized_current_options_matrix[player_id][cause_index])) / (2 * self.rad))
+            position_y = (
+                        (position_y * abs(normalized_current_options_matrix[player_id][cause_index])) / (2 * self.rad))
             curr_x += position_x
             curr_y += position_y
         return curr_x, curr_y
@@ -736,7 +708,6 @@ class Social_Choice_Sim:
     #
     #     return curr_x, curr_y
 
-
     def normal_vector_generation(self, player_id, normalized_current_options_matrix, cause_index):
         curr_x = 0
         curr_y = 0
@@ -759,15 +730,14 @@ class Social_Choice_Sim:
                 new_row = [(val / current_sum) * 10 for val in row]
                 new_options_matrix.append(new_row)
             else:
-                new_options_matrix.append(row) # all zeros, just chill
+                new_options_matrix.append(row)  # all zeros, just chill
         return new_options_matrix
 
-
     def create_choice_matrix(self, current_options_matrix):
-        current_options_matrix = [[0] + row for row in current_options_matrix] # append a 0 to it
+        current_options_matrix = [[0] + row for row in current_options_matrix]  # append a 0 to it
         choice_list = [0] * len(current_options_matrix[0])
         for i, row in enumerate(current_options_matrix):
-            min_val = min(row) # lets avoid clamping for now IG.
+            min_val = min(row)  # lets avoid clamping for now IG.
             adjusted_row = [x - min_val for x in row]
             total = sum(adjusted_row)
             if total == 0:
@@ -784,20 +754,21 @@ class Social_Choice_Sim:
 
     def get_highest_utility_player(self):
         # this is going to be a problem. I need to create a current scoreborad, that should be heplful.
-        if len(self.results_sums) == 0: # no utility? thats fine, pick a random player
-            return self.total_order[random.randint(0, self.total_players-1)]
-        else: # utility time. return the highest.
-            return self.total_order[self.results_sums.index(max(self.results_sums))] # return the index of the highest utility player.
-
+        if len(self.results_sums) == 0:  # no utility? thats fine, pick a random player
+            return self.total_order[random.randint(0, self.total_players - 1)]
+        else:  # utility time. return the highest.
+            return self.total_order[
+                self.results_sums.index(max(self.results_sums))]  # return the index of the highest utility player.
 
     # this functin is used for simulation purposes ONLY. should never be called with live players.
     def let_others_create_options_matrix(self, bot_peeps, influence_matrix):
+
         list_of_columns = []
         for peep in bot_peeps:
             list_of_columns.append(self.allocation_bots[self.bot_index_dict[peep]].create_column(self.total_players))
         current_options_matrix = np.transpose(list_of_columns).tolist()
         indexes = []
         for peep in bot_peeps:
-            indexes.append(bot_peeps.index(peep)+1)
+            indexes.append(bot_peeps.index(peep) + 1)
         self.current_options_matrix = current_options_matrix
         return current_options_matrix, indexes

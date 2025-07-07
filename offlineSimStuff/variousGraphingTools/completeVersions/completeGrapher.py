@@ -62,7 +62,7 @@ class CompleteGrapher():
             gs = gridspec.GridSpec(1, 3, width_ratios=[0.8, 3.0, 1.5])
 
             ax_matrix = fig.add_subplot(gs[0])
-            self.draw_matrix_panel(ax_matrix, current_options_matrix, curr_votes, winning_vote, peeps)
+            self.draw_matrix_panel(ax_matrix, current_options_matrix, curr_votes, winning_vote, peeps, results_sums)
 
             ax_graph = fig.add_subplot(gs[1])
             self.draw_node_graph(ax_graph, all_nodes, curr_votes, winning_vote, types_list, bot_color_map, bot_name_map)
@@ -99,14 +99,14 @@ class CompleteGrapher():
         plt.tight_layout()
         plt.show()
 
-    def draw_matrix_panel(self, ax_matrix, current_options_matrix, curr_votes, winning_vote, peeps):
+    def draw_matrix_panel(self, ax_matrix, current_options_matrix, curr_votes, winning_vote, peeps, results_sums):
         ax_matrix.axis('off')
 
         num_rows = len(current_options_matrix)
         matrix_array = np.array(current_options_matrix)
         col_sums = matrix_array.sum(axis=0)
         best_option = int(np.argmax(col_sums)) + 1  # gets the index of the best option and adds one to it
-        x_start = 4
+        x_start = 6
         spacing = 3
 
         for k, creator in enumerate(peeps):
@@ -129,7 +129,7 @@ class CompleteGrapher():
             options = current_options_matrix[i]
 
             # Use fixed-width formatting for alignment
-            ax_matrix.text(0, -i, f"{player_id:>2} |", ha='left', va='center', fontsize=12,
+            ax_matrix.text(0, -i, f"{player_id:>2}, {results_sums[i]} |", ha='left', va='center', fontsize=12,
                            fontfamily='monospace')
 
             formatted_options = ""
