@@ -13,14 +13,12 @@ OPTIONS = {
     #General settings
     "NUM_HUMANS": 1,
     "TOTAL_PLAYERS": 6,
-    "JHG_ROUNDS_PER_SC_ROUND" : 2, # Number of JHG rounds to play between each social choice round
-    "NUM_CYCLES": 2, # Max number of JHG rounds to play. Game ends after the nth round
+    "JHG_ROUNDS_PER_SC_ROUND" : [2,2,2], # Number of JHG rounds to play between each social choice round
     "SC_GROUP_OPTION": 0, # See options_creation.py -> group_size_options to understand what this means
     "SC_VOTE_CYCLES": 3, # Number of cycles to play each social choice round. Players will vote this many times, with the nth vote being final.
     "LOGGING" : True,
     "NUM_TOKENS_PER_PLAYER": 4,
     "UTILITY_PER_PLAYER": 6,
-    # TODO: MOve the utility and toekn allocation from 2 different spots server and client side and make them options that we can mess with here.
 
     #Misc (Wasn't sure where to put this)
     "PLAYER_ALLOCATIONS" : True,
@@ -42,7 +40,6 @@ class Server():
         self.num_bots = options["NUM_BOTS"]
         self.sc_group_option = options["SC_GROUP_OPTION"]
         self.jhg_rounds_per_sc_round = options["JHG_ROUNDS_PER_SC_ROUND"]
-        self.num_cycles = options["NUM_CYCLES"]
         self.sc_vote_cycles = options["SC_VOTE_CYCLES"]
         self.logging = options["LOGGING"]
         self.tokens_per_player = options["NUM_TOKENS_PER_PLAYER"]
@@ -54,7 +51,7 @@ class Server():
         self.JHG_manager = None
         self.connection_manager = None
         self.current_logger = None
-        self.max_rounds = self.determine_rounds()
+        self.rounds_list = self.determine_rounds()
 
 
     def start_server(self, host='0.0.0.0', port=12345):
@@ -79,16 +76,15 @@ class Server():
     def play_game(self):
         # Main game loop -- Play as many rounds as specified in OPTIONS
 
-        for curr_round in range(self.max_rounds):
+        for list_index in range(0, len(self.rounds_list)):
+            print("this is the list index ", list_index)
             is_last_jhg_round = False
-            # on hte last round, fire this so it goes off twice, else, don't have it go off.
-            print("this is the current round ", curr_round, " and this is the modulo ", curr_round % self.jhg_rounds_per_sc_round)
-            # DO the JHG STUFF FIRST.
-            if curr_round == self.max_rounds - 1: is_last_jhg_round = True
+            curr_round = int(self.rounds_list[list_index][0]) # yeah something like that
+            if curr_round == len(self.rounds_list) - 1: is_last_jhg_round = True
             self.JHG_manager.play_jhg_round(self.JHG_manager.current_round, is_last_jhg_round)
             self.current_logger.save_jhg_round(curr_round)
             # THEN DECIDE IF YOU NEED TO RUN AN SC ROUND.
-            if (curr_round % self.jhg_rounds_per_sc_round) == self.jhg_rounds_per_sc_round -1:
+            if self.rounds_list[list_index][1] == "*": # if we have a star in there, run an SC round.
                 if self.player_allocations:
                     peeps, total_order_index = self.generate_peeps(self.total_order, self.JHG_manager, self.SC_manager)
                     influence_matrix = self.JHG_manager.get_influence_matrix()
@@ -132,11 +128,18 @@ class Server():
         return indexes
 
     def determine_rounds(self):
-        num_cycles = self.num_cycles
         num_games_in_cycle = self.jhg_rounds_per_sc_round
-        max_rounds = num_games_in_cycle * num_cycles
-        return max_rounds # for i in range this number
+        new_list = []
+        max_item = 0
+        for instance in num_games_in_cycle:
+            for i in range(instance):
+                new_list.append(str(i+max_item) + "-")
+            new_list.pop()
+            new_list.append(str(len(new_list))+"*")
+            max_item = len(new_list)
 
+        print("This is the new list ", new_list, " and here is what we were workign with ", self.jhg_rounds_per_sc_round)
+        return new_list
 
 
 

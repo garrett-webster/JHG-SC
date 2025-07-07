@@ -14,32 +14,27 @@ from offlineSimStuff.variousGraphingTools.sc_tools.graph_influence_matrix import
 from Server.OptionGenerators.generators import generator_factory
 from offlineSimStuff.variousGraphingTools.completeVersions.completeLogger import CompleteLogger
 
-
 # starts the sim, could make this take command line arguments
 # takes in a bot type, a number of rounds, and then runs it and plots the results. plans for expansion coming soon.
-def run_trial(sc_sim, jhg_sim, num_rounds, num_cycles, create_graphs, group, total_order, create_influence, current_logger):
-    # ok so what do I actually want to happen in here
-    # i need to run as many rounds as I want of JHG and SC-sim
-    # i could allow for differing rounds? I will probably initalize that and pass it into run trial
-    # num cycles is also important,
-    # not sure how I am going to easily create the JHG graphs, or the tokens allocations. I will ahve to figure it out.
-    # but lets start with running a single round of JHG with da bots, then a single round of SC_sim, and then graphing all of it.
-    # should be fun.
-    # sc_sim.set_round(num_rounds)
-    jhg_rounds_per_sc_round = 3 # just to give me some kind of number to start with.
+def run_trial(sc_sim, jhg_sim, rounds_list, num_cycles, create_graphs, group, total_order, create_influence, current_logger):
+
     sc_sim.set_group(group)
     played_sc = False
     played_jhg = False
     influence_matrix = None # this should get overwritten pretty quick, but its there so there's no error.
-    for curr_round in tqdm(range(0, num_rounds)): # everything NEEDS to start at 1, PLEASE.
-        played_sc = False
-        played_jhg = False
-        if curr_round % jhg_rounds_per_sc_round == 0 and curr_round != 0:
+    for list_index in tqdm(range(0, len(round_list))): # everything NEEDS to start at 1, PLEASE.
+
+        curr_round_identifier = round_list[list_index]
+        curr_round = int(curr_round_identifier[0]) # TYPECAST THIS TO INT YOU SILLY BILLY
+        print("this is the curr round ", curr_round)
+        sc_rounds = True if curr_round_identifier[1] == "*" else False
+
+        run_jhg_stuff(jhg_sim, curr_round, current_logger)
+        played_jhg = True
+
+        if sc_rounds:
             run_sc_stuff(sc_sim, jhg_sim, total_order, influence_matrix, curr_round, current_logger)
             played_sc = True
-
-        #run_jhg_stuff(jhg_sim, curr_round, current_logger)
-        #played_jhg = True
 
         if create_graphs:
             pass
@@ -155,9 +150,24 @@ def create_total_order(total_players, num_humans):
         total_order.append("P" + str(human))
     return total_order
 
+def determine_rounds(jhg_rounds_per_sc_game_list):
+    num_games_in_cycle = jhg_rounds_per_sc_game_list
+    new_list = []
+    max_item = 0
+    for instance in num_games_in_cycle:
+        for i in range(instance):
+            new_list.append(str(i + max_item) + "-")
+        new_list.pop()
+        new_list.append(str(len(new_list)) + "*")
+        max_item = len(new_list)
+
+    print("This is the new list ", new_list, " and here is what we were workign with ", jhg_rounds_per_sc_game_list)
+    return new_list
+
 
 if __name__ == "__main__":
-    num_rounds = 6
+    jhg_games_per_sc_round = [6,3,4]
+    round_list = determine_rounds(jhg_games_per_sc_round)
     num_cycles = 3
     num_players = 9
     num_humans = 0
@@ -177,4 +187,4 @@ if __name__ == "__main__":
     current_jhg_sim = create_jhg_sim(num_humans, num_players, total_order, tokens_per_player)
     current_sc_sim = create_sim(num_players, scenario, chromosome, group, total_order, allocation_bot_type, utility_per_player)
     current_logger = CompleteLogger(current_sc_sim, current_jhg_sim)
-    sc_sim, jhg_sim = run_trial(current_sc_sim, current_jhg_sim, num_rounds, num_cycles, create_graphs, group, total_order, create_influence, current_logger)
+    sc_sim, jhg_sim = run_trial(current_sc_sim, current_jhg_sim, round_list, num_cycles, create_graphs, group, total_order, create_influence, current_logger)

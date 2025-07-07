@@ -800,5 +800,4 @@ class Social_Choice_Sim:
         for peep in bot_peeps:
             indexes.append(bot_peeps.index(peep)+1)
         self.current_options_matrix = current_options_matrix
-        print("this is the current optiosn matrix ", self.current_options_matrix)
         return current_options_matrix, indexes
