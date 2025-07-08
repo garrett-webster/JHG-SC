@@ -110,7 +110,7 @@ class MainWindow(QMainWindow):
         self.JHG_panel.setMinimumHeight(2400)
         round_state = self.round_state
         self.JHG_panel.setLayout(JhgPanel(round_state, connection_manager, self.token_label,
-                                          self.jhg_popularity_graph, self.jhg_network))
+                                          self.jhg_popularity_graph, self.jhg_network, self.jhg_buttons))
         self.JHG_panel.setObjectName("JHG_Panel")
         self.JHG_panel.setProperty("min-height", 80 + 40 * self.round_state.num_players)
 
@@ -178,7 +178,7 @@ class MainWindow(QMainWindow):
         self.ServerListener.update_sc_nodes_graph_signal.connect(self.update_sc_nodes_graph)
         self.ServerListener.switch_to_jhg_signal.connect(self.start_jhg_round)
         self.ServerListener_thread.started.connect(self.ServerListener.start_listening)
-        self.ServerListener.disable_jhg_buttons_signal.connect(self.disable_jhg_buttons)
+        #self.ServerListener.disable_jhg_buttons_signal.connect(self.disable_jhg_buttons)
         self.ServerListener.sc_create_stuff.connect(self.sc_create_allocations)
         self.ServerListener.update_sc_influence.connect(self.sc_update_influence)
 
@@ -233,6 +233,10 @@ class MainWindow(QMainWindow):
 
     def disable_jhg_buttons(self, panel):
         panel.setEnabled(False)
+        for button in self.jhg_buttons:
+            if button.objectName() == "JHGSubmitButton":
+                button.setText("Submit")
+            button.setEnabled(False) # don't turn him on but like set the text appropraitely.
 
     def enable_jhg_buttons(self, panel):
         panel.setEnabled(True)

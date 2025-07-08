@@ -8,13 +8,12 @@ from Client.combinedLayout.colors import COLORS
 
 
 class JhgVotingPanel(QVBoxLayout):
-    def __init__(self, round_state, connection_manager, token_counter):
+    def __init__(self, round_state, connection_manager, token_counter, jhg_buttons):
         super().__init__()
         while round_state.client_id == -1: # tripping over its own shoelaces.
             pass
         # footer
         # Needs to go through the SubmitButton class so that the signal and socket works correctly
-        jhg_buttons = []
         submitButton = SubmitButton()
         jhg_buttons.append(submitButton)
         submitButton.clicked.connect(lambda: submitButton.submit(round_state, connection_manager))

@@ -12,7 +12,6 @@ class ServerListener(QObject):
     enable_allocations_interface = pyqtSignal()
     disable_sc_buttons_signal = pyqtSignal()
     enable_jhg_buttons_signal = pyqtSignal()
-    disable_jhg_buttons_signal = pyqtSignal()
     jhg_over_signal = pyqtSignal(bool, float)
     update_sc_votes_signal = pyqtSignal(dict, int, bool)
     update_sc_utilities_labels_signal = pyqtSignal(int, dict, int, dict, list)
@@ -75,7 +74,6 @@ class ServerListener(QObject):
         self.round_state.utilities_mat = message["UTILITIES"]
 
         self.update_sc_round_signal.emit()  # go ahead and adjust all the SC stuff appropriately as well.
-        self.disable_jhg_buttons_signal.emit() # this is now under the SC round signal thingyt. mayebn.
 
 
     def SC_CREATE(self, message):
