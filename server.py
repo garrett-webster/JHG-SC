@@ -20,6 +20,7 @@ OPTIONS = {
     "LOGGING" : True,
     "NUM_TOKENS_PER_PLAYER": 4,
     "UTILITY_PER_PLAYER": 6,
+    "STARTING_UTILITY": 10,
 
     #Misc (Wasn't sure where to put this)
     "PLAYER_ALLOCATIONS" : True,
@@ -46,6 +47,7 @@ class Server():
         self.tokens_per_player = options["NUM_TOKENS_PER_PLAYER"]
         self.utility_per_player = options["UTILITY_PER_PLAYER"]
         self.player_allocations = options["PLAYER_ALLOCATIONS"]
+        self.starting_utility = options["STARTING_UTILITY"]
         self.total_order = None
         self.generator = None
         self.SC_manager = None
@@ -61,7 +63,7 @@ class Server():
         self.total_order = self.connection_manager.get_total_list()
         print("Server started")
         # Halts execution until enough players have joined
-        self.connection_manager.add_clients(OPTIONS["NUM_HUMANS"], OPTIONS["NUM_BOTS"], OPTIONS["SC_VOTE_CYCLES"], OPTIONS["NUM_TOKENS_PER_PLAYER"], OPTIONS["UTILITY_PER_PLAYER"])
+        self.connection_manager.add_clients(OPTIONS["NUM_HUMANS"], OPTIONS["NUM_BOTS"], OPTIONS["SC_VOTE_CYCLES"], OPTIONS["NUM_TOKENS_PER_PLAYER"], OPTIONS["UTILITY_PER_PLAYER"], OPTIONS["STARTING_UTILITY"])
 
         # we will get here in a minute.
         self.JHG_manager = JHGManager(self.connection_manager, self.num_humans, self.num_players, self.num_bots, self.total_order, self.tokens_per_player)
