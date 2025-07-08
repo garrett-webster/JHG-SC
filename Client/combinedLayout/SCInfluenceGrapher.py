@@ -1,4 +1,6 @@
 import numpy as np
+
+from Client.combinedLayout.hoverScatter import HoverScatter
 from Client.combinedLayout.ui_functions.StudyScripts.network import NodeNetwork
 from Client.combinedLayout.colors import COLORS
 import pyqtgraph as pg
@@ -17,11 +19,19 @@ def update_sc_network_graph(main_window, I, results_sums, curr_round):
 
     spots = []
     for i, (x, y) in enumerate(node_positions):
-        color = COLORS[i % len(COLORS)]  # Cycle through COLORS if there are more nodes than COLORS
-        spots.append({'pos': (x, y), 'size': 15, 'brush': pg.mkBrush(color), 'pen': None})
+        data = str(i + 1)
+        if (i + i) == main_window.round_state.client_id:
+            data = "You (" + str(i + 1) + ")"
+        color = COLORS[i % len(COLORS)]  # Cycle through COLORS
+        spots.append({
+            'pos': (x, y),
+            'size': 15,
+            'brush': pg.mkBrush(color),
+            'pen': None,
+            'data': f"{data}"  # Tooltip text
+        })
 
-    scatter = pg.ScatterPlotItem()
-    scatter.addPoints(spots)  # Add all nodes with individual COLORS
+    scatter = HoverScatter(spots=spots)
     main_window.sc_influence.addItem(scatter)
 
     # Normalize the influence weights for color mapping and opacity
