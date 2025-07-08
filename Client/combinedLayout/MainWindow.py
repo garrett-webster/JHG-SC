@@ -217,6 +217,7 @@ class MainWindow(QMainWindow):
         start_jhg_round(self)
 
     def jhg_over(self, is_last, init_pop_influence):
+        time.sleep(0.1)
         #self.disable_jhg_buttons(self.JHG_panel) Try not putting that there, let it get cancelled somewhere else.
         jhg_over(self, is_last, init_pop_influence)
         self.round_state.utilities = [0 for _ in range(self.round_state.num_players)] # reset this bc this isn't happening quick enough.
@@ -235,6 +236,7 @@ class MainWindow(QMainWindow):
 
     def enable_jhg_buttons(self, panel):
         panel.setEnabled(True)
+        self.SC_voting_grid.submit_button.setText("Submit")
 
     def change_cause_labels(self, total_ids):
         new_total_ids = copy.deepcopy(total_ids)
@@ -255,6 +257,8 @@ class MainWindow(QMainWindow):
 
 
     def sc_create_allocations(self, client_id_list, total_id_list):
+        print("AYO IS THIS OGING OFF")
+        self.disable_jhg_buttons(self.JHG_panel)
         if self.round_state.client_id in client_id_list:
             self.enable_allocations_interface()
         else:

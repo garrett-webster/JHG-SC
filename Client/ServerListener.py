@@ -61,6 +61,7 @@ class ServerListener(QObject):
 
 
     def JHG_OVER(self, message):
+        time.sleep(0.1)
         self.round_state.influence_mat = np.array(message["INFLUENCE_MAT"])
         self.update_jhg_state(message)
         self.jhg_over_signal.emit(message["IS_LAST"], message["INIT_POP_INFLUENCE"])
@@ -74,7 +75,7 @@ class ServerListener(QObject):
         self.round_state.utilities_mat = message["UTILITIES"]
 
         self.update_sc_round_signal.emit()  # go ahead and adjust all the SC stuff appropriately as well.
-        #self.disable_jhg_buttons_signal.emit() # this is now under the SC round signal thingyt. mayebn.
+        self.disable_jhg_buttons_signal.emit() # this is now under the SC round signal thingyt. mayebn.
 
 
     def SC_CREATE(self, message):
@@ -112,6 +113,7 @@ class ServerListener(QObject):
 
     # Prepares the client for the next round by updating self.round_state and the gui
     def update_jhg_state(self, json_data):
+        time.sleep(0.1)
         self.round_state.message = json_data
 
         self.round_state.received = json_data["RECEIVED"]

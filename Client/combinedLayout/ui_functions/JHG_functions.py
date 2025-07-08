@@ -91,10 +91,11 @@ def update_jhg_popularity_graph(round_state, jhg_popularity_graph):
 
 def jhg_over(main_window, is_last, init_pop_influence):
     update_jhg_network_graph(main_window)
-
+    print("THIS IS GOING OFF NOW AND IS LAST IS ", is_last)
     if not is_last:
         start_jhg_round(main_window)
     else:
+        #main_window.disable_jhg_buttons(main_window.JHG_panel) # PLEASE
         for button in main_window.jhg_buttons:
             button.setEnabled(False)
 

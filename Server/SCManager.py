@@ -186,6 +186,7 @@ class SCManager:
         for bot, i in enumerate(bot_peeps):
             final_columns[i] = bot_columns[bot] # hopefully
         for player, i in enumerate(player_peeps):
+            print("THIS IS THE I WE ARE DEALING WITH, WHAT IS THE I ", i)
             final_columns[i] = player_columns[i]
 
         # should do all the orginization of the final columns and leave it in the original peeps thing.

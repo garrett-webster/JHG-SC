@@ -11,9 +11,10 @@ import numpy as np
 
 OPTIONS = {
     #General settings
-    "NUM_HUMANS": 1,
-    "TOTAL_PLAYERS": 6,
-    "JHG_ROUNDS_PER_SC_ROUND" : [2,2,2], # Number of JHG rounds to play between each social choice round
+    "NUM_HUMANS": 3,
+    "TOTAL_PLAYERS": 3,
+    #"JHG_ROUNDS_PER_SC_ROUND" : [5,3,3,3], # Number of JHG rounds to play between each social choice round
+    "JHG_ROUNDS_PER_SC_ROUND" : [2,1,1], # Number of JHG rounds to play between each social choice round
     "SC_GROUP_OPTION": 0, # See options_creation.py -> group_size_options to understand what this means
     "SC_VOTE_CYCLES": 3, # Number of cycles to play each social choice round. Players will vote this many times, with the nth vote being final.
     "LOGGING" : True,
@@ -80,7 +81,7 @@ class Server():
             print("this is the list index ", list_index)
             is_last_jhg_round = False
             curr_round = int(self.rounds_list[list_index][0]) # yeah something like that
-            if curr_round == len(self.rounds_list) - 1: is_last_jhg_round = True
+            if self.rounds_list[list_index][1] == "*": is_last_jhg_round = True
             self.JHG_manager.play_jhg_round(self.JHG_manager.current_round, is_last_jhg_round)
             self.current_logger.save_jhg_round(curr_round)
             # THEN DECIDE IF YOU NEED TO RUN AN SC ROUND.
@@ -96,7 +97,7 @@ class Server():
                 self.current_logger.save_sc_round(curr_round)
 
 
-        self.current_logger.close_json("TRIAL TRIAL TRIAL")
+        self.current_logger.close_json("HumanResultsTime")
         print("game over")
 
     def generate_peeps(self, total_order, jhg_manager, sc_manager):

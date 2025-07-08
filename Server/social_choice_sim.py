@@ -66,8 +66,8 @@ class Social_Choice_Sim:
         self.bot_type = self.set_bot_list(scenario)
         self.allocation_bot_type = self.set_bot_list(allocation_scenario)
         self.bots = self.create_bots(self.total_order)  # make sure to pull this from the right spot.
-        #self.allocation_bots = self.create_allocation_bots(self.total_order) # old code, want to try something new
-        self.allocation_bots = self.use_gene_bots()
+        self.allocation_bots = self.create_allocation_bots(self.total_order) # old code, want to try something new
+        #self.allocation_bots = self.use_gene_bots()
         self.bot_list_as_string = self.create_bot_list_as_string(self.bots)
         # self.allocation_bot_list_as_string = self.create_bot_list_as_string(self.allocation_bots)
         self.set_bot_chromosomes(self.chromosomes)  # no chromosomes for allocaiton bots.

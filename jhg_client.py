@@ -31,8 +31,8 @@ if __name__ == "__main__":
     app.setStyleSheet(load_stylesheet("combinedLayout/style.qss"))
 
     #host = '10.55.10.49'
-    host = '127.0.0.1'
-    #host = '192.168.36.2'
+    #host = '127.0.0.1'
+    host = '192.168.36.3'
     #port = 12346
     port = 12345
 
