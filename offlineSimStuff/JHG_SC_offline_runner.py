@@ -44,6 +44,9 @@ def run_trial(sc_sim, jhg_sim, rounds_list, num_cycles, create_graphs, group, to
 
 
     current_logger.close_json("TRIAL_TRIAL_TRIAL")
+    sc_sim.set_rounds(curr_round)
+    graph_long_term_stuff(sc_sim, curr_round)
+
     return sc_sim, jhg_sim
 
 def run_sc_stuff(sc_sim, jhg_sim, total_order, influence_matrix, curr_round, current_logger):
@@ -71,6 +74,9 @@ def run_jhg_stuff(jhg_sim, curr_round, current_logger):
     current_logger.save_jhg_round(curr_round) # lets try not runing it wiht the logger.
     return influence_matrix
 
+def graph_long_term_stuff(sc_sim, curr_round):
+    current_grapher = CompleteGrapher()
+    current_grapher.draw_long_term_graphs(sc_sim)
 
 def generate_peeps(total_order, jhg_sim, sc_sim):
     popularity_array = (jhg_sim.get_popularities()) # huh
@@ -156,14 +162,15 @@ def determine_rounds(jhg_rounds_per_sc_game_list):
 
 
 if __name__ == "__main__":
-    jhg_games_per_sc_round = [6,3,4]
+    # jhg_games_per_sc_round = [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
+    jhg_games_per_sc_round = [1,1,1,1,1,1]
     round_list = determine_rounds(jhg_games_per_sc_round)
     num_cycles = 3
     num_players = 9
     num_humans = 0
     tokens_per_player = 2
     utility_per_player = 3
-    create_graphs = True
+    create_graphs = False
     create_influence = True
     total_groups = ["", 0, 1, 2]
     chromosomes_directory = "testChromosome"

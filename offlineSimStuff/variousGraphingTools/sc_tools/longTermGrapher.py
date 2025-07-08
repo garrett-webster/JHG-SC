@@ -64,7 +64,7 @@ class longTermGrapher():
 
 
         # Prepare the x-axis (rounds)
-        rounds = range(num_rounds)  # just generates a list so we can zip with it later
+        rounds = range(num_rounds+2)  # just generates a list so we can zip with it later and then padd it with an extra one round for beginning.
 
         # total score per round (for the black line)
         total_scores_per_round = [sum(results[player][round_num] for player in results) for round_num in rounds]

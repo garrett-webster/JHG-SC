@@ -469,7 +469,10 @@ class CompleteGrapher():
         lc = LineCollection(segments, colors=colors, zorder=1)
         ax.add_collection(lc)
 
-
+    def draw_long_term_graphs(self, sc_sim):
+        from offlineSimStuff.variousGraphingTools.sc_tools.longTermGrapher import longTermGrapher
+        new_grapher = longTermGrapher()
+        new_grapher.draw_graph_from_sim(sc_sim)
 
 
 
