@@ -87,8 +87,8 @@ class ServerListener(QObject):
 
     def SC_OVER(self, message):
         # This is the only time that the user won't switch the tab to see a round it the history tab, so it needs a little manual help.
-        if self.round_state.jhg_round_num == 1:
-            self.main_window.sc_history_grid.update_grid(message["VOTES"], message["UTILITIES"], self.round_state.sc_round_num)
+        # if self.round_state.jhg_round_num == 1:
+        self.main_window.sc_history_grid.update_grid(message["VOTES"], message["UTILITIES"], self.round_state.sc_round_num)
 
         self.disable_sc_buttons_signal.emit()
         new_utilities = message["NEW_UTILITIES"]
