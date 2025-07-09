@@ -214,6 +214,7 @@ class JHGEngine():
         else:
             return self.I[0]
 
+
     def get_popularity(self, t=None):
         return self.P[t] if t is not None else self.P[self.t]
     

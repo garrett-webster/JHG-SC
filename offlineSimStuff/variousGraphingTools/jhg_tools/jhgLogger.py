@@ -82,7 +82,11 @@ class JHGLogger():
             json.dump(popularity_lists, file, indent=4)
 
     def record_big_picture(self):
-        pass # I don't know what I want this to look like yet. will likely just be the popularity over time, maybe? IDK. 
+        total_data = {}
+        # need to return the bot type, tahts pretty much it.
+        bot_types = self.jhg_sim.return_bot_types()
+        total_data["bot_types"] = bot_types
+        return total_data
 
 
     # this is supposed to be for garretts logger. I should probably ask him wha ti nee dto include in this json.

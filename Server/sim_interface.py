@@ -2,10 +2,12 @@
 import os
 import sys
 import copy
+from os import popen
 
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 from Server.Engine.geneagent3 import GeneAgent3
 from Server.Engine.humanagent import HumanAgent
+from Server.Engine.socialwelfaragent import SocialWelfareAgent
 from Server.Engine.simulator import GameSimulator
 
 import numpy as np
@@ -14,17 +16,17 @@ import random
 np.set_printoptions(precision=2, suppress=True)
 
 class JHG_simulator():
-    def __init__(self, num_human_players, num_players, total_order, tokens_per_player=2):
+    def __init__(self, num_human_players, num_players, total_order, tokens_per_player=2, bot_type=0):
         self.num_players = num_players
         self.total_order = total_order
         self.sim = None
         self.players = None
         # went ahead and gave this a default. the currently trained agents have this baked into them that they need to have 2 tokens per player, curious in expanding that.
-        self.start_game(num_human_players, num_players, tokens_per_player)
+        self.start_game(num_human_players, num_players, tokens_per_player, bot_type)
         self.T = None
 
 
-    def start_game(self, num_human_players, num_players, tokens_per_player):
+    def start_game(self, num_human_players, num_players, tokens_per_player, bot_type):
         init_pop = "equal"
 
         numAgents = num_players - num_human_players
@@ -43,19 +45,17 @@ class JHG_simulator():
         theGen = 199
         num_gene_copies = 3
 
-        theGenePools = loadPopulationFromFile(popSize, theFolder, theGen, num_gene_copies, tokens_per_player)
-
+        # should be formatted appropraitely?
+        theGenePools = self.create_pools(popSize, theFolder, theGen, num_gene_copies, tokens_per_player, bot_type)
 
         plyrs = []
-        for i in range(0, len(player_idxs)):
+        for i in range(0, len(player_idxs)): # so here's the thing - I have 0! clue on how this works. I'mma try somethihgn stupid ig.
             if player_idxs[i] >= popSize:
                 plyrs.append(configured_players[int(player_idxs[i] - popSize)])
             else:
                 plyrs.append(theGenePools[player_idxs[i]])
 
-
-        new_order = copy.copy(self.total_order)
-        # lets try something silly.
+                    # lets try something silly.
         plyrs = self.reorder_agents(plyrs) # reorder them so we like them better.
 
         players = np.array(plyrs)
@@ -96,7 +96,7 @@ class JHG_simulator():
             game_params)  # sets up our sim object - might need to make this global so we can grab it wherever we need it.
 
     def reorder_agents(self, plyrs):
-        bots = [a for a in plyrs if a.whoami == "gene"]
+        bots = [a for a in plyrs if a.whoami != "Human"]
         players = [a for a in plyrs if a.whoami == "Human"]
         ordered_agents = []
         for id in self.total_order:
@@ -197,6 +197,30 @@ class JHG_simulator():
     def get_highest_popularity_player(self):
         return (self.total_order[(list(self.sim.get_popularity())).index([max(list(self.sim.get_popularity()))])])
 
+    def get_bot_types(self):
+        bots = []
+        for player in self.players:
+            if isinstance(player, GeneAgent3):
+                bots.append(0)
+            if isinstance(player, HumanAgent):
+                bots.append(1)
+            if isinstance(player, SocialWelfareAgent):
+                bots.append(2)
+        return bots
+
+
+    def create_pools(self, popSize, generationFolder, startIndex, num_gene_pools, tokens_per_player, bot_type):
+        thePopulation = []
+
+        if bot_type == 0:
+            thePopulation = loadPopulationFromFile(popSize, generationFolder, startIndex, num_gene_pools, tokens_per_player)
+            return thePopulation
+
+        if bot_type == 1: # just go all teh way through. get us the whole thing even though we dont' need it bc its just easier that way.
+            for i in range(popSize):
+                thePopulation.append(SocialWelfareAgent(tokens_per_player))
+
+        return thePopulation
 
 
 
@@ -228,3 +252,5 @@ def loadPopulationFromFile(popSize, generationFolder, startIndex, num_gene_pools
     fp.close()
 
     return thePopulation
+
+

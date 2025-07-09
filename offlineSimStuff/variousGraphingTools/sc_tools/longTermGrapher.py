@@ -64,7 +64,8 @@ class longTermGrapher():
 
 
         # Prepare the x-axis (rounds)
-        rounds = range(num_rounds+2)  # just generates a list so we can zip with it later and then padd it with an extra one round for beginning.
+        # ok instead of trying to hard code it this seems to work better.
+        rounds = range(len(sums_per_round[0]))  # just generates a list so we can zip with it later and then padd it with an extra one round for beginning.
 
         # total score per round (for the black line)
         total_scores_per_round = [sum(results[player][round_num] for player in results) for round_num in rounds]
@@ -141,23 +142,17 @@ class longTermGrapher():
         if group_title == "":
             group_title = "No group"
 
-
-
         my_path = os.path.dirname(os.path.abspath(__file__))
         scenario_str = f"scenario_{scenario}"
         group_str = f"group_{group}"
         dir_path = os.path.join(my_path, "individualRoundGraphs", scenario_str, group_str)
         os.makedirs(dir_path, exist_ok=True)
 
-        #file_name = f"Scenario {scenario} Group {group_title}. Chromosome {chromosome}.png"
         file_name = f"Chromosome {chromosome}.png"
 
-        #Save to longTermGrapherFolder
+        # Save to longTermGrapherFolder
         long_term_path = os.path.join(my_path, "longTermGrapherFolder", file_name)
+        os.makedirs(os.path.dirname(long_term_path), exist_ok=True)  # Ensure directory exists
         plt.savefig(long_term_path, dpi=300)
-
-        # Save to individualRoundGraphs folder
-        #full_path = os.path.join(dir_path, file_name)
-        #plt.savefig(full_path, dpi=300)
 
         plt.show()

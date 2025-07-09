@@ -9,33 +9,129 @@ from offlineSimStuff.variousGraphingTools.sc_tools.simLogger import simLogger
 from offlineSimStuff.variousGraphingTools.jhg_tools.jhgLogger import JHGLogger
 
 class CompleteLogger():
-    def __init__(self, sc_sim, jhg_sim):
+    def __init__(self):
+        # so these boys need to persist so lets create em here.
+        self.long_term_data = self.create_long_term_data()
+        self.big_boy_data = {}  # initalize an empty dict.
+
+    def resetup(self, jhg_sim, sc_sim):
         self.jhg_sim = jhg_sim
         self.sc_sim = sc_sim
-        self.big_boy_data = {} # initalize an empty dict.
+
         self.sc_logger = simLogger(self.sc_sim)
         self.jhg_logger = JHGLogger(self.jhg_sim)
 
-    def save_sc_round(self, curr_round):
-        if curr_round not in self.big_boy_data: # make sure he exists.
-            self.big_boy_data[curr_round] = {}
-        self.big_boy_data[curr_round]["SC_STUFF"] = self.sc_logger.record_individual_round()
 
-    def save_jhg_round(self, curr_round):
-        if curr_round not in self.big_boy_data: # make sure he exists.
-            self.big_boy_data[curr_round] = {}
+    def save_sc_round(self, curr_round, curr_logger_round):
+        if curr_logger_round not in self.big_boy_data: # make sure he exists.
+            self.big_boy_data[curr_logger_round] = {}
+
+        self.big_boy_data[curr_logger_round]["SC_STUFF"] = self.sc_logger.record_individual_round()
+        print("here is self.big_boy_data at the thing ", self.big_boy_data[curr_logger_round]["SC_STUFF"]["results_sums"])
+
+    def save_jhg_round(self, curr_round, curr_logger_round):
+        if curr_logger_round not in self.big_boy_data: # make sure he exists.
+            self.big_boy_data[curr_logger_round] = {}
         new_var = self.jhg_logger.return_round_for_writing(curr_round)
         #print("this is the total size ", sys.getsizeof(new_var))
 
-        self.big_boy_data[curr_round]["JHG_STUFF"] = self.jhg_logger.return_round_for_writing(curr_round)
+        self.big_boy_data[curr_logger_round]["JHG_STUFF"] = self.jhg_logger.return_round_for_writing(curr_round)
 
     # this should close the json the way that I want it to. lets go ahead and build this into our offline version first and go from there.
     def close_json(self, filename):
         self.big_boy_data["SC_CONCLUSION"] = self.sc_logger.record_big_picture()
+        self.big_boy_data["JHG_CONCLUSION"] = self.jhg_logger.record_big_picture()
+        self.big_boy_data["long_term_data"] = self.long_term_data # just slap that in there. just for funzies.
         base_dir = os.path.dirname(os.path.abspath(__file__)) # gets our current location
         relative_path = os.path.join(base_dir, "completeLogs", filename + ".json") # assembles the full file path
         os.makedirs(os.path.dirname(relative_path), exist_ok=True) # double check that we are free to boogy
 
         with open(relative_path, "w") as file: # opens and then writes the file.
             json.dump(self.big_boy_data, file, indent=4)
+
+
+    def get_all_bot_types(self):
+        sc_bot_types = self.sc_sim.bot_type
+        allocation_bot_types = self.sc_sim.allocation_bot_type
+        jhg_bot_types = self.jhg_sim.get_bot_types()
+        return jhg_bot_types, sc_bot_types, allocation_bot_types
+
+    # this function takes our existing long term data dict structure and condenses it to something graph-able.
+    def calculate_long_term_stats(self):
+        ## -- Getting average score per round and sums per player from the JHG game and SC game -- ##
+
+        # so I am not sure on the best way to do this, I think go
+        avg_pop_per_round, per_player_per_round = self.extract_data_from_dict(self.long_term_data["avg_pops"])
+        avg_utility_per_round, utility_per_player_per_round = self.extract_data_from_dict(self.long_term_data["avg_utility"])
+        return avg_pop_per_round, per_player_per_round, avg_utility_per_round, utility_per_player_per_round
+
+
+    # so I realized that I was treating the popualrity and the utility exactly the same, so I was like "wait I can use the same function"
+    # so here is a funciton that when given the data, will make the avg_per_round and avg_per_round_per_player
+    def extract_data_from_dict(self, data):
+        num_rounds = len(data)
+        first_key = next(iter(data))
+        num_players = len(data[first_key][0])
+        num_attempts = len(data[first_key])
+
+        sums_per_player = [[0 for _ in range(num_rounds)] for _ in range(num_players)]  # makes a 2d list
+        for round in data:
+            for attempt in data[round]:
+                for i, player in enumerate(attempt):
+                    sums_per_player[i][round] += player  # maybe?
+
+        # now I need to normalize by attempts
+        for i, score_list in enumerate(sums_per_player):
+            for j, score in enumerate(score_list):
+                sums_per_player[i][j] = score / num_attempts
+
+        # sums per player stores the average score for player x at round x across all attempts. So, if [0][0] is 99, then the average score for round 1 player 1 is 99 across all attempts.
+        # we can use those to graph fairly easily. now what we should do is find the average score per round
+        average_score_per_round = [[] for _ in range(num_rounds)]
+        for i, player in enumerate(sums_per_player):
+            for i, round in enumerate(player):
+                average_score_per_round[i].append(round)
+
+        # now we gotta normalize those to be the length we expect
+        for i, score_list in enumerate(average_score_per_round):
+            new_average = sum(score_list) / len(score_list)
+            average_score_per_round[i] = new_average
+
+        return average_score_per_round, sums_per_player
+
+
+    def create_long_term_data(self):
+        long_term_data = {
+            "avg_pops": {},
+            "highest_pops": {},
+            "avg_utility": {},
+            "highest_utilities": {},
+            # "coop_score": [], # look I want to
+            # "cov": [],
+            # maybe stick some other jhg stuff in here.
+        }
+        return long_term_data
+
+    def create_big_boy_graphs(self, max_rounds, offset):
+        for i in range(max_rounds, 0, -1):
+            curr_round = max_rounds - i # this way we start at 0 and work our way up
+            print("ohter trhing ",
+                  self.big_boy_data[curr_round + offset]["SC_STUFF"]["results_sums"])
+            if len(self.long_term_data["avg_pops"]) == 0:
+                for key in range(max_rounds):
+                    self.long_term_data["avg_pops"][key] = [] # creates an empty list at every round
+                    self.long_term_data["avg_utility"][key] = [] # trust
+                    self.long_term_data["highest_pops"][key] = []  # just make this a list, its fine
+                    self.long_term_data["highest_utilities"][key] = []
+                    # self.long_term_data["coop_score"][key] = []
+                    # self.long_term_data["cov"][key] = []
+            # we need the offset to account for the fact that round 40 and round 20 are the same for long term, but very different for the logger. wraps around.
+            self.long_term_data["avg_pops"][curr_round].append(self.big_boy_data[curr_round+offset]["JHG_STUFF"]["Popularity"])
+            self.long_term_data["highest_pops"][curr_round].append(max(self.big_boy_data[curr_round+offset]["JHG_STUFF"]["Popularity"]))
+            self.long_term_data["avg_utility"][curr_round].append(self.big_boy_data[curr_round+offset]["SC_STUFF"]["results_sums"])
+            self.long_term_data["highest_utilities"][curr_round].append(max(self.big_boy_data[curr_round+offset]["SC_STUFF"]["results_sums"]))
+
+
+
+
 

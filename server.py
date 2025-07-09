@@ -79,6 +79,10 @@ class Server():
     def play_game(self):
         # Main game loop -- Play as many rounds as specified in OPTIONS
 
+        # add this code in at some point - current implementation only works for less than 10 rounds.
+        # sc_rounds = round_list[list_index][-1] == "*"
+        # curr_round = int(round_list[list_index][:-1])
+
         for list_index in range(0, len(self.rounds_list)):
             print("this is the list index ", list_index)
             is_last_jhg_round = False
@@ -141,7 +145,7 @@ class Server():
             new_list.append(str(len(new_list))+"*")
             max_item = len(new_list)
 
-        print("This is the new list ", new_list, " and here is what we were workign with ", self.jhg_rounds_per_sc_round)
+        #print("This is the new list ", new_list, " and here is what we were workign with ", self.jhg_rounds_per_sc_round)
         return new_list
 
 

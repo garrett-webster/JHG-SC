@@ -39,6 +39,9 @@ class GameSimulator:
     def play_round(self, T):
         self.engine.apply_transaction(T)
 
+    def return_bot_type(self):
+        return self.engine.bots
+
 
     def save(self, outFilePath):
         with open(outFilePath, "w") as f:

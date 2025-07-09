@@ -258,7 +258,7 @@ class GeneAgent3(AbstractAgent):
 
     def play_round(self, player_idx, round_num, received, popularities, influence, extra_data):
         self.printT(player_idx, str(received))
-        print("this is the round number ", round_num)
+        #print("this is the round number ", round_num)
         # set up some variables
         if self.theTracked != 99999:
             self.theTracked = self.getTracked()

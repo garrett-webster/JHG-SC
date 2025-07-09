@@ -11,32 +11,35 @@ class simLogger:
 
     def record_individual_round(self):
         all_nodes, all_votes, winning_vote_list, current_options_matrix, types_list, scenario, group, curr_round, cycle, chromosome, influence_matrix, results_sums, results, peeps = self.sim.prepare_graph()
-        total_data = {}
-        total_data["types_list"] = types_list
-        total_data["all_nodes"] = all_nodes
-        new_votes = copy.deepcopy(all_votes)
-        total_data["all_votes"] = new_votes
-        total_data["winning_vote"] = winning_vote_list
-        total_data["current_options_matrix"] = current_options_matrix
-        total_data["scenario"] = scenario
-        total_data["group"] = group
-        total_data["curr_round"] = curr_round
-        total_data["cycle"] = cycle
-        total_data["chromosome"] = chromosome
-        total_data["influence_matrix"] = influence_matrix
-        total_data["results_sums"] = results_sums
-        total_data["results"] = results
-        total_data["peeps"] = peeps
+
+        total_data = {
+            "types_list": types_list,
+            "all_nodes": all_nodes,
+            "all_votes": copy.deepcopy(all_votes),
+            "winning_vote": winning_vote_list,
+            "current_options_matrix": current_options_matrix,
+            "scenario": scenario,
+            "group": group,
+            "curr_round": curr_round,
+            "cycle": cycle,
+            "chromosome": chromosome,
+            "influence_matrix": influence_matrix,
+            "results_sums": copy.copy(results_sums),
+            "results": results,
+            "peeps": peeps
+        }
 
         return total_data
 
 
     def record_big_picture(self):
         results, cooperation_score, bot_type, num_rounds, scenario, group, chromosome = self.sim.get_results()
+        alloc_bot_type = self.sim.allocation_bot_type
         total_data = {}
         total_data["results"] = results
         total_data["cooperation_score"] = cooperation_score
         total_data["bot_type"] = bot_type
+        total_data["alloc_bot_type"] = alloc_bot_type
         total_data["num_rounds"] = num_rounds
         total_data["scenario"] = scenario
         total_data["group"] = group

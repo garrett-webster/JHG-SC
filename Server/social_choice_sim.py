@@ -412,7 +412,6 @@ class Social_Choice_Sim:
         for player in range(len(self.current_results)):
             self.results_sums[player] += self.current_results[player]  # should keep a running total.
             self.results[player].append(self.current_results[player])
-        print("here is the current results len ", len(self.results[0]))
 
     def get_new_utilities(self):
         return self.results

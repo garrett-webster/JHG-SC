@@ -469,10 +469,125 @@ class CompleteGrapher():
         lc = LineCollection(segments, colors=colors, zorder=1)
         ax.add_collection(lc)
 
-    def draw_long_term_graphs(self, sc_sim):
-        from offlineSimStuff.variousGraphingTools.sc_tools.longTermGrapher import longTermGrapher
-        new_grapher = longTermGrapher()
-        new_grapher.draw_graph_from_sim(sc_sim)
+    def draw_long_term_graphs_given_logger(self, current_logger):
+        avg_pop_per_round, per_player_per_round, avg_utility_per_round, utility_per_player_per_round = current_logger.calculate_long_term_stats()
+        jhg_bot_type, sc_bot_type, allocation_bot_types = current_logger.get_all_bot_types()
+        self.draw_two_long_graphs(avg_pop_per_round, per_player_per_round, avg_utility_per_round, utility_per_player_per_round, jhg_bot_type, sc_bot_type, allocation_bot_types)
+
+
+    def draw_two_long_graphs(self, avg_pop_per_round, per_player_per_round, avg_utility_per_round, utility_per_player_per_round, jhg_bot_type, sc_bot_type, allocation_bot_types):
+
+        # I could put the starting amounts in there by hand and trace it all the way down or just accept that they are likely to never change.
+        avg_rise_pop = ((avg_pop_per_round[-1] - 100)) / len(avg_pop_per_round) # DON"T SUBTRACT! It all works itself out in the end.
+        avg_rise_utility = ((avg_utility_per_round[-1] - 10)) / len(avg_utility_per_round)
+
+        print("here is the avg pop ", avg_pop_per_round, " here is the per_player_per ", per_player_per_round, " here is the avg_utility ", avg_utility_per_round, " and here is the utilty ", utility_per_player_per_round)
+        sc_bot_name_map = {
+            "-1": "player",
+            "0": "random",
+            "1": "sW",
+            "2": "G",
+            "3": "bG",
+            "4": "lA",
+            "5": "sC",
+            "6": "sMA",
+            "7": "hA1",
+            "8": "hA2",
+            "9": "hA3",
+            "10": "cH",
+        }
+
+        allocation_bot_name_map = {
+            "-1": "player",
+            "0": "random",
+            "1": "sW",
+            "2": "G"
+
+        }
+
+        jhg_bot_name_map = {
+            "0" : "GA3",
+            "1" : "player",
+            "2" : "sW",
+        }
+
+        rounds = range(1, len(avg_pop_per_round)+1)
+
+        fig, axes = plt.subplots(1, 2, figsize=(14, 6), sharex=True)
+
+        # LEFT: Popularity
+        ax1 = axes[0]
+        for i, player_scores in enumerate(per_player_per_round):
+            bot_type_id = jhg_bot_type[i] if i < len(jhg_bot_type) else "?"
+            bot_type_name = jhg_bot_name_map.get(str(bot_type_id), f"Bot {bot_type_id}")
+            label = f'P{i + 1} ({bot_type_name})'
+            ax1.plot(rounds, player_scores, label=label)
+
+        ax1.plot(rounds, avg_pop_per_round, color='black', linewidth=3, label='Avg Popularity')
+        ax1.set_title('Average Popularity Over Time')
+        ax1.set_xlabel('Round')
+        ax1.set_ylabel('Popularity')
+        ax1.legend()
+        ax1.grid(True)
+
+        # RIGHT: Utility
+        ax2 = axes[1]
+        for i, player_scores in enumerate(utility_per_player_per_round):
+            bot_type_id = sc_bot_type[i] if i < len(sc_bot_type) else "?"
+            alloc_bot_type_id = allocation_bot_types[i] if i < len(allocation_bot_types) else "?"
+            bot_type_name = sc_bot_name_map.get(str(bot_type_id), f"Bot {bot_type_id}")
+            alloc_type_name = allocation_bot_name_map.get(str(alloc_bot_type_id), f"Alloc {alloc_bot_type_id}")
+            label = f'P{i + 1} ({bot_type_name} {alloc_type_name})'
+            ax2.plot(rounds, player_scores, label=label)
+
+        ax2.plot(rounds, avg_utility_per_round, color='black', linewidth=3, label='Avg Utility')
+        ax2.set_title('Average Utility Over Time')
+        ax2.set_xlabel('Round')
+        ax2.set_ylabel('Utility')
+        ax2.legend()
+        ax2.grid(True)
+
+        # plt.suptitle(f"Scenario: {scenario} | Group: {group or 'No Group'} | Chromosome: {chromosome}", fontsize=14)
+        plt.tight_layout(rect=[0, 0.03, 1, 0.95])
+
+        # add the average increase in pop and utility as part of the legend.
+        ax1.text(
+            0.95, 0.95,
+            f'Avg Rise (Pop): {avg_rise_pop:.2f}',
+            transform=ax1.transAxes,
+            horizontalalignment='right',
+            verticalalignment='top',
+            fontsize=12,
+            color='black',
+            weight='bold'
+        )
+
+        # Add text to right plot (utility)
+        ax2.text(
+            0.95, 0.95,
+            f'Avg Rise (Util): {avg_rise_utility:.2f}',
+            transform=ax2.transAxes,
+            horizontalalignment='right',
+            verticalalignment='top',
+            fontsize=12,
+            color='black',
+            weight='bold'
+        )
+
+
+        # # Save the figure
+        # my_path = os.path.dirname(os.path.abspath(__file__))
+        # scenario_str = f"scenario_{scenario}"
+        # group_str = f"group_{group or 'NoGroup'}"
+        # dir_path = os.path.join(my_path, "popularityUtilityGraphs", scenario_str, group_str)
+        # os.makedirs(dir_path, exist_ok=True)
+        #
+        # file_name = f"PopularityUtility_Chromosome_{chromosome}.png"
+        # file_path = os.path.join(dir_path, file_name)
+        # plt.savefig(file_path, dpi=300)
+
+
+        plt.show()
 
 
 
