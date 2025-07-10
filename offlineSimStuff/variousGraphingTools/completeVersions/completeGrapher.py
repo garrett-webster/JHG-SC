@@ -19,6 +19,7 @@ from matplotlib.colors import LinearSegmentedColormap, Normalize
 import json
 
 
+
 class CompleteGrapher():
     def __init__(self):
         pass
@@ -481,7 +482,10 @@ class CompleteGrapher():
         avg_rise_pop = ((avg_pop_per_round[-1] - 100)) / len(avg_pop_per_round) # DON"T SUBTRACT! It all works itself out in the end.
         avg_rise_utility = ((avg_utility_per_round[-1] - 10)) / len(avg_utility_per_round)
 
-        print("here is the avg pop ", avg_pop_per_round, " here is the per_player_per ", per_player_per_round, " here is the avg_utility ", avg_utility_per_round, " and here is the utilty ", utility_per_player_per_round)
+        #pairs = [(i, y) for i, y in enumerate(avg_pop_per_round)]
+        rounded_list = [round(y, 6) for y in avg_pop_per_round]
+        print(rounded_list)
+
         sc_bot_name_map = {
             "-1": "player",
             "0": "random",
@@ -514,6 +518,11 @@ class CompleteGrapher():
         jhg_rounds = range(1, len(avg_pop_per_round)+1)
 
         fig, axes = plt.subplots(1, 2, figsize=(14, 6), sharex=False)
+        # -- determining line of best fit for JHG
+        starting_pop = 100
+        log_ratio = np.log(np.array(avg_pop_per_round) / starting_pop)
+        # this here be the slope (modifier to e, a is auto 100 and yeah)
+        b = np.dot(jhg_rounds, log_ratio) / np.dot(jhg_rounds,jhg_rounds)
 
         # LEFT: Popularity
         ax1 = axes[0]
@@ -554,7 +563,7 @@ class CompleteGrapher():
         # add the average increase in pop and utility as part of the legend.
         ax1.text(
             0.95, 0.95,
-            f'Avg Rise (Pop): {avg_rise_pop:.2f}',
+            f'Exp. fit vars: {b:3e}',
             transform=ax1.transAxes,
             horizontalalignment='right',
             verticalalignment='top',
@@ -589,7 +598,5 @@ class CompleteGrapher():
 
 
         plt.show()
-
-
 
 
