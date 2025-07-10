@@ -115,21 +115,23 @@ class CompleteLogger():
     def create_big_boy_graphs(self, max_rounds, offset):
         for i in range(max_rounds, 0, -1):
             curr_round = max_rounds - i # this way we start at 0 and work our way up
-            print("ohter trhing ",
-                  self.big_boy_data[curr_round + offset]["SC_STUFF"]["results_sums"])
-            if len(self.long_term_data["avg_pops"]) == 0:
-                for key in range(max_rounds):
-                    self.long_term_data["avg_pops"][key] = [] # creates an empty list at every round
-                    self.long_term_data["avg_utility"][key] = [] # trust
-                    self.long_term_data["highest_pops"][key] = []  # just make this a list, its fine
-                    self.long_term_data["highest_utilities"][key] = []
-                    # self.long_term_data["coop_score"][key] = []
-                    # self.long_term_data["cov"][key] = []
-            # we need the offset to account for the fact that round 40 and round 20 are the same for long term, but very different for the logger. wraps around.
-            self.long_term_data["avg_pops"][curr_round].append(self.big_boy_data[curr_round+offset]["JHG_STUFF"]["Popularity"])
-            self.long_term_data["highest_pops"][curr_round].append(max(self.big_boy_data[curr_round+offset]["JHG_STUFF"]["Popularity"]))
-            self.long_term_data["avg_utility"][curr_round].append(self.big_boy_data[curr_round+offset]["SC_STUFF"]["results_sums"])
-            self.long_term_data["highest_utilities"][curr_round].append(max(self.big_boy_data[curr_round+offset]["SC_STUFF"]["results_sums"]))
+
+            if "SC_STUFF" in self.big_boy_data[curr_round + offset]:
+                sc_round = self.big_boy_data[curr_round]["SC_STUFF"]["curr_round"] # saves the current SC round in the fetcher. (Creates a comprehensible dictinoary)
+                self.long_term_data["avg_utility"][sc_round] = []  # trust
+                self.long_term_data["highest_utilities"][sc_round] = []
+
+                self.long_term_data["avg_utility"][sc_round].append(self.big_boy_data[curr_round + offset]["SC_STUFF"]["results_sums"])
+                self.long_term_data["highest_utilities"][sc_round].append(max(self.big_boy_data[curr_round + offset]["SC_STUFF"]["results_sums"]))
+
+            if "JHG_STUFF" in self.big_boy_data[curr_round + offset]: # so right now we are doing this weird thing where uhh, we have JHG thing every round. might be worth baking something in that makes it so we don't have to do that.
+                self.long_term_data["avg_pops"][curr_round] = []  # creates an empty list at every round
+                self.long_term_data["highest_pops"][curr_round] = []  # just make this a list, its fine
+
+                # we need the offset to account for the fact that round 40 and round 20 are the same for long term, but very different for the logger. wraps around.
+                self.long_term_data["avg_pops"][curr_round].append(self.big_boy_data[curr_round+offset]["JHG_STUFF"]["Popularity"])
+                self.long_term_data["highest_pops"][curr_round].append(max(self.big_boy_data[curr_round+offset]["JHG_STUFF"]["Popularity"]))
+
 
 
 

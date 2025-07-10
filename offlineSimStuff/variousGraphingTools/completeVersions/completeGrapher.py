@@ -511,9 +511,9 @@ class CompleteGrapher():
             "2" : "sW",
         }
 
-        rounds = range(1, len(avg_pop_per_round)+1)
+        jhg_rounds = range(1, len(avg_pop_per_round)+1)
 
-        fig, axes = plt.subplots(1, 2, figsize=(14, 6), sharex=True)
+        fig, axes = plt.subplots(1, 2, figsize=(14, 6), sharex=False)
 
         # LEFT: Popularity
         ax1 = axes[0]
@@ -521,9 +521,9 @@ class CompleteGrapher():
             bot_type_id = jhg_bot_type[i] if i < len(jhg_bot_type) else "?"
             bot_type_name = jhg_bot_name_map.get(str(bot_type_id), f"Bot {bot_type_id}")
             label = f'P{i + 1} ({bot_type_name})'
-            ax1.plot(rounds, player_scores, label=label)
+            ax1.plot(jhg_rounds, player_scores, label=label)
 
-        ax1.plot(rounds, avg_pop_per_round, color='black', linewidth=3, label='Avg Popularity')
+        ax1.plot(jhg_rounds, avg_pop_per_round, color='black', linewidth=3, label='Avg Popularity')
         ax1.set_title('Average Popularity Over Time')
         ax1.set_xlabel('Round')
         ax1.set_ylabel('Popularity')
@@ -531,6 +531,7 @@ class CompleteGrapher():
         ax1.grid(True)
 
         # RIGHT: Utility
+        sc_rounds = range(1, len(avg_utility_per_round)+1)
         ax2 = axes[1]
         for i, player_scores in enumerate(utility_per_player_per_round):
             bot_type_id = sc_bot_type[i] if i < len(sc_bot_type) else "?"
@@ -538,9 +539,9 @@ class CompleteGrapher():
             bot_type_name = sc_bot_name_map.get(str(bot_type_id), f"Bot {bot_type_id}")
             alloc_type_name = allocation_bot_name_map.get(str(alloc_bot_type_id), f"Alloc {alloc_bot_type_id}")
             label = f'P{i + 1} ({bot_type_name} {alloc_type_name})'
-            ax2.plot(rounds, player_scores, label=label)
+            ax2.plot(sc_rounds, player_scores, label=label)
 
-        ax2.plot(rounds, avg_utility_per_round, color='black', linewidth=3, label='Avg Utility')
+        ax2.plot(sc_rounds, avg_utility_per_round, color='black', linewidth=3, label='Avg Utility')
         ax2.set_title('Average Utility Over Time')
         ax2.set_xlabel('Round')
         ax2.set_ylabel('Utility')

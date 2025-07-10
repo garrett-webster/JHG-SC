@@ -28,6 +28,8 @@ def run_trial(sc_sim, jhg_sim, round_list, attempt, num_cycles, create_graphs, g
         sc_rounds = round_list[list_index][-1] == "*"
         curr_round = int(round_list[list_index][:-1]) # useful, yes, but not quite the logger round.
         curr_logger_round = (len(round_list) * attempt) + curr_round # this way the logger is logging it continously, but the sims don't interpret it that way.
+        print("this is the curr_round ", curr_round)
+
 
         influence_matrix = run_jhg_stuff(jhg_sim, curr_round, current_logger, curr_logger_round)
         played_jhg = True
@@ -171,7 +173,8 @@ def graph_longterm(current_logger):
 if __name__ == "__main__":
 
     #jhg_games_per_sc_round = [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
-    jhg_games_per_sc_round = [1,1,1]
+    jhg_games_per_sc_round = [4,3,3,3,3,3]
+    #jhg_games_per_sc_round = [1,1,1]
 
 
     round_list = determine_rounds(jhg_games_per_sc_round)
@@ -199,9 +202,6 @@ if __name__ == "__main__":
 
     for attempt in range(num_attempts):
         offset = num_rounds * attempt
-        print("here is the attempt ", attempt)
-        if attempt == 1:
-            print("Stop ehre")
         current_jhg_sim = create_jhg_sim(num_humans, num_players, total_order, tokens_per_player, jhg_bot_type)
         current_sc_sim = create_sim(num_players, scenario, chromosome, group, total_order, allocation_bot_type, utility_per_player)
         # it doesn't like this much but it IS doign what I want it to do.
