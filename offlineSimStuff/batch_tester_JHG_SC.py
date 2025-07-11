@@ -23,12 +23,13 @@ def run_trial(sc_sim, jhg_sim, round_list, attempt, num_cycles, create_graphs, g
     played_jhg = False
     influence_matrix = None # this should get overwritten pretty quick, but its there so there's no error.
     curr_sc_round = 0
-    for list_index in tqdm(range(0, len(round_list))): # everything NEEDS to start at 1, PLEASE.
+    #for list_index in tqdm(range(0, len(round_list))): # everything NEEDS to start at 1, PLEASE.
+    for list_index in (range(0, len(round_list))): # everything NEEDS to start at 1, PLEASE.
 
         sc_rounds = round_list[list_index][-1] == "*"
         curr_round = int(round_list[list_index][:-1]) # useful, yes, but not quite the logger round.
         curr_logger_round = (len(round_list) * attempt) + curr_round # this way the logger is logging it continously, but the sims don't interpret it that way.
-        print("this is the curr_round ", curr_round)
+        #print("this is the curr_round ", curr_round)
 
 
         influence_matrix = run_jhg_stuff(jhg_sim, curr_round, current_logger, curr_logger_round)
@@ -48,7 +49,8 @@ def run_trial(sc_sim, jhg_sim, round_list, attempt, num_cycles, create_graphs, g
             graphEverything(sc_sim, jhg_sim, curr_round, played_sc, played_jhg)
 
 
-    sc_sim.set_rounds(curr_round)
+    sc_sim.set_rounds(curr_sc_round) # ok if we use the curr_sc_round that should fix the coop score
+    current_logger.gather_ending_deets(attempt)
     #graph_long_term_stuff(sc_sim, curr_round)
 
     return sc_sim, jhg_sim, current_logger
@@ -173,7 +175,7 @@ def graph_longterm(current_logger):
 if __name__ == "__main__":
 
     #jhg_games_per_sc_round = [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
-    jhg_games_per_sc_round = [4,3,3,3]#,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,2]
+    jhg_games_per_sc_round = [4,3,3,3,3,3]#,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,2]
     #jhg_games_per_sc_round = [1,1,1]
 
 
@@ -190,17 +192,17 @@ if __name__ == "__main__":
     chromosomes_directory = "testChromosome"
     group = ""
     # these paths are relative to the file location, so as long as you don't move the file it can and will run from anywhere.
-    scenario = "scenarioIndicator/allPareto"
+    scenario = "scenarioIndicator/allRandom"
     chromosome = "chromosomes/experiment"
-    allocation_bot_type = "allocations_scenarios/social_welfare"
-    jhg_bot_type = 0 # lets try using the socialwelfare stuff.
+    allocation_bot_type = "allocations_scenarios/random"
+    jhg_bot_type = 3 # lets try using the socialwelfare stuff.
     total_order = create_total_order(num_players, num_humans)
-    num_attempts = 2 # we are going to run this twice.
-
+   # num_attempts = 1000 # we are going to run this twice.
+    num_attempts = 1000
     num_rounds = len(round_list)
     current_logger = CompleteLogger()
 
-    for attempt in range(num_attempts):
+    for attempt in tqdm(range(num_attempts)):
         offset = num_rounds * attempt
         current_jhg_sim = create_jhg_sim(num_humans, num_players, total_order, tokens_per_player, jhg_bot_type)
         current_sc_sim = create_sim(num_players, scenario, chromosome, group, total_order, allocation_bot_type, utility_per_player)

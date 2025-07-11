@@ -45,7 +45,7 @@ def run_trial(sc_sim, jhg_sim, rounds_list, num_cycles, create_graphs, group, to
             graphEverything(sc_sim, jhg_sim, curr_round, played_sc, played_jhg)
 
 
-    current_logger.close_json("TRIAL_TRIAL_TRIAL")
+    current_logger.gather_ending_deets("TRIAL_TRIAL_TRIAL")
     sc_sim.set_rounds(curr_round)
     graph_long_term_stuff(sc_sim, curr_round)
 

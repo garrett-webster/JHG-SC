@@ -27,7 +27,7 @@ class CompleteLogger():
             self.big_boy_data[curr_logger_round] = {}
 
         self.big_boy_data[curr_logger_round]["SC_STUFF"] = self.sc_logger.record_individual_round()
-        print("here is self.big_boy_data at the thing ", self.big_boy_data[curr_logger_round]["SC_STUFF"]["results_sums"])
+        #print("here is self.big_boy_data at the thing ", self.big_boy_data[curr_logger_round]["SC_STUFF"]["results_sums"])
 
     def save_jhg_round(self, curr_round, curr_logger_round):
         if curr_logger_round not in self.big_boy_data: # make sure he exists.
@@ -37,11 +37,26 @@ class CompleteLogger():
 
         self.big_boy_data[curr_logger_round]["JHG_STUFF"] = self.jhg_logger.return_round_for_writing(curr_round)
 
-    # this should close the json the way that I want it to. lets go ahead and build this into our offline version first and go from there.
-    def close_json(self, filename):
-        self.big_boy_data["SC_CONCLUSION"] = self.sc_logger.record_big_picture()
-        self.big_boy_data["JHG_CONCLUSION"] = self.jhg_logger.record_big_picture()
-        self.big_boy_data["long_term_data"] = self.long_term_data # just slap that in there. just for funzies.
+    # this no longer closes the json. It grabs the concluding details and slaps them in where appropriate.
+    def gather_ending_deets(self, attempt):
+
+        if "CONCLUSION" not in self.big_boy_data:
+            self.big_boy_data["CONCLUSION"] = {}
+
+        if "SC_CONCLUSION" not in self.big_boy_data["CONCLUSION"]:
+            self.big_boy_data["CONCLUSION"]["SC_CONCLUSION"] = {}
+        if "JHG_CONCLUSION" not in self.big_boy_data["CONCLUSION"]:
+            self.big_boy_data["CONCLUSION"]["JHG_CONCLUSION"] = {}
+        if "LONG_TERM_DATA" not in self.big_boy_data:
+            self.big_boy_data["CONCLUSION"]["LONG_TERM_DATA"] = {}
+
+
+        self.big_boy_data["CONCLUSION"]["SC_CONCLUSION"][attempt] = self.sc_logger.record_big_picture()
+        self.big_boy_data["CONCLUSION"]["JHG_CONCLUSION"][attempt] = self.jhg_logger.record_big_picture()
+        self.big_boy_data["CONCLUSION"]["LONG_TERM_DATA"][attempt] = self.long_term_data # just slap that in there. just for funzies.
+
+
+    def actually_close_the_thing(self, filename): # actually closes the thing.
         base_dir = os.path.dirname(os.path.abspath(__file__)) # gets our current location
         relative_path = os.path.join(base_dir, "completeLogs", filename + ".json") # assembles the full file path
         os.makedirs(os.path.dirname(relative_path), exist_ok=True) # double check that we are free to boogy
@@ -50,11 +65,15 @@ class CompleteLogger():
             json.dump(self.big_boy_data, file, indent=4)
 
 
+
     def get_all_bot_types(self):
         sc_bot_types = self.sc_sim.bot_type
         allocation_bot_types = self.sc_sim.allocation_bot_type
         jhg_bot_types = self.jhg_sim.get_bot_types()
         return jhg_bot_types, sc_bot_types, allocation_bot_types
+
+    def get_coop_data(self):
+        return self.big_boy_data["CONCLUSION"]["SC_CONCLUSION"]
 
     # this function takes our existing long term data dict structure and condenses it to something graph-able.
     def calculate_long_term_stats(self):
@@ -123,6 +142,7 @@ class CompleteLogger():
 
                 self.long_term_data["avg_utility"][sc_round].append(self.big_boy_data[curr_round + offset]["SC_STUFF"]["results_sums"])
                 self.long_term_data["highest_utilities"][sc_round].append(max(self.big_boy_data[curr_round + offset]["SC_STUFF"]["results_sums"]))
+
 
             if "JHG_STUFF" in self.big_boy_data[curr_round + offset]: # so right now we are doing this weird thing where uhh, we have JHG thing every round. might be worth baking something in that makes it so we don't have to do that.
                 self.long_term_data["avg_pops"][curr_round] = []  # creates an empty list at every round

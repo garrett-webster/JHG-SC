@@ -2,12 +2,14 @@
 import os
 import sys
 import copy
+from lib2to3.btm_utils import tokens
 from os import popen
 
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 from Server.Engine.geneagent3 import GeneAgent3
 from Server.Engine.humanagent import HumanAgent
 from Server.Engine.socialwelfaragent import SocialWelfareAgent
+from Server.Engine.randomagent import RandomAgent
 from Server.Engine.simulator import GameSimulator
 
 import numpy as np
@@ -206,6 +208,8 @@ class JHG_simulator():
                 bots.append(1)
             if isinstance(player, SocialWelfareAgent):
                 bots.append(2)
+            if isinstance(player, RandomAgent):
+                bots.append(3)
         return bots
 
 
@@ -215,10 +219,14 @@ class JHG_simulator():
         if bot_type == 0:
             thePopulation = loadPopulationFromFile(popSize, generationFolder, startIndex, num_gene_pools, tokens_per_player)
             return thePopulation
+        # I know what you're thinking. wheres the human? He won't fall under pools, thankfully. he'll go other places.
 
-        if bot_type == 1: # just go all teh way through. get us the whole thing even though we dont' need it bc its just easier that way.
+        if bot_type == 2: # just go all teh way through. get us the whole thing even though we dont' need it bc its just easier that way.
             for i in range(popSize):
                 thePopulation.append(SocialWelfareAgent(tokens_per_player))
+        if bot_type == 3:
+            for i in range(popSize):
+                thePopulation.append(RandomAgent(tokens_per_player))
 
         return thePopulation
 

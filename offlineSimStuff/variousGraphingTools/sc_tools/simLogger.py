@@ -35,15 +35,17 @@ class simLogger:
     def record_big_picture(self):
         results, cooperation_score, bot_type, num_rounds, scenario, group, chromosome = self.sim.get_results()
         alloc_bot_type = self.sim.allocation_bot_type
-        total_data = {}
-        total_data["results"] = results
-        total_data["cooperation_score"] = cooperation_score
-        total_data["bot_type"] = bot_type
-        total_data["alloc_bot_type"] = alloc_bot_type
-        total_data["num_rounds"] = num_rounds
-        total_data["scenario"] = scenario
-        total_data["group"] = group
-        total_data["chromosome"] = chromosome
+        total_data = {
+            "results": results,
+            "cooperation_score": cooperation_score,
+            "bot_type": bot_type,
+            "alloc_bot_type": alloc_bot_type,
+            "num_rounds": num_rounds,
+            "scenario": scenario,
+            "group": group,
+            "chromosome": chromosome,
+        }
+
         return total_data
 
         # my_path = os.path.dirname(os.path.abspath(__file__))

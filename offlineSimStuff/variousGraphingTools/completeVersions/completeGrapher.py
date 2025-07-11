@@ -473,13 +473,14 @@ class CompleteGrapher():
     def draw_long_term_graphs_given_logger(self, current_logger):
         avg_pop_per_round, per_player_per_round, avg_utility_per_round, utility_per_player_per_round = current_logger.calculate_long_term_stats()
         jhg_bot_type, sc_bot_type, allocation_bot_types = current_logger.get_all_bot_types()
-        self.draw_two_long_graphs(avg_pop_per_round, per_player_per_round, avg_utility_per_round, utility_per_player_per_round, jhg_bot_type, sc_bot_type, allocation_bot_types)
+        cooperation_score, number_of_attempts = self.get_coop_score(current_logger)
+        self.draw_two_long_graphs(avg_pop_per_round, per_player_per_round, avg_utility_per_round, utility_per_player_per_round, jhg_bot_type, sc_bot_type, allocation_bot_types, cooperation_score, number_of_attempts)
 
 
-    def draw_two_long_graphs(self, avg_pop_per_round, per_player_per_round, avg_utility_per_round, utility_per_player_per_round, jhg_bot_type, sc_bot_type, allocation_bot_types):
+    def draw_two_long_graphs(self, avg_pop_per_round, per_player_per_round, avg_utility_per_round, utility_per_player_per_round, jhg_bot_type, sc_bot_type, allocation_bot_types, cooperation_score, number_of_attempts):
 
         # I could put the starting amounts in there by hand and trace it all the way down or just accept that they are likely to never change.
-        avg_rise_pop = ((avg_pop_per_round[-1] - 100)) / len(avg_pop_per_round) # DON"T SUBTRACT! It all works itself out in the end.
+        avg_rise_pop = ((avg_pop_per_round[-1] - 100)) / len(avg_pop_per_round) # if we ever need it its still here but rn we are using the exponential regression function.
         avg_rise_utility = ((avg_utility_per_round[-1] - 10)) / len(avg_utility_per_round)
 
         #pairs = [(i, y) for i, y in enumerate(avg_pop_per_round)]
@@ -513,6 +514,7 @@ class CompleteGrapher():
             "0" : "GA3",
             "1" : "player",
             "2" : "sW",
+            "3" : "random"
         }
 
         jhg_rounds = range(1, len(avg_pop_per_round)+1)
@@ -533,7 +535,7 @@ class CompleteGrapher():
             ax1.plot(jhg_rounds, player_scores, label=label)
 
         ax1.plot(jhg_rounds, avg_pop_per_round, color='black', linewidth=3, label='Avg Popularity')
-        ax1.set_title('Average Popularity Over Time')
+        ax1.set_title('Average Popularity Over Time', loc="left")
         ax1.set_xlabel('Round')
         ax1.set_ylabel('Popularity')
         ax1.legend()
@@ -551,7 +553,7 @@ class CompleteGrapher():
             ax2.plot(sc_rounds, player_scores, label=label)
 
         ax2.plot(sc_rounds, avg_utility_per_round, color='black', linewidth=3, label='Avg Utility')
-        ax2.set_title('Average Utility Over Time')
+        ax2.set_title('Average Utility Over Time', loc="left")
         ax2.set_xlabel('Round')
         ax2.set_ylabel('Utility')
         ax2.legend()
@@ -561,27 +563,46 @@ class CompleteGrapher():
         plt.tight_layout(rect=[0, 0.03, 1, 0.95])
 
         # add the average increase in pop and utility as part of the legend.
-        ax1.text(
-            0.95, 0.95,
+        fig.text(
+            0.35, 0.895,  # X and Y position (tweak as needed)
             f'Exp. fit vars: {b:3e}',
-            transform=ax1.transAxes,
-            horizontalalignment='right',
-            verticalalignment='top',
+            ha='center',
+            va='bottom',
             fontsize=12,
             color='black',
             weight='bold'
         )
 
         # Add text to right plot (utility)
-        ax2.text(
-            0.95, 0.95,
+        fig.text(
+            0.90, 0.895,  # X and Y position (tweak as needed)
             f'Avg Rise (Util): {avg_rise_utility:.2f}',
-            transform=ax2.transAxes,
-            horizontalalignment='right',
-            verticalalignment='top',
+            ha='center',
+            va='bottom',
             fontsize=12,
             color='black',
             weight='bold'
+        )
+
+        # add the coop score as text to bottom left
+        fig.text(
+            0.90, 0.05,
+            f"coop_score: {cooperation_score:.2f}",
+            ha="center",
+            va="bottom",
+            fontsize=12,
+            color="black",
+            weight="bold",
+        )
+
+        fig.text(
+            0.5, 0.95,
+            f"no. of attempts: {number_of_attempts}",
+            ha="center",
+            va="bottom",
+            fontsize=12,
+            color="black",
+            weight="bold",
         )
 
 
@@ -599,4 +620,11 @@ class CompleteGrapher():
 
         plt.show()
 
-
+    def get_coop_score(self, current_logger):
+        new_dict = current_logger.get_coop_data()
+        new_sum = 0
+        new_dict_keys = new_dict.keys()
+        for attempt in new_dict_keys:
+            new_sum += new_dict[attempt]["cooperation_score"]
+        new_sum = new_sum / len(new_dict_keys)
+        return new_sum, len(new_dict_keys)

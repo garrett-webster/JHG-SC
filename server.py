@@ -103,7 +103,7 @@ class Server():
                 self.current_logger.save_sc_round(curr_round)
 
 
-        self.current_logger.close_json("HumanResultsTime")
+        self.current_logger.gather_ending_deets("HumanResultsTime")
         print("game over")
 
     def generate_peeps(self, total_order, jhg_manager, sc_manager):

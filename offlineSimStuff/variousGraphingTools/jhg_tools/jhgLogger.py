@@ -84,7 +84,7 @@ class JHGLogger():
     def record_big_picture(self):
         total_data = {}
         # need to return the bot type, tahts pretty much it.
-        bot_types = self.jhg_sim.return_bot_types()
+        bot_types = self.jhg_sim.get_bot_types()
         total_data["bot_types"] = bot_types
         return total_data
 
