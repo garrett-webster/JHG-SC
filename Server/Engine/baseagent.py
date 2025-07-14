@@ -7,5 +7,5 @@ class AbstractAgent:
         pass
 
 
-    def setGameParams(self, gameParams, visualTraits, _forcedRandom):
-        pass
+    def setGameParams(self, coefs, alpha, beta, povertyLine, forcedRandom):
+        pass # PLEASE work

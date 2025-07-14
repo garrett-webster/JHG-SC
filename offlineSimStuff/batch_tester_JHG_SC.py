@@ -195,7 +195,7 @@ if __name__ == "__main__":
     scenario = "scenarioIndicator/allRandom"
     chromosome = "chromosomes/experiment"
     allocation_bot_type = "allocations_scenarios/random"
-    jhg_bot_type = 3 # lets try using the socialwelfare stuff.
+    jhg_bot_type = 0 # lets try using the socialwelfare stuff.
     total_order = create_total_order(num_players, num_humans)
    # num_attempts = 1000 # we are going to run this twice.
     num_attempts = 1000

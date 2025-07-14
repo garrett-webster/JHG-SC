@@ -185,5 +185,5 @@ if __name__ == "__main__":
 
     current_jhg_sim = create_jhg_sim(num_humans, num_players, total_order, tokens_per_player)
     current_sc_sim = create_sim(num_players, scenario, chromosome, group, total_order, allocation_bot_type, utility_per_player)
-    current_logger = CompleteLogger(current_sc_sim, current_jhg_sim)
+    current_logger = CompleteLogger()
     sc_sim, jhg_sim = run_trial(current_sc_sim, current_jhg_sim, round_list, num_cycles, create_graphs, group, total_order, create_influence, current_logger)
