@@ -19,6 +19,12 @@ class ConnectionManager:
         try:
             message_dict = self.compile_message(*message_args)
             message_str = json.dumps(message_dict) + '\n'  # Newline delimiter
+
+            message_bytes = message_str.encode('utf-8')
+            message_size = len(message_bytes)
+
+            print(f"Message size: {message_size} bytes")
+
             target_socket.sendall(message_str.encode('utf-8'))
         except (socket.error, BrokenPipeError) as e:
             print(f"Error sending message: {e}")

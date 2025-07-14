@@ -11,10 +11,10 @@ import numpy as np
 
 OPTIONS = {
     #General settings
-    "NUM_HUMANS": 2,
-    "TOTAL_PLAYERS": 3,
-    #"JHG_ROUNDS_PER_SC_ROUND" : [5,3,3,3], # Number of JHG rounds to play between each social choice round
-    "JHG_ROUNDS_PER_SC_ROUND" : [1,1,1], # Number of JHG rounds to play between each social choice round
+    "NUM_HUMANS": 1,
+    "TOTAL_PLAYERS": 8,
+    "JHG_ROUNDS_PER_SC_ROUND" : [5,3,3,3], # Number of JHG rounds to play between each social choice round
+    #"JHG_ROUNDS_PER_SC_ROUND" : [1,1,1], # Number of JHG rounds to play between each social choice round
     "SC_GROUP_OPTION": 0, # See options_creation.py -> group_size_options to understand what this means
     "SC_VOTE_CYCLES": 3, # Number of cycles to play each social choice round. Players will vote this many times, with the nth vote being final.
     "LOGGING" : True,
@@ -73,7 +73,8 @@ class Server():
         self.SC_manager = SCManager(self.connection_manager, self.num_humans, self.generator, self.num_players, self.num_bots,
                                     self.sc_group_option, self.sc_vote_cycles, self.total_order, self.utility_per_player)
 
-        self.current_logger = CompleteLogger(self.SC_manager.sc_sim, self.JHG_manager.jhg_sim)
+        self.current_logger = CompleteLogger()
+        self.current_logger.resetup(self.JHG_manager.jhg_sim, self.SC_manager.sc_sim)
 
 
     def play_game(self):
@@ -82,14 +83,15 @@ class Server():
         # add this code in at some point - current implementation only works for less than 10 rounds.
         # sc_rounds = round_list[list_index][-1] == "*"
         # curr_round = int(round_list[list_index][:-1])
-
+        curr_sc_round = 0
         for list_index in range(0, len(self.rounds_list)):
             print("this is the list index ", list_index)
             is_last_jhg_round = False
             curr_round = int(self.rounds_list[list_index][0]) # yeah something like that
+            curr_logger_round = curr_round
             if self.rounds_list[list_index][1] == "*": is_last_jhg_round = True
             self.JHG_manager.play_jhg_round(self.JHG_manager.current_round, is_last_jhg_round)
-            self.current_logger.save_jhg_round(curr_round)
+            self.current_logger.save_jhg_round(curr_round, curr_logger_round)
             # THEN DECIDE IF YOU NEED TO RUN AN SC ROUND.
             if self.rounds_list[list_index][1] == "*": # if we have a star in there, run an SC round.
                 if self.player_allocations:
@@ -100,7 +102,9 @@ class Server():
                 else:
                     self.SC_manager.init_next_round()
                 self.SC_manager.play_social_choice_round(self.JHG_manager.get_sim)
-                self.current_logger.save_sc_round(curr_round)
+                self.current_logger.save_sc_round(curr_sc_round, curr_logger_round)
+                curr_sc_round += 1 # WHEE.
+
 
 
         self.current_logger.gather_ending_deets("HumanResultsTime")

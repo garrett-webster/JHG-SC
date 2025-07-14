@@ -337,7 +337,7 @@ class GeneAgent3(AbstractAgent):
             remaining_toks = num_tokens
             if safety_first:
                 # self.printT(player_idx, "    safety first!!")
-                remaining_toks -= guardo_toks
+                remaining_toks -= guardo_toks # what the FETCH does this do
 
             attack_alloc, num_attack_toks = self.quien_ataco(round_num, player_idx, num_players, num_tokens, remaining_toks, popularities, influence, selected_community.s, communities)
             self.printT(player_idx, "\n Attackings:")

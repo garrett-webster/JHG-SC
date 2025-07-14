@@ -1,6 +1,6 @@
 from Server.sim_interface import JHG_simulator
 from offlineSimStuff.variousGraphingTools.jhg_tools.jhgLogger import JHGLogger
-
+import time
 
 class JHGManager:
     def __init__(self, connection_manager, num_humans, num_players, num_bots, total_order, tokens_per_player):
@@ -27,7 +27,6 @@ class JHGManager:
             except KeyError:
                 print("Error processinging client_input: ", client_input)
         current_popularity = self.jhg_sim.execute_round(client_input, round_num - 1)
-
         # Creates a 2d array where each row corresponds to the allocation list of the player with the associated id
         allocations_matrix = self.jhg_sim.get_T()
 
@@ -36,6 +35,10 @@ class JHGManager:
         unique_messages = [received_dict, sent_dict]
 
         init_pop_influence = (1 - self.alpha) ** round_num * 100
+
+        print("Here are the influences ", self.jhg_sim.get_influence().tolist())
+        print("here is the init pop influence ", init_pop_influence)
+        print("here is the current_popualrity", list(current_popularity))
 
         self.connection_manager.distribute_message("JHG_OVER", round_num, list(current_popularity),
                                                    self.jhg_sim.get_influence().tolist(), init_pop_influence, is_last_jhg_round,

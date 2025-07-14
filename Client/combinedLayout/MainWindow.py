@@ -59,6 +59,7 @@ class MainWindow(QMainWindow):
         self.token_label = QLabel()
         self.sc_allocations_label = QLabel()
         self.jhg_popularity_graph = pg.PlotWidget()
+
         self.jhg_popularity_graph.setXRange(0, 2)
         self.jhg_popularity_graph.setYRange(0, 120)
         self.jhg_popularity_graph.getAxis('bottom').setTicks(
@@ -262,7 +263,6 @@ class MainWindow(QMainWindow):
 
 
     def sc_create_allocations(self, client_id_list, total_id_list):
-        print("AYO IS THIS OGING OFF")
         self.disable_jhg_buttons(self.JHG_panel)
         if self.round_state.client_id in client_id_list:
             self.enable_allocations_interface()
