@@ -25,8 +25,7 @@ class SCHistoryGrid(SCGrid):
     def change_round(self, index):
         round_key = str(index + 1)
         if round_key in self.sc_history:
-            print("This is the wining vote rn ", self.winning_vote)
-            self.update_sc_grid(self.sc_history[round_key]["votes"], self.sc_history[round_key]["utilities"], round_key, self.winning_vote)
+            self.update_sc_grid(self.sc_history[round_key]["votes"], self.sc_history[round_key]["utilities"], round_key)
         self.parent().parent().setTabText(1, "History")
 
 
@@ -38,13 +37,11 @@ class SCHistoryGrid(SCGrid):
         self.round_drop_down.setCurrentIndex(round - 1)
 
 
-    def update_sc_grid(self, votes, utilities, round_num, winning_vote=None):
+    def update_sc_grid(self, votes, utilities, round_num):
         one_idx_votes = {key: value + 1 for key, value in votes.items()}
         super().update_grid(one_idx_votes, utilities)
-        if winning_vote is None:
-            winning_vote = get_winning_vote(votes)
+        winning_vote = get_winning_vote(votes)
 
-        winning_vote += 1
         print("this is the winning vote ", winning_vote)
 
         # Color the labels for each player coinciding with the winning vote. Green if that cause has positive utility

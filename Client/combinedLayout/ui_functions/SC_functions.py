@@ -101,5 +101,4 @@ def get_winning_vote(votes):
     if vote_counts[str(winning_vote)] <= len(votes) // 2:
         winning_vote = -1
 
-    print("THis is the winning vote ", winning_vote)
-    return winning_vote
+    return winning_vote + 1
