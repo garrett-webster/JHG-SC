@@ -33,10 +33,11 @@ class Arrow:
         )
         ax.add_patch(self.arrow_patch)
 
-    def remove(self): #
+
+    def remove(self):
         if self.arrow_patch and self.arrow_patch.axes:
             try:
                 self.arrow_patch.remove()
             except Exception as e:
-                print(f"Failed to remove arrow: {e}")
+                print(f"Error removing arrow: {e}")
             self.arrow_patch = None
