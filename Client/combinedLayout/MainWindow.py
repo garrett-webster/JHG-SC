@@ -29,7 +29,7 @@ from Client.combinedLayout.SCInfluenceGrapher import update_sc_network_graph
 
 
 class MainWindow(QMainWindow):
-    def __init__(self, connection_manager, num_players, client_id, num_cycles, num_tokens_per_player, utility_per_player, starting_utility):
+    def __init__(self, connection_manager, num_players, client_id, num_cycles, num_tokens_per_player, utility_per_player, starting_utility, all_allocations):
         super().__init__()
         # This window is very dependent on things happening in the correct order.
         # If you mess with it, you might break a lot of things.
@@ -47,6 +47,7 @@ class MainWindow(QMainWindow):
         self.connection_manager = connection_manager
         self.num_cycles = num_cycles
         self.starting_util = starting_utility
+        self.all_allocations = all_allocations
 
 
 
@@ -227,7 +228,7 @@ class MainWindow(QMainWindow):
         #self.disable_jhg_buttons(self.JHG_panel) Try not putting that there, let it get cancelled somewhere else.
         jhg_over(self, is_last, init_pop_influence)
         self.round_state.utilities = [0 for _ in range(self.round_state.num_players)] # reset this bc this isn't happening quick enough.
-        #self.SC_panel.setCurrentIndex(0)  # don't move them there now, sometimes this doesn't do what we wnat it to do. 
+        #self.SC_panel.setCurrentIndex(0)  # don't move them there now, sometimes this doesn't do what we wnat it to do.
         # self.update_sc_graph() # hard coding this bc I want to see somethign real quick.
 
     def enable_allocations_interface(self):
@@ -268,13 +269,17 @@ class MainWindow(QMainWindow):
 
     def sc_create_allocations(self, client_id_list, total_id_list):
         self.disable_jhg_buttons(self.JHG_panel)
-        if self.round_state.client_id in client_id_list:
-            self.enable_allocations_interface()
-        else:
-            utilities_list = [0 for _ in range(self.round_state.num_players)]
-            # go ahead and just send back and empty list of 0's for our repsonse so its all good to go. shouldn't actually touch anything.
-            self.connection_manager.send_message("SUBMIT_UTILITY", self.round_state.client_id, self.round_state.jhg_round_num, utilities_list)
-            self.SC_voting_grid.setEnabled(False) # turn this off. Should become reenabled when all is said and done.
+
+        if self.all_allocations: # if we wnat everyone to send allocations, go for it
+            self.enable_allocations_interface() # this enables it for all clients
+        else: # if we only want specific people to allocatione:
+            if self.round_state.client_id in client_id_list:
+                self.enable_allocations_interface()
+            else: # sit tight, get a new utilities list, go from there.
+                utilities_list = [0 for _ in range(self.round_state.num_players)]
+                # go ahead and just send back and empty list of 0's for our repsonse so its all good to go. shouldn't actually touch anything.
+                self.connection_manager.send_message("SUBMIT_UTILITY", self.round_state.client_id, self.round_state.jhg_round_num, utilities_list)
+                self.SC_voting_grid.setEnabled(False) # turn this off. Should become reenabled when all is said and done.
 
         self.round_state.reset_everything()
         self.change_cause_labels(total_id_list)

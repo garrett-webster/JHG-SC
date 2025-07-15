@@ -31,8 +31,8 @@ if __name__ == "__main__":
     app.setStyleSheet(load_stylesheet("combinedLayout/style.qss"))
 
     #host = '10.55.10.49'
-    host = '127.0.0.1'
-    #host = '192.168.36.3'
+    #host = '127.0.0.1'
+    host = '192.168.36.5'
     #port = 12346
     port = 12345
 
@@ -45,8 +45,9 @@ if __name__ == "__main__":
     num_tokens_per_player = init_vals["TOKENS_PER_PLAYER"]
     utility_per_player = init_vals["UTILITY_PER_PLAYER"]
     starting_utility = init_vals["STARTING_UTILITY"]
+    all_allocations = init_vals["ALL_ALLOCATIONS"]
 
-    window = MainWindow(connection_manager, num_players, client_id, num_cycles, num_tokens_per_player, utility_per_player, starting_utility)
-    #window.showFullScreen() # this enables full screen on the chromebooks
-    window.show()
+    window = MainWindow(connection_manager, num_players, client_id, num_cycles, num_tokens_per_player, utility_per_player, starting_utility, all_allocations)
+    window.showFullScreen() # this enables full screen on the chromebooks
+    #window.show()
     app.exec()

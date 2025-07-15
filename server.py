@@ -11,7 +11,7 @@ import numpy as np
 
 OPTIONS = {
     #General settings
-    "NUM_HUMANS": 1,
+    "NUM_HUMANS": 3,
     "TOTAL_PLAYERS": 8,
     "JHG_ROUNDS_PER_SC_ROUND" : [2,3,3,3], # Number of JHG rounds to play between each social choice round
     #"JHG_ROUNDS_PER_SC_ROUND" : [1,1,1], # Number of JHG rounds to play between each social choice round
@@ -24,6 +24,7 @@ OPTIONS = {
 
     #Misc (Wasn't sure where to put this)
     "PLAYER_ALLOCATIONS" : True,
+    "ALL_ALLOCATIONS" : True,
 
     # Generator options
     "OPTION_GENERATOR": 2, # Defines what behavior the options generator should use. See Server.OptionsGenerators.generators for the full list
@@ -47,6 +48,7 @@ class Server():
         self.tokens_per_player = options["NUM_TOKENS_PER_PLAYER"]
         self.utility_per_player = options["UTILITY_PER_PLAYER"]
         self.player_allocations = options["PLAYER_ALLOCATIONS"]
+        self.all_allocations = options["ALL_ALLOCATIONS"]
         self.starting_utility = options["STARTING_UTILITY"]
         self.total_order = None
         self.generator = None
@@ -63,7 +65,7 @@ class Server():
         self.total_order = self.connection_manager.get_total_list()
         print("Server started")
         # Halts execution until enough players have joined
-        self.connection_manager.add_clients(OPTIONS["NUM_HUMANS"], OPTIONS["NUM_BOTS"], OPTIONS["SC_VOTE_CYCLES"], OPTIONS["NUM_TOKENS_PER_PLAYER"], OPTIONS["UTILITY_PER_PLAYER"], OPTIONS["STARTING_UTILITY"])
+        self.connection_manager.add_clients(OPTIONS["NUM_HUMANS"], OPTIONS["NUM_BOTS"], OPTIONS["SC_VOTE_CYCLES"], OPTIONS["NUM_TOKENS_PER_PLAYER"], OPTIONS["UTILITY_PER_PLAYER"], OPTIONS["STARTING_UTILITY"], OPTIONS["ALL_ALLOCATIONS"])
 
         # we will get here in a minute.
         self.JHG_manager = JHGManager(self.connection_manager, self.num_humans, self.num_players, self.num_bots, self.total_order, self.tokens_per_player)
