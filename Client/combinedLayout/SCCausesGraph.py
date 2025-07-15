@@ -50,7 +50,9 @@ class SCCausesGraph(QWidget):
         self.nodes_ax.grid(False)
         self.nodes_ax.cla()
 
-    def update_sc_nodes_graph(self, round_num, winning_vote=None):
+    def update_sc_nodes_graph_gritty(self, round_num, winning_vote=None):
+        print("this is the winning vote under the fancy fetcher ", winning_vote)
+
         if self.round_state.nodes:
             # Clear graph
             self.nodes_ax.cla()
@@ -187,7 +189,8 @@ class SCCausesGraph(QWidget):
             self.nodes_canvas.draw()
 
     def draw_causes_graph(self, votes, utilities, winning_vote, round_num):
-        self.update_sc_nodes_graph(round_num, winning_vote)
+        print("winnign vote under 1 ", winning_vote)
+        self.update_sc_nodes_graph_gritty(round_num, winning_vote)
         self.update_arrows(votes)
 
     def update_cycle_label(self, cycle, current_round_tab = False):

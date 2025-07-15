@@ -2,7 +2,7 @@ import random
 import numpy as np
 
 class Random():
-    def __init__(self, new_id, utility_per_player=3):
+    def __init__(self, new_id, utility_per_player=6):
         self.number_type = 0  # used for logging purposes.
         self.self_id = new_id
         self.utility_per_player = utility_per_player
@@ -31,4 +31,4 @@ class Random():
         if transaction_vector[self.self_id] < 0:
             transaction_vector[self.self_id] = transaction_vector[self.self_id] * -1
 
-        return transaction_vector
+        return transaction_vector * self.utility_per_player
