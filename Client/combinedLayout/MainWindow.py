@@ -135,6 +135,7 @@ class MainWindow(QMainWindow):
         create_sc_ui_elements(self)
         self.SC_cause_graph.init_sc_nodes_graph(self.round_state)
 
+
         graphs_layout = QVBoxLayout()
 
         sc_graph_tabs = QTabWidget()
@@ -154,6 +155,7 @@ class MainWindow(QMainWindow):
         self.attach_sc_buttons() #no longer does waht we want it to do, no gurantee of 3 diemsinons, scrapping that whole thing.
         self.SC_panel.addTab(self.SC_creations_panel, "Allocations")
         self.SC_panel.setTabVisible(2, False)  # disable the tab unless you need it
+        self.SC_panel.setCurrentIndex(1)
 
         self.SC_Allocations_grapher = SC_Allocations_Grapher(self.round_state.client_id) # idc how tempting it is do NOT throw main window in here.
 
@@ -225,7 +227,7 @@ class MainWindow(QMainWindow):
         #self.disable_jhg_buttons(self.JHG_panel) Try not putting that there, let it get cancelled somewhere else.
         jhg_over(self, is_last, init_pop_influence)
         self.round_state.utilities = [0 for _ in range(self.round_state.num_players)] # reset this bc this isn't happening quick enough.
-        self.SC_panel.setCurrentIndex(0)  # should forcefully move them over if they aren't there already.
+        #self.SC_panel.setCurrentIndex(0)  # don't move them there now, sometimes this doesn't do what we wnat it to do. 
         # self.update_sc_graph() # hard coding this bc I want to see somethign real quick.
 
     def enable_allocations_interface(self):

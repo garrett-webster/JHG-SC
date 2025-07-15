@@ -22,6 +22,8 @@ def create_sc_ui_elements(main_window):
 
     main_window.SC_panel.setMinimumWidth(400)
     main_window.SC_panel.addTab(main_window.SC_voting_grid, "Next Round")
+    main_window.SC_panel.setTabEnabled(0, False)
+    main_window.SC_panel.setCurrentIndex(1) # don't let them touch it yet
 
     # Set up the SC allocations panel
 
@@ -51,6 +53,7 @@ def update_sc_utilities_labels(main_window, round_num, new_utilities, winning_vo
     main_window.SC_cause_graph.update_arrows(history_grid.sc_history[str(round_num)]["votes"], True)
     main_window.SC_panel.setTabText(1, "Results")
     main_window.SC_panel.setTabText(0, "Next Round")
+    main_window.SC_panel.setTabEnabled(0, False)
 
     if winning_vote != -1:
         main_window.SC_voting_grid.update_col_2(new_utilities)
