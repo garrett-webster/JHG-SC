@@ -47,5 +47,6 @@ if __name__ == "__main__":
     starting_utility = init_vals["STARTING_UTILITY"]
 
     window = MainWindow(connection_manager, num_players, client_id, num_cycles, num_tokens_per_player, utility_per_player, starting_utility)
+    #window.showFullScreen() # this enables full screen on the chromebooks
     window.show()
     app.exec()

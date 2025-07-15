@@ -58,7 +58,7 @@ class SCGrid(QTabWidget):
 
 
     def update_grid(self, col_2_vals, utility_mat):
-        print("This is the utility_mat ", utility_mat)
+        #print("This is the utility_mat ", utility_mat)
         self.update_col_2(col_2_vals)
         self.update_utilities(utility_mat)
 

@@ -84,16 +84,18 @@ class Server():
         # sc_rounds = round_list[list_index][-1] == "*"
         # curr_round = int(round_list[list_index][:-1])
         curr_sc_round = 0
-        for list_index in range(0, len(self.rounds_list)):
-            print("this is the list index ", list_index)
+        print("Yo are we entering this thing ")
+        for i, list_index in enumerate(self.rounds_list):
+            print("this is teh list index ", list_index, " and this is i, ", i)
             is_last_jhg_round = False
-            curr_round = int(self.rounds_list[list_index][0]) # yeah something like that
+            curr_round = int(list_index[:-1]) # yeah something like that
             curr_logger_round = curr_round
-            if self.rounds_list[list_index][1] == "*": is_last_jhg_round = True
+            if list_index[-1] == "*": is_last_jhg_round = True
             self.JHG_manager.play_jhg_round(self.JHG_manager.current_round, is_last_jhg_round)
             self.current_logger.save_jhg_round(curr_round, curr_logger_round)
             # THEN DECIDE IF YOU NEED TO RUN AN SC ROUND.
-            if self.rounds_list[list_index][1] == "*": # if we have a star in there, run an SC round.
+            if list_index[-1] == "*": # if we have a star in there, run an SC round.
+                print("RUNNING AN SC ROUND MAYBE ", list_index)
                 if self.player_allocations:
                     peeps, total_order_index = self.generate_peeps(self.total_order, self.JHG_manager, self.SC_manager)
                     influence_matrix = self.JHG_manager.get_influence_matrix()
@@ -149,7 +151,7 @@ class Server():
             new_list.append(str(len(new_list))+"*")
             max_item = len(new_list)
 
-        #print("This is the new list ", new_list, " and here is what we were workign with ", self.jhg_rounds_per_sc_round)
+        print("This is the new list ", new_list, " and here is what we were workign with ", self.jhg_rounds_per_sc_round)
         return new_list
 
 

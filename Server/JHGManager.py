@@ -36,9 +36,9 @@ class JHGManager:
 
         init_pop_influence = (1 - self.alpha) ** round_num * 100
 
-        print("Here are the influences ", self.jhg_sim.get_influence().tolist())
-        print("here is the init pop influence ", init_pop_influence)
-        print("here is the current_popualrity", list(current_popularity))
+        #print("Here are the influences ", self.jhg_sim.get_influence().tolist())
+        #print("here is the init pop influence ", init_pop_influence)
+        #print("here is the current_popualrity", list(current_popularity))
 
         self.connection_manager.distribute_message("JHG_OVER", round_num, list(current_popularity),
                                                    self.jhg_sim.get_influence().tolist(), init_pop_influence, is_last_jhg_round,

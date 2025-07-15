@@ -23,7 +23,7 @@ class ConnectionManager:
             message_bytes = message_str.encode('utf-8')
             message_size = len(message_bytes)
 
-            print(f"Message size: {message_size} bytes")
+            #print(f"Message size: {message_size} bytes")
 
             target_socket.sendall(message_str.encode('utf-8'))
         except (socket.error, BrokenPipeError) as e:

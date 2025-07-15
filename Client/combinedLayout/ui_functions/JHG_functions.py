@@ -18,8 +18,6 @@ def update_jhg_ui_elements(main_window):
         jhg_widgets[i].popularity_label.setText(
             str(round(main_window.round_state.message["POPULARITY"][i])))
         main_window.round_state.players[i].popularity_over_time.append(main_window.round_state.message["POPULARITY"][i])
-        print("This is the i, ", i)
-        print("this is the new popularity ", main_window.round_state.message["POPULARITY"][i])
         jhg_widgets[i].allocation_box.setText("0")
 
         QTimer.singleShot(0, lambda: update_jhg_popularity_graph(main_window.round_state, main_window.jhg_popularity_graph))
@@ -69,13 +67,13 @@ def update_jhg_popularity_graph(round_state, jhg_popularity_graph):
     )
     jhg_popularity_graph.setXRange(0, round_state.jhg_round_num + 1, padding=0)
     jhg_popularity_graph.setYRange(0, max_popularity + 10, padding=0)
-    view_box.autoRange()
+    #view_box.autoRange()
     jhg_popularity_graph.repaint()
 
 
 def jhg_over(main_window, is_last, init_pop_influence):
     update_jhg_network_graph(main_window)
-    print("THIS IS GOING OFF NOW AND IS LAST IS ", is_last)
+    #print("THIS IS GOING OFF NOW AND IS LAST IS ", is_last)
     if not is_last:
         start_jhg_round(main_window)
     else:
