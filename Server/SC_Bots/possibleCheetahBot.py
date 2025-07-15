@@ -33,8 +33,7 @@ class cheetahBot(AbstractVotingBot):
         col_probs_matrix = self.global_shift(current_options_matrix)
         col_probs = [sum(col) for col in zip(*col_probs_matrix)]  # how likely everything is to pass given what they like.
         total = sum(col_probs)
-        col_probs = [val / total for val in col_probs]
-
+        if total != 0: col_probs = [val / total for val in col_probs]
 
 
         matrix = self.add_padding(col_probs_matrix)  # creates no negatives w/ a positive shift

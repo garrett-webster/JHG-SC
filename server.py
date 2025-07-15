@@ -11,7 +11,7 @@ import numpy as np
 
 OPTIONS = {
     #General settings
-    "NUM_HUMANS": 3,
+    "NUM_HUMANS": 1,
     "TOTAL_PLAYERS": 8,
     "JHG_ROUNDS_PER_SC_ROUND" : [2,3,3,3], # Number of JHG rounds to play between each social choice round
     #"JHG_ROUNDS_PER_SC_ROUND" : [1,1,1], # Number of JHG rounds to play between each social choice round

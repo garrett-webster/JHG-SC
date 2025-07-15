@@ -33,13 +33,10 @@ class Arrow:
         )
         ax.add_patch(self.arrow_patch)
 
-
-    def remove(self):
-        """
-        Removes the arrow from the canvas (axes)
-        :param ax: Matplotlib Axes object to remove the arrow from
-        """
-        if self.arrow_patch:  # Check if the arrow exists
-            self.arrow_patch.remove()  # Remove the arrow from the axes
-            self.arrow_patch = None  # Reset the reference to the arrow
-            #ax.figure.canvas.draw()  # Redraw the canvas to update the figure
+    def remove(self): #
+        if self.arrow_patch and self.arrow_patch.axes:
+            try:
+                self.arrow_patch.remove()
+            except Exception as e:
+                print(f"Failed to remove arrow: {e}")
+            self.arrow_patch = None
