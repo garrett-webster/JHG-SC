@@ -4,11 +4,8 @@ import random
 from collections import Counter
 from pathlib import Path
 import numpy as np
-from numpy.distutils.from_template import list_re
 
 from Server.Engine.geneagent3 import GeneAgent3
-
-# from Client.combinedLayout.colors import COLORS
 from Server.Node import Node
 from Server.SC_Bots.legacyBots.humanAttempt2 import humanAttempt2
 from Server.OptionGenerators.options_creation import generate_two_plus_one_groups
@@ -19,15 +16,10 @@ from Server.SC_Bots.legacyBots.somewhatMoreAwareGreedy import somewhatMoreAwaren
 from Server.SC_Bots.optimalHuman import optimalHuman
 from Server.SC_Bots.legacyBots.reorganizedHuman import reorganizedHuman
 from Server.SC_Bots.possibleCheetahBot import cheetahBot
-
 from Server.allocation_bots.socialWelfare import SocialWelfare
 from Server.allocation_bots.random import Random
 
-# lets just see if this works.
-
-
-NUM_CAUSES = 3
-
+NUM_CAUSES = 3 # if its ever not this a LOT of math breaks, so just leave it be.
 
 class Social_Choice_Sim:
     def __init__(self, total_players, num_causes, num_humans, options_generator, cycle=0, round=0, chromosomes="",
@@ -240,16 +232,6 @@ class Social_Choice_Sim:
             self.players[str(i)] += self.current_options_matrix[i][int(winning_vote)]
 
     def create_options_matrix(self):
-        # if self.sc_groups != -1:
-        #     self.current_options_matrix = generate_two_plus_one_groups_options_best_of_three(self.sc_groups)
-        # else: # so we have to generate noise to try and "mimic" the other stuff.
-        #     self.current_options_matrix = [[random.randint(-8, 8) for _ in range(self.num_causes)] for _ in range(self.total_players)]
-        #     noise_matrix = [[random.randint(-2, 2) for _ in range(self.num_causes)] for _ in range(self.total_players)]
-        #     self.current_options_matrix = [
-        #         [original + noise for original, noise in zip(row, noise_row)]
-        #         for row, noise_row in zip(self.current_options_matrix, noise_matrix)
-        #     ]
-
         self.current_options_matrix = self.options_generator.generateOptions()
         return self.current_options_matrix  # because why not
 
@@ -460,8 +442,6 @@ class Social_Choice_Sim:
 
     # default to groups being None,
     def start_round(self, options_and_peeps=None):
-        # if sc_groups != None:
-        # self.sc_groups = sc_groups
         if options_and_peeps is not None:
             self.current_options_matrix = options_and_peeps[0]
             self.peeps = options_and_peeps[1]
@@ -545,30 +525,6 @@ class Social_Choice_Sim:
         self.current_options_matrix = new_options_matrix
         self.player_nodes = self.create_player_nodes()
 
-    # def print_col_passing(self):
-    #     total = sum(self.choice_matrix)
-    #     normalized_list = [val / total for val in self.choice_matrix]
-    #     print("ratio passing ", normalized_list)
-    #
-    #     total = sum(self.all_numbers_matrix)
-    #     normalized_list = [val / total for val in self.all_numbers_matrix]
-    #     print("number distro ", normalized_list)
-    #     below_zero = sum(normalized_list[0:9])
-    #     zero = normalized_list[10]
-    #     above_zero = sum(normalized_list[11:20])
-    #     print("here are below zero ", below_zero, " here are above zero ", above_zero, " and here is zero ", zero)
-    #     #self.create_heat_map(normalized_list) # used to create a heatmap of number distro, probably deleteable.
-    #
-    #
-    # def create_heat_map(self, data):
-    #     array = np.array(data).reshape(3, 7)  # shape it however you want
-    #
-    #     # Create heatmap
-    #     plt.figure(figsize=(8, 4))
-    #     #sns.heatmap(array, annot=True, cmap="YlGnBu", cbar=True)
-    #     plt.title("Heatmap of Number Distribution")
-    #     plt.show()
-
     def use_gene_bots(self):
         num_agents = self.total_players
         popSize = 60
@@ -637,11 +593,6 @@ class Social_Choice_Sim:
             new_y = math.sin(displacement * i) * self.rad
             causes.append(Node(new_x, new_y, "CAUSE", "Cause " + str(i + 1), False))
             self.causes_rads.append(i * displacement)
-        # totally forgot I added this, but its not necessary. leaving it in in case I want to use it later.
-        # for i in range(NUM_CAUSES): #3 is the number of causes
-        #     new_x = math.cos(displacement * i) * self.rad * 2
-        #     new_y = math.sin(displacement * i) * self.rad * 2
-        #     self.outer_points.append(Node(new_x, new_y, "CAUSE", "Cause " + str(i+1), False))
 
         causes.append(Node(0, 0, "Cause", ".", False))
         return causes  # no need to return the midpoints
@@ -739,33 +690,7 @@ class Social_Choice_Sim:
             curr_y += position_y
         return curr_x, curr_y
 
-    # code for getting rid of the deadspots that we currently have. Not entirely tested; likely to have bugs.
-    # def unit_circle_coordinates_generation(self, player_id, normalized_current_options_matrix):
-    #     curr_x = 0
-    #     curr_y = 0
-    #
-    #     for cause_index in range(NUM_CAUSES):
-    #         weight = normalized_current_options_matrix[player_id][cause_index]
-    #         base_x, base_y = self.causes[cause_index].get_x(), self.causes[cause_index].get_y()
-    #
-    #         # Normalize the cause vector
-    #         length = math.sqrt(base_x ** 2 + base_y ** 2)
-    #         if length == 0:
-    #             continue  # Avoid division by zero
-    #
-    #         # Use the magnitude of the weight directly to scale outward
-    #         norm_x = base_x / length
-    #         norm_y = base_y / length
-    #
-    #         curr_x += norm_x * weight * self.rad
-    #         curr_y += norm_y * weight * self.rad
-    #
-    #         magnitude = math.sqrt(curr_x ** 2 + curr_y ** 2)
-    #         if magnitude > 10:
-    #             curr_x = (curr_x / magnitude) * 5
-    #             curr_y = (curr_y / magnitude) * 5
-    #
-    #     return curr_x, curr_y
+
 
     def normal_vector_generation(self, player_id, normalized_current_options_matrix, cause_index):
         curr_x = 0
@@ -805,7 +730,7 @@ class Social_Choice_Sim:
                 normalized_row = [x / total for x in adjusted_row]
             choice_list = [choice_list[i] + normalized_row[i] for i in range(len(choice_list))]
         total = sum(choice_list)
-        choice_list = [val / total for val in choice_list]
+        if total != 0: choice_list = [val / total for val in choice_list]
         return choice_list
 
     def get_winning_probabilities(self):

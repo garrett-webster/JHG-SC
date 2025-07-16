@@ -42,8 +42,6 @@ class SCHistoryGrid(SCGrid):
         super().update_grid(one_idx_votes, utilities)
         winning_vote = get_winning_vote(votes)
 
-        print("this is the winning vote ", winning_vote)
-
         # Color the labels for each player coinciding with the winning vote. Green if that cause has positive utility
         # for that player, red if it has negative utility for the player, and white if it is zero. Also resets the labels
         # for every other cause to white

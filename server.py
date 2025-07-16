@@ -13,7 +13,7 @@ OPTIONS = {
     #General settings
     "NUM_HUMANS": 0, # utterly fetched but can I run this headless
     "TOTAL_PLAYERS": 8,
-    "JHG_ROUNDS_PER_SC_ROUND" : [2,2], # Number of JHG rounds to play between each social choice round
+    "JHG_ROUNDS_PER_SC_ROUND" : [2,2,2,2,2,2,2,2,2,2,2,2,2,2], # Number of JHG rounds to play between each social choice round
     #"JHG_ROUNDS_PER_SC_ROUND" : [1,1,1], # Number of JHG rounds to play between each social choice round
     "SC_GROUP_OPTION": 0, # See options_creation.py -> group_size_options to understand what this means
     "SC_VOTE_CYCLES": 3, # Number of cycles to play each social choice round. Players will vote this many times, with the nth vote being final.
@@ -82,13 +82,8 @@ class Server():
     def play_game(self):
         # Main game loop -- Play as many rounds as specified in OPTIONS
 
-        # add this code in at some point - current implementation only works for less than 10 rounds.
-        # sc_rounds = round_list[list_index][-1] == "*"
-        # curr_round = int(round_list[list_index][:-1])
         curr_sc_round = 0
-        print("Yo are we entering this thing ")
         for i, list_index in enumerate(self.rounds_list):
-            print("this is teh list index ", list_index, " and this is i, ", i)
             is_last_jhg_round = False
             curr_round = int(list_index[:-1]) # yeah something like that
             curr_logger_round = curr_round
@@ -97,7 +92,6 @@ class Server():
             self.current_logger.save_jhg_round(curr_round, curr_logger_round)
             # THEN DECIDE IF YOU NEED TO RUN AN SC ROUND.
             if list_index[-1] == "*": # if we have a star in there, run an SC round.
-                print("RUNNING AN SC ROUND MAYBE ", list_index)
                 if self.player_allocations:
                     peeps, total_order_index = self.generate_peeps(self.total_order, self.JHG_manager, self.SC_manager)
                     influence_matrix = self.JHG_manager.get_influence_matrix()
@@ -109,10 +103,9 @@ class Server():
                 self.current_logger.save_sc_round(curr_sc_round, curr_logger_round)
                 curr_sc_round += 1 # WHEE.
 
-
+        # https://www.youtube.com/watch?v=FU0dOV2gSts
         self.current_logger.create_big_boy_graphs(len(self.rounds_list), 0)
         self.current_logger.gather_ending_deets(0) # so the logger has been mad adjusted to work with other stuff, just trust me.
-
         self.current_logger.actually_close_the_thing("I'mNotLikeTheOtherLogs") # pick me log
         print("game over")
 
@@ -121,7 +114,6 @@ class Server():
         total = sum(popularity_array)
         # this is easy bc this will always be positive
         normalized_popularity_array = [val / total for val in popularity_array]
-        # THIS IS WORSE.
         utilities_array = sc_manager.sc_sim.results_sums
         global_shift = min(0, min(utilities_array))
         # shift everything over. subtract bc its either 0 or a negative number.
