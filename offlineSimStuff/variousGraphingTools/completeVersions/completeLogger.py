@@ -72,6 +72,14 @@ class CompleteLogger():
         jhg_bot_types = self.jhg_sim.get_bot_types()
         return jhg_bot_types, sc_bot_types, allocation_bot_types
 
+    def get_bot_types_from_json(self, dict):
+        first_key = next(iter(dict))
+        sc_bot_types = dict["SC_CONCLUSION"]["0"]["bot_type"]
+        allocation_bot_types = dict["SC_CONCLUSION"]["0"]["alloc_bot_type"]
+        jhg_bot_types = dict["JHG_CONCLUSION"]["0"]["bot_types"]
+        return jhg_bot_types, sc_bot_types, allocation_bot_types
+
+
     def get_coop_data(self):
         return self.big_boy_data["CONCLUSION"]["SC_CONCLUSION"]
 
@@ -84,6 +92,12 @@ class CompleteLogger():
         avg_utility_per_round, utility_per_player_per_round = self.extract_data_from_dict(self.long_term_data["avg_utility"])
         return avg_pop_per_round, per_player_per_round, avg_utility_per_round, utility_per_player_per_round
 
+    def get_long_term_stats_from_dict(self, dict):
+        first_key = next(iter(dict))  # get first key dynamically
+        avg_pop_per_round, per_player_per_round = self.extract_data_from_dict(dict[first_key]["avg_pops"])
+        avg_utility_per_round, utility_per_player_per_round = self.extract_data_from_dict(dict[first_key]["avg_utility"])
+        return avg_pop_per_round, per_player_per_round, avg_utility_per_round, utility_per_player_per_round
+
 
     # so I realized that I was treating the popualrity and the utility exactly the same, so I was like "wait I can use the same function"
     # so here is a funciton that when given the data, will make the avg_per_round and avg_per_round_per_player
@@ -94,10 +108,15 @@ class CompleteLogger():
         num_attempts = len(data[first_key])
 
         sums_per_player = [[0 for _ in range(num_rounds)] for _ in range(num_players)]  # makes a 2d list
-        for round in data:
-            for attempt in data[round]:
+        # this is because sometimes when the json writes, it writes an oopsie that doesn't map the keys in order.
+        round_keys = sorted(data.keys(), key=lambda x: int(x))
+        round_index_map = {key: idx for idx, key in enumerate(round_keys)}
+
+        for round_key in data:
+            round_index = round_index_map[round_key]
+            for attempt in data[round_key]:
                 for i, player in enumerate(attempt):
-                    sums_per_player[i][round] += player  # maybe?
+                    sums_per_player[i][round_index] += player
 
         # now I need to normalize by attempts
         for i, score_list in enumerate(sums_per_player):
@@ -133,11 +152,7 @@ class CompleteLogger():
 
     def create_big_boy_graphs(self, max_rounds, offset):
         for i in range(max_rounds, 1, -1):
-            print("this is the i ", i)
             curr_round = max_rounds - i # this way we start at 0 and work our way up
-            print("and this is the curr_round ", curr_round)
-            if i == 4:
-                pass
 
             if "SC_STUFF" in self.big_boy_data[curr_round + offset]:
                 sc_round = self.big_boy_data[curr_round]["SC_STUFF"]["curr_round"] # saves the current SC round in the fetcher. (Creates a comprehensible dictinoary)

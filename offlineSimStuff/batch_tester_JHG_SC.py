@@ -198,7 +198,7 @@ if __name__ == "__main__":
     jhg_bot_type = 0 # lets try using the socialwelfare stuff.
     total_order = create_total_order(num_players, num_humans)
    # num_attempts = 1000 # we are going to run this twice.
-    num_attempts = 1000
+    num_attempts = 100
     num_rounds = len(round_list)
     current_logger = CompleteLogger()
 
@@ -211,5 +211,6 @@ if __name__ == "__main__":
         sc_sim, jhg_sim, current_logger = run_trial(current_sc_sim, current_jhg_sim, round_list, attempt, num_cycles, create_graphs, group, total_order, create_influence, current_logger)
         current_logger.create_big_boy_graphs(num_rounds, num_rounds * attempt) # num rounds is self expanatory, the num_rounds*i tells me which round we are on in the logger. (kind of).
 
+    current_logger.actually_close_the_thing("Sizable_inventory")
     if graph_everything:
         graph_longterm(current_logger)

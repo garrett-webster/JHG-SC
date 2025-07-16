@@ -18,6 +18,7 @@ from matplotlib.colors import to_rgba
 from matplotlib.colors import LinearSegmentedColormap, Normalize
 import json
 
+from offlineSimStuff.variousGraphingTools.completeVersions.completeLogger import CompleteLogger
 
 
 class CompleteGrapher():
@@ -476,6 +477,17 @@ class CompleteGrapher():
         cooperation_score, number_of_attempts = self.get_coop_score(current_logger)
         self.draw_two_long_graphs(avg_pop_per_round, per_player_per_round, avg_utility_per_round, utility_per_player_per_round, jhg_bot_type, sc_bot_type, allocation_bot_types, cooperation_score, number_of_attempts)
 
+    def draw_long_term_graphs_given_file(self, file_path):
+        with open(file_path, "r") as f:
+            data = json.load(f)
+        dict_to_pass = data["CONCLUSION"]["LONG_TERM_DATA"]
+        complete_logger = CompleteLogger()
+        avg_pop_per_round, per_player_per_round, avg_utility_per_round, utility_per_player_per_round = complete_logger.get_long_term_stats_from_dict(dict_to_pass)
+        jhg_bot_type, sc_bot_type, allocation_bot_types = complete_logger.get_bot_types_from_json(data["CONCLUSION"])
+        cooperation_score, number_of_attempts = self.get_coop_score_from_file(data)
+        self.draw_two_long_graphs(avg_pop_per_round, per_player_per_round, avg_utility_per_round,
+                                  utility_per_player_per_round, jhg_bot_type, sc_bot_type, allocation_bot_types,
+                                  cooperation_score, number_of_attempts)
 
     def draw_two_long_graphs(self, avg_pop_per_round, per_player_per_round, avg_utility_per_round, utility_per_player_per_round, jhg_bot_type, sc_bot_type, allocation_bot_types, cooperation_score, number_of_attempts):
 
@@ -622,6 +634,15 @@ class CompleteGrapher():
 
     def get_coop_score(self, current_logger):
         new_dict = current_logger.get_coop_data()
+        new_sum = 0
+        new_dict_keys = new_dict.keys()
+        for attempt in new_dict_keys:
+            new_sum += new_dict[attempt]["cooperation_score"]
+        new_sum = new_sum / len(new_dict_keys)
+        return new_sum, len(new_dict_keys)
+
+    def get_coop_score_from_file(self, data):
+        new_dict = data["CONCLUSION"]["SC_CONCLUSION"]
         new_sum = 0
         new_dict_keys = new_dict.keys()
         for attempt in new_dict_keys:
