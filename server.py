@@ -11,9 +11,9 @@ import numpy as np
 
 OPTIONS = {
     #General settings
-    "NUM_HUMANS": 1,
+    "NUM_HUMANS": 0, # utterly fetched but can I run this headless
     "TOTAL_PLAYERS": 8,
-    "JHG_ROUNDS_PER_SC_ROUND" : [2,3,3,3], # Number of JHG rounds to play between each social choice round
+    "JHG_ROUNDS_PER_SC_ROUND" : [2,2], # Number of JHG rounds to play between each social choice round
     #"JHG_ROUNDS_PER_SC_ROUND" : [1,1,1], # Number of JHG rounds to play between each social choice round
     "SC_GROUP_OPTION": 0, # See options_creation.py -> group_size_options to understand what this means
     "SC_VOTE_CYCLES": 3, # Number of cycles to play each social choice round. Players will vote this many times, with the nth vote being final.
@@ -110,8 +110,10 @@ class Server():
                 curr_sc_round += 1 # WHEE.
 
 
+        self.current_logger.create_big_boy_graphs(len(self.rounds_list), 0)
+        self.current_logger.gather_ending_deets(0) # so the logger has been mad adjusted to work with other stuff, just trust me.
 
-        self.current_logger.gather_ending_deets("HumanResultsTime")
+        self.current_logger.actually_close_the_thing("I'mNotLikeTheOtherLogs") # pick me log
         print("game over")
 
     def generate_peeps(self, total_order, jhg_manager, sc_manager):

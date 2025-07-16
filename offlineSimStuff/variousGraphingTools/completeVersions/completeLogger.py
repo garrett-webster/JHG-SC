@@ -132,8 +132,12 @@ class CompleteLogger():
         return long_term_data
 
     def create_big_boy_graphs(self, max_rounds, offset):
-        for i in range(max_rounds, 0, -1):
+        for i in range(max_rounds, 1, -1):
+            print("this is the i ", i)
             curr_round = max_rounds - i # this way we start at 0 and work our way up
+            print("and this is the curr_round ", curr_round)
+            if i == 4:
+                pass
 
             if "SC_STUFF" in self.big_boy_data[curr_round + offset]:
                 sc_round = self.big_boy_data[curr_round]["SC_STUFF"]["curr_round"] # saves the current SC round in the fetcher. (Creates a comprehensible dictinoary)
