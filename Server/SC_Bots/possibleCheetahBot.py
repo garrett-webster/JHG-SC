@@ -41,7 +41,7 @@ class cheetahBot(AbstractVotingBot):
 
         choice_list, choice_matrix = self.create_choice_matrix(current_options_matrix)
         total = sum(choice_list)
-        choice_list = [val / total for val in choice_list]
+        if total != 0: choice_list = [val / total for val in choice_list]
         #print("this is the col probs ", col_probs, "\nand this is the choice ", choice_matrix)
         cause_sums = None  # used for generating bayseian prior - otherwise alwyas have col sums
         # print("these are the col probs", col_probs)
@@ -261,7 +261,7 @@ class cheetahBot(AbstractVotingBot):
             shift = max(-min(row), 0)
             row = [var + shift for var in row]
             total = sum(row)
-            row = [var / total for var in row]
+            if total != 0: row = [var / total for var in row]
             for index in range(len(row)):
                 scores[index] += row[index]
 
