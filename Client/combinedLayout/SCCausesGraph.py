@@ -155,6 +155,9 @@ class SCCausesGraph(QWidget):
 
             self.nodes_ax.set_aspect('equal', adjustable='box')
 
+            # just in case. this is already happening under allocations, but in case we off toggle I wan tot make sure the update is still getting over here.
+            self.nodes_ax.autoscale_view()  # lets see if this helps at all.
+
             # Redraw the canvas
             self.nodes_canvas.draw()
 
@@ -280,6 +283,10 @@ class SCCausesGraph(QWidget):
         self.nodes_ax.set_ylim(-max_range, max_range)
 
         self.nodes_ax.set_aspect('equal', adjustable='box')
+
+        # this right here should reset the graph limits so that way everythign doesn't blow up every time. # Add more explanation later.
+
+        self.nodes_ax.autoscale_view()  # lets see if this helps at all.
 
         # Redraw the canvas
         self.nodes_canvas.draw()
