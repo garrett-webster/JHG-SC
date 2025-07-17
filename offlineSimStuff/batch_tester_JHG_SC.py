@@ -175,7 +175,7 @@ def graph_longterm(current_logger):
 if __name__ == "__main__":
 
     #jhg_games_per_sc_round = [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
-    jhg_games_per_sc_round = [4,3,3,3,3,3]#,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,2]
+    jhg_games_per_sc_round = [4,3,3]#,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,2]
     #jhg_games_per_sc_round = [1,1,1]
 
 
@@ -183,12 +183,11 @@ if __name__ == "__main__":
     num_cycles = 3
     num_players = 9
     num_humans = 0
-    tokens_per_player = 4
+    tokens_per_player = 2
     utility_per_player = 3
-    create_graphs = False
+    create_graphs = True
     graph_everything = True
     create_influence = True
-    total_groups = ["", 0, 1, 2]
     chromosomes_directory = "testChromosome"
     group = ""
     # these paths are relative to the file location, so as long as you don't move the file it can and will run from anywhere.
@@ -198,7 +197,7 @@ if __name__ == "__main__":
     jhg_bot_type = 0 # lets try using the socialwelfare stuff.
     total_order = create_total_order(num_players, num_humans)
    # num_attempts = 1000 # we are going to run this twice.
-    num_attempts = 100
+    num_attempts = 1
     num_rounds = len(round_list)
     current_logger = CompleteLogger()
 

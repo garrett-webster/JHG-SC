@@ -23,7 +23,7 @@ NUM_CAUSES = 3 # if its ever not this a LOT of math breaks, so just leave it be.
 
 class Social_Choice_Sim:
     def __init__(self, total_players, num_causes, num_humans, options_generator, cycle=0, round=0, chromosomes="",
-                 scenario="", group="", total_order=None, allocation_scenario="", utility_per_player=3):
+                 scenario="", group="", total_order=None, allocation_scenario="", utility_per_player=3, make_bots=True):
         self.options_generator = options_generator
         if total_order == None:  # generating it non server side
             self.total_order = self.create_total_order(total_players, num_humans)
@@ -46,6 +46,7 @@ class Social_Choice_Sim:
         self.causes = self.create_cause_nodes()  # graphing stuff.
 
         self.player_nodes = []  # also graphing stuff.
+        self.bot_type = self.set_bot_list(scenario)
 
         self.chromosome_string = ""  # holds the file name of the chromosome baering file.
         self.chromosomes = self.set_chromosomes(
@@ -57,12 +58,15 @@ class Social_Choice_Sim:
         # create the bots, first getting number and type from scenario and then setting the chromosomes from the chromsomes.
         self.bot_type = self.set_bot_list(scenario)
         self.allocation_bot_type = self.set_bot_list(allocation_scenario)
-        self.bots = self.create_bots(self.total_order)  # make sure to pull this from the right spot.
-        self.allocation_bots = self.create_allocation_bots(self.total_order) # old code, want to try something new
-        #self.allocation_bots = self.use_gene_bots()
+        #self.bots = self.create_bots(self.total_order)  # make sure to pull this from the right spot.
+        self.bots = self.use_gene_bots() # the hope is that I just use all of em and call it a day.
+        #self.allocation_bots = self.create_allocation_bots(self.total_order) # old code, want to try something new
+        self.allocation_bots = self.use_gene_bots()
         self.bot_list_as_string = self.create_bot_list_as_string(self.bots)
         # self.allocation_bot_list_as_string = self.create_bot_list_as_string(self.allocation_bots)
-        self.set_bot_chromosomes(self.chromosomes)  # no chromosomes for allocaiton bots.
+        ## turn this one back one when you are not using the Gene3 agent bots, as those are initalized with chromosomes.
+        # self.set_bot_chromosomes(self.chromosomes)  # no chromosomes for allocaiton bots.
+        self.total_types = self.create_total_types()
 
         # group stuff - all used under set group, and then there are defualts just in case.
         self.group = -1  # doesn't exist, let me know it hasn't been set.
@@ -79,7 +83,7 @@ class Social_Choice_Sim:
         self.num_rounds = 0  # used in various spots for graphing and whatnot. not terribly important.
         self.current_results = []  # holds the results from the last "return win" call, which we can access later.
         self.results = self.create_results()  # dict key: player id, attribute: list of all utility changes per round.
-        self.total_types = self.create_total_types()  # holds EVERYONE. now we gotta do a significant amount of refactoring.
+          # holds EVERYONE. now we gotta do a significant amount of refactoring.
         self.choice_matrix = [0] * (self.num_causes + 1)
         self.last_option = 0
         # self.all_numbers_matrix = [0] * 21
@@ -96,6 +100,11 @@ class Social_Choice_Sim:
         # self.v = [[0 for _ in range(total_players)] for _ in range(total_players)]  # represents the change in utility at that round.
         self.peeps = None  # just so we have it around
         self.new_v = None
+        self.extra_data = {
+            i: {
+                j: None for j in range(len(total_order))
+            } for i in range(len(total_order))
+        }
 
     def create_total_order(self, total_players, num_humans):
         num_bots = total_players - num_humans
@@ -214,6 +223,13 @@ class Social_Choice_Sim:
 
         return new_bot  # the matched bot that we were looking for.
 
+    # ovverides the other bots to make sure that I can use the same bot for both - important for the genetic algorithm.
+    def bot_ovveride(self, bots):
+        self.bots = bots
+        self.allocation_bots = bots
+        self.total_types = self.create_total_types() # make this cause we need it now
+
+
     def create_players(self):
         players = {}
         for i in range(self.total_players):
@@ -290,9 +306,15 @@ class Social_Choice_Sim:
 
         bot_votes = {}
         final_votes = None
+        extra_data = {""}
         for i, bot in enumerate(self.bots):
             # print("this is the bot id ", bot.self_id, " an dthis is the i index ", i)
-            final_votes = bot.get_vote(self.current_options_matrix, previous_votes, cycle, max_cycle)
+            if isinstance(bot, GeneAgent3):
+                # ok what the FETCH should received be. I think just its list in V is probably the way to go.
+                recieved = np.array([0 for _ in range(len(self.total_order))]) if self.new_v is None else self.new_v[i] # gotta figure out if we HAVE recieved anything yet. could use a round=0check.
+                final_votes = bot.get_vote(i, round, recieved, self.results_sums, np.array(self.I[round]), extra_data, self.current_options_matrix)
+            else:
+                final_votes = bot.get_vote(self.current_options_matrix, previous_votes, cycle, max_cycle)
             all_votes[bot_indexes.pop(0)] = final_votes
 
         self.final_votes = all_votes
@@ -336,14 +358,13 @@ class Social_Choice_Sim:
 
         # creates the new utilty effort matrix based on the actual votes. Doesn't matter what actually won, just what you voted for in the end.
         new_v = []
-        current_options_matrix_columns = columns = list(zip(*self.current_options_matrix))  # get the columns.
+        current_options_matrix_columns = list(zip(*self.current_options_matrix))  # get the columns.
         for plyr_idx in range(self.total_players):
             if all_votes[plyr_idx] == -1:
                 new_v.append([0 for _ in range(
                     self.total_players)])  # if abstain, 0's across the board. probably. I might rework this later.
             else:
-                new_v.append(current_options_matrix_columns[
-                                 all_votes[plyr_idx]])  # add the column of what they did to the new v.
+                new_v.append(current_options_matrix_columns[all_votes[plyr_idx]])  # add the column of what they did to the new v.
 
         self.new_v = new_v
         self.calculate_influence_matrix(new_v, self.round)

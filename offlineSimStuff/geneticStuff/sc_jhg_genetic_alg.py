@@ -1,14 +1,20 @@
-import copy
 
 from Server.Engine.engine import JHGEngine
 from Server.Engine.geneagent3 import GeneAgent3
 from Server.Engine.baseagent import AbstractAgent
+from Server.OptionGenerators.generators import generator_factory # i don't like him
 from dataclasses import dataclass
 import random
 import csv # WHEEE. make sure this doesn't leak over the client or server otherwise I have to update the venv on the chromebooks.
 import os
 import math
 import numpy as np
+
+from Server.sim_interface import JHG_simulator # using the sim instead of the engine. is it a bad idea? yeah. Am I doing it anyway? yeah.
+from Server.social_choice_sim import Social_Choice_Sim
+from offlineSimStuff.batch_tester_JHG_SC import determine_rounds
+
+
 
 """
 Genetic algorithm from C++ ijacai paper for training Gene3 agents in the Junior high test bed. this is the Python reference 
@@ -21,17 +27,17 @@ understand how this functinos before I use it myself.
 
 @dataclass # because python doesn't support dedicated new stucts the way C++ does. I could have built a custom class, but this seemed lighterweight and better addapted.
 class PopularityMetrics:
-    avePop: float
-    endPop: float
-    relPop: float
+    avgUtility: float
+    endUtility: float
+    relUtility: float
 
 # ok so for our purposes this is almost always going to be 100. there are other things we CAN do but we are most interested in the initial 100 testbed.
-def definiteInitialPopularities(initPopType, numPlayers, initialPopularities):
+def definteInitialUtility(initPopType, numPlayers, initialPopularities):
     # see its not gonna tell you this but you are going to need to return initial Popularities here
-    basePop = 100.0
+    basePop = 10.0
     if (initPopType == "random"):
         for i in range(numPlayers):
-            initialPopularities[i] = (random.randint(0, 199)) + 1.0
+            initialPopularities[i] = (random.randint(0, 19)) + 1.0
     elif initPopType == "equal":
         for i in range(numPlayers):
             initialPopularities[i] = basePop
@@ -45,9 +51,9 @@ def definiteInitialPopularities(initPopType, numPlayers, initialPopularities):
         initialPopularities = shuffle(initialPopularities, numPlayers)
     elif initPopType == "highlow":
         for i in range(int(math.floor(numPlayers / 2))):
-            initialPopularities[i] = 1.0 + random.randint(0, 49) + 150
+            initialPopularities[i] = 1.0 + random.randint(0, 5) + 15
         for i in range(int(math.ceil(numPlayers / 2)), numPlayers):
-            initialPopularities[i] = 1.0 + random.randint(0, 49)
+            initialPopularities[i] = 1.0 + random.randint(0, 5)
         initialPopularities = shuffle(initialPopularities, numPlayers)
     else:
         print("don't udnerstand input, going with equal ")
@@ -81,11 +87,81 @@ def shuffle(initialPopularities, numPlayers):
         initialPopularities[n2] = tmp
     return initialPopularities
 
+# this is the one we have to absolutely massacre to make sure this works the way that we want it to.
 
-def playGame(agents, numPlayers, numRounds, gener, gamer, initialPopularities, povertyLine, forcedRandom):
+def make_sims():
+    total_order = create_total_order(0, numPlayers)
+    jhg_bot_type = 0  # doesn't really matter, will also be doing a bot override.
+    cycle = -1
+    curr_round = -1
+    num_causes = 3
+    scenario = ""
+    chromosomes = ""
+    allocation_bot_type = ""
+    group = ""
+    utility_per_player = 3
+    alpha = 0.2  # double check these magical fetchers when you get the chance actually.
+    beta = 0.5
+    give = 1.3
+    keep = 0.95
+    steal = 1.6
+    base_pop = 100
+    poverty_line = povertyLine
+    game_params = {
+        "alpha": alpha,
+        "beta": beta,
+        "keep": keep,
+        "give": steal,
+        "steal": steal,
+        "poverty_line": poverty_line,
+    }
+    generator = generator_factory(2, numPlayers, 5, -10, 10, 3, None, None)
+    jhg_engine = JHGEngine(alpha, beta, give, keep, steal, numPlayers, base_pop, povertyLine)
+    sc_sim = Social_Choice_Sim(numPlayers, num_causes, 0, generator, cycle, curr_round, chromosomes, scenario, group,
+                               total_order, allocation_bot_type, utility_per_player, False)
+    return jhg_engine, sc_sim, total_order
+
+def run_sc_gen_stuff(agents, jhg_engine, sc_sim, total_order, curr_round, num_cycles):
+    possible_peeps, indexes = generate_peeps(total_order, jhg_engine.get_popularity(), sc_sim)
+    influence_matrix = jhg_engine.get_influence()
+    current_options_matrix, peeps = sc_sim.let_others_create_options_matrix(possible_peeps.tolist(), influence_matrix,
+                                                                            curr_round)  # actually creates the matrix
+    sc_sim.start_round((current_options_matrix, indexes))
+    bot_votes = {}
+    extra_data = {
+        i: {
+            j: None for j in range(len(total_order))
+        } for i in range(len(total_order))
+    }
+    for cycle in range(num_cycles):
+        bot_votes[cycle] = []
+        received = sc_sim.new_v[curr_round]
+        for agent in range(len(agents)):
+            bot_votes[cycle].append(agents[agent].get_vote(agent, curr_round, received, sc_sim.results_sums, sc_sim.I, extra_data, current_options_matrix))
+        sc_sim.record_votes(bot_votes[cycle], cycle) # important for logging individual games, can likely be disregarded here
+
+    # make sure that this happens IMMEDIATELY afterward.
+    winning_vote, round_results = sc_sim.return_win(bot_votes[num_cycles - 1])  # we need this to run, even if we don't need the results HERE per se
+    sc_sim.save_results()
+    # ok so what do I actually
+    # what doe I need to
+    return sc_sim.current_results(), sc_sim.results_sums # so we have the change in utility and overall utility
+
+def run_jhg_gen_stuff(jhg_engine, curr_round, agents):
+    received = [0.0 for _ in range(numPlayers)]  # C++ really needs to allocate memeory before hadn
+    transactions = [0 for _ in range(numPlayers)]  # so this is how I replilcate it in python.
+
+    for i in range(numPlayers):
+        for j in range(numPlayers):
+            received[j] = np.array(jhg_engine.T[curr_round][j][i])
+        transactions[i] = agents[i].play_round(i, curr_round, received, jhg_engine.P[curr_round], jhg_engine.I[curr_round], transactions[i])
+    jhg_engine.apply_transaction(transactions) # thanks references
+
+def playGame(agents, numPlayers, numRounds, gener, gamer, initialPopularities, povertyLine, forcedRandom, rounds_list):
     # for this one, reference defs.h in the C++ code. most of these are hard coded into the engine and this is just tranfering them over.
     # they might get set to different values in the engine, but i wan this engine to be consistent with other engines.
     # so for now just accept the magic numbers and we will move on with our day
+    num_cycles = 3
     alpha = 0.2 # double check these magical fetchers when you get the chance actually.
     beta = 0.5
     give = 1.3
@@ -106,7 +182,6 @@ def playGame(agents, numPlayers, numRounds, gener, gamer, initialPopularities, p
         # IDK what post contract does, only seems to be relevant in the coop bots and I am not interesteed in them atm rn.
 
 
-    numToknes = 2 * numPlayers # not actuall necessary as the numTokens is already built into the bots.
     received = [0.0 for _ in range(numPlayers)] # C++ really needs to allocate memeory before hadn
     transactions = [0 for _ in range(numPlayers)] # so this is how I replilcate it in python.
 
@@ -114,37 +189,66 @@ def playGame(agents, numPlayers, numRounds, gener, gamer, initialPopularities, p
         transactions[i] = [0 for _ in range(numPlayers)]
 
     # they hard lean into initalizing arrays of type class and then filling them later, which is weird to replicate in python
-    pmetrics = [PopularityMetrics(avePop=0, endPop=0, relPop=0) for _ in range(numPlayers)]
+    pmetrics = [PopularityMetrics(avgUtility=0, endUtility=0, relUtility=0) for _ in range(numPlayers)]
     # actually I can skip the next step because its just setting it up, yay for python one line loops.
 
-    extra_data = {} # literally no clue as to why this is useful, but filling it with None seems to do the trick.
-    for player in range(numPlayers): # could help maybe.
-        extra_data[player] = None
 
-    # create a new JHG sim, so everything happens within the same sim
-    jhg_sim = JHGEngine(alpha, beta, give, keep, steal, numPlayers, base_pop, povertyLine)
-    for r in range(numRounds):
-        for i in range(numPlayers):
-            for j in range(numPlayers):
-                received[j] = np.array(jhg_sim.T[r][j][i]) # ???
-            #agents[i].play_round(numPlayers, numToknes, i, r, received, jhg_sim.P[r], jhg_sim.I[r], transactions[i])
-            transactions[i] = agents[i].play_round(i, r, received, jhg_sim.P[r], jhg_sim.I[r], transactions[i]) # ?? still don't know what the "extra data" is. might be transcations?
-        jhg_sim.apply_transaction(transactions) # applies the round, this is where we learn
+    # make the new sims, and then override the bots that they have in them.
+    ## TODO: make a reset function that allows us to not have to make new sims everytime and lets us recycle them.
+    # the SC sim is especially heavy in terms of initalization.
+    jhg_engine, sc_sim, total_order = make_sims()
+    sc_sim.bot_ovveride(agents)
+    sc_sim.set_group("")
+    played_sc = False
+    played_jhg = False
+    influence_matrix = None
+    curr_sc_round = 0
+    for list_index in range(0, len(rounds_list)):
+        # pick individuals to put into the gene pools.
+        for i in range(agentsPerGame):
+            plyrIdxs[i] = random.randint(0, popSize - 1)
+            agents[i] = theGenePools[plyrIdxs[i]]
 
-        for i in range(numPlayers): # how much have we increased overall and in this round
-            pmetrics[i].avePop += jhg_sim.P[jhg_sim.t][i] / numRounds
-            pmetrics[i].endPop = jhg_sim.P[jhg_sim.t][i]
+        sc_rounds = rounds_list[list_index][-1] == "*"
+        curr_round = int(rounds_list[list_index][:-1])  # yeah something like that
+        run_jhg_gen_stuff(jhg_engine, curr_round, agents)
 
-    # this is where we dould record stuff under the game logs, not sure if I wnat to do that yet.
-    # you know what, why not.
-    filename = "../Results/theGameLogs/log_" + str(gener) + "_" + str(gamer) + ".csv"
-    #jhg_sim.save(filename) # haven't actually bothered to write this yet.
+        if sc_rounds:
+            changeUtility, overallUtility = run_sc_gen_stuff(agents, jhg_engine, sc_sim, total_order, curr_round, num_cycles)
 
-    transactions = None # looks different than the C++ code, thats becuase garbage collection is a jerk.
-    received = None
-    jhg_sim = None
+            for i in range(numPlayers):
+                pmetrics[i].avgUtility += changeUtility[i]
+                pmetrics[i].endUtility = overallUtility[i]
 
     return pmetrics # returns out data type
+
+# this might POOP poop the bed, pretty sure it was written with managers in mind rather than the sims, so we shall see.
+def generate_peeps(total_order, jhg_pops, sc_sim):
+    popularity_array = jhg_pops  # huh
+    total = sum(popularity_array)
+    # this is easy bc this will always be positive
+    normalized_popularity_array = [val / total for val in popularity_array]
+    # THIS IS WORSE.
+    utilities_array = sc_sim.results_sums
+    global_shift = min(0, min(utilities_array))
+    # shift everything over. subtract bc its either 0 or a negative number.
+    utilities_array = [val - global_shift for val in utilities_array]
+    total = sum(utilities_array)  # yeah override this why not.
+    normalized_utility_array = [val / total if total != 0 else 1 / len(total_order) for val in utilities_array]
+    # new goal -- figure out how zip works
+    overall_probability_array = [(p + u) / 2 for p, u in zip(normalized_popularity_array, normalized_utility_array)]
+    probabilities = np.array(overall_probability_array)
+    new_world_order = np.array(total_order)
+    # shoudl pull without replacement from total order using the overall probability array, gives 3 choies without replacement.
+    new_peeps = np.random.choice(new_world_order, p=probabilities, size=3, replace=False)
+    indexes = peeps_to_total_order(new_peeps, total_order)
+    return new_peeps, indexes
+
+def peeps_to_total_order(peeps, total_order):
+    indexes = []
+    for peep in peeps:
+        indexes.append(total_order.index(peep)+1)
+    return indexes
 
 # writes the stuff so we can access it later when we want it.
 def write_generational_results(theGenePools, popSize, gen, agentsPerGame):
@@ -260,6 +364,17 @@ def deleteGenePool(theGenePools, popSize):
     return theGenePools
 
 
+def create_total_order(total_players, num_humans):
+    total_order = []
+    num_bots = total_players - num_humans
+    total_order = []
+    for bot in range(num_bots):
+        total_order.append("B" + str(bot))
+    for human in range(num_humans):
+        total_order.append("P" + str(human))
+    return total_order
+
+
 if __name__ == "__main__":
     ## -- INIT STUFF , didn't feel like using the command line everytime, thats on me. heres' the init and all explanation -- ##
     #// - run the code: ./jhgsim(0) evolve(1) ../Results/theGenerations(2) 100(3) 3(4) 0(5) 100(6) 100(7) 10(8) 30(9) 0(10) basicConfig(11) varied(12)
@@ -279,18 +394,22 @@ if __name__ == "__main__":
     configFile = "basicConfig" # trains with just cab agents, no assasains.
     initPops = "varied" # starts eveyrone at different initial popularities when training.
     tokens_per_player = 2 # probably best if I just reduce this back to whatever. (Added by me just in case we wanted to be silly)
-
+    num_humans = 0 # we discriminate in this fetcher
 
     # should initialize this fetcher
     theGenePools = [GeneAgent3("", numGeneGopies, tokens_per_player) for _ in range(popSize)] # don't let this be empty
 
     numPlayers = agentsPerGame + 0 # could put gocnifutred players.size but that si currently empty and I couldn't care less.
     maxPlayers = numPlayers
-    possible_init_pops = ["equal", "random", "step", "power", "highlow"]
-    initPopularities = [0.0 for _ in range(numPlayers)]
-    initRelativePops = [0.0 for _ in range(numPlayers)]
+
     plyrIdxs = [0 for _ in range(numPlayers)]
-    agents = [AbstractAgent() for _ in range(popSize)] # unfortunately this DOES seem to be the best way to do this in python.
+    possible_init_pops = ["equal", "random", "step", "power", "highlow"]
+    initUtilities = [0.0 for _ in range(numPlayers)]
+    initRelativeUtilities = [0.0 for _ in range(numPlayers)]
+    agents = [AbstractAgent() for _ in range(popSize)]  # the fetchers we will be training
+
+    jhg_games_per_round = [4,3,3] # just give me an easy place to start.
+    rounds_list = determine_rounds(jhg_games_per_round)
 
     for gen in range(num_gens): # however many generations we want
         for game in range(games_per_gen): # however many games we want per generation
@@ -306,26 +425,26 @@ if __name__ == "__main__":
                 sel = random.randint(0, 4)
             else:
                 sel = 0
-            initialPopularites = definiteInitialPopularities(possible_init_pops[sel], numPlayers, initPopularities)
+            # this should be all 10's after the first run
+            initUtilities = definteInitialUtility(possible_init_pops[sel], numPlayers, initUtilities)
 
             s = 0
             for i in range(numPlayers):
-                s += initialPopularites[i]
+                s += initUtilities[i]
 
             # pretty sure this just normalizes it AGAIN in case we missed it the first time.
             for i in range(numPlayers):
-                initRelativePops[i] = initialPopularites[i]/s
+                initRelativeUtilities[i] = initUtilities[i]/s
 
-            print("Here where we start ", agents[0])
-            pmetrics = playGame(agents, numPlayers, roundsPerGame, gen, game, initialPopularites, povertyLine, False)
+            pmetrics = playGame(agents, numPlayers, roundsPerGame, gen, game, initUtilities, povertyLine, False, rounds_list)
 
             # now we gotta calcualte relative popularity
 
             s = 0.0
             for i in range(numPlayers):
-                s += pmetrics[i].avePop
+                s += pmetrics[i].avgUtility
             for i in range(numPlayers):
-                pmetrics[i].relPop = pmetrics[i].avePop / s
+                pmetrics[i].relUtility = pmetrics[i].avgUtility / s
 
             # print some stuff to the terminal for the purposes of understanding other stuf.f
             print("Indicies: ")
@@ -333,26 +452,26 @@ if __name__ == "__main__":
                 print("i, ", plyrIdxs[i])
 
             print("\n")
-            print("averagePop :")
+            print("averageUtility :")
             for i in range(numPlayers):
-                print(f"{pmetrics[i].avePop}.2")
+                print(f"{pmetrics[i].avgUtility}.2")
             print("\n")
             print("\n")
 
-            print("relPop: ")
+            print("relUtility: ")
             for i in range(numPlayers):
-                print(f"{pmetrics[i].relPop}.2")
+                print(f"{pmetrics[i].relUtility}.2")
 
             print("\n")
-            print("Average popularity ", s / agentsPerGame)
+            print("Average Utility ", s / agentsPerGame)
 
 
             # we gotta update fitness - fitness whole pizza in they mouth
             for i in range(agentsPerGame):
                 if theGenePools[plyrIdxs[i]].played_genes: # THANK GOODNESS I thought I was gonna have to assemble that from scratch.
                     theGenePools[plyrIdxs[i]].count += 1
-                    theGenePools[plyrIdxs[i]].absoluteFitness += ((pmetrics[i].avePop + pmetrics[i].endPop) / 2.0) # ok buddy
-                    theGenePools[plyrIdxs[i]].relativeFitness += pmetrics[i].relPop # this at least makes sense
+                    theGenePools[plyrIdxs[i]].absoluteFitness += ((pmetrics[i].avgUtility + pmetrics[i].endUtility) / 2.0) # ok buddy
+                    theGenePools[plyrIdxs[i]].relativeFitness += pmetrics[i].relUtility # this at least makes sense
 
 
             pmetrics = None # free that up, thank you very much garbage collection.

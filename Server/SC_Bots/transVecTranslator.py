@@ -5,18 +5,20 @@ allocation and all possible votes, and then return the index of the closest poss
 a way for these gene3agents to vote using a transaction vector.
 """
 import numpy as np
+import copy
 
+# not sure why we have this in a separate file but here we are
+def translateVecToIndex(transVec, currentOptionsMatrix):
+    # we also have to include an abstain option.
+    new_options_matrix = copy.deepcopy(currentOptionsMatrix)
+    new_options_matrix = [[0] + row for row in new_options_matrix] # add a 0 column right off the bat.
+    total_distances = []
 
-class transVecTranslator:
-    def __init__(self):
-        pass # not sure what to put here yhet
+    transposed_matrix = list(zip(*new_options_matrix))  # Now each item is a column
 
-    def translateVecToIndex(self, transVec, currentOptionsMatrix):
-        total_distances = []
-        for curr_index in currentOptionsMatrix:
-            curr_column = [row[curr_index] for row in transVec]
-            total_distances.append(np.linalg.norm(np.array(transVec) - np.array(curr_column)))
-        new_distances = [abs(distance) for distance in total_distances] # get the abs value
-        index_to_return = new_distances.index(min(new_distances)) # ge the min of the abs
-        print("this was the distance between allocation and vote ", total_distances[index_to_return]) # want to see pos or neg for fun
-        return index_to_return # the vote that was the closest.
+    for column in transposed_matrix:
+        distance = np.linalg.norm(np.array(transVec) - np.array(column)) # remember that euclidian distances are always positive
+        total_distances.append(distance)
+    index_to_return = total_distances.index(min(total_distances)) # ge the min of the abs
+    #print("this was the distance between allocation and vote ", total_distances[index_to_return]) # want to see pos or neg for fun
+    return index_to_return-1 # the vote that was the closest. (rememnber, 0 shoudl be represented as -1, off by one erorr here.

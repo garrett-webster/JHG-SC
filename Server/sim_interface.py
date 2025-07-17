@@ -1,9 +1,7 @@
 # refer to "main.py" in ../ for more information
 import os
 import sys
-import copy
-from lib2to3.btm_utils import tokens
-from os import popen
+
 
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 from Server.Engine.geneagent3 import GeneAgent3
@@ -18,14 +16,47 @@ import random
 np.set_printoptions(precision=2, suppress=True)
 
 class JHG_simulator():
-    def __init__(self, num_human_players, num_players, total_order, tokens_per_player=2, bot_type=0):
+    def __init__(self, num_human_players, num_players, total_order, tokens_per_player=2, bot_type=0, start_game=True):
         self.num_players = num_players
         self.total_order = total_order
         self.sim = None
         self.players = None
         # went ahead and gave this a default. the currently trained agents have this baked into them that they need to have 2 tokens per player, curious in expanding that.
-        self.start_game(num_human_players, num_players, tokens_per_player, bot_type)
+        if start_game:
+            self.start_game(num_human_players, num_players, tokens_per_player, bot_type)
+        else:
+            self.create_sim(num_human_players)
         self.T = None
+
+    # just sets us up a sim, quick and dirty like
+    def create_sim(self, num_players):
+        poverty_line = 0
+        init_pop = 100
+
+        initial_pops = self.define_initial_pops(init_pop, num_players)
+
+        alpha_min, alpha_max = 0.20, 0.20
+        beta_min, beta_max = 0.5, 1.0
+        keep_min, keep_max = 0.95, 0.95
+        give_min, give_max = 1.30, 1.30
+        steal_min, steal_max = 1.6, 1.60
+
+        num_players = num_players
+
+        game_params = {
+            "num_players": num_players,
+            "alpha": alpha_min,  # np.random.uniform(alpha_min, alpha_max),
+            "beta": beta_min,  # np.random.uniform(beta_min, beta_max),
+            "keep": keep_min,  # np.random.uniform(keep_min, keep_max),
+            "give": give_min,  # np.random.uniform(give_min, give_max),
+            "steal": steal_min,  # np.random.uniform(steal_min, steal_max),
+            "poverty_line": poverty_line,
+            "base_popularity": np.array(initial_pops)
+        }
+
+        self.sim = GameSimulator(
+            game_params)  # sets up our sim object - might need to make this global so we can grab it wherever we need it.
+        self.T = np.array([[0.0 for _ in range(num_players)] for _ in range(num_players)])
 
 
     def start_game(self, num_human_players, num_players, tokens_per_player, bot_type):
@@ -229,6 +260,9 @@ class JHG_simulator():
                 thePopulation.append(RandomAgent(tokens_per_player))
 
         return thePopulation
+
+    def bot_ovveride(self, bots): # make sure this is the right type before you throw it on there.
+        self.players = bots
 
 
 

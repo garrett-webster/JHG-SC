@@ -5,6 +5,7 @@ import numpy as np
 import sys
 import copy
 from pathlib import Path
+from Server.SC_Bots.transVecTranslator import translateVecToIndex
 
 
 class CommunityEvaluation():
@@ -175,7 +176,10 @@ class GeneAgent3(AbstractAgent):
 
         fp.close()
 
-    
+    def get_number_type(self):
+        return 11 # IDEK just pick a number
+
+
     def getRand(self):
         num = self.randNums[self.randCount]
         self.randCount = self.randCount + 1
@@ -282,6 +286,11 @@ class GeneAgent3(AbstractAgent):
                 theStr = theStr + "_" + str(self.genes_long[i][key])
 
         return theStr
+
+    def get_vote(self, player_idx, round_num, received, popularities, influence, extra_data, current_options_matrix):
+        transaction_vector = self.play_round(player_idx, round_num, received, popularities, influence, extra_data)
+        final_vote = translateVecToIndex(transaction_vector, current_options_matrix)
+        return final_vote # please let this work
 
 
     def play_round(self, player_idx, round_num, received, popularities, influence, extra_data):

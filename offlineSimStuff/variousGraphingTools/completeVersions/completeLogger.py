@@ -73,7 +73,7 @@ class CompleteLogger():
         return jhg_bot_types, sc_bot_types, allocation_bot_types
 
     def get_bot_types_from_json(self, dict):
-        first_key = next(iter(dict))
+        first_key = next(iter(dict)) # could add this in to be more robust in the future.
         sc_bot_types = dict["SC_CONCLUSION"]["0"]["bot_type"]
         allocation_bot_types = dict["SC_CONCLUSION"]["0"]["alloc_bot_type"]
         jhg_bot_types = dict["JHG_CONCLUSION"]["0"]["bot_types"]
