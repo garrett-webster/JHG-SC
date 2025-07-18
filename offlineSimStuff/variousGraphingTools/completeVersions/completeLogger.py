@@ -86,10 +86,15 @@ class CompleteLogger():
     # this function takes our existing long term data dict structure and condenses it to something graph-able.
     def calculate_long_term_stats(self):
         ## -- Getting average score per round and sums per player from the JHG game and SC game -- ##
-
+        avg_pop_per_round = []
+        per_player_per_round = []
+        avg_utility_per_round = []
+        utility_per_player_per_round = []
         # so I am not sure on the best way to do this, I think go
-        avg_pop_per_round, per_player_per_round = self.extract_data_from_dict(self.long_term_data["avg_pops"])
-        avg_utility_per_round, utility_per_player_per_round = self.extract_data_from_dict(self.long_term_data["avg_utility"])
+        if self.long_term_data["avg_pops"]:
+            avg_pop_per_round, per_player_per_round = self.extract_data_from_dict(self.long_term_data["avg_pops"])
+        if self.long_term_data["avg_utility"]:
+            avg_utility_per_round, utility_per_player_per_round = self.extract_data_from_dict(self.long_term_data["avg_utility"])
         return avg_pop_per_round, per_player_per_round, avg_utility_per_round, utility_per_player_per_round
 
     def get_long_term_stats_from_dict(self, dict):

@@ -24,12 +24,12 @@ class geneticLogger():
         self.genetic_data = {} # clears out the fetcher
         self.generation = generation
 
-    def save_round(self, pmetrics):
-        self.genetic_data[round] = pmetrics
-        filename = "gen" + str(self.generation) # could make this more explicit but this is a goo dplace to start
+    def save_round(self, pmetrics, generation):
+        print("this is the pmetrics object, ", pmetrics, " and this is the generatyion ", generation)
+        filename = "gen" + str(generation) # could make this more explicit but this is a goo dplace to start
         base_dire = os.path.dirname(os.path.abspath(__file__))
         relative_path = os.path.join(base_dire, "geneticLogs", filename + ".json")
         os.makedirs(os.path.dirname(relative_path), exist_ok=True)
 
         with open(relative_path, "w") as f:
-            json.dump(self.genetic_data, f, cls=EnhancedJSONEncoder) # bars
+            json.dump(pmetrics, f, cls=EnhancedJSONEncoder) # bars

@@ -357,20 +357,21 @@ if __name__ == "__main__":
 
             pmetrics = None # free that up, thank you very much garbage collection.
 
-            write_generational_results(theGenePools, popSize, gen, agentsPerGame)
-            # LEBROOOON
 
-            # now we gotta evolve the actual fetchers.
-            theGenePools_old = theGenePools # switcherooni
-            theGenePools = evolvePopulationPairs(theGenePools_old, popSize, numGeneGopies) # get the new ones
-            theGenePools_old = None # clear out the old oners
+        write_generational_results(theGenePools, popSize, gen, agentsPerGame)
+        # LEBROOOON
 
-        # garbage collection. please ignore.
-        theGenePools_old = None
-        initialPopularites = None
-        iniitalRelativePopularities = None
-        plyrIdxs = None
-        agents = None
+        # now we gotta evolve the actual fetchers.
+        theGenePools_old = theGenePools # switcherooni
+        theGenePools = evolvePopulationPairs(theGenePools_old, popSize, numGeneGopies) # get the new ones
+        theGenePools_old = None # clear out the old oners
+
+        # # garbage collection. please ignore.
+        # theGenePools_old = None
+        # initialPopularites = None
+        # iniitalRelativePopularities = None
+        # plyrIdxs = None
+        # agents = None
 
         # no extra players within the config file so we can probably just NOT do that
 

@@ -270,7 +270,8 @@ class JHG_simulator():
 def loadPopulationFromFile(popSize, generationFolder, startIndex, num_gene_pools, tokens_per_player):
     fnombre = "Kill me"
     try:
-        fnombre = generationFolder + "/gen_" + str(startIndex) + ".csv"
+        #fnombre = generationFolder + "/gen_" + str(startIndex) + ".csv"
+        fnombre = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\Server\Engine\gen_199.csv"
         fp = open(fnombre, "r")
     except FileNotFoundError:
         try:

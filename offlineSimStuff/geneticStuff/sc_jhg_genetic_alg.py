@@ -13,6 +13,7 @@ import numpy as np
 from Server.sim_interface import JHG_simulator # using the sim instead of the engine. is it a bad idea? yeah. Am I doing it anyway? yeah.
 from Server.social_choice_sim import Social_Choice_Sim
 from offlineSimStuff.batch_tester_JHG_SC import determine_rounds
+from offlineSimStuff.geneticStuff.geneticLogger import geneticLogger
 
 
 
@@ -56,7 +57,7 @@ def definteInitialUtility(initPopType, numPlayers, initialPopularities):
             initialPopularities[i] = 1.0 + random.randint(0, 5)
         initialPopularities = shuffle(initialPopularities, numPlayers)
     else:
-        print("don't udnerstand input, going with equal ")
+        #print("don't udnerstand input, going with equal ")
         for i in range(numPlayers): # the case we actually use.
             initialPopularities[i] = basePop
 
@@ -121,11 +122,11 @@ def make_sims():
                                total_order, allocation_bot_type, utility_per_player, False)
     return jhg_engine, sc_sim, total_order
 
-def run_sc_gen_stuff(agents, jhg_engine, sc_sim, total_order, curr_round, num_cycles):
+def run_sc_gen_stuff(agents, jhg_engine, sc_sim, total_order, curr_sc_round, num_cycles, numPlayers):
     possible_peeps, indexes = generate_peeps(total_order, jhg_engine.get_popularity(), sc_sim)
     influence_matrix = jhg_engine.get_influence()
     current_options_matrix, peeps = sc_sim.let_others_create_options_matrix(possible_peeps.tolist(), influence_matrix,
-                                                                            curr_round)  # actually creates the matrix
+                                                                            curr_sc_round)  # actually creates the matrix
     sc_sim.start_round((current_options_matrix, indexes))
     bot_votes = {}
     extra_data = {
@@ -134,10 +135,11 @@ def run_sc_gen_stuff(agents, jhg_engine, sc_sim, total_order, curr_round, num_cy
         } for i in range(len(total_order))
     }
     for cycle in range(num_cycles):
-        bot_votes[cycle] = []
-        received = sc_sim.new_v[curr_round]
-        for agent in range(len(agents)):
-            bot_votes[cycle].append(agents[agent].get_vote(agent, curr_round, received, sc_sim.results_sums, sc_sim.I, extra_data, current_options_matrix))
+        bot_votes[cycle] = {}
+        for agent in range(numPlayers):
+            received = sc_sim.new_v[agent] if sc_sim.new_v is not None else [0 for _ in range(numPlayers)]
+            # the influence array is doing all sorts of silly things lately, and I am not sure why. I think we have lost track of SC round in here somewhere.
+            bot_votes[cycle][agent] = (agents[agent].get_vote(agent, curr_sc_round, received, sc_sim.results_sums, np.array(sc_sim.I[curr_sc_round]), extra_data, current_options_matrix))
         sc_sim.record_votes(bot_votes[cycle], cycle) # important for logging individual games, can likely be disregarded here
 
     # make sure that this happens IMMEDIATELY afterward.
@@ -145,9 +147,9 @@ def run_sc_gen_stuff(agents, jhg_engine, sc_sim, total_order, curr_round, num_cy
     sc_sim.save_results()
     # ok so what do I actually
     # what doe I need to
-    return sc_sim.current_results(), sc_sim.results_sums # so we have the change in utility and overall utility
+    return sc_sim.current_results, sc_sim.results_sums # so we have the change in utility and overall utility
 
-def run_jhg_gen_stuff(jhg_engine, curr_round, agents):
+def run_jhg_gen_stuff(jhg_engine, curr_round, agents, numPlayers):
     received = [0.0 for _ in range(numPlayers)]  # C++ really needs to allocate memeory before hadn
     transactions = [0 for _ in range(numPlayers)]  # so this is how I replilcate it in python.
 
@@ -197,24 +199,21 @@ def playGame(agents, numPlayers, numRounds, gener, gamer, initialPopularities, p
     ## TODO: make a reset function that allows us to not have to make new sims everytime and lets us recycle them.
     # the SC sim is especially heavy in terms of initalization.
     jhg_engine, sc_sim, total_order = make_sims()
-    sc_sim.bot_ovveride(agents)
+    sc_sim.bot_ovveride(agents[:numPlayers])
     sc_sim.set_group("")
     played_sc = False
     played_jhg = False
     influence_matrix = None
     curr_sc_round = 0
     for list_index in range(0, len(rounds_list)):
-        # pick individuals to put into the gene pools.
-        for i in range(agentsPerGame):
-            plyrIdxs[i] = random.randint(0, popSize - 1)
-            agents[i] = theGenePools[plyrIdxs[i]]
 
         sc_rounds = rounds_list[list_index][-1] == "*"
         curr_round = int(rounds_list[list_index][:-1])  # yeah something like that
-        run_jhg_gen_stuff(jhg_engine, curr_round, agents)
+        run_jhg_gen_stuff(jhg_engine, curr_round, agents, numPlayers)
 
         if sc_rounds:
-            changeUtility, overallUtility = run_sc_gen_stuff(agents, jhg_engine, sc_sim, total_order, curr_round, num_cycles)
+            changeUtility, overallUtility = run_sc_gen_stuff(agents, jhg_engine, sc_sim, total_order, curr_sc_round, num_cycles, numPlayers)
+            curr_sc_round += 1
 
             for i in range(numPlayers):
                 pmetrics[i].avgUtility += changeUtility[i]
@@ -263,15 +262,20 @@ def write_generational_results(theGenePools, popSize, gen, agentsPerGame):
     # Sort agents by fitness
     sorted_agents = sorted(theGenePools, key=lambda agent: agent.absoluteFitness, reverse=True)
 
+    # Get the absolute path to the directory containing this script
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    # Construct the full output directory path
+    output_dir = os.path.join(script_dir, "Results", "theGenerations")
     # Ensure output directory exists
-    output_dir = "../Results/theGenerations"
     os.makedirs(output_dir, exist_ok=True)
+    # Construct the filename path
     filename = os.path.join(output_dir, f"gen_{gen}.csv")
+    print("this is where it is supposedly writing ", filename)
 
     # Write CSV
     with open(filename, mode='w', newline='') as file:
         writer = csv.writer(file)
-        writer.writerow(["Genes", "GamesPlayed", "RelativeFitness", "AbsoluteFitness"])  # optional header
+        writer.writerow(["Genes", "GamesPlayed", "RelativeUtility", "AbsoluteUtility"])  # optional header
         for agent in sorted_agents:
             writer.writerow([
                 agent.getString(),
@@ -281,7 +285,7 @@ def write_generational_results(theGenePools, popSize, gen, agentsPerGame):
             ])
 
     avg_fitness = sum(agent.absoluteFitness for agent in theGenePools) / popSize
-    print(f"Average fitness in generation {gen}: {avg_fitness:.4f}")
+    print(f"Average utility in generation {gen}: {avg_fitness:.4f}")
 
 
 def mutateIt(gene):
@@ -306,7 +310,6 @@ def evolvePopulationPairs(theGenePool_prev, popSize, numGeneCopies):
     num_genes = len(gene_keys) * 3 # cycle through it 3 times, one for each one
     # represents the amount we will have to iterate through or something.
     # problem - you need to generate a list 3 times the length so we can put it all in there. trhat way you can have 3 copies. give it another whirl on monday.
-    print("TheGenePool_prev[0]->numGenes:", num_genes) # this is 99, not 33.
 
     theGenePool = [GeneAgent3("", numGeneCopies, 2) for _ in range(popSize)] #initalize empty gene pool.
 
@@ -335,6 +338,7 @@ def evolvePopulationPairs(theGenePool_prev, popSize, numGeneCopies):
     return theGenePool # puts back the new gene pool to be played with again.
 
 # take in our population and put the best fetchers at the very top and the worst fetchers at the very bottom.
+# only problem is, what is
 def selectByFitness(thePopulation, popSize, _rank):
     mag = 0.0
     for i in range(popSize):
@@ -343,6 +347,8 @@ def selectByFitness(thePopulation, popSize, _rank):
         else:
             mag += thePopulation[i].absoluteFitness
     num = random.random()  # Returns float in [0.0, 1.0)
+    if mag == 0: # if there is nothing going on, just uhh return a random number.
+        return random.randint(0, popSize-1)
     sum = 0.0
     for i in range(popSize):
         if (_rank):
@@ -353,7 +359,7 @@ def selectByFitness(thePopulation, popSize, _rank):
         if num <= sum:
             return i
 
-    print("uh no select, whatever happened ", num, " ", sum)
+    #print("uh no select, whatever happened ", num, " ", sum)
     # exit(1)
 
     return popSize - 1
@@ -386,8 +392,8 @@ if __name__ == "__main__":
     popSize = 100 # number of agnets in the gene pool (use 100 here)
     numGeneGopies = 3 # numbers of sets of genes (3 was the number used in the paper)
     startIndex = 0 # generation to start training (0 to start form scratch)
-    num_gens = 100 # generation to end traning trains up to 99
-    games_per_gen = 100 # agents from the gene pool are selected at random, 100 times.
+    num_gens = 200 # generation to end traning trains up to 99
+    games_per_gen = 10 # agents from the gene pool are selected at random, 100 times.
     agentsPerGame = 10 # number of agents per game
     roundsPerGame = 30 # number fo rounds per game
     povertyLine = 0 # see SM-1
@@ -395,6 +401,7 @@ if __name__ == "__main__":
     initPops = "varied" # starts eveyrone at different initial popularities when training.
     tokens_per_player = 2 # probably best if I just reduce this back to whatever. (Added by me just in case we wanted to be silly)
     num_humans = 0 # we discriminate in this fetcher
+    current_logger = geneticLogger()
 
     # should initialize this fetcher
     theGenePools = [GeneAgent3("", numGeneGopies, tokens_per_player) for _ in range(popSize)] # don't let this be empty
@@ -408,7 +415,7 @@ if __name__ == "__main__":
     initRelativeUtilities = [0.0 for _ in range(numPlayers)]
     agents = [AbstractAgent() for _ in range(popSize)]  # the fetchers we will be training
 
-    jhg_games_per_round = [4,3,3] # just give me an easy place to start.
+    jhg_games_per_round = [2,2] # just give me an easy place to start.
     rounds_list = determine_rounds(jhg_games_per_round)
 
     for gen in range(num_gens): # however many generations we want
@@ -443,27 +450,28 @@ if __name__ == "__main__":
             s = 0.0
             for i in range(numPlayers):
                 s += pmetrics[i].avgUtility
-            for i in range(numPlayers):
-                pmetrics[i].relUtility = pmetrics[i].avgUtility / s
+            if s != 0.0:
+                for i in range(numPlayers):
+                    pmetrics[i].relUtility = pmetrics[i].avgUtility / s
 
             # print some stuff to the terminal for the purposes of understanding other stuf.f
-            print("Indicies: ")
-            for i in range(numPlayers):
-                print("i, ", plyrIdxs[i])
-
-            print("\n")
-            print("averageUtility :")
-            for i in range(numPlayers):
-                print(f"{pmetrics[i].avgUtility}.2")
-            print("\n")
-            print("\n")
-
-            print("relUtility: ")
-            for i in range(numPlayers):
-                print(f"{pmetrics[i].relUtility}.2")
-
-            print("\n")
-            print("Average Utility ", s / agentsPerGame)
+            # print("Indicies: ")
+            # for i in range(numPlayers):
+            #     print("i, ", plyrIdxs[i])
+            #
+            # print("\n")
+            # print("averageUtility :")
+            # for i in range(numPlayers):
+            #     print(f"{pmetrics[i].avgUtility}.2")
+            # print("\n")
+            # print("\n")
+            #
+            # print("relUtility: ")
+            # for i in range(numPlayers):
+            #     print(f"{pmetrics[i].relUtility}.2")
+            #
+            # print("\n")
+            #print("Average Utility ", s / agentsPerGame)
 
 
             # we gotta update fitness - fitness whole pizza in they mouth
@@ -473,25 +481,25 @@ if __name__ == "__main__":
                     theGenePools[plyrIdxs[i]].absoluteFitness += ((pmetrics[i].avgUtility + pmetrics[i].endUtility) / 2.0) # ok buddy
                     theGenePools[plyrIdxs[i]].relativeFitness += pmetrics[i].relUtility # this at least makes sense
 
+        print("this is the gen it thinks it is ", gen)
 
-            pmetrics = None # free that up, thank you very much garbage collection.
+        write_generational_results(theGenePools, popSize, gen, agentsPerGame)
 
-            write_generational_results(theGenePools, popSize, gen, agentsPerGame)
-            # LEBROOOON
+        # LEBROOOON
 
-            # now we gotta evolve the actual fetchers.
-            theGenePools_old = theGenePools # switcherooni
-            theGenePools = evolvePopulationPairs(theGenePools_old, popSize, numGeneGopies) # get the new ones
-            theGenePools_old = None # clear out the old oners
+        # now we gotta evolve the actual fetchers.
+        theGenePools_old = theGenePools # switcherooni
+        theGenePools = evolvePopulationPairs(theGenePools_old, popSize, numGeneGopies) # get the new ones
+        theGenePools_old = None # clear out the old oners
 
-        # garbage collection. please ignore.
-        theGenePools_old = None
-        initialPopularites = None
-        iniitalRelativePopularities = None
-        plyrIdxs = None
-        agents = None
+    # garbage collection. please ignore.
+    theGenePools_old = None
+    initialPopularites = None
+    iniitalRelativePopularities = None
+    plyrIdxs = None
+    agents = None
 
-        # no extra players within the config file so we can probably just NOT do that
+    # no extra players within the config file so we can probably just NOT do that
 
-        # YAHOOO that should be it.
+    # YAHOOO that should be it.
 

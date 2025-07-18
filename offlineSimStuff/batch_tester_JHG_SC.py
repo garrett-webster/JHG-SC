@@ -175,7 +175,7 @@ def graph_longterm(current_logger):
 if __name__ == "__main__":
 
     #jhg_games_per_sc_round = [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
-    jhg_games_per_sc_round = [4,3,3]#,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,2]
+    jhg_games_per_sc_round = [4,3,3,3,3]#,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,2]
     #jhg_games_per_sc_round = [1,1,1]
 
 
@@ -185,7 +185,7 @@ if __name__ == "__main__":
     num_humans = 0
     tokens_per_player = 2
     utility_per_player = 3
-    create_graphs = True
+    create_graphs = False
     graph_everything = True
     create_influence = True
     chromosomes_directory = "testChromosome"
@@ -197,7 +197,7 @@ if __name__ == "__main__":
     jhg_bot_type = 0 # lets try using the socialwelfare stuff.
     total_order = create_total_order(num_players, num_humans)
    # num_attempts = 1000 # we are going to run this twice.
-    num_attempts = 1
+    num_attempts = 100
     num_rounds = len(round_list)
     current_logger = CompleteLogger()
 
@@ -205,6 +205,7 @@ if __name__ == "__main__":
         offset = num_rounds * attempt
         current_jhg_sim = create_jhg_sim(num_humans, num_players, total_order, tokens_per_player, jhg_bot_type)
         current_sc_sim = create_sim(num_players, scenario, chromosome, group, total_order, allocation_bot_type, utility_per_player)
+        current_sc_sim.bot_ovveride(current_jhg_sim.players)
         # it doesn't like this much but it IS doign what I want it to do.
         current_logger.resetup(current_jhg_sim, current_sc_sim)
         sc_sim, jhg_sim, current_logger = run_trial(current_sc_sim, current_jhg_sim, round_list, attempt, num_cycles, create_graphs, group, total_order, create_influence, current_logger)
