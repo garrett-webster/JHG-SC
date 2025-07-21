@@ -43,16 +43,17 @@ class CompleteLogger():
         if "CONCLUSION" not in self.big_boy_data:
             self.big_boy_data["CONCLUSION"] = {}
 
-        if "SC_CONCLUSION" not in self.big_boy_data["CONCLUSION"]:
+        if "SC_CONCLUSION" not in self.big_boy_data["CONCLUSION"] and self.sc_sim:
             self.big_boy_data["CONCLUSION"]["SC_CONCLUSION"] = {}
-        if "JHG_CONCLUSION" not in self.big_boy_data["CONCLUSION"]:
+        if "JHG_CONCLUSION" not in self.big_boy_data["CONCLUSION"] and self.jhg_sim:
             self.big_boy_data["CONCLUSION"]["JHG_CONCLUSION"] = {}
         if "LONG_TERM_DATA" not in self.big_boy_data:
             self.big_boy_data["CONCLUSION"]["LONG_TERM_DATA"] = {}
 
-
-        self.big_boy_data["CONCLUSION"]["SC_CONCLUSION"][attempt] = self.sc_logger.record_big_picture()
-        self.big_boy_data["CONCLUSION"]["JHG_CONCLUSION"][attempt] = self.jhg_logger.record_big_picture()
+        if self.sc_sim:
+            self.big_boy_data["CONCLUSION"]["SC_CONCLUSION"][attempt] = self.sc_logger.record_big_picture()
+        if self.jhg_sim:
+            self.big_boy_data["CONCLUSION"]["JHG_CONCLUSION"][attempt] = self.jhg_logger.record_big_picture()
         self.big_boy_data["CONCLUSION"]["LONG_TERM_DATA"][attempt] = self.long_term_data # just slap that in there. just for funzies.
 
 
@@ -67,9 +68,13 @@ class CompleteLogger():
 
 
     def get_all_bot_types(self):
-        sc_bot_types = self.sc_sim.bot_type
-        allocation_bot_types = self.sc_sim.allocation_bot_type
-        jhg_bot_types = self.jhg_sim.get_bot_types()
+        sc_bot_types, allocation_bot_types, jhg_bot_types = None, None, None
+        if self.sc_sim:
+            sc_bot_types = self.sc_sim.bot_type
+            allocation_bot_types = self.sc_sim.allocation_bot_type
+        if self.jhg_sim:
+            jhg_bot_types = self.jhg_sim.get_bot_types()
+
         return jhg_bot_types, sc_bot_types, allocation_bot_types
 
     def get_bot_types_from_json(self, dict):

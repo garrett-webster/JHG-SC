@@ -23,7 +23,7 @@ NUM_CAUSES = 3 # if its ever not this a LOT of math breaks, so just leave it be.
 
 class Social_Choice_Sim:
     def __init__(self, total_players, num_causes, num_humans, options_generator, cycle=0, round=0, chromosomes="",
-                 scenario="", group="", total_order=None, allocation_scenario="", utility_per_player=3, make_bots=True):
+                 scenario="", group="", total_order=None, allocation_scenario="", utility_per_player=3):
         self.options_generator = options_generator
         if total_order == None:  # generating it non server side
             self.total_order = self.create_total_order(total_players, num_humans)
@@ -370,6 +370,19 @@ class Social_Choice_Sim:
         self.calculate_influence_matrix(new_v, self.round)
         return winning_vote, self.current_results
 
+    def calculate_v_given_options_and_votes(self, current_options_matrix, previous_votes):
+        new_v = []
+        current_options_matrix_columns = list(zip(*current_options_matrix))  # get the columns.
+        for plyr_idx in range(self.total_players):
+            if previous_votes[plyr_idx] == -1:
+                new_v.append([0 for _ in range(
+                    self.total_players)])  # if abstain, 0's across the board. probably. I might rework this later.
+            else:
+                new_v.append(current_options_matrix_columns[
+                                 previous_votes[plyr_idx]])  # add the column of what they did to the new v.
+        return new_v
+
+
     def print_influence_matrix(self, current_round):
         print(self.I[current_round])
 
@@ -514,7 +527,7 @@ class Social_Choice_Sim:
 
     def get_results(self):
         # print("Aight were is the zero, its gotta be under num_rounds right?") literally zero clue whawt this print statement was supposed to be for.
-        cooperation_score = self.cooperation_score / self.num_rounds  # as a percent, how often we cooperated. (had a non negative cause pass)
+        cooperation_score = self.cooperation_score / self.num_rounds if self.num_rounds > 0 else 0  # as a percent, how often we cooperated. (had a non negative cause pass)
         return self.results, cooperation_score, self.total_types, self.num_rounds, self.scenario_string, self.group, self.chromosome_string
 
     def get_everything_for_logger(self):
@@ -766,7 +779,8 @@ class Social_Choice_Sim:
                 self.results_sums.index(max(self.results_sums))]  # return the index of the highest utility player.
 
     # this functin is used for simulation purposes ONLY. should never be called with live players.
-    def let_others_create_options_matrix(self, bot_peeps, influence_matrix, curr_round):
+    def let_others_create_options_matrix(self, bot_peeps, curr_round):
+
         indexes = [] # this gest used regardless.
         for peep in bot_peeps:
             indexes.append(bot_peeps.index(peep) + 1)
@@ -789,7 +803,7 @@ class Social_Choice_Sim:
                     curr_round,
                     T_prev[:, i], # should be a 9x9 ndarray (from numpy)
                     self.results_sums,
-                    influence_matrix,
+                    np.array(self.I[curr_round]),
                     extra_data, # yes this is blank. no I don't know why.
                 ))
             total_columns = []

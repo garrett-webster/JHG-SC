@@ -16,40 +16,42 @@ from offlineSimStuff.variousGraphingTools.completeVersions.completeLogger import
 
 # starts the sim, could make this take command line arguments
 # takes in a bot type, a number of rounds, and then runs it and plots the results. plans for expansion coming soon.
-def run_trial(sc_sim, jhg_sim, round_list, attempt, num_cycles, create_graphs, group, total_order, create_influence, current_logger):
+def run_trial(sc_sim, jhg_sim, round_list, attempt, num_cycles, create_graphs, group, total_order, create_influence, current_logger, offset):
 
     sc_sim.set_group(group)
     played_sc = False
     played_jhg = False
-    influence_matrix = None # this should get overwritten pretty quick, but its there so there's no error.
     curr_sc_round = 0
+    influence_matrix = None # this should get overwritten pretty quick, but its there so there's no error.
     #for list_index in tqdm(range(0, len(round_list))): # everything NEEDS to start at 1, PLEASE.
     for list_index in (range(0, len(round_list))): # everything NEEDS to start at 1, PLEASE.
 
         sc_rounds = round_list[list_index][-1] == "*"
-        curr_round = int(round_list[list_index][:-1]) # useful, yes, but not quite the logger round.
-        curr_logger_round = (len(round_list) * attempt) + curr_round # this way the logger is logging it continously, but the sims don't interpret it that way.
-        #print("this is the curr_round ", curr_round)
+        jhg_rounds = round_list[list_index][-1] == "-"
+        curr_round = int(round_list[list_index][:-1]) # useful, yes, but not quite the logger round
+        curr_logger_round = curr_round + offset # this way the logger is logging it continously, but the sims don't interpret it that way.
 
+        if jhg_rounds:
+            influence_matrix = run_jhg_stuff(jhg_sim, curr_round, current_logger, curr_logger_round)
+            played_jhg = True
 
-        influence_matrix = run_jhg_stuff(jhg_sim, curr_round, current_logger, curr_logger_round)
-        played_jhg = True
 
         if sc_rounds:
+
             run_sc_stuff(sc_sim, jhg_sim, total_order, influence_matrix, curr_sc_round, current_logger, curr_logger_round)
             played_sc = True
+            sc_sim.set_rounds(curr_round)
             curr_sc_round += 1
+
 
         if create_graphs:
             pass
             graphEverything(sc_sim, jhg_sim, curr_round, played_sc, played_jhg)
 
         # just want to have some sort of insight into what is happening.
-        if curr_sc_round == 1000:
-            graphEverything(sc_sim, jhg_sim, curr_round, played_sc, played_jhg)
 
+    # run this just once at the very end to prevent bricking
 
-    sc_sim.set_rounds(curr_sc_round) # ok if we use the curr_sc_round that should fix the coop score
     current_logger.gather_ending_deets(attempt)
     #graph_long_term_stuff(sc_sim, curr_round)
 
@@ -69,8 +71,7 @@ def run_sc_stuff(sc_sim, jhg_sim, total_order, influence_matrix, curr_round, cur
         sc_sim.record_votes(bot_votes[cycle], cycle)
 
     # make sure that this happens IMMEDIATELY afterward.
-    winning_vote, round_results = sc_sim.return_win(
-        bot_votes[num_cycles - 1])  # we need this to run, even if we don't need the results HERE per se
+    winning_vote, round_results = sc_sim.return_win(bot_votes[num_cycles - 1])
     sc_sim.save_results()
     current_logger.save_sc_round(curr_round, curr_logger_round)
 
@@ -153,17 +154,31 @@ def create_total_order(total_players, num_humans):
     return total_order
 
 def determine_rounds(jhg_rounds_per_sc_game_list):
-    num_games_in_cycle = jhg_rounds_per_sc_game_list
-    new_list = []
-    max_item = 0
-    for instance in num_games_in_cycle:
-        for i in range(instance):
-            new_list.append(str(i + max_item) + "-")
-        new_list.pop()
-        new_list.append(str(len(new_list)) + "*")
-        max_item = len(new_list)
+    new_list = [] # WHEEE gotta start somewhere
+    if jhg_rounds_per_sc_game_list[0] == "J" or jhg_rounds_per_sc_game_list[0] == "S":
+        print("engaging pure opertaiopns, standing by")
+        if jhg_rounds_per_sc_game_list[0] == "J":
+            num_rounds = int(jhg_rounds_per_sc_game_list[-1]) # possibly one of the jankier lines that I have ever written but here we are
+            for i in range(num_rounds):
+                new_list.append(str(i) + "-")
 
-    #print("This is the new list ", new_list, " and here is what we were workign with ", jhg_rounds_per_sc_game_list)
+        if jhg_rounds_per_sc_game_list[0] == "S":
+            num_rounds = int(jhg_rounds_per_sc_game_list[-1])
+            for i in range(num_rounds):
+                new_list.append(str(i) + "*")
+
+
+
+    else:
+        new_list = []
+        current = 0  # Tracks number for "-" entries
+        for instance in jhg_rounds_per_sc_game_list:
+            for _ in range(instance):
+                new_list.append(f"{current}-")
+                current += 1
+            new_list.append(f"{current - 1}*")  # Append the last "-" number with "*"
+        print("This is the new list ", new_list, " and here is what we were workign with ", jhg_rounds_per_sc_game_list)
+
     return new_list
 
 # this function takes in a complete logger object and creates some graphs based on that.
@@ -174,8 +189,10 @@ def graph_longterm(current_logger):
 
 if __name__ == "__main__":
 
-    #jhg_games_per_sc_round = [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
-    jhg_games_per_sc_round = [4,3,3,3,3]#,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,2]
+    #jhg_games_per_sc_round = [1,1,1,1,1,1,1,1]#,1,1,1,1,1,1,1,1,1,1,1,1]
+    #jhg_games_per_sc_round = [4,3,3,3,3]#,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,2]
+    #jhg_games_per_sc_round = [2,3,3]#,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,2]
+    jhg_games_per_sc_round = ["J", 20]
     #jhg_games_per_sc_round = [1,1,1]
 
 
@@ -197,8 +214,8 @@ if __name__ == "__main__":
     jhg_bot_type = 0 # lets try using the socialwelfare stuff.
     total_order = create_total_order(num_players, num_humans)
    # num_attempts = 1000 # we are going to run this twice.
-    num_attempts = 100
-    num_rounds = len(round_list)
+    num_attempts = 20
+    num_rounds = sum(jhg_games_per_sc_round) if len(jhg_games_per_sc_round) > 2 else jhg_games_per_sc_round[-1] # if its a list, len of list. else, grab the second identifier
     current_logger = CompleteLogger()
 
     for attempt in tqdm(range(num_attempts)):
@@ -208,7 +225,7 @@ if __name__ == "__main__":
         current_sc_sim.bot_ovveride(current_jhg_sim.players)
         # it doesn't like this much but it IS doign what I want it to do.
         current_logger.resetup(current_jhg_sim, current_sc_sim)
-        sc_sim, jhg_sim, current_logger = run_trial(current_sc_sim, current_jhg_sim, round_list, attempt, num_cycles, create_graphs, group, total_order, create_influence, current_logger)
+        sc_sim, jhg_sim, current_logger = run_trial(current_sc_sim, current_jhg_sim, round_list, attempt, num_cycles, create_graphs, group, total_order, create_influence, current_logger, offset)
         current_logger.create_big_boy_graphs(num_rounds, num_rounds * attempt) # num rounds is self expanatory, the num_rounds*i tells me which round we are on in the logger. (kind of).
 
     current_logger.actually_close_the_thing("Sizable_inventory")

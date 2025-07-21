@@ -2,55 +2,43 @@
 import time
 from Server.social_choice_sim import Social_Choice_Sim
 from tqdm import tqdm
+import numpy as np
 
 from offlineSimStuff.variousGraphingTools.sc_tools.causeNodeGraphVisualizer import causeNodeGraphVisualizer
-from offlineSimStuff.variousGraphingTools.sc_tools.simLogger import simLogger
 from Server.OptionGenerators.generators import generator_factory
-
+from offlineSimStuff.variousGraphingTools.completeVersions.completeLogger import CompleteLogger
+from offlineSimStuff.variousGraphingTools.completeVersions.completeGrapher import CompleteGrapher
 
 # starts the sim, could make this take command line arguments
 # takes in a bot type, a number of rounds, and then runs it and plots the results. plans for expansion coming soon.
-def run_trial(sim, num_rounds, num_cycles, create_graphs, group):
+def run_trial(sim, num_rounds, num_cycles, create_graphs, group, total_order, current_logger):
     # we need to get the groups, where we can have no groups or a variety of groups.
-    current_logger = simLogger(sim)
-    sim.set_rounds(num_rounds) # for graphing purposes
+
     start_time = time.time() # so we can calculate total time. not entirely necessary.
     sim.set_group(group)
 
-    for curr_round in tqdm(range(1, num_rounds+1)): # do this outside the sim, could make it inside but I like it outside.
-    #for curr_round in (range(1, num_rounds+1)): # do this outside the sim, could make it inside but I like it outside.
-        # force it to start at 1 instead of 0 -- helps prevent off by one errors later in the code.
-    #for curr_round in (range(num_rounds)): # do this outside the sim, could make it inside but I like it outside.
-
+    for curr_round in tqdm(range(num_rounds)): # do this outside the sim, could make it inside but I like it outside.
+        sim.set_rounds(num_rounds)  # for graphing purposes
         sim.start_round() # creates the current current options matrix, makes da player nodes, sets up causes, etc.
+        possible_peeps, indexes = generate_peeps(total_order,
+                                                 sim)  # people who are needed to create the matrix
+        influence_matrix = sim.get_influence_matrix()
+        current_options_matrix, peeps = sim.let_others_create_options_matrix(possible_peeps.tolist(),
+                                                                                influence_matrix, # problem
+                                                                                curr_round)  # actually creates the matrix
         bot_votes = {}
         for cycle in range(num_cycles):
             #print("*****************STARTING CYCLE " + str(cycle+1) + "************************")
             bot_votes[cycle] = sim.get_votes(bot_votes, curr_round, cycle, num_cycles)
             sim.record_votes(bot_votes[cycle], cycle)
 
-        all_votes = bot_votes
-        bot_votes = bot_votes[num_cycles-1] # grab just the last votes, they are the only ones that matter anyway.
-        total_votes = len(bot_votes)
-        # keep this out just in case.
-        winning_vote, round_results = sim.return_win(bot_votes)  # is all votes, works here
-        #if sim.get_last_option() == 3: # I just wanna understand why this happens.
-            #print("This was the winning vote ", winning_vote+1)
-            #graph_nodes(sim)  # only do this for specific rounds
-        # this saves everything to the JSON that we need. I mean it saves it to the sim, I can change that so we can log it instead.
-        if create_graphs:  # only do this once, makes sense for jsoning stuff.
-            graph_nodes(sim)  # only do this for specific rounds
 
+        winning_vote, round_results = sim.return_win(bot_votes[num_cycles-1])  # is all votes, works here
         sim.save_results()
-        #print("this is the round numb we are adding ", int(curr_round))
-        #current_logger.add_round_to_sim(int(curr_round)) # make it start at one instead of zero.
+        current_logger.save_sc_round(curr_round, curr_round) # there is no reason
 
-    end_time = time.time()
-    #sim.print_col_passing() # this shows us the breakdown of the number distro. incredibly fascinating! look at it later.
-    #current_logger.record_big_picture()
-    #filename = "madMessign'"
-    #current_logger.finish_json(filename)
-    #print("This was the total time ", end_time - start_time)
+
+    current_logger.gather_ending_deets(0)
     return sim
 
 
@@ -59,7 +47,7 @@ def graph_nodes(sim):
     currVisualizer.create_graph_with_sim(sim)
 
 
-def create_sim(scenario=None, chromosomes=None, group=""):
+def create_sim(total_players, scenario=None, chromosomes=None, group="", total_order=None, allocation_scenario=None, utility_per_player=3):
 
     # SUM: this sets the bot list type, so we can have siutaions set up
     if scenario is None:
@@ -71,12 +59,8 @@ def create_sim(scenario=None, chromosomes=None, group=""):
     total_players = 9
     num_causes = 3
     num_humans = 0
-    # total_order = create_total_order(total_players, num_humans)
-
     generator = generator_factory(2, total_players, 5, 10, -10, 3, None, None)
-
-    sim = Social_Choice_Sim(total_players, num_causes, num_humans, generator, cycle, curr_round, chromosomes, scenario, group)
-
+    sim = Social_Choice_Sim(total_players, num_causes, num_humans, generator, cycle, curr_round, chromosomes, scenario, group, total_order, allocation_scenario, utility_per_player)
     return sim
 
 def create_total_order(total_players, num_humans):
@@ -89,10 +73,40 @@ def create_total_order(total_players, num_humans):
         total_order.append("P" + str(human))
     return total_order
 
+def generate_peeps(total_order, sc_sim):
+    popularity_array = [100 for _ in range(len(total_order))]
+    total = sum(popularity_array)
+    # this is easy bc this will always be positive
+    normalized_popularity_array = [val / total for val in popularity_array]
+    # THIS IS WORSE.
+    utilities_array = sc_sim.results_sums
+    global_shift = min(0, min(utilities_array))
+    # shift everything over. subtract bc its either 0 or a negative number.
+    utilities_array = [val - global_shift for val in utilities_array]
+    total = sum(utilities_array) # yeah override this why not.
+    normalized_utility_array = [val / total if total != 0 else 1 / len(total_order) for val in utilities_array]
+    # new goal -- figure out how zip works
+    overall_probability_array = [(p + u) / 2 for p, u in zip(normalized_popularity_array, normalized_utility_array)]
+    probabilities = np.array(overall_probability_array)
+    new_world_order = np.array(total_order)
+    # shoudl pull without replacement from total order using the overall probability array, gives 3 choies without replacement.
+    new_peeps = np.random.choice(new_world_order, p=probabilities, size=3, replace=False)
+    indexes = peeps_to_total_order(new_peeps, total_order)
+    return new_peeps, indexes
+
+def peeps_to_total_order(peeps, total_order):
+    indexes = []
+    for peep in peeps:
+        indexes.append(total_order.index(peep)+1)
+    return indexes
+
+
 
 if __name__ == "__main__":
-    num_rounds = 1
+    num_rounds = 100
     num_cycles = 3
+    num_players = 9
+    num_humans = 0
     create_graphs = True
     total_groups = ["", 0, 1, 2]
     chromosomes_directory = "testChromosome"
@@ -100,74 +114,18 @@ if __name__ == "__main__":
     # these paths are relative to the file location, so as long as you don't move the file it can and will run from anywhere.
     scenario = "scenarioIndicator/humanAttempt3"
     chromosome = "chromosomes/experiment"
+    allocation_bot_type = ""
+    utility_per_player = 3
+    total_order = create_total_order(num_players, 0)
+    current_logger = CompleteLogger()
+
+    current_sim = create_sim(num_players, scenario, chromosome, group, total_order, allocation_bot_type, utility_per_player)
+    current_logger.resetup(None, current_sim)
+    updated_sim = run_trial(current_sim, num_rounds, num_cycles, create_graphs, group, total_order, current_logger)
+    current_logger.gather_ending_deets(0)
+    current_logger.create_big_boy_graphs(num_rounds, num_rounds * 0)  # also weird logger stuff
+
+    curr_everything_grapher = CompleteGrapher()
+    curr_everything_grapher.draw_long_term_graphs_given_logger(current_logger)
 
 
-    current_sim = create_sim(scenario, chromosome, group)
-    updated_sim = run_trial(current_sim, num_rounds, num_cycles, create_graphs, group)
-    probs_list = updated_sim.get_winning_probabilities()
-    # print("Average winning probs ", sum(probs_list) / num_rounds)
-    # print("min winning probs ", min(probs_list))
-    # print("max winning probs ", max(probs_list))
-    # print("median winning probs ", statistics.median(probs_list))
-    # print("here was the winning probability ", sum(updated_sim.get_winning_probabilities()) / num_rounds)
-    #current_visualizer = longTermGrapher()
-    #current_visualizer.draw_graph_from_sim(updated_sim)
-
-
-    big_boy_json = {}
-
-
-
-
-# legacy code for testing every chromosome that I generated in the chromsome repo. Don't worry about it too much.
-# for chromosome_path in os.listdir(chromosomes_directory):
-#     chromosome = os.path.join(chromosomes_directory, chromosome_path)
-#     current_sim = create_sim(scenario, chromosome, group)
-#
-#     updated_sim = run_trial(current_sim, num_rounds, num_cycles, create_graphs, group)
-#     current_visualizer = longTermGrapher()
-#     current_visualizer.draw_graph_from_sim(updated_sim)
-#     current_logger = simLogger(updated_sim)
-#     current_logger.log_stuff_for_chromosome(big_boy_json)
-#
-# final_logger = simLogger()
-# final_logger.write_a_json_to_file(big_boy_json)
-
-
-
-
-# legacy code for testing every scenario and every round. Right now I am more interested in no groups, my bot
-
-# num_rounds = 10000
-# num_cycles = 3
-# create_graphs = False
-# total_groups = ["", 0, 1, 2]
-# scenario_directory = "scenarioIndicator"
-# group = ""
-# for scenario_path in os.listdir(scenario_directory):
-#     scenario = os.path.join(scenario_directory, scenario_path)
-#     for group in total_groups:
-#         # current_sim = create_sim(scenario)
-#         current_sim = create_sim()  # if no sim
-#
-#         current_sim = run_trial(current_sim, num_rounds, num_cycles, create_graphs, group)
-#         current_visualizer = longTermGrapher()
-#         current_visualizer.draw_graph_from_sim(current_sim)
-
-
-# legacy code for generating all the test chromosome:
-    #
-    #
-    # output_dir = "testChromosome"
-    # os.makedirs(output_dir, exist_ok=True)
-    #
-    # chromosome_1_options = [0.01, 0.1, 0.2, 0.5, 0.9, 1, 2, 5, 10]
-    # chromosome_2_options = [0.01, 0.1, 0.5, 0.9, 1, 2, 5, 10]
-    # chromosome = []
-    # for chromsome_1 in chromosome_1_options:
-    #     for chromsome_2 in chromosome_2_options:
-    #         filename = f"{chromsome_1},{chromsome_2}.txt"
-    #         filename = os.path.join(output_dir, filename)
-    #         with open(filename, "w") as f:
-    #             for i in range(1, 11+1):
-    #                 f.write(f"{i},{chromsome_1},{chromsome_2}\n")

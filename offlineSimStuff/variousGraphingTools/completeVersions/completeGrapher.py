@@ -474,7 +474,7 @@ class CompleteGrapher():
     def draw_long_term_graphs_given_logger(self, current_logger):
         avg_pop_per_round, per_player_per_round, avg_utility_per_round, utility_per_player_per_round = current_logger.calculate_long_term_stats()
         jhg_bot_type, sc_bot_type, allocation_bot_types = current_logger.get_all_bot_types()
-        cooperation_score, number_of_attempts = self.get_coop_score(current_logger)
+        cooperation_score, number_of_attempts = (self.get_coop_score(current_logger) if current_logger.sc_sim else (0, 0))
         self.draw_two_long_graphs(avg_pop_per_round, per_player_per_round, avg_utility_per_round, utility_per_player_per_round, jhg_bot_type, sc_bot_type, allocation_bot_types, cooperation_score, number_of_attempts)
 
     def draw_long_term_graphs_given_file(self, file_path):
@@ -490,12 +490,12 @@ class CompleteGrapher():
                                   cooperation_score, number_of_attempts)
 
     def draw_two_long_graphs(self, avg_pop_per_round, per_player_per_round, avg_utility_per_round, utility_per_player_per_round, jhg_bot_type, sc_bot_type, allocation_bot_types, cooperation_score, number_of_attempts):
+        # ok I need to split up this code ot even check if I need to write the vote.
+
 
         # I could put the starting amounts in there by hand and trace it all the way down or just accept that they are likely to never change.
-        avg_rise_pop = ((avg_pop_per_round[-1] - 100)) / len(avg_pop_per_round) # if we ever need it its still here but rn we are using the exponential regression function.
-        avg_rise_utility = ((avg_utility_per_round[-1] - 10)) / len(avg_utility_per_round)
+        avg_rise_utility = ((avg_utility_per_round[-1] - 10)) / len(avg_utility_per_round) if avg_utility_per_round else 0
 
-        #pairs = [(i, y) for i, y in enumerate(avg_pop_per_round)]
         rounded_list = [round(y, 6) for y in avg_pop_per_round]
         print(rounded_list)
 
@@ -536,7 +536,7 @@ class CompleteGrapher():
         starting_pop = 100
         log_ratio = np.log(np.array(avg_pop_per_round) / starting_pop)
         # this here be the slope (modifier to e, a is auto 100 and yeah)
-        b = np.dot(jhg_rounds, log_ratio) / np.dot(jhg_rounds,jhg_rounds)
+        b = np.dot(jhg_rounds, log_ratio) / np.dot(jhg_rounds,jhg_rounds) if len(jhg_rounds) > 0 else 0
 
         # LEFT: Popularity
         ax1 = axes[0]

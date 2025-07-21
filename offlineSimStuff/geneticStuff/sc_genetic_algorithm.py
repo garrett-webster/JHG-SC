@@ -92,7 +92,6 @@ def shuffle(initialPopularities, numPlayers):
 
 def make_sims():
     total_order = create_total_order(0, numPlayers)
-    jhg_bot_type = 0  # doesn't really matter, will also be doing a bot override.
     cycle = -1
     curr_round = -1
     num_causes = 3
@@ -101,31 +100,14 @@ def make_sims():
     allocation_bot_type = ""
     group = ""
     utility_per_player = 3
-    alpha = 0.2  # double check these magical fetchers when you get the chance actually.
-    beta = 0.5
-    give = 1.3
-    keep = 0.95
-    steal = 1.6
-    base_pop = 100
-    poverty_line = povertyLine
-    game_params = {
-        "alpha": alpha,
-        "beta": beta,
-        "keep": keep,
-        "give": steal,
-        "steal": steal,
-        "poverty_line": poverty_line,
-    }
     generator = generator_factory(2, numPlayers, 5, -10, 10, 3, None, None)
-    jhg_engine = JHGEngine(alpha, beta, give, keep, steal, numPlayers, base_pop, povertyLine)
     sc_sim = Social_Choice_Sim(numPlayers, num_causes, 0, generator, cycle, curr_round, chromosomes, scenario, group,
-                               total_order, allocation_bot_type, utility_per_player, False)
-    return jhg_engine, sc_sim, total_order
+                               total_order, allocation_bot_type, utility_per_player)
+    return sc_sim, total_order
 
-def run_sc_gen_stuff(agents, jhg_engine, sc_sim, total_order, curr_sc_round, num_cycles, numPlayers):
-    possible_peeps, indexes = generate_peeps(total_order, jhg_engine.get_popularity(), sc_sim)
-    influence_matrix = jhg_engine.get_influence()
-    current_options_matrix, peeps = sc_sim.let_others_create_options_matrix(possible_peeps.tolist(), influence_matrix,
+def run_sc_gen_stuff(agents, sc_sim, total_order, curr_sc_round, num_cycles, numPlayers):
+    possible_peeps, indexes = generate_peeps(total_order, sc_sim)
+    current_options_matrix, peeps = sc_sim.let_others_create_options_matrix(possible_peeps.tolist(),
                                                                             curr_sc_round)  # actually creates the matrix
     sc_sim.start_round((current_options_matrix, indexes))
     bot_votes = {}
@@ -136,8 +118,10 @@ def run_sc_gen_stuff(agents, jhg_engine, sc_sim, total_order, curr_sc_round, num
     }
     for cycle in range(num_cycles):
         bot_votes[cycle] = {}
+        last_round_v = bot_votes[cycle-1]
+
         for agent in range(numPlayers):
-            received = sc_sim.new_v[agent] if sc_sim.new_v is not None else [0 for _ in range(numPlayers)]
+            received = reconcile_recieved(sc_sim, agent, bot_votes[cycle-1])
             # the influence array is doing all sorts of silly things lately, and I am not sure why. I think we have lost track of SC round in here somewhere.
             bot_votes[cycle][agent] = (agents[agent].get_vote(agent, curr_sc_round, received, sc_sim.results_sums, np.array(sc_sim.I[curr_sc_round]), extra_data, current_options_matrix))
         sc_sim.record_votes(bot_votes[cycle], cycle) # important for logging individual games, can likely be disregarded here
@@ -148,6 +132,13 @@ def run_sc_gen_stuff(agents, jhg_engine, sc_sim, total_order, curr_sc_round, num
     # ok so what do I actually
     # what doe I need to
     return sc_sim.current_results, sc_sim.results_sums # so we have the change in utility and overall utility
+
+def reconcile_received(sc_sim, agent, previous_votes):
+    solid_recieved = sc_sim.new_v[agent] if sc_sim.new_v is not None else [0 for _ in range(numPlayers)]
+    # only problem - this completely fails to take into account previous cycles, which is odd. might need to save a new v per cycle and average it as we go. 
+    new_received = sc_sim.calculate_v_given_options_and_votes(sc_sim.scurrent_options_matrix, previous_votes)
+
+
 
 def run_jhg_gen_stuff(jhg_engine, curr_round, agents, numPlayers):
     received = [0.0 for _ in range(numPlayers)]  # C++ really needs to allocate memeory before hadn
@@ -198,8 +189,7 @@ def playGame(agents, numPlayers, numRounds, gener, gamer, initialPopularities, p
     # make the new sims, and then override the bots that they have in them.
     ## TODO: make a reset function that allows us to not have to make new sims everytime and lets us recycle them.
     # the SC sim is especially heavy in terms of initalization.
-    jhg_engine, sc_sim, total_order = make_sims()
-    sc_sim.bot_ovveride(agents[:numPlayers])
+    sc_sim, total_order = make_sims() # just have em make they own bots
     sc_sim.set_group("")
     played_sc = False
     played_jhg = False
@@ -208,10 +198,10 @@ def playGame(agents, numPlayers, numRounds, gener, gamer, initialPopularities, p
     for list_index in range(0, len(rounds_list)):
 
         sc_rounds = rounds_list[list_index][-1] == "*"
+        jhg_rounds = rounds_list[list_index][-1] == "-"
         curr_round = int(rounds_list[list_index][:-1])  # yeah something like that
 
-
-        changeUtility, overallUtility = run_sc_gen_stuff(agents, jhg_engine, sc_sim, total_order, curr_sc_round, num_cycles, numPlayers)
+        changeUtility, overallUtility = run_sc_gen_stuff(agents, sc_sim, total_order, curr_sc_round, num_cycles, numPlayers)
         curr_sc_round += 1
 
         for i in range(numPlayers):
@@ -221,8 +211,8 @@ def playGame(agents, numPlayers, numRounds, gener, gamer, initialPopularities, p
     return pmetrics # returns out data type
 
 # this might POOP poop the bed, pretty sure it was written with managers in mind rather than the sims, so we shall see.
-def generate_peeps(total_order, jhg_pops, sc_sim):
-    popularity_array = jhg_pops  # huh
+def generate_peeps(total_order, sc_sim):
+    popularity_array = [100 * len(total_order)]  # huh
     total = sum(popularity_array)
     # this is easy bc this will always be positive
     normalized_popularity_array = [val / total for val in popularity_array]
@@ -414,7 +404,10 @@ if __name__ == "__main__":
     initRelativeUtilities = [0.0 for _ in range(numPlayers)]
     agents = [AbstractAgent() for _ in range(popSize)]  # the fetchers we will be training
 
-    jhg_games_per_round = [1,1,1,1,1,1] # just give me an easy place to start.
+    # the nomral way to handle this is 3,4,4,4 etc where thats the number of jhg games per sc game
+    # however, you can specify a certain number of rounds of pure by speciying "S,20" or "J,20" both of
+    # which will give you either 20 sc games or 20 jhg games, respectively.
+    jhg_games_per_round = ["S", 6] # just give me an easy place to start.
     rounds_list = determine_rounds(jhg_games_per_round)
 
     for gen in range(num_gens): # however many generations we want
