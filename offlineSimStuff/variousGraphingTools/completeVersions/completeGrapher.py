@@ -490,14 +490,15 @@ class CompleteGrapher():
                                   cooperation_score, number_of_attempts)
 
     def draw_two_long_graphs(self, avg_pop_per_round, per_player_per_round, avg_utility_per_round, utility_per_player_per_round, jhg_bot_type, sc_bot_type, allocation_bot_types, cooperation_score, number_of_attempts):
-        # ok I need to split up this code ot even check if I need to write the vote.
-
+        # aight we might need to draw two different graphs, lets find out.
+        pop_graph = avg_pop_per_round is not None and len(avg_pop_per_round) > 0
+        util_graph = avg_utility_per_round is not None and len(avg_utility_per_round) > 0
+        num_graphs = int(pop_graph) + int(util_graph)
 
         # I could put the starting amounts in there by hand and trace it all the way down or just accept that they are likely to never change.
         avg_rise_utility = ((avg_utility_per_round[-1] - 10)) / len(avg_utility_per_round) if avg_utility_per_round else 0
 
         rounded_list = [round(y, 6) for y in avg_pop_per_round]
-        print(rounded_list)
 
         sc_bot_name_map = {
             "-1": "player",
@@ -531,81 +532,94 @@ class CompleteGrapher():
 
         jhg_rounds = range(1, len(avg_pop_per_round)+1)
 
-        fig, axes = plt.subplots(1, 2, figsize=(14, 6), sharex=False)
+        # Set up figure and axes
+        fig, axes = plt.subplots(1, num_graphs, figsize=(7 * num_graphs, 6))
+        if num_graphs == 1:
+            axes = [axes]  # Make it iterable
+        current_axis = 0
+
         # -- determining line of best fit for JHG
-        starting_pop = 100
-        log_ratio = np.log(np.array(avg_pop_per_round) / starting_pop)
-        # this here be the slope (modifier to e, a is auto 100 and yeah)
-        b = np.dot(jhg_rounds, log_ratio) / np.dot(jhg_rounds,jhg_rounds) if len(jhg_rounds) > 0 else 0
+        if pop_graph:
+            ax = axes[current_axis]
+            for i, player_scores in enumerate(per_player_per_round):
+                bot_type_id = jhg_bot_type[i] if i < len(jhg_bot_type) else "?"
+                bot_type_name = jhg_bot_name_map.get(str(bot_type_id), f"Bot {bot_type_id}")
+                label = f'P{i + 1} ({bot_type_name})'
+                ax.plot(jhg_rounds, player_scores, label=label)
 
-        # LEFT: Popularity
-        ax1 = axes[0]
-        for i, player_scores in enumerate(per_player_per_round):
-            bot_type_id = jhg_bot_type[i] if i < len(jhg_bot_type) else "?"
-            bot_type_name = jhg_bot_name_map.get(str(bot_type_id), f"Bot {bot_type_id}")
-            label = f'P{i + 1} ({bot_type_name})'
-            ax1.plot(jhg_rounds, player_scores, label=label)
+            ax.plot(jhg_rounds, avg_pop_per_round, color='black', linewidth=3, label='Avg Popularity')
+            ax.set_title('Average Popularity Over Time', loc="left")
+            ax.set_xlabel('Round')
+            ax.set_ylabel('Popularity')
+            ax.legend()
+            ax.grid(True)
 
-        ax1.plot(jhg_rounds, avg_pop_per_round, color='black', linewidth=3, label='Avg Popularity')
-        ax1.set_title('Average Popularity Over Time', loc="left")
-        ax1.set_xlabel('Round')
-        ax1.set_ylabel('Popularity')
-        ax1.legend()
-        ax1.grid(True)
+            # Fit exponential model for population
+            starting_pop = 100
+            log_ratio = np.log(np.array(avg_pop_per_round) / starting_pop)
+            b = np.dot(jhg_rounds, log_ratio) / np.dot(jhg_rounds, jhg_rounds) if jhg_rounds else 0
+            current_axis += 1
+            # add the average increase in pop and utility as part of the legend.
+            x = 0.35 if num_graphs == 2 else 0.8
+            fig.text(
+                x, 0.895,  # 0.35 together, 0.8 on its own
+                f'Exp. fit vars: {b:3e}',
+                ha='center',
+                va='bottom',
+                fontsize=12,
+                color='black',
+                weight='bold'
+            )
 
-        # RIGHT: Utility
-        sc_rounds = range(1, len(avg_utility_per_round)+1)
-        ax2 = axes[1]
-        for i, player_scores in enumerate(utility_per_player_per_round):
-            bot_type_id = sc_bot_type[i] if i < len(sc_bot_type) else "?"
-            alloc_bot_type_id = allocation_bot_types[i] if i < len(allocation_bot_types) else "?"
-            bot_type_name = sc_bot_name_map.get(str(bot_type_id), f"Bot {bot_type_id}")
-            alloc_type_name = allocation_bot_name_map.get(str(alloc_bot_type_id), f"Alloc {alloc_bot_type_id}")
-            label = f'P{i + 1} ({bot_type_name} {alloc_type_name})'
-            ax2.plot(sc_rounds, player_scores, label=label)
 
-        ax2.plot(sc_rounds, avg_utility_per_round, color='black', linewidth=3, label='Avg Utility')
-        ax2.set_title('Average Utility Over Time', loc="left")
-        ax2.set_xlabel('Round')
-        ax2.set_ylabel('Utility')
-        ax2.legend()
-        ax2.grid(True)
+        else:
+            b = 0
+
+        # ---- Utility Graph ----
+        if util_graph:
+            ax = axes[current_axis]
+            sc_rounds = range(1, len(avg_utility_per_round) + 1)
+            for i, player_scores in enumerate(utility_per_player_per_round):
+                bot_type_id = sc_bot_type[i] if i < len(sc_bot_type) else "?"
+                alloc_bot_type_id = allocation_bot_types[i] if i < len(allocation_bot_types) else "?"
+                bot_type_name = sc_bot_name_map.get(str(bot_type_id), f"Bot {bot_type_id}")
+                alloc_type_name = allocation_bot_name_map.get(str(alloc_bot_type_id), f"Alloc {alloc_bot_type_id}")
+                label = f'P{i + 1} ({bot_type_name} {alloc_type_name})'
+                ax.plot(sc_rounds, player_scores, label=label)
+
+            ax.plot(sc_rounds, avg_utility_per_round, color='black', linewidth=3, label='Avg Utility')
+            ax.set_title('Average Utility Over Time', loc="left")
+            ax.set_xlabel('Round')
+            ax.set_ylabel('Utility')
+            ax.legend()
+            ax.grid(True)
+
+            # Add text to right plot (utility)
+            x = 0.9 if num_graphs == 2 else 0.8
+            fig.text(
+                x, 0.895,  # X and Y position (tweak as needed) # 0.9 with both, 0.8 on they own
+                f'Avg Rise (Util): {avg_rise_utility:.2f}',
+                ha='center',
+                va='bottom',
+                fontsize=12,
+                color='black',
+                weight='bold'
+            )
+
+            # add the coop score as text to bottom right
+            fig.text(
+                x, 0.05, # o.9 with both, o.8 on they own.
+                f"coop_score: {cooperation_score:.2f}",
+                ha="center",
+                va="bottom",
+                fontsize=12,
+                color="black",
+                weight="bold",
+            )
+
 
         # plt.suptitle(f"Scenario: {scenario} | Group: {group or 'No Group'} | Chromosome: {chromosome}", fontsize=14)
         plt.tight_layout(rect=[0, 0.03, 1, 0.95])
-
-        # add the average increase in pop and utility as part of the legend.
-        fig.text(
-            0.35, 0.895,  # X and Y position (tweak as needed)
-            f'Exp. fit vars: {b:3e}',
-            ha='center',
-            va='bottom',
-            fontsize=12,
-            color='black',
-            weight='bold'
-        )
-
-        # Add text to right plot (utility)
-        fig.text(
-            0.90, 0.895,  # X and Y position (tweak as needed)
-            f'Avg Rise (Util): {avg_rise_utility:.2f}',
-            ha='center',
-            va='bottom',
-            fontsize=12,
-            color='black',
-            weight='bold'
-        )
-
-        # add the coop score as text to bottom left
-        fig.text(
-            0.90, 0.05,
-            f"coop_score: {cooperation_score:.2f}",
-            ha="center",
-            va="bottom",
-            fontsize=12,
-            color="black",
-            weight="bold",
-        )
 
         fig.text(
             0.5, 0.95,

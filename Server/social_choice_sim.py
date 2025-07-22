@@ -309,9 +309,14 @@ class Social_Choice_Sim:
         extra_data = {""}
         for i, bot in enumerate(self.bots):
             # print("this is the bot id ", bot.self_id, " an dthis is the i index ", i)
+            # print("this is the cycle we are working with ", cycle, " and the round ", round)
             if isinstance(bot, GeneAgent3):
+                if cycle == 0:
+                    votes_put_in = None
+                else:
+                    votes_put_in = previous_votes[cycle-1]
                 # ok what the FETCH should received be. I think just its list in V is probably the way to go.
-                recieved = np.array([0 for _ in range(len(self.total_order))]) if self.new_v is None else self.new_v[i] # gotta figure out if we HAVE recieved anything yet. could use a round=0check.
+                recieved = self.reconcile_received(i, votes_put_in) # gotta figure out if we HAVE recieved anything yet. could use a round=0check.
                 final_votes = bot.get_vote(i, round, recieved, self.results_sums, np.array(self.I[round]), extra_data, self.current_options_matrix)
             else:
                 final_votes = bot.get_vote(self.current_options_matrix, previous_votes, cycle, max_cycle)
@@ -320,6 +325,18 @@ class Social_Choice_Sim:
         self.final_votes = all_votes
 
         return all_votes
+
+    def reconcile_received(self, agent, previous_votes):
+        # if the game is just starting or the first round, we will have no room with which to think, thus 0's.
+        solid_received = self.new_v[agent] if self.new_v is not None else [0 for _ in range(self.total_players)]  # this SHOULD? work better.
+        # only problem - this completely fails to take into account previous cycles, which is odd. might need to save a new v per cycle and average it as we go.
+        new_received = self.calculate_v_given_options_and_votes(self.current_options_matrix, previous_votes)[agent]
+        # print("Here is the solid received ", solid_received, " and here is the new_received ", new_received)
+        new_v = []
+        for i in range(len(new_received)):
+            new_v.append((solid_received[i] + new_received[i]) / 2) # make this part of the agent chromosome at some point, for right now its just there.
+        # print("this is the new v ", new_v)
+        return new_v
 
     # this exists of necessity of needing to add player votes to this fetcher. Bot votes only are easy, but we need player votes as well.
     def record_votes(self, current_votes, cycle_number):
@@ -360,17 +377,40 @@ class Social_Choice_Sim:
         new_v = []
         current_options_matrix_columns = list(zip(*self.current_options_matrix))  # get the columns.
         for plyr_idx in range(self.total_players):
-            if all_votes[plyr_idx] == -1:
+            if winning_vote == -1:
                 new_v.append([0 for _ in range(
                     self.total_players)])  # if abstain, 0's across the board. probably. I might rework this later.
             else:
-                new_v.append(current_options_matrix_columns[all_votes[plyr_idx]])  # add the column of what they did to the new v.
+                new_v.append(current_options_matrix_columns[winning_vote])  # add the column of what they did to the new v.
 
         self.new_v = new_v
         self.calculate_influence_matrix(new_v, self.round)
         return winning_vote, self.current_results
 
+
+    # # this fetcher right here contains using the actual player votes to decide the new v. the above version is going to use the winning vote.
+    # new_v = []
+    # current_options_matrix_columns = list(zip(*self.current_options_matrix))  # get the columns.
+    # for plyr_idx in range(self.total_players):
+    #     if all_votes[plyr_idx] == -1:
+    #         new_v.append([0 for _ in range(
+    #             self.total_players)])  # if abstain, 0's across the board. probably. I might rework this later.
+    #     else:
+    #         new_v.append(
+    #             current_options_matrix_columns[all_votes[plyr_idx]])  # add the column of what they did to the new v.
+    #
+    # self.new_v = new_v
+    # self.calculate_influence_matrix(new_v, self.round)
+    # return winning_vote, self.current_results
+
+
+
+
+
     def calculate_v_given_options_and_votes(self, current_options_matrix, previous_votes):
+        if not previous_votes: # nothing to go off of, early return.
+            return [[0 for _ in range(self.total_players)] for _ in range(self.total_players)]
+
         new_v = []
         current_options_matrix_columns = list(zip(*current_options_matrix))  # get the columns.
         for plyr_idx in range(self.total_players):
@@ -381,10 +421,6 @@ class Social_Choice_Sim:
                 new_v.append(current_options_matrix_columns[
                                  previous_votes[plyr_idx]])  # add the column of what they did to the new v.
         return new_v
-
-
-    def print_influence_matrix(self, current_round):
-        print(self.I[current_round])
 
     # this one has one goal. is there a winning vote.
     def return_win_without_silly(self, all_votes):

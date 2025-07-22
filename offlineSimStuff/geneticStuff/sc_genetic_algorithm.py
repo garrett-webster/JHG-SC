@@ -118,10 +118,13 @@ def run_sc_gen_stuff(agents, sc_sim, total_order, curr_sc_round, num_cycles, num
     }
     for cycle in range(num_cycles):
         bot_votes[cycle] = {}
-        last_round_v = bot_votes[cycle-1]
+        if cycle == 0:
+            prev_votes = [0 for _ in range(len(total_order))]
+        else:
+            prev_votes = bot_votes[cycle-1]
 
         for agent in range(numPlayers):
-            received = reconcile_recieved(sc_sim, agent, bot_votes[cycle-1])
+            received = reconcile_received(sc_sim, agent, prev_votes) # use all bot votes here
             # the influence array is doing all sorts of silly things lately, and I am not sure why. I think we have lost track of SC round in here somewhere.
             bot_votes[cycle][agent] = (agents[agent].get_vote(agent, curr_sc_round, received, sc_sim.results_sums, np.array(sc_sim.I[curr_sc_round]), extra_data, current_options_matrix))
         sc_sim.record_votes(bot_votes[cycle], cycle) # important for logging individual games, can likely be disregarded here
@@ -133,10 +136,15 @@ def run_sc_gen_stuff(agents, sc_sim, total_order, curr_sc_round, num_cycles, num
     # what doe I need to
     return sc_sim.current_results, sc_sim.results_sums # so we have the change in utility and overall utility
 
+# not a lot going on here - we simply take in the most recent votes,
 def reconcile_received(sc_sim, agent, previous_votes):
-    solid_recieved = sc_sim.new_v[agent] if sc_sim.new_v is not None else [0 for _ in range(numPlayers)]
-    # only problem - this completely fails to take into account previous cycles, which is odd. might need to save a new v per cycle and average it as we go. 
+    solid_received = sc_sim.new_v[agent] if sc_sim.new_v is not None else [0 for _ in range(numPlayers)] # THIS IS WRONG, FIX
+    # only problem - this completely fails to take into account previous cycles, which is odd. might need to save a new v per cycle and average it as we go.
     new_received = sc_sim.calculate_v_given_options_and_votes(sc_sim.scurrent_options_matrix, previous_votes)
+    new_v = []
+    for i in range(len(new_received)):
+        new_v.append((solid_received[i] + new_received[i]) / 2)
+    return new_v
 
 
 

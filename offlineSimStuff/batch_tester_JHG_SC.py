@@ -37,7 +37,6 @@ def run_trial(sc_sim, jhg_sim, round_list, attempt, num_cycles, create_graphs, g
 
 
         if sc_rounds:
-
             run_sc_stuff(sc_sim, jhg_sim, total_order, influence_matrix, curr_sc_round, current_logger, curr_logger_round)
             played_sc = True
             sc_sim.set_rounds(curr_round)
@@ -61,8 +60,7 @@ def run_sc_stuff(sc_sim, jhg_sim, total_order, influence_matrix, curr_round, cur
     sc_sim.set_rounds(curr_round)
     possible_peeps, indexes = generate_peeps(total_order, jhg_sim, sc_sim)  # people who are needed to create the matrix
     # should I make this, you know, an entirely different bot? having them in the same file feels wrong becuase they are doing differen things.
-    current_options_matrix, peeps = sc_sim.let_others_create_options_matrix(possible_peeps.tolist(),
-                                                                     influence_matrix, curr_round)  # actually creates the matrix
+    current_options_matrix, peeps = sc_sim.let_others_create_options_matrix(possible_peeps.tolist(), curr_round)  # actually creates the matrix
     sc_sim.start_round((current_options_matrix, indexes))
 
     bot_votes = {}
@@ -191,8 +189,8 @@ if __name__ == "__main__":
 
     #jhg_games_per_sc_round = [1,1,1,1,1,1,1,1]#,1,1,1,1,1,1,1,1,1,1,1,1]
     #jhg_games_per_sc_round = [4,3,3,3,3]#,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,2]
-    #jhg_games_per_sc_round = [2,3,3]#,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,2]
-    jhg_games_per_sc_round = ["J", 20]
+    jhg_games_per_sc_round = [2,3,3]#,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,2]
+    #jhg_games_per_sc_round = ["S", 4]
     #jhg_games_per_sc_round = [1,1,1]
 
 
@@ -214,7 +212,7 @@ if __name__ == "__main__":
     jhg_bot_type = 0 # lets try using the socialwelfare stuff.
     total_order = create_total_order(num_players, num_humans)
    # num_attempts = 1000 # we are going to run this twice.
-    num_attempts = 20
+    num_attempts = 4
     num_rounds = sum(jhg_games_per_sc_round) if len(jhg_games_per_sc_round) > 2 else jhg_games_per_sc_round[-1] # if its a list, len of list. else, grab the second identifier
     current_logger = CompleteLogger()
 
