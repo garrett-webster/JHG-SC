@@ -163,6 +163,8 @@ class SCCausesGraph(QWidget):
 
     def update_arrows(self, votes, current_round_tab = False):
         # checks for existing arrows, and removes them.
+        print("here are the votes we are looking at ", votes)
+
         if votes:  # only run this if there are actual potential votes.
             for arrow in self.arrows:  # if there is anything in there.
                 arrow.remove()

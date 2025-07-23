@@ -9,6 +9,8 @@ import csv # WHEEE. make sure this doesn't leak over the client or server otherw
 import os
 import math
 import numpy as np
+from tqdm import tqdm
+
 
 from Server.sim_interface import JHG_simulator # using the sim instead of the engine. is it a bad idea? yeah. Am I doing it anyway? yeah.
 from Server.social_choice_sim import Social_Choice_Sim
@@ -108,7 +110,7 @@ def make_sims():
 def run_sc_gen_stuff(agents, sc_sim, total_order, curr_sc_round, num_cycles, numPlayers):
     possible_peeps, indexes = generate_peeps(total_order, sc_sim)
     current_options_matrix, peeps = sc_sim.let_others_create_options_matrix(possible_peeps.tolist(),
-                                                                            curr_sc_round)  # actually creates the matrix
+                                                                            curr_sc_round, sc_sim.get_influence_matrix())  # actually creates the matrix
     sc_sim.start_round((current_options_matrix, indexes))
     bot_votes = {}
     extra_data = {
@@ -137,13 +139,17 @@ def run_sc_gen_stuff(agents, sc_sim, total_order, curr_sc_round, num_cycles, num
     return sc_sim.current_results, sc_sim.results_sums # so we have the change in utility and overall utility
 
 # not a lot going on here - we simply take in the most recent votes,
-def reconcile_received(sc_sim, agent, previous_votes):
-    solid_received = sc_sim.new_v[agent] if sc_sim.new_v is not None else [0 for _ in range(numPlayers)] # THIS IS WRONG, FIX
+def reconcile_received(self, agent, previous_votes):
+    # if the game is just starting or the first round, we will have no room with which to think, thus 0's.
+    solid_received = self.new_v[agent] if self.new_v is not None else [0 for _ in range( self.total_players)]  # this SHOULD? work better.
     # only problem - this completely fails to take into account previous cycles, which is odd. might need to save a new v per cycle and average it as we go.
-    new_received = sc_sim.calculate_v_given_options_and_votes(sc_sim.scurrent_options_matrix, previous_votes)
+    new_received = self.calculate_v_given_options_and_votes(self.current_options_matrix, previous_votes)[agent]
+    # print("Here is the solid received ", solid_received, " and here is the new_received ", new_received)
     new_v = []
     for i in range(len(new_received)):
-        new_v.append((solid_received[i] + new_received[i]) / 2)
+        new_v.append((solid_received[i] + new_received[
+            i]) / 2)  # make this part of the agent chromosome at some point, for right now its just there.
+    # print("this is the new v ", new_v)
     return new_v
 
 
@@ -220,7 +226,7 @@ def playGame(agents, numPlayers, numRounds, gener, gamer, initialPopularities, p
 
 # this might POOP poop the bed, pretty sure it was written with managers in mind rather than the sims, so we shall see.
 def generate_peeps(total_order, sc_sim):
-    popularity_array = [100 * len(total_order)]  # huh
+    popularity_array = [100 for _ in range(len(total_order))]  # huh
     total = sum(popularity_array)
     # this is easy bc this will always be positive
     normalized_popularity_array = [val / total for val in popularity_array]
@@ -418,7 +424,7 @@ if __name__ == "__main__":
     jhg_games_per_round = ["S", 6] # just give me an easy place to start.
     rounds_list = determine_rounds(jhg_games_per_round)
 
-    for gen in range(num_gens): # however many generations we want
+    for gen in tqdm(range(num_gens)): # however many generations we want
         for game in range(games_per_gen): # however many games we want per generation
 
             # pick individuals to put into the gene pools.

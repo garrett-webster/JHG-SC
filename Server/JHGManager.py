@@ -49,7 +49,7 @@ class JHGManager:
 
 
         self.current_round += 1
-        return client_input
+        return self.jhg_sim.get_influence()
 
 
     def get_sent_and_received(self, allocations_matrix):

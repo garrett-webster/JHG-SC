@@ -16,15 +16,14 @@ from offlineSimStuff.variousGraphingTools.completeVersions.completeLogger import
 
 # starts the sim, could make this take command line arguments
 # takes in a bot type, a number of rounds, and then runs it and plots the results. plans for expansion coming soon.
-def run_trial(sc_sim, jhg_sim, round_list, attempt, num_cycles, create_graphs, group, total_order, create_influence, current_logger, offset):
+def run_trial(sc_sim, jhg_sim, round_list, attempt, num_cycles, create_graphs, group, total_order, current_logger, offset):
 
     sc_sim.set_group(group)
     played_sc = False
     played_jhg = False
     curr_sc_round = 0
     influence_matrix = None # this should get overwritten pretty quick, but its there so there's no error.
-    #for list_index in tqdm(range(0, len(round_list))): # everything NEEDS to start at 1, PLEASE.
-    for list_index in (range(0, len(round_list))): # everything NEEDS to start at 1, PLEASE.
+    for list_index in (range(0, len(round_list))): # fixed, we start at 0 now.
 
         sc_rounds = round_list[list_index][-1] == "*"
         jhg_rounds = round_list[list_index][-1] == "-"
@@ -35,17 +34,19 @@ def run_trial(sc_sim, jhg_sim, round_list, attempt, num_cycles, create_graphs, g
             influence_matrix = run_jhg_stuff(jhg_sim, curr_round, current_logger, curr_logger_round)
             played_jhg = True
 
-
         if sc_rounds:
-            run_sc_stuff(sc_sim, jhg_sim, total_order, influence_matrix, curr_sc_round, current_logger, curr_logger_round)
+            influence_matrix, winning_vote = run_sc_stuff(sc_sim, jhg_sim, total_order, influence_matrix, curr_sc_round, current_logger, curr_logger_round, num_cycles)
             played_sc = True
-            sc_sim.set_rounds(curr_round)
+            sc_sim.set_rounds(curr_sc_round) # ???
             curr_sc_round += 1
 
 
-        if create_graphs:
+        if create_graphs: # if we wnat individual round grpahs, here they are. not used a whole lot but optional.
             pass
             graphEverything(sc_sim, jhg_sim, curr_round, played_sc, played_jhg)
+        # make sure these get reset after every round so they only print as necessary.
+        played_sc = False
+        played_jhg = False
 
         # just want to have some sort of insight into what is happening.
 
@@ -56,11 +57,16 @@ def run_trial(sc_sim, jhg_sim, round_list, attempt, num_cycles, create_graphs, g
 
     return sc_sim, jhg_sim, current_logger
 
-def run_sc_stuff(sc_sim, jhg_sim, total_order, influence_matrix, curr_round, current_logger, curr_logger_round):
+def run_sc_stuff(sc_sim, jhg_sim, total_order, influence_matrix, curr_round, current_logger, curr_logger_round, num_cycles):
     sc_sim.set_rounds(curr_round)
     possible_peeps, indexes = generate_peeps(total_order, jhg_sim, sc_sim)  # people who are needed to create the matrix
+    if influence_matrix is not None:
+        sc_influence = sc_sim.get_influence_matrix()
+        new_influence = reconcile_influence(influence_matrix, sc_sim.get_influence_matrix())
+    else:
+        new_influence = sc_sim.get_influence_matrix() # if there is no JHG influence, we are flying solo, leach off of own influence
     # should I make this, you know, an entirely different bot? having them in the same file feels wrong becuase they are doing differen things.
-    current_options_matrix, peeps = sc_sim.let_others_create_options_matrix(possible_peeps.tolist(), curr_round)  # actually creates the matrix
+    current_options_matrix, peeps = sc_sim.let_others_create_options_matrix(possible_peeps.tolist(), curr_round, new_influence)  # actually creates the matrix
     sc_sim.start_round((current_options_matrix, indexes))
 
     bot_votes = {}
@@ -68,10 +74,43 @@ def run_sc_stuff(sc_sim, jhg_sim, total_order, influence_matrix, curr_round, cur
         bot_votes[cycle] = sc_sim.get_votes(bot_votes, curr_round, cycle, num_cycles)
         sc_sim.record_votes(bot_votes[cycle], cycle)
 
+
+    if influence_matrix is not None: # we need to re run this after pushing it through to make sure that it actually changes.
+        new_influence = reconcile_influence(influence_matrix, sc_sim.get_influence_matrix())
+
     # make sure that this happens IMMEDIATELY afterward.
     winning_vote, round_results = sc_sim.return_win(bot_votes[num_cycles - 1])
     sc_sim.save_results()
     current_logger.save_sc_round(curr_round, curr_logger_round)
+    return new_influence, winning_vote # takes our modified influence and makes sure to feed it back into the jhg sim so we get a cyclical affect.
+
+def reconcile_influence(jhg_influence, sc_influence):
+
+    # ok this fetcher uses convex recombination to put the two together and then uses the frobenius norm to decide on the magnitude to adjust back too. bars!
+
+
+    alpha = 0.5 # THIS iS JUST A STARTER VALUE, WILL LIKELY BE MADE INTO A GENE OR WHATEVER.
+
+    if sc_influence is None:
+        print("something wrong :(")
+        return jhg_influence
+
+    sc_influence = np.array(sc_influence)
+    jhg_influence = np.array(jhg_influence) # This shbould never get used but it couldn't hurt
+
+    jhg_norm = np.linalg.norm(jhg_influence, 'fro')
+
+    combined = (1 - alpha) * jhg_influence + alpha * sc_influence
+
+    combined_norm = np.linalg.norm(combined, 'fro')
+    if combined_norm == 0:
+        return np.zeros_like(jhg_influence)
+
+    rescaled = combined * (jhg_norm / combined_norm)
+    return rescaled
+
+
+
 
 def run_jhg_stuff(jhg_sim, curr_round, current_logger, curr_logger_round):
     jhg_sim.execute_round(None, curr_round)  # no client input, thats crazy talk here. run a JHG round.
@@ -188,9 +227,9 @@ def graph_longterm(current_logger):
 if __name__ == "__main__":
 
     #jhg_games_per_sc_round = [1,1,1,1,1,1,1,1]#,1,1,1,1,1,1,1,1,1,1,1,1]
-    #jhg_games_per_sc_round = [4,3,3,3,3]#,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,2]
-    jhg_games_per_sc_round = [2,3,3]#,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,2]
-    #jhg_games_per_sc_round = ["S", 4]
+    jhg_games_per_sc_round = [4,3,3,3,3,3,3,3]#,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,2]
+    #jhg_games_per_sc_round = [2,3,3]#,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,2]
+    #jhg_games_per_sc_round = ["S", 10]
     #jhg_games_per_sc_round = [1,1,1]
 
 
@@ -202,30 +241,28 @@ if __name__ == "__main__":
     utility_per_player = 3
     create_graphs = False
     graph_everything = True
-    create_influence = True
+    create_influence = False
     chromosomes_directory = "testChromosome"
     group = ""
     # these paths are relative to the file location, so as long as you don't move the file it can and will run from anywhere.
     scenario = "scenarioIndicator/allRandom"
     chromosome = "chromosomes/experiment"
     allocation_bot_type = "allocations_scenarios/random"
-    jhg_bot_type = 0 # lets try using the socialwelfare stuff.
+    jhg_bot_type = 0 # 0 is gene bots, 2 is social welfare and 3 is random.
     total_order = create_total_order(num_players, num_humans)
-   # num_attempts = 1000 # we are going to run this twice.
-    num_attempts = 4
+    num_attempts = 100 # number of batches to do.
     num_rounds = sum(jhg_games_per_sc_round) if len(jhg_games_per_sc_round) > 2 else jhg_games_per_sc_round[-1] # if its a list, len of list. else, grab the second identifier
     current_logger = CompleteLogger()
 
-    for attempt in tqdm(range(num_attempts)):
-        offset = num_rounds * attempt
+    for attempt in tqdm(range(num_attempts)): # create a new sim for each attempt to prevent bleeding over.
+        offset = num_rounds * attempt # for logging purposes, lets us know the relationship between the logger round and current round
         current_jhg_sim = create_jhg_sim(num_humans, num_players, total_order, tokens_per_player, jhg_bot_type)
         current_sc_sim = create_sim(num_players, scenario, chromosome, group, total_order, allocation_bot_type, utility_per_player)
-        current_sc_sim.bot_ovveride(current_jhg_sim.players)
-        # it doesn't like this much but it IS doign what I want it to do.
-        current_logger.resetup(current_jhg_sim, current_sc_sim)
-        sc_sim, jhg_sim, current_logger = run_trial(current_sc_sim, current_jhg_sim, round_list, attempt, num_cycles, create_graphs, group, total_order, create_influence, current_logger, offset)
-        current_logger.create_big_boy_graphs(num_rounds, num_rounds * attempt) # num rounds is self expanatory, the num_rounds*i tells me which round we are on in the logger. (kind of).
+        current_sc_sim.bot_ovveride(current_jhg_sim.players) # tells the SC sim to make sure that it is using the same bots as the JHG by passing htem as a reference to both voting and allocation slots.
+        current_logger.resetup(current_jhg_sim, current_sc_sim) # sets up the current logger with our current sims that we write with and then trash.
+        sc_sim, jhg_sim, current_logger = run_trial(current_sc_sim, current_jhg_sim, round_list, attempt, num_cycles, create_graphs, group, total_order, current_logger, offset) # This is really whats getting run round times
+        current_logger.create_big_boy_graphs(num_rounds, offset) # it more initializes the data required to create hte big boy graphs, which we will use when we try to log everything
 
     current_logger.actually_close_the_thing("Sizable_inventory")
-    if graph_everything:
-        graph_longterm(current_logger)
+    if graph_everything: # this is what uses the create big boy graphs and offset
+        graph_longterm(current_logger) # takes in the current logger object and consults it for information and makes cool graphs afterward.

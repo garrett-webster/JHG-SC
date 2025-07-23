@@ -49,6 +49,11 @@ class HumanAgent(AbstractAgent):
     def getType(self):
         return self.whoami
 
+    def create_column(self, num_players):
+        return [0 for _ in range(num_players)]
+
+    def get_vote(self, current_options_matrix, previous_votes, cycle, max_cycle):
+        return -1 # SO we SHOUDL be overwriting this, we shall see.
 
     def play_round(self, player_idx, round_num, received, popularities, influence, extra_data):
         numPlayers = len(received)

@@ -23,9 +23,8 @@ def run_trial(sim, num_rounds, num_cycles, create_graphs, group, total_order, cu
         possible_peeps, indexes = generate_peeps(total_order,
                                                  sim)  # people who are needed to create the matrix
         influence_matrix = sim.get_influence_matrix()
-        current_options_matrix, peeps = sim.let_others_create_options_matrix(possible_peeps.tolist(),
-                                                                                influence_matrix, # problem
-                                                                                curr_round)  # actually creates the matrix
+        current_options_matrix, peeps = sim.let_others_create_options_matrix(possible_peeps.tolist(), # problem
+                                                                                curr_round, sim.get_influence_matrix())  # actually creates the matrix
         bot_votes = {}
         for cycle in range(num_cycles):
             #print("*****************STARTING CYCLE " + str(cycle+1) + "************************")

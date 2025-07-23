@@ -3,6 +3,7 @@ import time
 
 import numpy as np
 
+from Server.Engine.geneagent3 import GeneAgent3
 from Server.social_choice_sim import Social_Choice_Sim
 
 import copy
@@ -12,7 +13,7 @@ def create_empty_vote_matrix(num_players):
 
 
 class SCManager:
-    def __init__(self, connection_manager, num_humans, options_generator, num_players, num_bots, sc_group_option, vote_cycles, total_order, utility_per_player):
+    def __init__(self, connection_manager, num_humans, options_generator, num_players, num_bots, sc_group_option, vote_cycles, total_order, utility_per_player, bots):
         self.connection_manager = connection_manager
         self.round_num = 1
         self.save_dict = {}
@@ -25,6 +26,7 @@ class SCManager:
         allocation_scenario = "../JHG-SC/offlineSimStuff/allocations_scenarios/social_welfare"
         #print("this is the total ordering ", total_order)
         self.sc_sim = Social_Choice_Sim(num_players, 3, num_humans, options_generator, 3, 0, chromosomes, scenario, "", total_order, allocation_scenario, utility_per_player)
+        self.sc_sim.bot_ovveride(bots)
         #self.sc_groups = generate_two_plus_one_groups(num_players, sc_group_option)
         self.num_players = num_players
         self.num_bots = num_bots
@@ -56,14 +58,15 @@ class SCManager:
 
 
 
-    def play_social_choice_round(self, jhg_sim):
+    def play_social_choice_round(self, curr_sc_round, influence_matrix):
         # first we gotta GET the new current options matrix. thats a pain.
         # Run the voting and collect the votes
-        player_votes = self.run_sc_voting()
+        player_votes = self.run_sc_voting(curr_sc_round, influence_matrix)
+
         # this is the line where we get the bot votes as well.
         previous_votes = {}
         # always start from cycle 0, don't use the max one. methinks.
-        zero_idx_votes, one_idx_votes = self.compile_sc_votes(player_votes, self.round_num, 0, previous_votes) # no clue what cycle this is or why this runs.
+        zero_idx_votes, one_idx_votes = self.compile_sc_votes(player_votes, curr_sc_round, 0, previous_votes, influence_matrix) # no clue what cycle this is or why this runs.
         self.sc_sim.set_final_votes(zero_idx_votes)
         # this is weird garrett stuff Imma not touch it.
         self.update_vote_effects(zero_idx_votes, self.current_options_matrix,
@@ -91,7 +94,7 @@ class SCManager:
         self.round_num += 1
 
 
-    def run_sc_voting(self):
+    def run_sc_voting(self, curr_sc_round, influence_matrix):
         player_votes = {}
         is_last_cycle = False
         previous_votes = {}
@@ -107,19 +110,22 @@ class SCManager:
                     except KeyError:
                         print("SOMEONE SHOULDN't BE ALLOWED TO TOUCH THIS YET. FIX THAT")
 
-
+            if cycle == 1:
+                print("check previous here ")
             zero_idx_votes, one_idx_votes = self.compile_sc_votes(player_votes,
-                                                                  self.round_num, cycle, previous_votes)
+                                                                  curr_sc_round, cycle, previous_votes, influence_matrix)
             previous_votes[cycle] = zero_idx_votes
+            print("zero idx votes in hot oevr here ", zero_idx_votes)
             if cycle == self.vote_cycles - 1: is_last_cycle = True
             self.connection_manager.distribute_message("SC_VOTES", zero_idx_votes, cycle + 1, is_last_cycle)
 
         return player_votes
 
-    def compile_sc_votes(self, player_votes, round_num, cycle, previous_votes):
+    def compile_sc_votes(self, player_votes, round_num, cycle, previous_votes, influence_matrix):
         bot_votes = self.sc_sim.get_votes(previous_votes, round_num, cycle, self.vote_cycles)
 
-        all_votes = {**bot_votes, **player_votes}
+        all_votes = {**bot_votes, **player_votes} # player votes being second is MANDATORY.
+        print("here ar ethe bot votes ", bot_votes, " and here ar ethe player votes ", player_votes)
         all_votes_list = [option_num + 1 if option_num != -1 else -1 for option_num in
                           all_votes.values()]  # Convert 0-based votes to 1-based for display, but leave voters of -1 as they are
         self.options_votes_history[round_num] = all_votes  # Saves the history of votes
@@ -153,7 +159,7 @@ class SCManager:
     def get_highest_utility_player(self):
         return self.sc_sim.get_highest_utility_player()
 
-    def server_side_options_matrix(self, peeps, influence_matrix):
+    def server_side_options_matrix(self, peeps, influence_matrix, curr_round):
         player_peeps = []
         bot_peeps = []
         total_columns = []
@@ -179,8 +185,35 @@ class SCManager:
 
 
         bot_columns = []
-        for bot in self.sc_sim.allocation_bots:
-            bot_columns.append(bot.create_column(len(self.total_order))) # something like that?
+        extra_data = {} # we only use or initalize if gene3 agent but its just so smol its fine
+        for i in range(self.num_players):
+            extra_data[i] = None  # we never use government or anything.
+        for i, bot in enumerate(self.sc_sim.allocation_bots):
+            if isinstance(bot, GeneAgent3):
+                if self.sc_sim.new_v is not None:
+                    T_prev = self.sc_sim.new_v  # constructs the previous, like, received matrix. kind of.
+                else:
+                    T_prev = [[0 for _ in range(self.num_players)] for _ in
+                              range(self.num_players)]  # 2d nxn array filled w/ zeros.
+
+
+
+                T_prev = np.array(T_prev)
+                extra_data = {}
+                for i in range(self.num_players):
+                    extra_data[i] = None  # we never use government or anything.
+                # go ahead and queyr everyone and then organize it later.
+
+                bot_columns.append(bot.play_round(
+                    i,
+                    curr_round,
+                    T_prev[:, i],  # should be a 9x9 ndarray (from numpy)
+                    self.sc_sim.results_sums,
+                    np.array(influence_matrix),
+                    extra_data,  # yes this is blank. no I don't know why.
+                ))
+            else:
+                bot_columns.append(bot.create_column(len(self.total_order))) # something like that?
 
         final_columns = {}
         for bot, i in enumerate(bot_peeps):

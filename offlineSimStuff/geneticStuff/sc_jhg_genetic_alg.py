@@ -12,7 +12,7 @@ import numpy as np
 
 from Server.sim_interface import JHG_simulator # using the sim instead of the engine. is it a bad idea? yeah. Am I doing it anyway? yeah.
 from Server.social_choice_sim import Social_Choice_Sim
-from offlineSimStuff.batch_tester_JHG_SC import determine_rounds
+from offlineSimStuff.batch_tester_JHG_SC import determine_rounds, reconcile_influence
 from offlineSimStuff.geneticStuff.geneticLogger import geneticLogger
 
 
@@ -118,15 +118,14 @@ def make_sims():
     }
     generator = generator_factory(2, numPlayers, 5, -10, 10, 3, None, None)
     jhg_engine = JHGEngine(alpha, beta, give, keep, steal, numPlayers, base_pop, povertyLine)
-    sc_sim = Social_Choice_Sim(numPlayers, num_causes, 0, generator, cycle, curr_round, chromosomes, scenario, group,
-                               total_order, allocation_bot_type, utility_per_player, False)
+    sc_sim = Social_Choice_Sim(numPlayers, num_causes, num_humans, generator, cycle, curr_round, chromosomes, scenario, group, total_order, allocation_bot_type, utility_per_player)
     return jhg_engine, sc_sim, total_order
 
-def run_sc_gen_stuff(agents, jhg_engine, sc_sim, total_order, curr_sc_round, num_cycles, numPlayers):
+def run_sc_gen_stuff(agents, jhg_engine, sc_sim, total_order, curr_sc_round, num_cycles, numPlayers, influence_matrix):
     possible_peeps, indexes = generate_peeps(total_order, jhg_engine.get_popularity(), sc_sim)
-    influence_matrix = jhg_engine.get_influence()
-    current_options_matrix, peeps = sc_sim.let_others_create_options_matrix(possible_peeps.tolist(), influence_matrix,
-                                                                            curr_sc_round)  # actually creates the matrix
+    new_influence = reconcile_influence(influence_matrix, sc_sim.get_influence_matrix())
+    current_options_matrix, peeps = sc_sim.let_others_create_options_matrix(possible_peeps.tolist(),
+                                                                            curr_sc_round, new_influence)  # actually creates the matrix
     sc_sim.start_round((current_options_matrix, indexes))
     bot_votes = {}
     extra_data = {
@@ -136,18 +135,37 @@ def run_sc_gen_stuff(agents, jhg_engine, sc_sim, total_order, curr_sc_round, num
     }
     for cycle in range(num_cycles):
         bot_votes[cycle] = {}
+        if cycle == 0:
+            votes_put_in = None
+        else:
+            votes_put_in = bot_votes[cycle - 1]
         for agent in range(numPlayers):
-            received = sc_sim.new_v[agent] if sc_sim.new_v is not None else [0 for _ in range(numPlayers)]
+            recieved = sc_sim.reconcile_received(agent, votes_put_in)
             # the influence array is doing all sorts of silly things lately, and I am not sure why. I think we have lost track of SC round in here somewhere.
-            bot_votes[cycle][agent] = (agents[agent].get_vote(agent, curr_sc_round, received, sc_sim.results_sums, np.array(sc_sim.I[curr_sc_round]), extra_data, current_options_matrix))
+            bot_votes[cycle][agent] = (agents[agent].get_vote(agent, curr_sc_round, recieved, sc_sim.results_sums, np.array(sc_sim.I[curr_sc_round]), extra_data, current_options_matrix))
         sc_sim.record_votes(bot_votes[cycle], cycle) # important for logging individual games, can likely be disregarded here
+
+    new_influence = reconcile_influence(influence_matrix, sc_sim.get_influence_matrix())
 
     # make sure that this happens IMMEDIATELY afterward.
     winning_vote, round_results = sc_sim.return_win(bot_votes[num_cycles - 1])  # we need this to run, even if we don't need the results HERE per se
     sc_sim.save_results()
     # ok so what do I actually
     # what doe I need to
-    return sc_sim.current_results, sc_sim.results_sums # so we have the change in utility and overall utility
+    return sc_sim.current_results, sc_sim.results_sums, new_influence # so we have the change in utility and overall utility
+
+def reconcile_received(self, agent, previous_votes):
+    # if the game is just starting or the first round, we will have no room with which to think, thus 0's.
+    solid_received = self.new_v[agent] if self.new_v is not None else [0 for _ in range(self.total_players)]  # this SHOULD? work better.
+    # only problem - this completely fails to take into account previous cycles, which is odd. might need to save a new v per cycle and average it as we go.
+    new_received = self.calculate_v_given_options_and_votes(self.current_options_matrix, previous_votes)[agent]
+    # print("Here is the solid received ", solid_received, " and here is the new_received ", new_received)
+    new_v = []
+    for i in range(len(new_received)):
+        new_v.append((solid_received[i] + new_received[i]) / 2) # make this part of the agent chromosome at some point, for right now its just there.
+    # print("this is the new v ", new_v)
+    return new_v
+
 
 def run_jhg_gen_stuff(jhg_engine, curr_round, agents, numPlayers):
     received = [0.0 for _ in range(numPlayers)]  # C++ really needs to allocate memeory before hadn
@@ -158,11 +176,13 @@ def run_jhg_gen_stuff(jhg_engine, curr_round, agents, numPlayers):
             received[j] = np.array(jhg_engine.T[curr_round][j][i])
         transactions[i] = agents[i].play_round(i, curr_round, received, jhg_engine.P[curr_round], jhg_engine.I[curr_round], transactions[i])
     jhg_engine.apply_transaction(transactions) # thanks references
+    return jhg_engine.get_influence() # return da influence matrix
 
 def playGame(agents, numPlayers, numRounds, gener, gamer, initialPopularities, povertyLine, forcedRandom, rounds_list):
     # for this one, reference defs.h in the C++ code. most of these are hard coded into the engine and this is just tranfering them over.
     # they might get set to different values in the engine, but i wan this engine to be consistent with other engines.
     # so for now just accept the magic numbers and we will move on with our day
+    offset = gener * numRounds
     num_cycles = 3
     alpha = 0.2 # double check these magical fetchers when you get the chance actually.
     beta = 0.5
@@ -184,11 +204,11 @@ def playGame(agents, numPlayers, numRounds, gener, gamer, initialPopularities, p
         # IDK what post contract does, only seems to be relevant in the coop bots and I am not interesteed in them atm rn.
 
 
-    received = [0.0 for _ in range(numPlayers)] # C++ really needs to allocate memeory before hadn
-    transactions = [0 for _ in range(numPlayers)] # so this is how I replilcate it in python.
-
-    for i in range(numPlayers): # I think this makes the fetcher square?
-        transactions[i] = [0 for _ in range(numPlayers)]
+    # received = [0.0 for _ in range(numPlayers)] # C++ really needs to allocate memeory before hadn
+    # transactions = [0 for _ in range(numPlayers)] # so this is how I replilcate it in python.
+    #
+    # for i in range(numPlayers): # I think this makes the fetcher square?
+    #     transactions[i] = [0 for _ in range(numPlayers)]
 
     # they hard lean into initalizing arrays of type class and then filling them later, which is weird to replicate in python
     pmetrics = [PopularityMetrics(avgUtility=0, endUtility=0, relUtility=0) for _ in range(numPlayers)]
@@ -199,20 +219,22 @@ def playGame(agents, numPlayers, numRounds, gener, gamer, initialPopularities, p
     ## TODO: make a reset function that allows us to not have to make new sims everytime and lets us recycle them.
     # the SC sim is especially heavy in terms of initalization.
     jhg_engine, sc_sim, total_order = make_sims()
-    sc_sim.bot_ovveride(agents[:numPlayers])
+    sc_sim.bot_ovveride(agents[:numPlayers]) # this should put us all on the same page
     sc_sim.set_group("")
-    played_sc = False
-    played_jhg = False
+
     influence_matrix = None
     curr_sc_round = 0
     for list_index in range(0, len(rounds_list)):
 
         sc_rounds = rounds_list[list_index][-1] == "*"
-        curr_round = int(rounds_list[list_index][:-1])  # yeah something like that
-        run_jhg_gen_stuff(jhg_engine, curr_round, agents, numPlayers)
+        jhg_rounds = rounds_list[list_index][-1] == "-"
+        curr_round = int(rounds_list[list_index][:-1])  # useful, yes, but not quite the logger round
+        #curr_logger_round = gamer + offset  # this way the logger is logging it continously, but the sims don't interpret it that way.
+        if jhg_rounds:
+            influence_matrix = run_jhg_gen_stuff(jhg_engine, curr_round, agents, numPlayers)
 
         if sc_rounds:
-            changeUtility, overallUtility = run_sc_gen_stuff(agents, jhg_engine, sc_sim, total_order, curr_sc_round, num_cycles, numPlayers)
+            changeUtility, overallUtility, influence_matrix = run_sc_gen_stuff(agents, jhg_engine, sc_sim, total_order, curr_sc_round, num_cycles, numPlayers, influence_matrix)
             curr_sc_round += 1
 
             for i in range(numPlayers):
@@ -275,7 +297,8 @@ def write_generational_results(theGenePools, popSize, gen, agentsPerGame):
     # Write CSV
     with open(filename, mode='w', newline='') as file:
         writer = csv.writer(file)
-        writer.writerow(["Genes", "GamesPlayed", "RelativeUtility", "AbsoluteUtility"])  # optional header
+        # get rid of this STUPID and STINKY header.
+        #writer.writerow(["Genes", "GamesPlayed", "RelativeUtility", "AbsoluteUtility"])  # optional header
         for agent in sorted_agents:
             writer.writerow([
                 agent.getString(),
@@ -392,7 +415,7 @@ if __name__ == "__main__":
     popSize = 100 # number of agnets in the gene pool (use 100 here)
     numGeneGopies = 3 # numbers of sets of genes (3 was the number used in the paper)
     startIndex = 0 # generation to start training (0 to start form scratch)
-    num_gens = 200 # generation to end traning trains up to 99
+    num_gens = 300 # generation to end traning trains up to 99
     games_per_gen = 10 # agents from the gene pool are selected at random, 100 times.
     agentsPerGame = 10 # number of agents per game
     roundsPerGame = 30 # number fo rounds per game
@@ -415,7 +438,7 @@ if __name__ == "__main__":
     initRelativeUtilities = [0.0 for _ in range(numPlayers)]
     agents = [AbstractAgent() for _ in range(popSize)]  # the fetchers we will be training
 
-    jhg_games_per_round = [2,2] # just give me an easy place to start.
+    jhg_games_per_round = [4,3,3,3,3,3,3,3] # just give me an easy place to start.
     rounds_list = determine_rounds(jhg_games_per_round)
 
     for gen in range(num_gens): # however many generations we want
@@ -443,7 +466,9 @@ if __name__ == "__main__":
             for i in range(numPlayers):
                 initRelativeUtilities[i] = initUtilities[i]/s
 
-            pmetrics = playGame(agents, numPlayers, roundsPerGame, gen, game, initUtilities, povertyLine, False, rounds_list)
+            num_rounds = sum(jhg_games_per_round)
+
+            pmetrics = playGame(agents, numPlayers, num_rounds, gen, game, initUtilities, povertyLine, False, rounds_list)
 
             # now we gotta calcualte relative popularity
 

@@ -56,7 +56,7 @@ class Server():
         self.JHG_manager = None
         self.connection_manager = None
         self.current_logger = None
-        self.rounds_list = self.determine_rounds()
+        self.rounds_list = self.determine_rounds(self.jhg_rounds_per_sc_round)
 
 
     def start_server(self, host='0.0.0.0', port=12345):
@@ -73,7 +73,7 @@ class Server():
                                            OPTIONS["MAX_UTILITY"], OPTIONS["MIN_UTILITY"], OPTIONS["NUM_OPTIONS"],
                                            self.JHG_manager, self.connection_manager)
         self.SC_manager = SCManager(self.connection_manager, self.num_humans, self.generator, self.num_players, self.num_bots,
-                                    self.sc_group_option, self.sc_vote_cycles, self.total_order, self.utility_per_player)
+                                    self.sc_group_option, self.sc_vote_cycles, self.total_order, self.utility_per_player, self.JHG_manager.jhg_sim.players)
 
         self.current_logger = CompleteLogger()
         self.current_logger.resetup(self.JHG_manager.jhg_sim, self.SC_manager.sc_sim)
@@ -83,23 +83,37 @@ class Server():
         # Main game loop -- Play as many rounds as specified in OPTIONS
 
         curr_sc_round = 0
-        for i, list_index in enumerate(self.rounds_list):
+        influence_matrix = None
+
+        for list_index in range(len(self.rounds_list)):
             is_last_jhg_round = False
-            curr_round = int(list_index[:-1]) # yeah something like that
+
+            if self.rounds_list[list_index+1][-1] == "*": is_last_jhg_round = True
+
+            sc_rounds = self.rounds_list[list_index][-1] == "*"
+            jhg_rounds = self.rounds_list[list_index][-1] == "-"
+            curr_round = int(self.rounds_list[list_index][:-1])  # useful, yes, but not quite the logger round
             curr_logger_round = curr_round
-            if list_index[-1] == "*": is_last_jhg_round = True
-            self.JHG_manager.play_jhg_round(self.JHG_manager.current_round, is_last_jhg_round)
-            self.current_logger.save_jhg_round(curr_round, curr_logger_round)
-            # THEN DECIDE IF YOU NEED TO RUN AN SC ROUND.
-            if list_index[-1] == "*": # if we have a star in there, run an SC round.
+
+            if jhg_rounds:
+                influence_matrix = self.JHG_manager.play_jhg_round(self.JHG_manager.current_round, is_last_jhg_round)
+                self.current_logger.save_jhg_round(curr_round, curr_logger_round)
+
+            if sc_rounds:
                 if self.player_allocations:
                     peeps, total_order_index = self.generate_peeps(self.total_order, self.JHG_manager, self.SC_manager)
-                    influence_matrix = self.JHG_manager.get_influence_matrix()
-                    current_options_matrix = self.SC_manager.server_side_options_matrix(peeps, influence_matrix)
+                    if influence_matrix is not None:
+                        sc_influence = self.SC_manager.sc_sim.get_influence_matrix()
+                        new_influence = self.reconcile_influence(influence_matrix, sc_influence)
+                    else:
+                        new_influence = self.SC_manager.sc_sim.get_influence_matrix()
+
+
+                    current_options_matrix = self.SC_manager.server_side_options_matrix(peeps, new_influence, curr_round)
                     self.SC_manager.init_next_round((current_options_matrix, total_order_index))
                 else:
                     self.SC_manager.init_next_round()
-                self.SC_manager.play_social_choice_round(self.JHG_manager.get_sim)
+                self.SC_manager.play_social_choice_round(curr_sc_round, new_influence)
                 self.current_logger.save_sc_round(curr_sc_round, curr_logger_round)
                 curr_sc_round += 1 # WHEE.
 
@@ -136,20 +150,57 @@ class Server():
             indexes.append(total_order.index(peep)+1)
         return indexes
 
-    def determine_rounds(self):
-        num_games_in_cycle = self.jhg_rounds_per_sc_round
-        new_list = []
-        max_item = 0
-        for instance in num_games_in_cycle:
-            for i in range(instance):
-                new_list.append(str(i+max_item) + "-")
-            new_list.pop()
-            new_list.append(str(len(new_list))+"*")
-            max_item = len(new_list)
 
-        print("This is the new list ", new_list, " and here is what we were workign with ", self.jhg_rounds_per_sc_round)
+    # updated new and improved version ig.
+    def determine_rounds(self, jhg_rounds_per_sc_game_list):
+        new_list = []  # WHEEE gotta start somewhere
+        if jhg_rounds_per_sc_game_list[0] == "J" or jhg_rounds_per_sc_game_list[0] == "S":
+            print("engaging pure opertaiopns, standing by")
+            if jhg_rounds_per_sc_game_list[0] == "J":
+                num_rounds = int(jhg_rounds_per_sc_game_list[
+                                     -1])  # possibly one of the jankier lines that I have ever written but here we are
+                for i in range(num_rounds):
+                    new_list.append(str(i) + "-")
+
+            if jhg_rounds_per_sc_game_list[0] == "S":
+                num_rounds = int(jhg_rounds_per_sc_game_list[-1])
+                for i in range(num_rounds):
+                    new_list.append(str(i) + "*")
+
+        else:
+            new_list = []
+            current = 0  # Tracks number for "-" entries
+            for instance in jhg_rounds_per_sc_game_list:
+                for _ in range(instance):
+                    new_list.append(f"{current}-")
+                    current += 1
+                new_list.append(f"{current - 1}*")  # Append the last "-" number with "*"
+            print("This is the new list ", new_list, " and here is what we were workign with ",
+                  jhg_rounds_per_sc_game_list)
+
         return new_list
 
+    def reconcile_influence(self, jhg_influence, sc_influence):
+
+        # ok this fetcher uses convex recombination to put the two together and then uses the frobenius norm to decide on the magnitude to adjust back too. bars!
+        alpha = 0.5  # THIS iS JUST A STARTER VALUE, WILL LIKELY BE MADE INTO A GENE OR WHATEVER.
+        if sc_influence is None:
+            print("something wrong :(")
+            return jhg_influence
+
+        sc_influence = np.array(sc_influence)
+        jhg_influence = np.array(jhg_influence)  # This shbould never get used but it couldn't hurt
+
+        jhg_norm = np.linalg.norm(jhg_influence, 'fro')
+
+        combined = (1 - alpha) * jhg_influence + alpha * sc_influence
+
+        combined_norm = np.linalg.norm(combined, 'fro')
+        if combined_norm == 0:
+            return np.zeros_like(jhg_influence)
+
+        rescaled = combined * (jhg_norm / combined_norm)
+        return rescaled
 
 
 if __name__ == "__main__":

@@ -55,8 +55,7 @@ def run_sc_stuff(sc_sim, jhg_sim, total_order, influence_matrix, curr_round, cur
     sc_sim.set_rounds(curr_round)
     possible_peeps, indexes = generate_peeps(total_order, jhg_sim, sc_sim)  # people who are needed to create the matrix
     # should I make this, you know, an entirely different bot? having them in the same file feels wrong becuase they are doing differen things.
-    current_options_matrix, peeps = sc_sim.let_others_create_options_matrix(possible_peeps.tolist(),
-                                                                     influence_matrix, curr_round)  # actually creates the matrix
+    current_options_matrix, peeps = sc_sim.let_others_create_options_matrix(possible_peeps.tolist(), curr_round, sc_sim.get_influence_matrix())  # actually creates the matrix
     sc_sim.start_round((current_options_matrix, indexes))
 
     bot_votes = {}

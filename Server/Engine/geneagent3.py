@@ -103,7 +103,7 @@ class GeneAgent3(AbstractAgent):
                     "attackGoodGuys": np.random.randint(0,101),
                     "limitingGive": np.random.randint(0,101),
                     "groupAware": np.random.randint(0,101),
-                    "joinCoop": np.random.randint(0,101),           # Change Sep 21 (not used)
+                    "joinCoop": np.random.randint(0,101),
                 }
                 self.genes_long.append(gene_set)
         else:
@@ -147,7 +147,7 @@ class GeneAgent3(AbstractAgent):
                     "attackGoodGuys": int(words[30+count]),
                     "limitingGive": int(words[31+count]),
                     "groupAware": int(words[32+count]),
-                    "joinCoop": int(words[33+count]),           # Change Sep 21 (not used)
+                    "joinCoop": int(words[33+count]),
                 }
                 self.genes_long.append(gene_set)
                 count = count + 33

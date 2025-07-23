@@ -2,10 +2,12 @@ import copy
 import math
 import random
 from collections import Counter
+from functools import total_ordering
 from pathlib import Path
 import numpy as np
 
 from Server.Engine.geneagent3 import GeneAgent3
+from Server.Engine.humanagent import HumanAgent
 from Server.Node import Node
 from Server.SC_Bots.legacyBots.humanAttempt2 import humanAttempt2
 from Server.OptionGenerators.options_creation import generate_two_plus_one_groups
@@ -61,7 +63,7 @@ class Social_Choice_Sim:
         #self.bots = self.create_bots(self.total_order)  # make sure to pull this from the right spot.
         self.bots = self.use_gene_bots() # the hope is that I just use all of em and call it a day.
         #self.allocation_bots = self.create_allocation_bots(self.total_order) # old code, want to try something new
-        self.allocation_bots = self.use_gene_bots()
+        self.allocation_bots = self.bots # use the same bot for both.
         self.bot_list_as_string = self.create_bot_list_as_string(self.bots)
         # self.allocation_bot_list_as_string = self.create_bot_list_as_string(self.allocation_bots)
         ## turn this one back one when you are not using the Gene3 agent bots, as those are initalized with chromosomes.
@@ -80,7 +82,7 @@ class Social_Choice_Sim:
         self.results = {}  # holds all of our results from long term simulations before graphing.
         self.results_sums = [10] * total_players  # holds the SUM of all player results, so we can easily access and return them as necessary.
         self.cooperation_score = 0
-        self.num_rounds = 0  # used in various spots for graphing and whatnot. not terribly important.
+        self.num_rounds = -1  # used in various spots for graphing and whatnot. not terribly important.
         self.current_results = []  # holds the results from the last "return win" call, which we can access later.
         self.results = self.create_results()  # dict key: player id, attribute: list of all utility changes per round.
           # holds EVERYONE. now we gotta do a significant amount of refactoring.
@@ -131,11 +133,12 @@ class Social_Choice_Sim:
         if self.total_order is None:
             return self.bot_type
         self.total_types = self.bot_type
-        if self.total_players != self.num_humans or self.total_players != self.num_bots:  # if there is a mistmatch
+        if len(self.total_order) != len (self.total_types):
             for index, player in enumerate(self.total_order):
                 if player.startswith("P"):
                     self.total_types.insert(index, -1)
-        # print("these are the new total types ", self.total_types)
+        print("these are the new total types ", self.total_types)
+        print("here is the corrected len of total types ", len(self.total_types))
         return self.total_types
 
     def set_group(self, group_option):
@@ -286,6 +289,7 @@ class Social_Choice_Sim:
 
     def add_coop_score(self):
         self.cooperation_score = self.cooperation_score + 1
+        #print("this is the current coop score ", self.cooperation_score, " and here is the current round ", self.num_rounds)
 
     def set_coop_score(self, coop_score):
         self.cooperation_score = coop_score
@@ -294,11 +298,14 @@ class Social_Choice_Sim:
         return self.group
 
     def get_votes(self, previous_votes=None, round=0, cycle=0,
-                  max_cycle=3):  # generic get votes for all bot types. Not optimized for a single chromosome
+                  max_cycle=3, influence=None):  # generic get votes for all bot types. Not optimized for a single chromosome
+        print("this is the round we are dealing with ", round, " and this is the self.I we are dealing with ", self.I)
+        if influence == None: influence = self.I[round]
         self.round = round
         self.cycle = cycle
         all_votes = {}
         bot_indexes = []
+        print("here is the len of total types (Expect 8, not 9) ", len(self.total_types))
         for i, thing in enumerate(self.total_types):
             all_votes[i] = -1  # just assume they are all abstaining
             if thing != -1:
@@ -307,6 +314,7 @@ class Social_Choice_Sim:
         bot_votes = {}
         final_votes = None
         extra_data = {""}
+        print("here is the len of self.bots (should be 8, not 9 )", len(self.bots))
         for i, bot in enumerate(self.bots):
             # print("this is the bot id ", bot.self_id, " an dthis is the i index ", i)
             # print("this is the cycle we are working with ", cycle, " and the round ", round)
@@ -317,7 +325,9 @@ class Social_Choice_Sim:
                     votes_put_in = previous_votes[cycle-1]
                 # ok what the FETCH should received be. I think just its list in V is probably the way to go.
                 recieved = self.reconcile_received(i, votes_put_in) # gotta figure out if we HAVE recieved anything yet. could use a round=0check.
-                final_votes = bot.get_vote(i, round, recieved, self.results_sums, np.array(self.I[round]), extra_data, self.current_options_matrix)
+                final_votes = bot.get_vote(i, round, recieved, self.results_sums, np.array(influence), extra_data, self.current_options_matrix)
+            elif isinstance(bot, HumanAgent):
+                continue # he doesn't get to vote :(
             else:
                 final_votes = bot.get_vote(self.current_options_matrix, previous_votes, cycle, max_cycle)
             all_votes[bot_indexes.pop(0)] = final_votes
@@ -413,6 +423,7 @@ class Social_Choice_Sim:
 
         new_v = []
         current_options_matrix_columns = list(zip(*current_options_matrix))  # get the columns.
+        print("these are the previous votes we are dealing with ", previous_votes)
         for plyr_idx in range(self.total_players):
             if previous_votes[plyr_idx] == -1:
                 new_v.append([0 for _ in range(
@@ -563,7 +574,7 @@ class Social_Choice_Sim:
 
     def get_results(self):
         # print("Aight were is the zero, its gotta be under num_rounds right?") literally zero clue whawt this print statement was supposed to be for.
-        cooperation_score = self.cooperation_score / self.num_rounds if self.num_rounds > 0 else 0  # as a percent, how often we cooperated. (had a non negative cause pass)
+        cooperation_score = self.cooperation_score / (self.num_rounds+1) if self.num_rounds > 0 else 0  # how often a cause passed (bc rounds start form 0 we have to add one)
         return self.results, cooperation_score, self.total_types, self.num_rounds, self.scenario_string, self.group, self.chromosome_string
 
     def get_everything_for_logger(self):
@@ -603,7 +614,7 @@ class Social_Choice_Sim:
         theGen = 199
         num_gene_copies = 3
         thePopulation = []
-        fnombre = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\Server\Engine\gen_199.csv"
+        fnombre = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\offlineSimStuff\geneticStuff\SCResults\theGenerations\gen_1.csv"
         fp = open(fnombre, "r")
 
         for i in range(0, popSize):
@@ -815,7 +826,7 @@ class Social_Choice_Sim:
                 self.results_sums.index(max(self.results_sums))]  # return the index of the highest utility player.
 
     # this functin is used for simulation purposes ONLY. should never be called with live players.
-    def let_others_create_options_matrix(self, bot_peeps, curr_round):
+    def let_others_create_options_matrix(self, bot_peeps, curr_round, influence_matrix):
 
         indexes = [] # this gest used regardless.
         for peep in bot_peeps:
@@ -839,7 +850,7 @@ class Social_Choice_Sim:
                     curr_round,
                     T_prev[:, i], # should be a 9x9 ndarray (from numpy)
                     self.results_sums,
-                    np.array(self.I[curr_round]),
+                    np.array(influence_matrix),
                     extra_data, # yes this is blank. no I don't know why.
                 ))
             total_columns = []
