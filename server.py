@@ -87,13 +87,17 @@ class Server():
 
         for list_index in range(len(self.rounds_list)):
             is_last_jhg_round = False
+            print("This is the current list index ", list_index)
 
-            if self.rounds_list[list_index+1][-1] == "*": is_last_jhg_round = True
+            if list_index + 1 < len(self.rounds_list) and self.rounds_list[list_index + 1]:
+                if self.rounds_list[list_index + 1][-1] == "*":
+                    is_last_jhg_round = True
 
             sc_rounds = self.rounds_list[list_index][-1] == "*"
             jhg_rounds = self.rounds_list[list_index][-1] == "-"
             curr_round = int(self.rounds_list[list_index][:-1])  # useful, yes, but not quite the logger round
             curr_logger_round = curr_round
+            print("this is the current round")
 
             if jhg_rounds:
                 influence_matrix = self.JHG_manager.play_jhg_round(self.JHG_manager.current_round, is_last_jhg_round)
