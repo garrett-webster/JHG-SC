@@ -137,8 +137,8 @@ class Social_Choice_Sim:
             for index, player in enumerate(self.total_order):
                 if player.startswith("P"):
                     self.total_types.insert(index, -1)
-        print("these are the new total types ", self.total_types)
-        print("here is the corrected len of total types ", len(self.total_types))
+        # print("these are the new total types ", self.total_types)
+        # print("here is the corrected len of total types ", len(self.total_types))
         return self.total_types
 
     def set_group(self, group_option):
@@ -299,13 +299,13 @@ class Social_Choice_Sim:
 
     def get_votes(self, previous_votes=None, round=0, cycle=0,
                   max_cycle=3, influence=None):  # generic get votes for all bot types. Not optimized for a single chromosome
-        print("this is the round we are dealing with ", round, " and this is the self.I we are dealing with ", self.I)
+        # print("this is the round we are dealing with ", round, " and this is the self.I we are dealing with ", self.I)
         if influence == None: influence = self.I[round]
         self.round = round
         self.cycle = cycle
         all_votes = {}
         bot_indexes = []
-        print("here is the len of total types (Expect 8, not 9) ", len(self.total_types))
+        # print("here is the len of total types (Expect 8, not 9) ", len(self.total_types))
         for i, thing in enumerate(self.total_types):
             all_votes[i] = -1  # just assume they are all abstaining
             if thing != -1:
@@ -314,7 +314,7 @@ class Social_Choice_Sim:
         bot_votes = {}
         final_votes = None
         extra_data = {""}
-        print("here is the len of self.bots (should be 8, not 9 )", len(self.bots))
+        # print("here is the len of self.bots (should be 8, not 9 )", len(self.bots))
         for i, bot in enumerate(self.bots):
             # print("this is the bot id ", bot.self_id, " an dthis is the i index ", i)
             # print("this is the cycle we are working with ", cycle, " and the round ", round)
@@ -384,38 +384,35 @@ class Social_Choice_Sim:
         self.winning_probability.append(choice_list[winning_vote + 1])
 
         # creates the new utilty effort matrix based on the actual votes. Doesn't matter what actually won, just what you voted for in the end.
+        # this fetcher right here contains using the actual player votes to decide the new v. the below version is going to use the winning vote.
         new_v = []
         current_options_matrix_columns = list(zip(*self.current_options_matrix))  # get the columns.
         for plyr_idx in range(self.total_players):
-            if winning_vote == -1:
+            if all_votes[plyr_idx] == -1:
                 new_v.append([0 for _ in range(
                     self.total_players)])  # if abstain, 0's across the board. probably. I might rework this later.
             else:
-                new_v.append(current_options_matrix_columns[winning_vote])  # add the column of what they did to the new v.
+                new_v.append(
+                    current_options_matrix_columns[all_votes[plyr_idx]])  # add the column of what they did to the new v.
 
         self.new_v = new_v
         self.calculate_influence_matrix(new_v, self.round)
         return winning_vote, self.current_results
 
-
-    # # this fetcher right here contains using the actual player votes to decide the new v. the above version is going to use the winning vote.
+    # version uses the wining vote rather than the attempted vote. swapping them out to see if it makes a difference.
+    # worried this version de-teeths them in a way that flattens their possible animosity
     # new_v = []
     # current_options_matrix_columns = list(zip(*self.current_options_matrix))  # get the columns.
     # for plyr_idx in range(self.total_players):
-    #     if all_votes[plyr_idx] == -1:
+    #     if winning_vote == -1:
     #         new_v.append([0 for _ in range(
     #             self.total_players)])  # if abstain, 0's across the board. probably. I might rework this later.
     #     else:
-    #         new_v.append(
-    #             current_options_matrix_columns[all_votes[plyr_idx]])  # add the column of what they did to the new v.
+    #         new_v.append(current_options_matrix_columns[winning_vote])  # add the column of what they did to the new v.
     #
     # self.new_v = new_v
     # self.calculate_influence_matrix(new_v, self.round)
     # return winning_vote, self.current_results
-
-
-
-
 
     def calculate_v_given_options_and_votes(self, current_options_matrix, previous_votes):
         if not previous_votes: # nothing to go off of, early return.
@@ -423,7 +420,7 @@ class Social_Choice_Sim:
 
         new_v = []
         current_options_matrix_columns = list(zip(*current_options_matrix))  # get the columns.
-        print("these are the previous votes we are dealing with ", previous_votes)
+        # print("these are the previous votes we are dealing with ", previous_votes)
         for plyr_idx in range(self.total_players):
             if previous_votes[plyr_idx] == -1:
                 new_v.append([0 for _ in range(
@@ -575,7 +572,7 @@ class Social_Choice_Sim:
     def get_results(self):
         # print("Aight were is the zero, its gotta be under num_rounds right?") literally zero clue whawt this print statement was supposed to be for.
         cooperation_score = self.cooperation_score / (self.num_rounds+1) if self.num_rounds > 0 else 0  # how often a cause passed (bc rounds start form 0 we have to add one)
-        return self.results, cooperation_score, self.total_types, self.num_rounds, self.scenario_string, self.group, self.chromosome_string
+        return self.results, cooperation_score, self.total_types, self.num_rounds, self.scenario_string, self.group, self.chromosome_string, self.results_sums
 
     def get_everything_for_logger(self):
         self.create_player_nodes()

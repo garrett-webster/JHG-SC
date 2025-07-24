@@ -88,6 +88,9 @@ class CompleteLogger():
     def get_coop_data(self):
         return self.big_boy_data["CONCLUSION"]["SC_CONCLUSION"]
 
+    def get_jhg_cv_data(self):
+        return self.big_boy_data["CONCLUSION"]["JHG_CONCLUSION"]
+
     # this function takes our existing long term data dict structure and condenses it to something graph-able.
     def calculate_long_term_stats(self):
         ## -- Getting average score per round and sums per player from the JHG game and SC game -- ##
@@ -169,6 +172,7 @@ class CompleteLogger():
                 self.long_term_data["avg_utility"][sc_round] = []  # trust
                 self.long_term_data["highest_utilities"][sc_round] = []
 
+                # so I think keeping the line of best fit is probably good, I think keeping the average rise is good, I think we need to try and get the coefficient of varation tho
                 self.long_term_data["avg_utility"][sc_round].append(self.big_boy_data[curr_round + offset]["SC_STUFF"]["results_sums"])
                 self.long_term_data["highest_utilities"][sc_round].append(max(self.big_boy_data[curr_round + offset]["SC_STUFF"]["results_sums"]))
 

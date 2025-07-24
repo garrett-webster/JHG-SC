@@ -12,7 +12,7 @@ class longTermGrapher():
 
 
     def draw_graph_from_sim(self, sim):
-        results, cooperation_score, bot_type, num_rounds, scenario, group, chromosome = sim.get_results()
+        results, cooperation_score, bot_type, num_rounds, scenario, group, chromosome, results_sums = sim.get_results()
         self.draw_graph(results, cooperation_score, bot_type, num_rounds, scenario, group, chromosome)
 
     def draw_graph_from_file(self, new_data):

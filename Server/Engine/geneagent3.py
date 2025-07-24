@@ -288,24 +288,29 @@ class GeneAgent3(AbstractAgent):
         return theStr
 
     def get_vote(self, player_idx, round_num, received, popularities, influence, extra_data, current_options_matrix):
-        transaction_vector = self.play_round(player_idx, round_num, received, popularities, influence, extra_data)
+        transaction_vector = self.play_round(player_idx, round_num, received, popularities, influence, extra_data, True)
         final_vote = translateVecToIndex(transaction_vector, current_options_matrix)
         return final_vote # please let this work
 
 
-    def play_round(self, player_idx, round_num, received, popularities, influence, extra_data):
+    def play_round(self, player_idx, round_num, received, popularities, influence, extra_data, extra_flag=False):
+        # print("Here be the player idx ", player_idx)
         #self.printT(player_idx, str(received))
         #print("this is the round number ", round_num)
         # set up some variables
         if self.theTracked != 99999:
             self.theTracked = self.getTracked()
 
+        printTransactionVector = False
         # self.printT(player_idx, str(influence))
 
         self.pop_history.append(popularities)
 
         num_players = len(popularities)
         num_tokens = num_players * self.tokens_per_player
+        #output = ""
+        #output += (f"this is teh number of tokens that we are dealing with: {num_tokens} \n")
+        #printOutput = False
 
         if player_idx == self.theTracked:
             print()
@@ -320,6 +325,7 @@ class GeneAgent3(AbstractAgent):
             self.updateVars(received, popularities, num_tokens, num_players, player_idx)
 
         self.computeUsefulQuantities(round_num, num_players, influence, player_idx, num_tokens)
+
 
         if player_idx == self.theTracked:
             print(" Punishable debt: " + str(self.punishable_debt))
@@ -339,16 +345,23 @@ class GeneAgent3(AbstractAgent):
             safety_first = True
 
         guardo_toks = self.cuanto_guardo(round_num, player_idx, num_players, num_tokens, popularities, received, selected_community.s)
+        #output += ("Here is the guardo_toks ", guardo_toks, " \n")
         self.printT(player_idx, "   guardo_toks: " + str(guardo_toks))
 
         # # determine who to attack (if any)
         if (round_num > 0):# and (player_idx == 0):
+            # output += ("Here is the num tokens as of right now ", num_tokens, " \n")
             remaining_toks = num_tokens
             if safety_first:
                 # self.printT(player_idx, "    safety first!!")
-                remaining_toks -= guardo_toks # what the FETCH does this do
+                remaining_toks -= guardo_toks # I think this just actually forces us to keep a certain amount of tokens, I don't think I need to change this line.
+                #output += ("safety first ! True, here are the new remaining tokens " + str(remaining_toks), " \n")
 
             attack_alloc, num_attack_toks = self.quien_ataco(round_num, player_idx, num_players, num_tokens, remaining_toks, popularities, influence, selected_community.s, communities)
+            if num_attack_toks > 0:
+                print("STOP HERE PLEASAE :)")
+            #output += ("here is the attack_alloc ", attack_alloc, " and here is the num attack toks ", num_attack_toks, " \n")
+
             self.printT(player_idx, "\n Attackings:")
             self.printT(player_idx, "   attack_vec: " + str(attack_alloc) + " (" + str(num_attack_toks) + ")")
             # self.printT(player_idx, "")
@@ -366,14 +379,28 @@ class GeneAgent3(AbstractAgent):
         # self.printT(player_idx, "remaining_toks: " + str(remaining_toks))
 
         # figure out who to give tokens to
-        groups_alloc, num_group_gives = self.group_givings(round_num, num_players, num_tokens, num_tokens-num_attack_toks-guardo_toks, player_idx, influence, popularities, selected_community, attack_alloc)
+        if not extra_flag: # change on 7/24/2025 - extra flag is only true within the SC environment.
+            groups_alloc, num_group_gives = self.group_givings(round_num, num_players, num_tokens, num_tokens-num_attack_toks-guardo_toks, player_idx, influence, popularities, selected_community, attack_alloc)
+            #output += ("here is the groups alloc ", groups_alloc, " and here is the num_group_gives ", num_group_gives, " \n")
+        else:
+            if num_attack_toks > 0:
+                print("STOP HERE PLEASAE :)")
+                printTransactionVector = True
+           # output += ("we are in the SC environment, silly engaged", " \n")
+            giving_tokens = (num_tokens + num_attack_toks) - guardo_toks
+            groups_alloc, num_group_gives = self.group_givings(round_num, num_players, num_tokens, giving_tokens, player_idx, influence, popularities, selected_community, attack_alloc)
+            #output += ("here is the groups alloc ", groups_alloc, " and here is the num_group_gives ", num_group_gives, " \n")
 
         # update some variables
         transaction_vec = groups_alloc - attack_alloc
 
+        # output += ("Here is the transaction_vec ", transaction_vec, " \n")
+
         # Change made on 6/16
         guardo_toks = num_tokens - sum(np.absolute(transaction_vec))
+        # output += ("here is the guardo toks ", guardo_toks, " \n")
         transaction_vec[player_idx] += guardo_toks
+        # output += ("Here is the new transaction vector ", transaction_vec, " \n")
 
         self.prev_popularities = popularities
         self.prev_allocations = transaction_vec
@@ -386,7 +413,8 @@ class GeneAgent3(AbstractAgent):
 
         if transaction_vec[player_idx] < 0:
             print(str(player_idx) + " is stealing from self!!!")
-
+        if printTransactionVector:
+            print(transaction_vec)
         return transaction_vec
 
 

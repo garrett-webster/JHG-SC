@@ -1,9 +1,7 @@
 import json
 import os
 from datetime import datetime
-from operator import truediv
-
-from fontTools.pens.basePen import NullPen
+import numpy as np
 
 from Client.combinedLayout.colors import COLORS
 
@@ -86,6 +84,11 @@ class JHGLogger():
         # need to return the bot type, tahts pretty much it.
         bot_types = self.jhg_sim.get_bot_types()
         total_data["bot_types"] = bot_types
+        popularity = list(self.jhg_sim.get_popularities())
+        mean = np.mean(popularity)
+        std = np.std(popularity)
+        cv = std / abs(mean)  # measures distribution bet  ter than, say, std or mean on their own.
+        total_data["cv"] = cv
         return total_data
 
 

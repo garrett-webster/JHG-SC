@@ -16,7 +16,7 @@ from offlineSimStuff.variousGraphingTools.completeVersions.completeLogger import
 
 # starts the sim, could make this take command line arguments
 # takes in a bot type, a number of rounds, and then runs it and plots the results. plans for expansion coming soon.
-def run_trial(sc_sim, jhg_sim, round_list, attempt, num_cycles, create_graphs, group, total_order, current_logger, offset):
+def run_trial(sc_sim: "Social_Choice_Sim", jhg_sim, round_list, attempt, num_cycles, create_graphs, group, total_order, current_logger, offset):
 
     sc_sim.set_group(group)
     played_sc = False
@@ -227,10 +227,10 @@ def graph_longterm(current_logger):
 if __name__ == "__main__":
 
     #jhg_games_per_sc_round = [1,1,1,1,1,1,1,1]#,1,1,1,1,1,1,1,1,1,1,1,1]
-    jhg_games_per_sc_round = [4,3,3,3,3,3,3,3]#,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,2]
+    #jhg_games_per_sc_round = [4,3,3]#,3,3,3,3,3]#,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,2]
     #jhg_games_per_sc_round = [2,3,3]#,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,2]
-    #jhg_games_per_sc_round = ["S", 10]
-    #jhg_games_per_sc_round = [1,1,1]
+    #jhg_games_per_sc_round = ["S", 3]
+    jhg_games_per_sc_round = [1,1,1]
 
 
     round_list = determine_rounds(jhg_games_per_sc_round)
@@ -250,7 +250,7 @@ if __name__ == "__main__":
     allocation_bot_type = "allocations_scenarios/random"
     jhg_bot_type = 0 # 0 is gene bots, 2 is social welfare and 3 is random.
     total_order = create_total_order(num_players, num_humans)
-    num_attempts = 100 # number of batches to do.
+    num_attempts = 3 # number of batches to do.
     num_rounds = sum(jhg_games_per_sc_round) if len(jhg_games_per_sc_round) > 2 else jhg_games_per_sc_round[-1] # if its a list, len of list. else, grab the second identifier
     current_logger = CompleteLogger()
 

@@ -474,8 +474,9 @@ class CompleteGrapher():
     def draw_long_term_graphs_given_logger(self, current_logger):
         avg_pop_per_round, per_player_per_round, avg_utility_per_round, utility_per_player_per_round = current_logger.calculate_long_term_stats()
         jhg_bot_type, sc_bot_type, allocation_bot_types = current_logger.get_all_bot_types()
-        cooperation_score, number_of_attempts = (self.get_coop_score(current_logger) if current_logger.sc_sim else (0, 0))
-        self.draw_two_long_graphs(avg_pop_per_round, per_player_per_round, avg_utility_per_round, utility_per_player_per_round, jhg_bot_type, sc_bot_type, allocation_bot_types, cooperation_score, number_of_attempts)
+        cooperation_score, number_of_attempts, cv = (self.get_coop_score(current_logger) if current_logger.sc_sim else (0, 0, 0))
+        jhg_cv_score = self.get_cv_score(current_logger) if current_logger.jhg_sim else 0
+        self.draw_two_long_graphs(avg_pop_per_round, per_player_per_round, avg_utility_per_round, utility_per_player_per_round, jhg_bot_type, sc_bot_type, allocation_bot_types, cooperation_score, number_of_attempts, cv, jhg_cv_score)
 
     def draw_long_term_graphs_given_file(self, file_path):
         with open(file_path, "r") as f:
@@ -484,12 +485,15 @@ class CompleteGrapher():
         complete_logger = CompleteLogger()
         avg_pop_per_round, per_player_per_round, avg_utility_per_round, utility_per_player_per_round = complete_logger.get_long_term_stats_from_dict(dict_to_pass)
         jhg_bot_type, sc_bot_type, allocation_bot_types = complete_logger.get_bot_types_from_json(data["CONCLUSION"])
-        cooperation_score, number_of_attempts = self.get_coop_score_from_file(data)
+        cooperation_score, number_of_attempts, cv = self.get_coop_score_from_file(data)
+        jhg_cv_score = self.get_cv_score_from_file(data)
         self.draw_two_long_graphs(avg_pop_per_round, per_player_per_round, avg_utility_per_round,
                                   utility_per_player_per_round, jhg_bot_type, sc_bot_type, allocation_bot_types,
-                                  cooperation_score, number_of_attempts)
+                                  cooperation_score, number_of_attempts, cv, jhg_cv_score)
 
-    def draw_two_long_graphs(self, avg_pop_per_round, per_player_per_round, avg_utility_per_round, utility_per_player_per_round, jhg_bot_type, sc_bot_type, allocation_bot_types, cooperation_score, number_of_attempts):
+
+
+    def draw_two_long_graphs(self, avg_pop_per_round, per_player_per_round, avg_utility_per_round, utility_per_player_per_round, jhg_bot_type, sc_bot_type, allocation_bot_types, cooperation_score, number_of_attempts, cv, jhg_cv_score):
         # aight we might need to draw two different graphs, lets find out.
         pop_graph = avg_pop_per_round is not None and len(avg_pop_per_round) > 0
         util_graph = avg_utility_per_round is not None and len(avg_utility_per_round) > 0
@@ -570,6 +574,16 @@ class CompleteGrapher():
                 color='black',
                 weight='bold'
             )
+            fig.text(
+                x-0.2, 0.05,
+                f"CoV: {cv:.2f}",
+                ha='center',
+                va='bottom',
+                fontsize=12,
+                color='black',
+                weight='bold'
+            )
+
 
 
         else:
@@ -577,6 +591,7 @@ class CompleteGrapher():
 
         # ---- Utility Graph ----
         if util_graph:
+
             ax = axes[current_axis]
             sc_rounds = range(1, len(avg_utility_per_round) + 1)
             for i, player_scores in enumerate(utility_per_player_per_round):
@@ -617,6 +632,16 @@ class CompleteGrapher():
                 weight="bold",
             )
 
+            fig.text(
+                x-0.2, 0.05,
+                f"CoV: {cv:.2f}",
+                ha="center",
+                va="bottom",
+                fontsize=12,
+                color="black",
+                weight="bold",
+            )
+
 
         # plt.suptitle(f"Scenario: {scenario} | Group: {group or 'No Group'} | Chromosome: {chromosome}", fontsize=14)
         plt.tight_layout(rect=[0, 0.03, 1, 0.95])
@@ -649,17 +674,43 @@ class CompleteGrapher():
     def get_coop_score(self, current_logger):
         new_dict = current_logger.get_coop_data()
         new_sum = 0
+        new_cv_sum = 0
         new_dict_keys = new_dict.keys()
         for attempt in new_dict_keys:
             new_sum += new_dict[attempt]["cooperation_score"]
+            new_cv_sum += new_dict[attempt]["cv"]
         new_sum = new_sum / len(new_dict_keys)
-        return new_sum, len(new_dict_keys)
+        new_cv_sum = new_sum / len(new_dict_keys)
+        # fetch it we are going to get the CV while we are in here
+
+
+        return new_sum, len(new_dict_keys), (new_cv_sum / len(new_dict_keys))
 
     def get_coop_score_from_file(self, data):
         new_dict = data["CONCLUSION"]["SC_CONCLUSION"]
         new_sum = 0
+        new_cv_sum = 0
         new_dict_keys = new_dict.keys()
         for attempt in new_dict_keys:
             new_sum += new_dict[attempt]["cooperation_score"]
+            new_cv_sum += new_dict[attempt]["cv"]
         new_sum = new_sum / len(new_dict_keys)
-        return new_sum, len(new_dict_keys)
+        return new_sum, len(new_dict_keys), (new_cv_sum / len(new_dict_keys))
+
+    def get_cv_score(self, current_logger):
+        new_dict = current_logger.get_jhg_cv_data()
+        new_sum = 0
+        new_dict_keys = new_dict.keys()
+        for attempt in new_dict_keys:
+            new_sum += new_dict[attempt]["cv"]
+        new_sum = new_sum / len(new_dict_keys)
+        return new_sum # this is the new cv
+
+    def get_cv_score_from_file(self, data):
+        new_dict = data["CONCLUSION"]["JHG_CONCLUSION"]
+        new_sum = 0
+        new_dict_keys = new_dict.keys()
+        for attempt in new_dict_keys:
+            new_sum += new_dict[attempt]["cv"]
+        new_sum = new_sum / len(new_dict_keys)
+        return new_sum  # this is the new cv
