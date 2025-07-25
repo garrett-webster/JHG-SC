@@ -1,6 +1,7 @@
 import copy
 import math
 import random
+from asyncio import current_task
 from collections import Counter
 from functools import total_ordering
 from pathlib import Path
@@ -107,6 +108,7 @@ class Social_Choice_Sim:
                 j: None for j in range(len(total_order))
             } for i in range(len(total_order))
         }
+        self.most_recent_influence = None # keep this fetcher around somewhere.
 
     def create_total_order(self, total_players, num_humans):
         num_bots = total_players - num_humans
@@ -131,15 +133,14 @@ class Social_Choice_Sim:
     # here is the offender. this is the thing we have to rework.
     def create_total_types(self):
         if self.total_order is None:
-            return self.bot_type
-        self.total_types = self.bot_type
-        if len(self.total_order) != len (self.total_types):
-            for index, player in enumerate(self.total_order):
-                if player.startswith("P"):
-                    self.total_types.insert(index, -1)
-        # print("these are the new total types ", self.total_types)
-        # print("here is the corrected len of total types ", len(self.total_types))
+            return self.bot_type # assume only bots if no total order. never used.
+        self.total_types = [self.bot_type[0] for _ in range(self.num_bots)]
+        if len(self.total_types) != len(self.total_order): # the only way this happens is becuase we are missing human players
+            for i, player in enumerate(self.total_order):
+                if player[0] == "P":
+                    self.total_types.insert(i, -1)
         return self.total_types
+
 
     def set_group(self, group_option):
         if group_option == "":
@@ -332,6 +333,7 @@ class Social_Choice_Sim:
                 final_votes = bot.get_vote(self.current_options_matrix, previous_votes, cycle, max_cycle)
             all_votes[bot_indexes.pop(0)] = final_votes
 
+        self.most_recent_influence = influence
         self.final_votes = all_votes
 
         return all_votes
@@ -572,7 +574,7 @@ class Social_Choice_Sim:
     def get_results(self):
         # print("Aight were is the zero, its gotta be under num_rounds right?") literally zero clue whawt this print statement was supposed to be for.
         cooperation_score = self.cooperation_score / (self.num_rounds+1) if self.num_rounds > 0 else 0  # how often a cause passed (bc rounds start form 0 we have to add one)
-        return self.results, cooperation_score, self.total_types, self.num_rounds, self.scenario_string, self.group, self.chromosome_string, self.results_sums
+        return self.results, cooperation_score, self.total_types, self.num_rounds, self.scenario_string, self.group, self.chromosome_string, self.results_sums, self.most_recent_influence
 
     def get_everything_for_logger(self):
         self.create_player_nodes()

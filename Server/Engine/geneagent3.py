@@ -358,8 +358,8 @@ class GeneAgent3(AbstractAgent):
                 #output += ("safety first ! True, here are the new remaining tokens " + str(remaining_toks), " \n")
 
             attack_alloc, num_attack_toks = self.quien_ataco(round_num, player_idx, num_players, num_tokens, remaining_toks, popularities, influence, selected_community.s, communities)
-            if num_attack_toks > 0:
-                print("STOP HERE PLEASAE :)")
+            # if num_attack_toks > 0:
+            #     print("STOP HERE PLEASAE :)")
             #output += ("here is the attack_alloc ", attack_alloc, " and here is the num attack toks ", num_attack_toks, " \n")
 
             self.printT(player_idx, "\n Attackings:")

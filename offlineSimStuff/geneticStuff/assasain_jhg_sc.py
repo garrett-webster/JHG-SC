@@ -9,6 +9,7 @@ import csv # WHEEE. make sure this doesn't leak over the client or server otherw
 import os
 import math
 import numpy as np
+from tqdm import tqdm
 
 from Server.sim_interface import JHG_simulator # using the sim instead of the engine. is it a bad idea? yeah. Am I doing it anyway? yeah.
 from Server.social_choice_sim import Social_Choice_Sim
@@ -288,7 +289,7 @@ def write_generational_results(theGenePools, popSize, gen, agentsPerGame):
     # Get the absolute path to the directory containing this script
     script_dir = os.path.dirname(os.path.abspath(__file__))
     # Construct the full output directory path
-    output_dir = os.path.join(script_dir, "Results", "theGenerations")
+    output_dir = os.path.join(script_dir, "AssasainResults", "theGenerations")
     # Ensure output directory exists
     os.makedirs(output_dir, exist_ok=True)
     # Construct the filename path
@@ -309,6 +310,8 @@ def write_generational_results(theGenePools, popSize, gen, agentsPerGame):
             ])
 
     avg_fitness = sum(agent.absoluteFitness for agent in theGenePools) / popSize
+    rel_fitness = sum(agent.relativeFitness for agent in theGenePools) / popSize
+    print(f"Relative utility in generation {gen}: {rel_fitness:.4f}")
     print(f"Average utility in generation {gen}: {avg_fitness:.4f}")
 
 
@@ -416,7 +419,7 @@ if __name__ == "__main__":
     popSize = 100 # number of agnets in the gene pool (use 100 here)
     numGeneGopies = 3 # numbers of sets of genes (3 was the number used in the paper)
     startIndex = 0 # generation to start training (0 to start form scratch)
-    num_gens = 200 # generation to end traning trains up to 99
+    num_gens = 300 # generation to end traning trains up to 99
     games_per_gen = 10 # agents from the gene pool are selected at random, 100 times.
     agentsPerGame = 10 # number of agents per game
     roundsPerGame = 30 # number fo rounds per game
@@ -442,7 +445,7 @@ if __name__ == "__main__":
     jhg_games_per_round = [4,3,3,3,3,3,3,3] # just give me an easy place to start.
     rounds_list = determine_rounds(jhg_games_per_round)
 
-    for gen in range(num_gens): # however many generations we want
+    for gen in tqdm(range(num_gens)): # however many generations we want
         for game in range(games_per_gen): # however many games we want per generation
 
             # pick individuals to put into the gene pools.

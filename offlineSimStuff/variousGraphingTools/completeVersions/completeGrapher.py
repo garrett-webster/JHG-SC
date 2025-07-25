@@ -474,7 +474,7 @@ class CompleteGrapher():
     def draw_long_term_graphs_given_logger(self, current_logger):
         avg_pop_per_round, per_player_per_round, avg_utility_per_round, utility_per_player_per_round = current_logger.calculate_long_term_stats()
         jhg_bot_type, sc_bot_type, allocation_bot_types = current_logger.get_all_bot_types()
-        cooperation_score, number_of_attempts, cv = (self.get_coop_score(current_logger) if current_logger.sc_sim else (0, 0, 0))
+        cooperation_score, number_of_attempts, cv, influence = (self.get_coop_score(current_logger) if current_logger.sc_sim else (0, 0, 0, 0))
         jhg_cv_score = self.get_cv_score(current_logger) if current_logger.jhg_sim else 0
         self.draw_two_long_graphs(avg_pop_per_round, per_player_per_round, avg_utility_per_round, utility_per_player_per_round, jhg_bot_type, sc_bot_type, allocation_bot_types, cooperation_score, number_of_attempts, cv, jhg_cv_score)
 
@@ -676,26 +676,33 @@ class CompleteGrapher():
         new_sum = 0
         new_cv_sum = 0
         new_dict_keys = new_dict.keys()
+        last_attempt = None
         for attempt in new_dict_keys:
             new_sum += new_dict[attempt]["cooperation_score"]
             new_cv_sum += new_dict[attempt]["cv"]
+            last_attempt = attempt
         new_sum = new_sum / len(new_dict_keys)
         new_cv_sum = new_sum / len(new_dict_keys)
+        influence = new_dict[last_attempt]["influence"] # yeah this doesn't make any sense, don't think about it too hard rn
+        # get the new influence in here while we are here
         # fetch it we are going to get the CV while we are in here
 
 
-        return new_sum, len(new_dict_keys), (new_cv_sum / len(new_dict_keys))
+        return new_sum, len(new_dict_keys), (new_cv_sum / len(new_dict_keys)), influence
 
     def get_coop_score_from_file(self, data):
         new_dict = data["CONCLUSION"]["SC_CONCLUSION"]
         new_sum = 0
         new_cv_sum = 0
         new_dict_keys = new_dict.keys()
+        last_attempt = None
         for attempt in new_dict_keys:
             new_sum += new_dict[attempt]["cooperation_score"]
             new_cv_sum += new_dict[attempt]["cv"]
+            last_attempt = attempt
         new_sum = new_sum / len(new_dict_keys)
-        return new_sum, len(new_dict_keys), (new_cv_sum / len(new_dict_keys))
+        influence = new_dict[last_attempt]["influence"]
+        return new_sum, len(new_dict_keys), (new_cv_sum / len(new_dict_keys)), influence
 
     def get_cv_score(self, current_logger):
         new_dict = current_logger.get_jhg_cv_data()

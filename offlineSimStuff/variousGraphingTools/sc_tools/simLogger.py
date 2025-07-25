@@ -33,7 +33,7 @@ class simLogger:
 
 
     def record_big_picture(self):
-        results, cooperation_score, bot_type, num_rounds, scenario, group, chromosome, results_sums = self.sim.get_results()
+        results, cooperation_score, bot_type, num_rounds, scenario, group, chromosome, results_sums, influence = self.sim.get_results()
 
         alloc_bot_type = self.sim.allocation_bot_type
         std = np.std(results_sums)
@@ -48,7 +48,8 @@ class simLogger:
             "scenario": scenario,
             "group": group,
             "chromosome": chromosome,
-            "cv": cv,
+            "cv": float(cv),
+            "influence": list(influence),
         }
 
         return total_data
@@ -106,7 +107,7 @@ class simLogger:
 
 
     def log_stuff_for_chromosome(self, big_boy_json):
-        results, cooperation_score, bot_type, num_rounds, scenario, group, chromosome, results_sums = self.sim.get_results()
+        results, cooperation_score, bot_type, num_rounds, scenario, group, chromosome, results_sums, influence = self.sim.get_results()
         sums_per_round = {}
         for bot in results:
             sums_per_round[bot] = []

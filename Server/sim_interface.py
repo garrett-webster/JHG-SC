@@ -271,7 +271,7 @@ def loadPopulationFromFile(popSize, generationFolder, startIndex, num_gene_pools
     fnombre = "Kill me"
     try:
         #fnombre = generationFolder + "/gen_" + str(startIndex) + ".csv"
-        fnombre = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\offlineSimStuff\geneticStuff\Results\theGenerations\gen_55.csv"
+        fnombre = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\offlineSimStuff\geneticStuff\AssasainResults\theGenerations\gen_175.csv"
         fp = open(fnombre, "r")
     except FileNotFoundError:
         try:

@@ -88,7 +88,9 @@ class JHGLogger():
         mean = np.mean(popularity)
         std = np.std(popularity)
         cv = std / abs(mean)  # measures distribution bet  ter than, say, std or mean on their own.
-        total_data["cv"] = cv
+        total_data["cv"] = float(cv)
+        influence = list(self.jhg_sim.get_influence()) # that should do it without all the craziness
+        total_data["influence"] = np.array(influence).tolist() # get this as a list, not an ndarray.
         return total_data
 
 
