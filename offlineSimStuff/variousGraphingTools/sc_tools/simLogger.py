@@ -39,6 +39,11 @@ class simLogger:
         std = np.std(results_sums)
         mean = np.mean(results_sums)
         cv = std / abs(mean) # this lets me know how varied the information is at the end of the day.
+
+        avg_rise_utility = ((sum(results_sums) / len(results_sums)) - 10) / len(results) # find the average utilty (get rid fo starting utility) then divide by numbre of players then number of rounds.
+
+
+
         total_data = {
             "results": results,
             "cooperation_score": cooperation_score,
@@ -50,6 +55,7 @@ class simLogger:
             "chromosome": chromosome,
             "cv": float(cv),
             "influence": list(influence),
+            "avg_rise": avg_rise_utility,
         }
 
         return total_data

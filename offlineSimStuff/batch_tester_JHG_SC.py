@@ -219,7 +219,7 @@ def determine_rounds(jhg_rounds_per_sc_game_list):
     return new_list
 
 # this function takes in a complete logger object and creates some graphs based on that.
-def graph_longterm(current_logger, num_attempts):
+def graph_longterm(current_logger):
     curr_everything_grapher = CompleteGrapher()
     curr_everything_grapher.draw_long_term_graphs_given_logger(current_logger)
 
@@ -227,8 +227,8 @@ def graph_longterm(current_logger, num_attempts):
 if __name__ == "__main__":
 
     #jhg_games_per_sc_round = [1,1,1,1,1,1,1,1]#,1,1,1,1,1,1,1,1,1,1,1,1]
-    #jhg_games_per_sc_round = [4,3,3,3,3,3,3,3]
-    jhg_games_per_sc_round = [4,3,3]
+    jhg_games_per_sc_round = [4,3,3,3,3,3,3,3]
+    #jhg_games_per_sc_round = [4,3,3]
     #jhg_games_per_sc_round = [2,3,3]#,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,2]
     #jhg_games_per_sc_round = ["S", 3]
     #jhg_games_per_sc_round = [1,1,1]
@@ -251,9 +251,10 @@ if __name__ == "__main__":
     allocation_bot_type = "allocations_scenarios/random"
     jhg_bot_type = 0 # 0 is gene bots, 2 is social welfare and 3 is random.
     total_order = create_total_order(num_players, num_humans)
-    num_attempts = 2 # number of batches to do.
+    num_attempts = 1 # number of batches to do.
     num_rounds = sum(jhg_games_per_sc_round) if len(jhg_games_per_sc_round) > 2 else jhg_games_per_sc_round[-1] # if its a list, len of list. else, grab the second identifier
     current_logger = CompleteLogger()
+    current_logger.set_attempts(num_attempts) # felt it was best to separate this out bc its only really used here under the batch tester.
 
     for attempt in tqdm(range(num_attempts)): # create a new sim for each attempt to prevent bleeding over.
         offset = num_rounds * attempt # for logging purposes, lets us know the relationship between the logger round and current round

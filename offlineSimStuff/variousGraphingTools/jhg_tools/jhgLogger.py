@@ -17,6 +17,7 @@ class JHGLogger():
         # self.big_boy_data["Influence"] = {}
         # self.big_boy_data["T"] = {}
         self.start_time = datetime.now()
+        self.round = -1
 
 
     def record_individual_round(self):
@@ -44,6 +45,7 @@ class JHGLogger():
 
     def return_round_for_writing(self, curr_round):
         T, popularity, influence, old_popularity = self.jhg_sim.individual_round_deets_for_logger(curr_round)
+        self.round = curr_round
 
         # print(f"[DEBUG] Round {curr_round}")
         # print(f"  T size: {sys.getsizeof(T)}")
@@ -91,6 +93,23 @@ class JHGLogger():
         total_data["cv"] = float(cv)
         influence = list(self.jhg_sim.get_influence()) # that should do it without all the craziness
         total_data["influence"] = np.array(influence).tolist() # get this as a list, not an ndarray.
+        # Fit exponential model for population
+        # starting_pop = 100
+        # popularities = self.jhg_sim.get_popularities()
+        # jhg_rounds = range(1, self.round + 1)
+        # log_ratio = np.log(np.array(popularities) / starting_pop)
+        # b = np.dot(jhg_rounds, log_ratio) / np.dot(jhg_rounds, jhg_rounds) if jhg_rounds else 0
+        # total_data["b"] = b
+
+        # starting_pop = 100
+        # log_ratio = np.log(np.array(avg_pop_per_round) / starting_pop)
+        # b = np.dot(jhg_rounds, log_ratio) / np.dot(jhg_rounds, jhg_rounds) if jhg_rounds else 0
+
+        # how do we get the average pop per round
+        for key in self.big_boy_data.keys():
+            print("here we are ")
+
+
         return total_data
 
 

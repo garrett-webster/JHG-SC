@@ -19,6 +19,8 @@ from matplotlib.colors import LinearSegmentedColormap, Normalize
 import json
 
 from offlineSimStuff.variousGraphingTools.completeVersions.completeLogger import CompleteLogger
+from offlineSimStuff.variousGraphingTools.influenceMatrixStuff.opsahlClustering import OpsahlClustering
+
 
 
 class CompleteGrapher():
@@ -52,7 +54,8 @@ class CompleteGrapher():
             self.create_sc_graphs(all_nodes, all_votes, winning_vote_list, current_options_matrix, types_list, scenario,  group, round, cycle, chromosome, influence_matrix, results_sums, results, peeps)
 
 
-    def create_sc_graphs(self, all_nodes, all_votes, winning_vote_list, current_options_matrix, types_list, scenario, group, curr_round, cycle, chromosome, influence_matrix, results_sums, results, peeps):
+    def create_sc_graphs(self, all_nodes, all_votes, winning_vote_list, current_options_matrix, types_list, scenario,
+                         group, curr_round, cycle, chromosome, influence_matrix, results_sums, results, peeps):
         bot_color_map, bot_name_map = self.build_bot_mappings()
         influence_matrix = np.array(influence_matrix)
 
@@ -427,8 +430,16 @@ class CompleteGrapher():
         ax.set_xlim(-1, n)
         ax.set_ylim(-n, 1)
 
+    def normalize_matrix(self, matrix):
+        max_val = np.max(matrix)
+        if max_val == 0:
+            return matrix  # All zeros? No change.
+        return matrix / max_val
+
     def plot_influence_graph(self, ax, influence_matrix, popularity):
-        influence_matrix = np.array(influence_matrix)
+        influence_matrix = self.normalize_matrix(np.array(influence_matrix))
+        node_clustering, global_clustering = OpsahlClustering(influence_matrix) # leave the alpha at 0.5 rn
+        print("this is the global clustering that we are returning ", global_clustering)
         net = NodeNetwork()
         net.setupPlayers([f"{i}" for i in range(np.shape(popularity)[0])])
         net.initNodes(
@@ -470,39 +481,72 @@ class CompleteGrapher():
 
         lc = LineCollection(segments, colors=colors, zorder=1)
         ax.add_collection(lc)
+        ax.set_title('Final Influence Matrix', loc="left")
+        ax.text(
+            0.5, -0.15,  # Bottom center of the axis
+            f"global cluster score: {global_clustering:.2f}",
+            transform=ax.transAxes,
+            ha="center",
+            va="top",
+            fontsize=12,
+            color="black",
+            weight="bold",
+        )
 
     def draw_long_term_graphs_given_logger(self, current_logger):
+
+        num_attempts = current_logger.big_boy_data["CONCLUSION"]["num_attempts"]
+        num_players = current_logger.big_boy_data["CONCLUSION"]["num_players"]
+        avg_rise = current_logger.big_boy_data["CONCLUSION"]["SC_CONCLUSION"][0]["avg_rise"] if current_logger.sc_sim else 0
+        b = current_logger.big_boy_data["CONCLUSION"]["JHG_CONCLUSION"][0]["b"] if current_logger.jhg_sim else 0
         avg_pop_per_round, per_player_per_round, avg_utility_per_round, utility_per_player_per_round = current_logger.calculate_long_term_stats()
         jhg_bot_type, sc_bot_type, allocation_bot_types = current_logger.get_all_bot_types()
         cooperation_score, number_of_attempts, cv, influence = (self.get_coop_score(current_logger) if current_logger.sc_sim else (0, 0, 0, 0))
         jhg_cv_score = self.get_cv_score(current_logger) if current_logger.jhg_sim else 0
-        self.draw_two_long_graphs(avg_pop_per_round, per_player_per_round, avg_utility_per_round, utility_per_player_per_round, jhg_bot_type, sc_bot_type, allocation_bot_types, cooperation_score, number_of_attempts, cv, jhg_cv_score)
+        self.draw_two_long_graphs(avg_pop_per_round, per_player_per_round, avg_utility_per_round,
+                                  utility_per_player_per_round, jhg_bot_type, sc_bot_type, allocation_bot_types,
+                                  cooperation_score, number_of_attempts, cv, jhg_cv_score, num_attempts, influence,
+                                  num_players, avg_rise, b)
 
     def draw_long_term_graphs_given_file(self, file_path):
         with open(file_path, "r") as f:
             data = json.load(f)
+        num_attempts = data["CONCLUSION"]["num_attempts"]
+        num_players = data["CONCLUSION"]["num_players"]
         dict_to_pass = data["CONCLUSION"]["LONG_TERM_DATA"]
+        dict_to_check = data["CONCLUSION"]
+        avg_rise = dict_to_check["SC_CONCLUSION"][0]["avg_rise"] if "SC_CONCLUSION" in dict_to_check else 0
+        b = dict_to_check["JHG_CONCLUSION"][0]["b"] if "JHG_CONCLUSION" in dict_to_check else 0
         complete_logger = CompleteLogger()
         avg_pop_per_round, per_player_per_round, avg_utility_per_round, utility_per_player_per_round = complete_logger.get_long_term_stats_from_dict(dict_to_pass)
         jhg_bot_type, sc_bot_type, allocation_bot_types = complete_logger.get_bot_types_from_json(data["CONCLUSION"])
-        cooperation_score, number_of_attempts, cv = self.get_coop_score_from_file(data)
+        cooperation_score, number_of_attempts, cv, influence = self.get_coop_score_from_file(data)
         jhg_cv_score = self.get_cv_score_from_file(data)
         self.draw_two_long_graphs(avg_pop_per_round, per_player_per_round, avg_utility_per_round,
                                   utility_per_player_per_round, jhg_bot_type, sc_bot_type, allocation_bot_types,
-                                  cooperation_score, number_of_attempts, cv, jhg_cv_score)
+                                  cooperation_score, number_of_attempts, cv, jhg_cv_score, num_attempts, influence,
+                                  num_players, avg_rise, b)
 
 
 
-    def draw_two_long_graphs(self, avg_pop_per_round, per_player_per_round, avg_utility_per_round, utility_per_player_per_round, jhg_bot_type, sc_bot_type, allocation_bot_types, cooperation_score, number_of_attempts, cv, jhg_cv_score):
+    def draw_two_long_graphs(self, avg_pop_per_round, per_player_per_round, avg_utility_per_round, utility_per_player_per_round,
+                             jhg_bot_type, sc_bot_type, allocation_bot_types, cooperation_score, number_of_attempts, cv, jhg_cv_score,
+                             num_attempts, influence, num_players, avg_rise, b_one):
         # aight we might need to draw two different graphs, lets find out.
+
         pop_graph = avg_pop_per_round is not None and len(avg_pop_per_round) > 0
         util_graph = avg_utility_per_round is not None and len(avg_utility_per_round) > 0
         num_graphs = int(pop_graph) + int(util_graph)
+        plot_influence = number_of_attempts == 1 and influence is not None
+        if plot_influence:
+            num_graphs += 1
 
         # I could put the starting amounts in there by hand and trace it all the way down or just accept that they are likely to never change.
-        avg_rise_utility = ((avg_utility_per_round[-1] - 10)) / len(avg_utility_per_round) if avg_utility_per_round else 0
+        if not plot_influence:
+            avg_rise_utility = ((avg_utility_per_round[-1] - 10)) / len(avg_utility_per_round) if avg_utility_per_round else 0
+        else:
+            avg_rise_utility = avg_rise
 
-        rounded_list = [round(y, 6) for y in avg_pop_per_round]
 
         sc_bot_name_map = {
             "-1": "player",
@@ -545,11 +589,12 @@ class CompleteGrapher():
         # -- determining line of best fit for JHG
         if pop_graph:
             ax = axes[current_axis]
-            for i, player_scores in enumerate(per_player_per_round):
-                bot_type_id = jhg_bot_type[i] if i < len(jhg_bot_type) else "?"
-                bot_type_name = jhg_bot_name_map.get(str(bot_type_id), f"Bot {bot_type_id}")
-                label = f'P{i + 1} ({bot_type_name})'
-                ax.plot(jhg_rounds, player_scores, label=label)
+            if plot_influence:
+                for i, player_scores in enumerate(per_player_per_round):
+                    bot_type_id = jhg_bot_type[i] if i < len(jhg_bot_type) else "?"
+                    bot_type_name = jhg_bot_name_map.get(str(bot_type_id), f"Bot {bot_type_id}")
+                    label = f'P{i + 1} ({bot_type_name})'
+                    ax.plot(jhg_rounds, player_scores, label=label)
 
             ax.plot(jhg_rounds, avg_pop_per_round, color='black', linewidth=3, label='Avg Popularity')
             ax.set_title('Average Popularity Over Time', loc="left")
@@ -559,31 +604,35 @@ class CompleteGrapher():
             ax.grid(True)
 
             # Fit exponential model for population
-            starting_pop = 100
-            log_ratio = np.log(np.array(avg_pop_per_round) / starting_pop)
-            b = np.dot(jhg_rounds, log_ratio) / np.dot(jhg_rounds, jhg_rounds) if jhg_rounds else 0
-            current_axis += 1
-            # add the average increase in pop and utility as part of the legend.
-            x = 0.35 if num_graphs == 2 else 0.8
-            fig.text(
-                x, 0.895,  # 0.35 together, 0.8 on its own
-                f'Exp. fit vars: {b:3e}',
-                ha='center',
-                va='bottom',
-                fontsize=12,
-                color='black',
-                weight='bold'
-            )
-            fig.text(
-                x-0.2, 0.05,
-                f"CoV: {cv:.2f}",
-                ha='center',
-                va='bottom',
-                fontsize=12,
-                color='black',
-                weight='bold'
-            )
+            if not plot_influence:
+                starting_pop = 100
+                log_ratio = np.log(np.array(avg_pop_per_round) / starting_pop)
+                b = np.dot(jhg_rounds, log_ratio) / np.dot(jhg_rounds, jhg_rounds) if jhg_rounds else 0
+            else:
+                b = b_one
 
+            # add the average increase in pop and utility as part of the legend.
+            ax.text(
+                0.5, 1.05,  # x, y in axis coordinates
+                f'Exp. fit vars: {b:3e}',
+                transform=ax.transAxes,
+                ha='center',
+                va='bottom',
+                fontsize=12,
+                color='black',
+                weight='bold'
+            )
+            ax.text(
+                0.1, -0.15,  # x, y in axis coordinates
+                f'CoV: {jhg_cv_score:.2f}',
+                transform=ax.transAxes,
+                ha='center',
+                va='bottom',
+                fontsize=12,
+                color='black',
+                weight='bold'
+            )
+            current_axis += 1
 
 
         else:
@@ -594,13 +643,14 @@ class CompleteGrapher():
 
             ax = axes[current_axis]
             sc_rounds = range(1, len(avg_utility_per_round) + 1)
-            for i, player_scores in enumerate(utility_per_player_per_round):
-                bot_type_id = sc_bot_type[i] if i < len(sc_bot_type) else "?"
-                alloc_bot_type_id = allocation_bot_types[i] if i < len(allocation_bot_types) else "?"
-                bot_type_name = sc_bot_name_map.get(str(bot_type_id), f"Bot {bot_type_id}")
-                alloc_type_name = allocation_bot_name_map.get(str(alloc_bot_type_id), f"Alloc {alloc_bot_type_id}")
-                label = f'P{i + 1} ({bot_type_name} {alloc_type_name})'
-                ax.plot(sc_rounds, player_scores, label=label)
+            if plot_influence:
+                for i, player_scores in enumerate(utility_per_player_per_round):
+                    bot_type_id = sc_bot_type[i] if i < len(sc_bot_type) else "?"
+                    alloc_bot_type_id = allocation_bot_types[i] if i < len(allocation_bot_types) else "?"
+                    bot_type_name = sc_bot_name_map.get(str(bot_type_id), f"Bot {bot_type_id}")
+                    alloc_type_name = allocation_bot_name_map.get(str(alloc_bot_type_id), f"Alloc {alloc_bot_type_id}")
+                    label = f'P{i + 1} ({bot_type_name} {alloc_type_name})'
+                    ax.plot(sc_rounds, player_scores, label=label)
 
             ax.plot(sc_rounds, avg_utility_per_round, color='black', linewidth=3, label='Avg Utility')
             ax.set_title('Average Utility Over Time', loc="left")
@@ -609,11 +659,14 @@ class CompleteGrapher():
             ax.legend()
             ax.grid(True)
 
+            current_axis += 1
+
             # Add text to right plot (utility)
-            x = 0.9 if num_graphs == 2 else 0.8
-            fig.text(
-                x, 0.895,  # X and Y position (tweak as needed) # 0.9 with both, 0.8 on they own
+
+            ax.text(
+                0.5, 1.05,  # x, y in axis coordinates
                 f'Avg Rise (Util): {avg_rise_utility:.2f}',
+                transform=ax.transAxes,
                 ha='center',
                 va='bottom',
                 fontsize=12,
@@ -622,21 +675,23 @@ class CompleteGrapher():
             )
 
             # add the coop score as text to bottom right
-            fig.text(
-                x, 0.05, # o.9 with both, o.8 on they own.
+            ax.text(
+                0.8, -0.15,  # Bottom center of the axis
                 f"coop_score: {cooperation_score:.2f}",
+                transform=ax.transAxes,
                 ha="center",
-                va="bottom",
+                va="top",
                 fontsize=12,
                 color="black",
                 weight="bold",
             )
 
-            fig.text(
-                x-0.2, 0.05,
+            ax.text(
+                0.1, -0.15,  # Left bottom of axis
                 f"CoV: {cv:.2f}",
+                transform=ax.transAxes,
                 ha="center",
-                va="bottom",
+                va="top",
                 fontsize=12,
                 color="black",
                 weight="bold",
@@ -655,6 +710,13 @@ class CompleteGrapher():
             color="black",
             weight="bold",
         )
+
+        if plot_influence:
+            init_pop = 10 if util_graph and not pop_graph else 100
+            init_pops = [init_pop for _ in range(num_players)]
+            ax = axes[current_axis]
+            self.plot_influence_graph(ax, influence, init_pops)
+
 
 
         # # Save the figure
@@ -721,3 +783,4 @@ class CompleteGrapher():
             new_sum += new_dict[attempt]["cv"]
         new_sum = new_sum / len(new_dict_keys)
         return new_sum  # this is the new cv
+

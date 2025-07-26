@@ -7,12 +7,14 @@ import sys
 # class that contains various functions for saving stuff to jsons from old code.
 from offlineSimStuff.variousGraphingTools.sc_tools.simLogger import simLogger
 from offlineSimStuff.variousGraphingTools.jhg_tools.jhgLogger import JHGLogger
+from offlineSimStuff.variousGraphingTools.influenceMatrixStuff.opsahlClustering import OpsahlClustering
 
 class CompleteLogger():
     def __init__(self):
         # so these boys need to persist so lets create em here.
         self.long_term_data = self.create_long_term_data()
         self.big_boy_data = {}  # initalize an empty dict.
+        self.num_attempts = -1
 
     def resetup(self, jhg_sim, sc_sim):
         self.jhg_sim = jhg_sim
@@ -21,6 +23,11 @@ class CompleteLogger():
         self.sc_logger = simLogger(self.sc_sim)
         self.jhg_logger = JHGLogger(self.jhg_sim)
 
+    def set_attempts(self, attempts):
+        self.num_attempts = attempts
+
+    def get_attempts(self):
+        return self.num_attempts
 
     def save_sc_round(self, curr_round, curr_logger_round):
         if curr_logger_round not in self.big_boy_data: # make sure he exists.
@@ -55,6 +62,15 @@ class CompleteLogger():
         if self.jhg_sim:
             self.big_boy_data["CONCLUSION"]["JHG_CONCLUSION"][attempt] = self.jhg_logger.record_big_picture()
         self.big_boy_data["CONCLUSION"]["LONG_TERM_DATA"][attempt] = self.long_term_data # just slap that in there. just for funzies.
+
+        self.big_boy_data["CONCLUSION"]["num_attempts"] = self.num_attempts # just go ahead and throw that in on its own. nice little dangler.
+        num_players = 0
+        if self.sc_sim:
+            num_players = self.sc_sim.total_players
+        else: # we gotta have one or the other or what are we even doing
+            num_players = self.jhg_sim.total_players
+        self.big_boy_data["CONCLUSION"]["num_players"] = num_players
+
 
 
     def actually_close_the_thing(self, filename): # actually closes the thing.
@@ -103,6 +119,7 @@ class CompleteLogger():
             avg_pop_per_round, per_player_per_round = self.extract_data_from_dict(self.long_term_data["avg_pops"])
         if self.long_term_data["avg_utility"]:
             avg_utility_per_round, utility_per_player_per_round = self.extract_data_from_dict(self.long_term_data["avg_utility"])
+
         return avg_pop_per_round, per_player_per_round, avg_utility_per_round, utility_per_player_per_round
 
     def get_long_term_stats_from_dict(self, dict):
@@ -163,6 +180,7 @@ class CompleteLogger():
         }
         return long_term_data
 
+    # when I wrote this, this seemed like a really cool idea. Now I hate it and it is compltely unreadable)
     def create_big_boy_graphs(self, max_rounds, offset):
         for i in range(max_rounds, 1, -1):
             curr_round = max_rounds - i # this way we start at 0 and work our way up
@@ -184,6 +202,9 @@ class CompleteLogger():
                 # we need the offset to account for the fact that round 40 and round 20 are the same for long term, but very different for the logger. wraps around.
                 self.long_term_data["avg_pops"][curr_round].append(self.big_boy_data[curr_round+offset]["JHG_STUFF"]["Popularity"])
                 self.long_term_data["highest_pops"][curr_round].append(max(self.big_boy_data[curr_round+offset]["JHG_STUFF"]["Popularity"]))
+
+
+
 
 
 
