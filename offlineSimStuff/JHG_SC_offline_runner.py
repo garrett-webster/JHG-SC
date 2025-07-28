@@ -1,6 +1,4 @@
 # so this allows me to run the fetcher and create visualizations based off of scenarios and whatnot.
-import copy
-import random
 
 from Server.social_choice_sim import Social_Choice_Sim
 from Server.JHGManager import JHG_simulator
@@ -9,10 +7,10 @@ import numpy as np
 
 
 from offlineSimStuff.variousGraphingTools.completeVersions.completeGrapher import CompleteGrapher
-from offlineSimStuff.variousGraphingTools.sc_tools.causeNodeGraphVisualizer import causeNodeGraphVisualizer
-from offlineSimStuff.variousGraphingTools.sc_tools.graph_influence_matrix import influenceGrapher
+from offlineSimStuff.variousGraphingTools.outDated.sc_tools import causeNodeGraphVisualizer
+from offlineSimStuff.variousGraphingTools.outDated.sc_tools import influenceGrapher
 from Server.OptionGenerators.generators import generator_factory
-from offlineSimStuff.variousGraphingTools.completeVersions.completeLogger import CompleteLogger
+from offlineSimStuff.variousGraphingTools.outDated.completeLogger import CompleteLogger
 
 # starts the sim, could make this take command line arguments
 # takes in a bot type, a number of rounds, and then runs it and plots the results. plans for expansion coming soon.

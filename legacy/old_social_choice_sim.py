@@ -10,7 +10,18 @@ import numpy as np
 from Server.Engine.geneagent3 import GeneAgent3
 from Server.Engine.humanagent import HumanAgent
 from Server.Node import Node
+from Server.SC_Bots.legacyBots.humanAttempt2 import humanAttempt2
 from Server.OptionGenerators.options_creation import generate_two_plus_one_groups
+from Server.SC_Bots.Greedy import GreedyBot
+from Server.SC_Bots.SocialWelfare import SocialWelfareBot
+from Server.SC_Bots.Random import RandomBot
+from Server.SC_Bots.legacyBots.somewhatMoreAwareGreedy import somewhatMoreAwarenessGreedy
+from Server.SC_Bots.optimalHuman import optimalHuman
+from Server.SC_Bots.legacyBots.reorganizedHuman import reorganizedHuman
+from Server.SC_Bots.possibleCheetahBot import cheetahBot
+from Server.allocation_bots.socialWelfare import SocialWelfare
+from Server.allocation_bots.random import Random
+
 NUM_CAUSES = 3 # if its ever not this a LOT of math breaks, so just leave it be.
 
 class Social_Choice_Sim:
@@ -38,9 +49,26 @@ class Social_Choice_Sim:
         self.causes = self.create_cause_nodes()  # graphing stuff.
 
         self.player_nodes = []  # also graphing stuff.
+        self.bot_type = self.set_bot_list(scenario)
 
+        self.chromosome_string = ""  # holds the file name of the chromosome baering file.
+        self.chromosomes = self.set_chromosomes(
+            chromosomes)  # self.chromosomes contains the full list of all chromosomes.
 
+        # sets the scenario
+        self.scenario_string = Path(scenario).name
+
+        # create the bots, first getting number and type from scenario and then setting the chromosomes from the chromsomes.
+        self.bot_type = self.set_bot_list(scenario)
+        self.allocation_bot_type = self.set_bot_list(allocation_scenario)
+        #self.bots = self.create_bots(self.total_order)  # make sure to pull this from the right spot.
         self.bots = self.use_gene_bots() # the hope is that I just use all of em and call it a day.
+        #self.allocation_bots = self.create_allocation_bots(self.total_order) # old code, want to try something new
+        self.allocation_bots = self.bots # use the same bot for both.
+        self.bot_list_as_string = self.create_bot_list_as_string(self.bots)
+        # self.allocation_bot_list_as_string = self.create_bot_list_as_string(self.allocation_bots)
+        ## turn this one back one when you are not using the Gene3 agent bots, as those are initalized with chromosomes.
+        # self.set_bot_chromosomes(self.chromosomes)  # no chromosomes for allocaiton bots.
         self.total_types = self.create_total_types()
 
         # group stuff - all used under set group, and then there are defualts just in case.
@@ -67,7 +95,12 @@ class Social_Choice_Sim:
         self.winning_probability = []
 
         self.alpha = 0.2  # whatever we are hard coding this fetcher. I'll work with it more later.
-        self.I = {0: [[0 for _ in range(total_players)] for _ in range(total_players)]}  # square matrix of 0's for all player relations
+        # this is a 3 dimensional list of lists. we have a list for every round, and within that we have a list of lists that represents a 2d vector.
+        # not sure if this will help. lets find out.
+        self.I = {0: [[0 for _ in range(total_players)] for _ in
+                      range(total_players)]}  # square matrix of 0's for all player relations
+        # this needs to be a square matrix for reasons. thats cool I guess.
+        # self.v = [[0 for _ in range(total_players)] for _ in range(total_players)]  # represents the change in utility at that round.
         self.peeps = None  # just so we have it around
         self.new_v = None
         self.extra_data = {
@@ -93,10 +126,15 @@ class Social_Choice_Sim:
             self.results[i] = [10]  # just throw in all the utilites
         return self.results
 
+    def set_chromosome(self, chromosomes):
+        self.chromosome_string = Path(chromosomes).name
+        return self.chromosome_string
 
     # here is the offender. this is the thing we have to rework.
     def create_total_types(self):
-        self.total_types = [0 for _ in range(self.num_bots)]
+        if self.total_order is None:
+            return self.bot_type # assume only bots if no total order. never used.
+        self.total_types = [self.bot_type[0] for _ in range(self.num_bots)]
         if len(self.total_types) != len(self.total_order): # the only way this happens is becuase we are missing human players
             for i, player in enumerate(self.total_order):
                 if player[0] == "P":
@@ -112,6 +150,82 @@ class Social_Choice_Sim:
             self.group = group_option
             self.sc_groups = generate_two_plus_one_groups(self.total_players, group_option)
 
+    def create_bots(self, total_order):
+        bots_array = []
+        bot_indexes = []
+        self.bot_index_dict = {}
+        if total_order is not None:
+            for index, object in enumerate(total_order):
+                if object.startswith("B"):
+                    bot_indexes.append(index)
+                    # make sure this is doing whta you think its doing.
+                    self.bot_index_dict[object] = index
+
+        if len(self.bot_type) != self.num_bots:
+            # lets fix this logic right here and now.
+            self.bot_type = [self.bot_type[0]] * self.num_bots
+
+        for i, bot_type in enumerate(self.bot_type):
+            current_index = bot_indexes.pop(0)
+            # print("this the bot index that we are adding ", current_index)
+            bots_array.append(self.match_bot_type(bot_type, current_index))
+
+        return bots_array
+
+    def create_allocation_bots(self, total_order):
+        bots_array = []
+        bot_indexes = []
+        self.allocation_bots_index = {}
+        if total_order is not None:
+            for index, object in enumerate(total_order):
+                if object.startswith("B"):
+                    bot_indexes.append(index)
+                    # make sure this is doing whta you think its doing.
+                    self.allocation_bots_index[object] = index
+
+        if len(self.allocation_bot_type) != self.num_bots:
+            # lets fix this logic right here and now.
+            self.allocation_bot_type = [self.allocation_bot_type[0]] * self.num_bots
+
+        for i, bot_type in enumerate(self.allocation_bot_type):
+            current_index = bot_indexes.pop(0)
+            # print("this the bot index that we are adding ", current_index)
+            bots_array.append(self.match_allocation_bot_type(bot_type, current_index))
+
+        return bots_array
+
+    # I am not changing this. I don't bother with it. It does what it does and I don't want to refactor all the stubbins.
+    def match_bot_type(self, bot_type, index):
+        new_bot = None
+        bot_type = int(bot_type)
+        if bot_type == 0:
+            new_bot = (RandomBot(index))
+        if bot_type == 1:
+            new_bot = (SocialWelfareBot(index))
+        if bot_type == 2:
+            new_bot = (GreedyBot(index))
+        if bot_type == 6:
+            new_bot = (somewhatMoreAwarenessGreedy(index))
+        if bot_type == 7:
+            new_bot = (optimalHuman(index))
+        if bot_type == 8:
+            new_bot = (humanAttempt2(index))
+        if bot_type == 9:
+            new_bot = (reorganizedHuman(index))
+        if bot_type == 10:
+            new_bot = (cheetahBot(index))
+
+        return new_bot  # the matched bot that we were looking for.
+
+    def match_allocation_bot_type(self, bot_type, index):
+        new_bot = None
+        bot_type = int(bot_type)
+        if bot_type == 0:
+            new_bot = (Random(index, self.utility_per_player))
+        if bot_type == 1:
+            new_bot = (SocialWelfare(index, self.utility_per_player))
+
+        return new_bot  # the matched bot that we were looking for.
 
     # ovverides the other bots to make sure that I can use the same bot for both - important for the genetic algorithm.
     def bot_ovveride(self, bots):
@@ -126,9 +240,26 @@ class Social_Choice_Sim:
             players[str(i)] = 0
         return players
 
+    def set_bot_chromosomes(self, chromosomes):
+        if len(chromosomes) != len(self.bots):
+            chromosomes = [chromosomes[0]] * len(self.bots)
+
+        for i in range(len(self.bots)):
+            self.bots[i].set_chromosome(chromosomes[i])
+
+    def apply_vote(self, winning_vote):
+        for i in range(self.total_players):
+            self.players[str(i)] += self.current_options_matrix[i][int(winning_vote)]
+
     def create_options_matrix(self):
         self.current_options_matrix = self.options_generator.generateOptions()
         return self.current_options_matrix  # because why not
+
+    def get_scenario(self):
+        return self.scenario_string
+
+    def get_chromosome(self):
+        return self.chromosomes
 
     def get_causes(self):
         return self.causes
@@ -148,6 +279,9 @@ class Social_Choice_Sim:
     def get_cycle(self):
         return self.cycle
 
+    def get_bot_type(self):
+        return self.bot_type
+
     def set_final_votes(self, zero_idx_votes):
         self.final_votes = zero_idx_votes
 
@@ -156,6 +290,7 @@ class Social_Choice_Sim:
 
     def add_coop_score(self):
         self.cooperation_score = self.cooperation_score + 1
+        #print("this is the current coop score ", self.cooperation_score, " and here is the current round ", self.num_rounds)
 
     def set_coop_score(self, coop_score):
         self.cooperation_score = coop_score
@@ -263,7 +398,7 @@ class Social_Choice_Sim:
                     current_options_matrix_columns[all_votes[plyr_idx]])  # add the column of what they did to the new v.
 
         self.new_v = new_v
-        self.calculate_influence_matrix(new_v)
+        self.calculate_influence_matrix(new_v, self.round)
         return winning_vote, self.current_results
 
     # version uses the wining vote rather than the attempted vote. swapping them out to see if it makes a difference.
@@ -316,7 +451,7 @@ class Social_Choice_Sim:
 
         return winning_vote, self.current_results  # literally just returns who won. thats it.
 
-    def calculate_influence_matrix(self, new_v):
+    def calculate_influence_matrix(self, new_v, curr_round):
         new_index = len(self.I)  # lets see if this works any better.
         self.I[new_index] = [[0 for _ in range(self.total_players)] for _ in
                              range(self.total_players)]  # initalize it w/ something.
@@ -362,9 +497,52 @@ class Social_Choice_Sim:
         return average_utility_per_round
 
 
+
+
     def get_new_utilities(self):
         return self.results
 
+    # SUM: sets up the bot list with a current file. Will override any potential single types as those seem to be more important. will likely be refactored.
+    def set_bot_list(self, current_file):
+        if current_file != "":
+            with open(current_file, "r") as file:
+                for line in file:
+                    if line.startswith("#"):
+                        continue  # skip the comment lines
+                    bot_types = [int(x) for x in line.strip().split(",")]
+                    break  # stop when teh numbers are over.
+
+        else:
+            num_bots = self.total_players - self.num_humans
+            bot_types = [2] * num_bots
+
+        return bot_types
+
+    def set_chromosomes(self, current_file):
+        chromosomes_list = []
+        if isinstance(current_file, str):
+
+            if current_file != "":
+                with open(current_file, "r") as file:
+                    for line in file:
+                        if line.startswith("#"):
+                            continue
+                        parts = line.strip().split(",")
+                        if parts:  # make sure the line isn't empty
+                            try:
+                                parts_list = []
+                                for i in range(1, len(parts)):
+                                    parts_list.append(float(parts[i]))
+                                chromosomes_list.append(parts_list)
+                            except ValueError:
+                                pass  # skip lines that don't have valid integers
+            else:
+                chromosomes_list = [[1]] * self.num_bots
+
+        else:
+            chromosomes_list = current_file
+        self.chromosome_string = Path(current_file).name
+        return chromosomes_list
 
     # default to groups being None,
     def start_round(self, options_and_peeps=None):
@@ -377,11 +555,28 @@ class Social_Choice_Sim:
         self.set_new_options_matrix(self.current_options_matrix)
         self.player_nodes = self.create_player_nodes()
 
+    def make_native_type(self, return_values):
+        new_dict = {}
+        for key, inner_dict in return_values.items():
+            new_key = key.item() if isinstance(key, np.integer) else key
+            new_inner_dict = {}
+            for item, value in inner_dict.items():
+                new_inner_dict[item] = value.item if isinstance(value, np.generic) else value
+            new_dict[new_key] = new_inner_dict
+        return new_dict
+
     def compile_nodes(self):
         player_nodes = self.get_player_nodes()
         causes = self.get_causes()
         all_nodes = causes + player_nodes
         return all_nodes
+
+    def get_bot_votes(self, current_options_matrix):
+        votes = {}
+        for i, player in enumerate(self.players):
+            if player.getType() != "Human":
+                votes[str(i)] = player.getVote(current_options_matrix, i)
+        return votes
 
     # takes a bunch of data and turns it into a josn that we can use
     def record_individual_round(self):
@@ -426,8 +621,11 @@ class Social_Choice_Sim:
             "winning_vote_list": winning_vote_list,
             "current_options_matrix": self.current_options_matrix,
             "types_list": self.total_types,
+            "scenario_string": self.scenario_string,
             "group": group,
             "curr_round": self.round,
+            "cycle": self.cycle,
+            "chromosome string": self.chromosome_string,
             "influence_matrix": self.get_influence_matrix(),
             "results_sums": self.results_sums,
             "results": self.results,
@@ -437,6 +635,35 @@ class Social_Choice_Sim:
         #return current_node_json, self.all_votes, winning_vote_list, self.current_options_matrix, self.total_types, self.scenario_string, group, self.round, self.cycle, self.chromosome_string, self.get_influence_matrix(), self.results_sums, self.results, self.peeps
         return total_data
 
+
+
+    def get_results(self):
+        # print("Aight were is the zero, its gotta be under num_rounds right?") literally zero clue whawt this print statement was supposed to be for.
+        cooperation_score = self.cooperation_score / (self.num_rounds+1) if self.num_rounds > 0 else 0  # how often a cause passed (bc rounds start form 0 we have to add one)
+        return self.results, cooperation_score, self.total_types, self.num_rounds, self.scenario_string, self.group, self.chromosome_string, self.results_sums, self.most_recent_influence
+
+    def get_everything_for_logger(self):
+        self.create_player_nodes()
+        current_nodes = self.compile_nodes()
+        current_node_json = []
+        for node in current_nodes:
+            current_node_json.append(node.to_json())
+
+        current_cooperation_score = copy.copy(self.cooperation_score)
+        current_choice_matrix = copy.copy(self.choice_matrix)
+        winning_vote, _ = self.return_win(self.final_votes)
+        self.choice_matrix = current_choice_matrix
+        self.set_coop_score(current_cooperation_score)  # reset it bc the above does silly things.
+        cooperation_score = self.cooperation_score / self.num_rounds  # as a percent, how often we cooperated. (had a non negative cause pass)
+
+        return current_node_json, self.final_votes, winning_vote, self.current_options_matrix, self.results, cooperation_score, self.total_types, self.num_rounds, self.scenario_string, self.group, self.cycle, self.round
+
+    def create_bot_list_as_string(self, bots_list):
+        bots_as_string = []
+        for bot in bots_list:
+            bots_as_string.append(str(bot.get_number_type()))
+        return bots_as_string
+
     def set_new_options_matrix(self, new_optins_matrix):
         self.current_options_matrix = new_optins_matrix
 
@@ -444,7 +671,6 @@ class Social_Choice_Sim:
         self.current_options_matrix = new_options_matrix
         self.player_nodes = self.create_player_nodes()
 
-    # not really used, thanks to BOT overrride.
     def use_gene_bots(self):
         num_agents = self.total_players
         popSize = 60
@@ -500,133 +726,6 @@ class Social_Choice_Sim:
             a.setGameParams(game_params, forcedRandom)
 
         return players # this SHOUDL do the trick.
-
-
-    def create_choice_matrix(self, current_options_matrix):
-        current_options_matrix = [[0] + row for row in current_options_matrix]  # append a 0 to it
-        choice_list = [0] * len(current_options_matrix[0])
-        for i, row in enumerate(current_options_matrix):
-            min_val = min(row)  # lets avoid clamping for now IG.
-            adjusted_row = [x - min_val for x in row]
-            total = sum(adjusted_row)
-            if total == 0:
-                normalized_row = [0 for _ in adjusted_row]
-            else:
-                normalized_row = [x / total for x in adjusted_row]
-            choice_list = [choice_list[i] + normalized_row[i] for i in range(len(choice_list))]
-        total = sum(choice_list)
-        if total != 0: choice_list = [val / total for val in choice_list]
-        return choice_list
-
-    def get_winning_probabilities(self):
-        return self.winning_probability
-
-    def get_highest_utility_player(self):
-        # this is going to be a problem. I need to create a current scoreborad, that should be heplful.
-        if len(self.results_sums) == 0:  # no utility? thats fine, pick a random player
-            return self.total_order[random.randint(0, self.total_players - 1)]
-        else:  # utility time. return the highest.
-            return self.total_order[
-                self.results_sums.index(max(self.results_sums))]  # return the index of the highest utility player.
-
-    # this functin is used for simulation purposes ONLY. should never be called with live players.
-    def let_others_create_options_matrix(self, bot_peeps, curr_round, influence_matrix):
-
-        indexes = [] # this gest used regardless.
-        for peep in bot_peeps:
-            indexes.append(bot_peeps.index(peep) + 1)
-
-        if isinstance(self.allocation_bots[0], GeneAgent3):
-            if self.new_v is not None:
-                T_prev = self.new_v # constructs the previous, like, received matrix. kind of.
-            else:
-                T_prev = [[0 for _ in range(self.total_players)] for _ in range(self.total_players)] # 2d nxn array filled w/ zeros.
-
-            T_prev = np.array(T_prev)
-            new_columns = []
-            extra_data = {}
-            for i in range(self.total_players):
-                extra_data[i] = None # we never use government or anything.
-            # go ahead and queyr everyone and then organize it later.
-            for i in range(len(self.allocation_bots)):
-                new_columns.append(self.allocation_bots[i].play_round(
-                    i,
-                    curr_round,
-                    T_prev[:, i], # should be a 9x9 ndarray (from numpy)
-                    self.results_sums,
-                    np.array(influence_matrix),
-                    extra_data, # yes this is blank. no I don't know why.
-                ))
-            total_columns = []
-            for peep in bot_peeps:
-                peep_index = peep[1]
-                total_columns.append(new_columns[int(peep_index)])
-            current_options_matrix = np.transpose(total_columns).tolist()
-            return current_options_matrix, indexes
-
-        else:
-            list_of_columns = []
-            for peep in bot_peeps:
-                list_of_columns.append(self.allocation_bots[self.bot_index_dict[peep]].create_column(self.total_players))
-            current_options_matrix = np.transpose(list_of_columns).tolist()
-
-
-            self.current_options_matrix = current_options_matrix
-            return current_options_matrix, indexes
-
-
-    ########################################################################
-    ###--- LOGGING TIME. NOT DIRECTLY SIM BUT HOW SIM RECORDS RESULTS ---###
-    #########################################################################
-
-    def get_game_deets(self):
-        cooperation_score = self.cooperation_score / (self.num_rounds+1) if self.num_rounds > 0 else 0  # as a percent, how often we cooperated. (had a non negative cause pass)
-        sc_bot_type = 0 # don't return anything here rn.
-        results = self.results # do I actually need this?
-        results_sums = self.results_sums
-        num_rounds = self.num_rounds
-        cv, sums_per_round = self.get_sums_per_round_and_cv()
-        influence = self.most_recent_influence
-        #utility_per_round = list(zip(*self.get_results_per_round()))
-        utility_per_round = self.get_results_per_round()
-        avg_utility_per_round = self.get_average_utility_per_round()
-        avg_rise = (avg_utility_per_round[-1]-10) / num_rounds
-
-        total_data = {
-            "cooperation_score": cooperation_score,
-            "avg_rise": avg_rise,
-            "results": results,
-            "result_sums": results_sums,
-            "num_rounds": num_rounds,
-            "sums_per_round": sums_per_round,
-            "cv": cv,
-            "influence": influence,
-            "utility_per_round": utility_per_round,
-            "avg_utility_per_round": avg_utility_per_round,
-        }
-
-        #return cooperation_score, avg_rise, results, results_sums, num_rounds, sums_per_round, cv, influence, utility_per_round, avg_utility_per_round
-        return total_data
-
-
-    def get_sums_per_round_and_cv(self):
-        results = self.results
-        num_rounds = self.num_rounds
-        sums_per_round = {}
-        for bot in results:
-            sums_per_round[bot] = []
-            current_sum = 0
-            for i, new_sum in enumerate(results[bot]):
-                current_sum += new_sum
-                sums_per_round[bot].append(current_sum)
-
-        new_list = []
-        for bot in sums_per_round:
-            new_list.append(sums_per_round[bot][num_rounds - 1])
-        std = np.std(new_list)
-        mean = np.mean(new_list)
-        cv = std / abs(mean)  # measures distribution bet  ter than, say, std or mean on their own.
-        return cv, sums_per_round
 
     ########################################################################
     ###--- NODE CREATION FOR FRONT END. NOT USEFUL FOR GENETIC STUFF. ---###
@@ -738,6 +837,7 @@ class Social_Choice_Sim:
         return curr_x, curr_y
 
 
+
     def normal_vector_generation(self, player_id, normalized_current_options_matrix, cause_index):
         curr_x = 0
         curr_y = 0
@@ -763,5 +863,124 @@ class Social_Choice_Sim:
                 new_options_matrix.append(row)  # all zeros, just chill
         return new_options_matrix
 
+    def create_choice_matrix(self, current_options_matrix):
+        current_options_matrix = [[0] + row for row in current_options_matrix]  # append a 0 to it
+        choice_list = [0] * len(current_options_matrix[0])
+        for i, row in enumerate(current_options_matrix):
+            min_val = min(row)  # lets avoid clamping for now IG.
+            adjusted_row = [x - min_val for x in row]
+            total = sum(adjusted_row)
+            if total == 0:
+                normalized_row = [0 for _ in adjusted_row]
+            else:
+                normalized_row = [x / total for x in adjusted_row]
+            choice_list = [choice_list[i] + normalized_row[i] for i in range(len(choice_list))]
+        total = sum(choice_list)
+        if total != 0: choice_list = [val / total for val in choice_list]
+        return choice_list
+
+    def get_winning_probabilities(self):
+        return self.winning_probability
+
+    def get_highest_utility_player(self):
+        # this is going to be a problem. I need to create a current scoreborad, that should be heplful.
+        if len(self.results_sums) == 0:  # no utility? thats fine, pick a random player
+            return self.total_order[random.randint(0, self.total_players - 1)]
+        else:  # utility time. return the highest.
+            return self.total_order[
+                self.results_sums.index(max(self.results_sums))]  # return the index of the highest utility player.
+
+    # this functin is used for simulation purposes ONLY. should never be called with live players.
+    def let_others_create_options_matrix(self, bot_peeps, curr_round, influence_matrix):
+
+        indexes = [] # this gest used regardless.
+        for peep in bot_peeps:
+            indexes.append(bot_peeps.index(peep) + 1)
+
+        if isinstance(self.allocation_bots[0], GeneAgent3):
+            if self.new_v is not None:
+                T_prev = self.new_v # constructs the previous, like, received matrix. kind of.
+            else:
+                T_prev = [[0 for _ in range(self.total_players)] for _ in range(self.total_players)] # 2d nxn array filled w/ zeros.
+
+            T_prev = np.array(T_prev)
+            new_columns = []
+            extra_data = {}
+            for i in range(self.total_players):
+                extra_data[i] = None # we never use government or anything.
+            # go ahead and queyr everyone and then organize it later.
+            for i in range(len(self.allocation_bots)):
+                new_columns.append(self.allocation_bots[i].play_round(
+                    i,
+                    curr_round,
+                    T_prev[:, i], # should be a 9x9 ndarray (from numpy)
+                    self.results_sums,
+                    np.array(influence_matrix),
+                    extra_data, # yes this is blank. no I don't know why.
+                ))
+            total_columns = []
+            for peep in bot_peeps:
+                peep_index = peep[1]
+                total_columns.append(new_columns[int(peep_index)])
+            current_options_matrix = np.transpose(total_columns).tolist()
+            return current_options_matrix, indexes
+
+        else:
+            list_of_columns = []
+            for peep in bot_peeps:
+                list_of_columns.append(self.allocation_bots[self.bot_index_dict[peep]].create_column(self.total_players))
+            current_options_matrix = np.transpose(list_of_columns).tolist()
 
 
+            self.current_options_matrix = current_options_matrix
+            return current_options_matrix, indexes
+
+
+    def get_game_deets(self):
+        cooperation_score = self.cooperation_score / (self.num_rounds+1) if self.num_rounds > 0 else 0  # as a percent, how often we cooperated. (had a non negative cause pass)
+        sc_bot_type = 0 # don't return anything here rn.
+        results = self.results # do I actually need this?
+        results_sums = self.results_sums
+        num_rounds = self.num_rounds
+        cv, sums_per_round = self.get_sums_per_round_and_cv()
+        influence = self.most_recent_influence
+        #utility_per_round = list(zip(*self.get_results_per_round()))
+        utility_per_round = self.get_results_per_round()
+        avg_utility_per_round = self.get_average_utility_per_round()
+        avg_rise = (avg_utility_per_round[-1]-10) / num_rounds
+
+        total_data = {
+            "cooperation_score": cooperation_score,
+            "avg_rise": avg_rise,
+            "results": results,
+            "result_sums": results_sums,
+            "num_rounds": num_rounds,
+            "sums_per_round": sums_per_round,
+            "cv": cv,
+            "influence": influence,
+            "utility_per_round": utility_per_round,
+            "avg_utility_per_round": avg_utility_per_round,
+        }
+
+        #return cooperation_score, avg_rise, results, results_sums, num_rounds, sums_per_round, cv, influence, utility_per_round, avg_utility_per_round
+        return total_data
+
+
+    def get_sums_per_round_and_cv(self):
+        results = self.results
+        num_rounds = self.num_rounds
+        sums_per_round = {}
+        for bot in results:
+            sums_per_round[bot] = []
+            current_sum = 0
+            for i, new_sum in enumerate(results[bot]):
+                current_sum += new_sum
+                sums_per_round[bot].append(current_sum)
+
+        new_list = []
+        for bot in sums_per_round:
+            new_list.append(sums_per_round[bot][num_rounds - 1])
+        std = np.std(new_list)
+        mean = np.mean(new_list)
+        cv = std / abs(mean)  # measures distribution bet  ter than, say, std or mean on their own.
+        return cv, sums_per_round

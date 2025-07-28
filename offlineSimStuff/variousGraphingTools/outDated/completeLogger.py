@@ -2,12 +2,11 @@ import os
 import json
 
 # Debug info
-import sys
 
 # class that contains various functions for saving stuff to jsons from old code.
-from offlineSimStuff.variousGraphingTools.sc_tools.simLogger import simLogger
-from offlineSimStuff.variousGraphingTools.jhg_tools.jhgLogger import JHGLogger
-from offlineSimStuff.variousGraphingTools.influenceMatrixStuff.opsahlClustering import OpsahlClustering
+from offlineSimStuff.variousGraphingTools.outDated.sc_tools.simLogger import simLogger
+from offlineSimStuff.variousGraphingTools.outDated.jhg_tools.jhgLogger import JHGLogger
+
 
 class CompleteLogger():
     def __init__(self):

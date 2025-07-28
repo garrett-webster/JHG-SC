@@ -3,9 +3,9 @@ import time
 from Server.social_choice_sim import Social_Choice_Sim
 from tqdm import tqdm
 import statistics
-from offlineSimStuff.variousGraphingTools.sc_tools.causeNodeGraphVisualizer import causeNodeGraphVisualizer
-from offlineSimStuff.variousGraphingTools.sc_tools.longTermGrapher import longTermGrapher
-from offlineSimStuff.variousGraphingTools.sc_tools.simLogger import simLogger
+from offlineSimStuff.variousGraphingTools.outDated.sc_tools import causeNodeGraphVisualizer
+from offlineSimStuff.variousGraphingTools.outDated.sc_tools import longTermGrapher
+from offlineSimStuff.variousGraphingTools.outDated.sc_tools import simLogger
 
 
 # starts the sim, could make this take command line arguments

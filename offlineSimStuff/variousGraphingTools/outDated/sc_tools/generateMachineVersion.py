@@ -5,7 +5,7 @@
 # so lets get it
 import json
 from Server.social_choice_sim import Social_Choice_Sim # gets me the actual sim
-from offlineSimStuff.variousGraphingTools.sc_tools.simLogger import simLogger
+from offlineSimStuff.variousGraphingTools.outDated.sc_tools.simLogger import simLogger
 from Server.OptionGenerators.generators import generator_factory
 
 if __name__ == "__main__":
@@ -15,7 +15,7 @@ if __name__ == "__main__":
     # filename = datetime.now().strftime("%Y%m%d_%H%M%S") + "human_study_results.json"
     # filepath = os.path.join(directory, filename)
 
-    filepath = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\offlineSimStuff\sc_logs_repo\20250523_140645human_study_results.json.json"
+    filepath = r"/offlineSimStuff/sc_logs_repo/20250523_140645human_study_results.json.json"
 
     with open(filepath, 'r') as f:
         big_boy_data = json.load(f)

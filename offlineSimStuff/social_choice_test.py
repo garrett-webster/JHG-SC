@@ -4,9 +4,9 @@ from Server.social_choice_sim import Social_Choice_Sim
 from tqdm import tqdm
 import numpy as np
 
-from offlineSimStuff.variousGraphingTools.sc_tools.causeNodeGraphVisualizer import causeNodeGraphVisualizer
+from offlineSimStuff.variousGraphingTools.outDated.sc_tools import causeNodeGraphVisualizer
 from Server.OptionGenerators.generators import generator_factory
-from offlineSimStuff.variousGraphingTools.completeVersions.completeLogger import CompleteLogger
+from offlineSimStuff.variousGraphingTools.outDated.completeLogger import CompleteLogger
 from offlineSimStuff.variousGraphingTools.completeVersions.completeGrapher import CompleteGrapher
 
 # starts the sim, could make this take command line arguments

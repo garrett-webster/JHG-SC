@@ -64,7 +64,7 @@ class JHGLogger():
 
     def conclude_overview(self):
         my_path = os.path.dirname(os.path.abspath(__file__))
-        filename = "../../../Server/jhg_logs_repo/conclude.json"
+        filename = "../../../../Server/jhg_logs_repo/conclude.json"
         file_path = os.path.join(my_path, filename)
         with open(file_path, "w") as file:
             json.dump(self.big_boy_data, file, indent=4)
@@ -286,7 +286,7 @@ class JHGLogger():
         total_data["colorGroups"] = []
 
         my_path = os.path.dirname(os.path.abspath(__file__))
-        file_name = "../../../Server/formalStyleConclusion.json"
+        file_name = "../../../../Server/formalStyleConclusion.json"
         file_path = os.path.join(my_path, file_name)
         with open(file_path, "w") as outfile:
             json.dump(total_data, outfile, indent=4)

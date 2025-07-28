@@ -1,6 +1,6 @@
 import json
-from offlineSimStuff.variousGraphingTools.sc_tools.causeNodeGraphVisualizer import causeNodeGraphVisualizer
-from offlineSimStuff.variousGraphingTools.sc_tools.longTermGrapher import longTermGrapher
+from offlineSimStuff.variousGraphingTools.outDated.sc_tools import causeNodeGraphVisualizer
+from offlineSimStuff.variousGraphingTools.outDated.sc_tools import longTermGrapher
 
 
 def create_stuff(big_boy_data):

@@ -2,23 +2,19 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 from matplotlib.patches import FancyArrowPatch
 import matplotlib.gridspec as gridspec
-from pathlib import Path
 from matplotlib.patches import Patch
 import os
 import numpy as np # for col sums
 
 from matplotlib.patches import Circle
 from itertools import combinations
-from pathlib import Path
 
 from Client.combinedLayout.ui_functions.StudyScripts.network import NodeNetwork # just for graphing the influence matrix node edges.
 from Client.combinedLayout.colors import COLORS
 from matplotlib.collections import LineCollection
 from matplotlib.colors import to_rgba
 from matplotlib.colors import LinearSegmentedColormap, Normalize
-import json
 
-from offlineSimStuff.variousGraphingTools.completeVersions.completeLogger import CompleteLogger
 from offlineSimStuff.variousGraphingTools.influenceMatrixStuff.opsahlClustering import OpsahlClustering
 
 
@@ -31,10 +27,10 @@ class CompleteGrapher():
 
     def create_round_graphs_with_round_logger(self, round_logger, curr_round, played_sc, played_jhg):
         if played_sc:
-            (all_nodes, all_votes, winning_vote_list, current_options_matrix, types_list, scenario, group, round, cycle,
-             chromosome, influence_matrix, results_sums, results, peeps) = round_logger.get_round_data(curr_round, True, False)
-            self.create_sc_graphs(all_nodes, all_votes, winning_vote_list, current_options_matrix, types_list, scenario,
-                                  group, round, cycle, chromosome, influence_matrix, results_sums, results, peeps)
+            (all_nodes, all_votes, winning_vote_list, current_options_matrix, types_list, group, round,
+             influence_matrix, results_sums, results, peeps) = round_logger.get_round_data(curr_round, True, False)
+            self.create_sc_graphs(all_nodes, all_votes, winning_vote_list, current_options_matrix, types_list,
+                                  group, round, influence_matrix, results_sums, results, peeps)
 
         if played_jhg:
             allocations, popularity, influence, old_popularity = round_logger.get_round_data(curr_round, False, True)
@@ -48,8 +44,8 @@ class CompleteGrapher():
         self.draw_two_long_graphs_simplified(num_players, cooperation_score, avg_rise, results, results_sums, num_rounds,
                                              sums_per_round, cv, influence, utility_per_round, average_utility_per_round, b, pops, jhg_cv, jhg_influence, pop_per_round)
 
-    def create_sc_graphs(self, all_nodes, all_votes, winning_vote_list, current_options_matrix, types_list, scenario,
-                         group, curr_round, cycle, chromosome, influence_matrix, results_sums, results, peeps):
+    def create_sc_graphs(self, all_nodes, all_votes, winning_vote_list, current_options_matrix, types_list,
+                         group, curr_round, influence_matrix, results_sums, results, peeps):
 
         influence_matrix = np.array(influence_matrix)
 
@@ -70,12 +66,12 @@ class CompleteGrapher():
             self.draw_influence_panel(ax_inf, influence_matrix, results_sums)
 
             # hopefully this is the exactly the same as before. if not I can check and restore as necessary.
-            fig.suptitle(f"Round: {curr_round}  Situation: {scenario}  Cycle: {int(cycle_key) + 1}  Group: {group}", fontsize=16, fontweight='bold', y=0.98)
+            fig.suptitle(f"Round: {curr_round}  Situation: something  Cycle: {int(cycle_key) + 1}  Group: {group}", fontsize=16, fontweight='bold', y=0.98)
             # Reduce space between matrix and graph and the overall layout
             fig.subplots_adjust(wspace=0.01, left=0.05, right=0.95, top=0.95, bottom=0.15)  # Adjust bottom margin
 
-            path = self.build_save_path(scenario, group, curr_round, cycle_key)
-            self.save_figure(fig, path)
+            # path = self.build_save_path(, group, curr_round, cycle_key)
+            # self.save_figure(fig, path)
 
 
     def create_jhg_graphs(self, allocations, popularity, influence, curr_round, old_popularities):

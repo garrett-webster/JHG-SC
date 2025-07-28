@@ -28,12 +28,12 @@ class RoundLogger():
     def get_round_data(self, curr_round, sc_round, jhg_round):
         if sc_round:
             sc = self.round_data["SC_STUFF"].get(curr_round)
-            all_nodes, all_votes, winning_vote_list, current_options_matrix, types_list, scenario, group, curr_round, cycle, chromosome, influence_matrix, results_sums, results, peeps = (
+            all_nodes, all_votes, winning_vote_list, current_options_matrix, types_list, group, curr_round, influence_matrix, results_sums, results, peeps = (
                 self.extract_keys(sc, ["all_nodes", "all_votes", "winning_vote_list", "current_options_matrix", "types_list",
-                                       "scenario_string", "group", "curr_round", "cycle", "chromosome", "influence_matrix",
+                                             "group", "curr_round", "influence_matrix",
                                        "results_sums", "results", "peeps"]))
 
-            return all_nodes, all_votes, winning_vote_list, current_options_matrix, types_list, scenario, group, curr_round, cycle, chromosome, influence_matrix, results_sums, results, peeps
+            return all_nodes, all_votes, winning_vote_list, current_options_matrix, types_list, group, curr_round, influence_matrix, results_sums, results, peeps
         if jhg_round:
             jhg = self.round_data["JHG_STUFF"].get(curr_round)
             allocations, popularity, influence, old_popularity = self.extract_keys(jhg, ["T", "pop_new", "influence", "pop_old"])

@@ -1,6 +1,6 @@
 from Server.jhg_sim import JHG_simulator
-from offlineSimStuff.variousGraphingTools.jhg_tools.jhgLogger import JHGLogger
-import time
+from offlineSimStuff.variousGraphingTools.outDated.jhg_tools.jhgLogger import JHGLogger
+
 
 class JHGManager:
     def __init__(self, connection_manager, num_humans, num_players, num_bots, total_order, tokens_per_player):

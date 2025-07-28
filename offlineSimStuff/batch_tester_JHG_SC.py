@@ -229,7 +229,7 @@ if __name__ == "__main__":
     num_humans = 0
     tokens_per_player = 2
     utility_per_player = 3
-    create_round_graphs_bool = False
+    create_round_graphs_bool = True
     create_game_graphs_bool = True
     create_influence = False
     chromosomes_directory = "testChromosome"
