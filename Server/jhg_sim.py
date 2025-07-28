@@ -27,6 +27,8 @@ class JHG_simulator():
         else:
             self.create_sim(num_human_players)
         self.T = None
+        self.avg_pop_per_round = []
+        self.game_popularities = []
 
     # just sets us up a sim, quick and dirty like
     def create_sim(self, num_players):
@@ -165,7 +167,11 @@ class JHG_simulator():
 
         self.sim.play_round(T)
         self.T = T
-        return self.sim.get_popularity() # I think this is all we need? maybe?
+        new_popularity = self.sim.get_popularity()
+        avg_pop = sum(new_popularity) / self.num_players
+        self.avg_pop_per_round.append(avg_pop)
+        self.game_popularities.append(new_popularity)
+        return new_popularity # I think this is all we need? maybe?
 
 
 
@@ -224,8 +230,15 @@ class JHG_simulator():
     def get_popularities(self, curr_round=None):
         return self.sim.get_popularity(curr_round)
 
-    def individual_round_deets_for_logger(self, curr_round):
-        return self.sim.get_transaction().tolist(), self.sim.get_popularity().tolist(), self.sim.get_influence().tolist(), self.sim.get_popularity(curr_round-1).tolist()
+    def record_individual_round(self, curr_round):
+        total_data = {
+            "T": self.sim.get_transaction().tolist(),
+            "pop_new": self.sim.get_popularity().tolist(),
+            "influence": self.sim.get_influence().tolist(),
+            "pop_old": self.sim.get_popularity(curr_round-1).tolist()
+        }
+        #return self.sim.get_transaction().tolist(), self.sim.get_popularity().tolist(), self.sim.get_influence().tolist(), self.sim.get_popularity(curr_round-1).tolist()
+        return total_data
 
     def get_highest_popularity_player(self):
         return (self.total_order[(list(self.sim.get_popularity())).index([max(list(self.sim.get_popularity()))])])
@@ -264,6 +277,39 @@ class JHG_simulator():
     def bot_ovveride(self, bots): # make sure this is the right type before you throw it on there.
         self.players = bots
 
+
+    def get_game_deets(self):
+        b = self.get_b()
+        # jhg_bot_type = 0 ## ignore this for now, its not terribly relavent atm.
+        pops = list(zip(*self.game_popularities))
+        cv = self.get_cv()
+        influence = self.get_influence()
+        pop_per_round = list(self.avg_pop_per_round)
+
+        total_data = {
+            "b": b,
+            "pop": pops,
+            "cv": cv,
+            "influence": influence,
+            "pop_per_round": pop_per_round,
+        }
+
+        #return b, pops, cv, influence, pop_per_round
+        return total_data
+
+    def get_b(self):
+        starting_pop = 100
+        jhg_rounds = range(1, len(self.avg_pop_per_round) + 1)
+        log_ratio = np.log(np.array(self.avg_pop_per_round) / starting_pop)
+        b = np.dot(jhg_rounds, log_ratio) / np.dot(jhg_rounds, jhg_rounds) if jhg_rounds else 0
+        return b
+
+    def get_cv(self):
+        popularity = list(self.get_popularities())
+        mean = np.mean(popularity)
+        std = np.std(popularity)
+        cv = std / abs(mean)  # measures distribution bet  ter than, say, std or mean on their own.
+        return cv
 
 
 

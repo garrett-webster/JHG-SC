@@ -475,6 +475,30 @@ class Social_Choice_Sim:
             self.results_sums[player] += self.current_results[player]  # should keep a running total.
             self.results[player].append(self.current_results[player])
 
+
+    def get_results_per_round(self):
+        sums_per_round = [[0 for _ in range(self.num_rounds)] for _ in range(self.total_players)]
+        for bot in self.results:
+            sums_per_round[bot] = []
+            current_sum = 0
+            for i, new_sum in enumerate(self.results[bot]):
+                current_sum += new_sum
+                sums_per_round[bot].append(current_sum)
+
+        return sums_per_round
+
+    def get_average_utility_per_round(self):
+        average_utility_per_round = []
+        sums_per_round = self.get_results_per_round()
+        inverted_sums_per_round = list(zip(*sums_per_round))
+        for i, player in enumerate(inverted_sums_per_round):
+            average_utility_per_round.append(sum(player) / len(player))
+
+        return average_utility_per_round
+
+
+
+
     def get_new_utilities(self):
         return self.results
 
@@ -554,6 +578,28 @@ class Social_Choice_Sim:
                 votes[str(i)] = player.getVote(current_options_matrix, i)
         return votes
 
+    # takes a bunch of data and turns it into a josn that we can use
+    def record_individual_round(self):
+        (all_nodes, all_votes, winning_vote_list, current_options_matrix, types_list, scenario, group, curr_round, cycle,
+         chromosome, influence_matrix, results_sums, results, peeps) = self.prepare_graph()
+        total_data = {
+            "types_list": types_list,
+            "all_nodes": all_nodes,
+            "all_votes": copy.deepcopy(all_votes),
+            "winning_vote": winning_vote_list,
+            "current_options_matrix": current_options_matrix,
+            "scenario": scenario,
+            "group": group,
+            "curr_round": curr_round,
+            "cycle": cycle,
+            "chromosome": chromosome,
+            "influence_matrix": influence_matrix,
+            "results_sums": copy.copy(results_sums),
+            "results": results,
+            "peeps": peeps
+        }
+        return total_data # WHEE
+
     def prepare_graph(self):
         self.create_player_nodes()
         current_nodes = self.compile_nodes()
@@ -569,7 +615,27 @@ class Social_Choice_Sim:
         # so now what we do instead is that we take in a winning vote list cycle by cycle and spit it out as necessary.
         # --- supplemental information required for allocations and more advanced graph --- #
 
-        return current_node_json, self.all_votes, winning_vote_list, self.current_options_matrix, self.total_types, self.scenario_string, group, self.round, self.cycle, self.chromosome_string, self.get_influence_matrix(), self.results_sums, self.results, self.peeps
+        total_data = {
+            "all_nodes": list(current_node_json),
+            "all_votes": self.all_votes,
+            "winning_vote_list": winning_vote_list,
+            "current_options_matrix": self.current_options_matrix,
+            "types_list": self.total_types,
+            "scenario_string": self.scenario_string,
+            "group": group,
+            "curr_round": self.round,
+            "cycle": self.cycle,
+            "chromosome string": self.chromosome_string,
+            "influence_matrix": self.get_influence_matrix(),
+            "results_sums": self.results_sums,
+            "results": self.results,
+            "peeps": self.peeps,
+        }
+
+        #return current_node_json, self.all_votes, winning_vote_list, self.current_options_matrix, self.total_types, self.scenario_string, group, self.round, self.cycle, self.chromosome_string, self.get_influence_matrix(), self.results_sums, self.results, self.peeps
+        return total_data
+
+
 
     def get_results(self):
         # print("Aight were is the zero, its gotta be under num_rounds right?") literally zero clue whawt this print statement was supposed to be for.
@@ -868,3 +934,53 @@ class Social_Choice_Sim:
 
             self.current_options_matrix = current_options_matrix
             return current_options_matrix, indexes
+
+
+    def get_game_deets(self):
+        cooperation_score = self.cooperation_score / (self.num_rounds+1) if self.num_rounds > 0 else 0  # as a percent, how often we cooperated. (had a non negative cause pass)
+        sc_bot_type = 0 # don't return anything here rn.
+        results = self.results # do I actually need this?
+        results_sums = self.results_sums
+        num_rounds = self.num_rounds
+        cv, sums_per_round = self.get_sums_per_round_and_cv()
+        influence = self.most_recent_influence
+        #utility_per_round = list(zip(*self.get_results_per_round()))
+        utility_per_round = self.get_results_per_round()
+        avg_utility_per_round = self.get_average_utility_per_round()
+        avg_rise = (avg_utility_per_round[-1]-10) / num_rounds
+
+        total_data = {
+            "cooperation_score": cooperation_score,
+            "avg_rise": avg_rise,
+            "results": results,
+            "result_sums": results_sums,
+            "num_rounds": num_rounds,
+            "sums_per_round": sums_per_round,
+            "cv": cv,
+            "influence": influence,
+            "utility_per_round": utility_per_round,
+            "avg_utility_per_round": avg_utility_per_round,
+        }
+
+        #return cooperation_score, avg_rise, results, results_sums, num_rounds, sums_per_round, cv, influence, utility_per_round, avg_utility_per_round
+        return total_data
+
+
+    def get_sums_per_round_and_cv(self):
+        results = self.results
+        num_rounds = self.num_rounds
+        sums_per_round = {}
+        for bot in results:
+            sums_per_round[bot] = []
+            current_sum = 0
+            for i, new_sum in enumerate(results[bot]):
+                current_sum += new_sum
+                sums_per_round[bot].append(current_sum)
+
+        new_list = []
+        for bot in sums_per_round:
+            new_list.append(sums_per_round[bot][num_rounds - 1])
+        std = np.std(new_list)
+        mean = np.mean(new_list)
+        cv = std / abs(mean)  # measures distribution bet  ter than, say, std or mean on their own.
+        return cv, sums_per_round

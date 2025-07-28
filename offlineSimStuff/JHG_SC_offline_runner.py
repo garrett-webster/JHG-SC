@@ -171,7 +171,7 @@ if __name__ == "__main__":
     num_humans = 0
     tokens_per_player = 2
     utility_per_player = 3
-    create_graphs = False
+    create_graphs = True
     create_influence = True
     total_groups = ["", 0, 1, 2]
     chromosomes_directory = "testChromosome"

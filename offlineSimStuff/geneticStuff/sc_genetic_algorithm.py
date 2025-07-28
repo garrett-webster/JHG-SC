@@ -12,7 +12,7 @@ import numpy as np
 from tqdm import tqdm
 
 
-from Server.sim_interface import JHG_simulator # using the sim instead of the engine. is it a bad idea? yeah. Am I doing it anyway? yeah.
+from Server.jhg_sim import JHG_simulator # using the sim instead of the engine. is it a bad idea? yeah. Am I doing it anyway? yeah.
 from Server.social_choice_sim import Social_Choice_Sim
 from offlineSimStuff.batch_tester_JHG_SC import determine_rounds
 from offlineSimStuff.geneticStuff.geneticLogger import geneticLogger
