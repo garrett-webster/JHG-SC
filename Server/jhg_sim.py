@@ -174,6 +174,17 @@ class JHG_simulator():
         return new_popularity # I think this is all we need? maybe?
 
 
+    def get_groups(self):
+        group_assumptions = []
+        for i, plyr in enumerate(self.players):
+            if plyr.getType() == "Human":
+                group_assumptions.append([-1]) # its a human, I don't have access to da numbers.
+            else:
+                group_assumptions.append(plyr.get_selected_community())
+
+        return group_assumptions
+
+
 
     def define_initial_pops(self, init_pop, num_players):
         base_pop = 100

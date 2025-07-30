@@ -12,12 +12,15 @@ import numpy as np
 # from offlineSimStuff.variousGraphingTools.sc_tools.causeNodeGraphVisualizer import causeNodeGraphVisualizer
 # from offlineSimStuff.variousGraphingTools.sc_tools.graph_influence_matrix import influenceGrapher
 from Server.OptionGenerators.generators import generator_factory
-from offlineSimStuff.variousGraphingTools.individualLoggers.gameLogger import GameLogger
+
 # from offlineSimStuff.variousGraphingTools.completeVersions.completeLogger import CompleteLogger
 # from offlineSimStuff.variousGraphingTools.completeVersions.completeGrapher import CompleteGrapher
 
 from offlineSimStuff.variousGraphingTools.individualLoggers.roundLogger import RoundLogger
+from offlineSimStuff.variousGraphingTools.individualLoggers.gameLogger import GameLogger
+from offlineSimStuff.variousGraphingTools.groupStuff.groupLogger import GroupLogger
 from offlineSimStuff.variousGraphingTools.completeVersions.completeGrapher import CompleteGrapher
+from offlineSimStuff.variousGraphingTools.groupStuff.groupGrapher import GroupGrapher
 
 
 
@@ -86,7 +89,9 @@ def run_sc_stuff(sc_sim, jhg_sim, total_order, influence_matrix, curr_round, num
 
 def reconcile_influence(jhg_influence, sc_influence):
     # ok this fetcher uses convex recombination to put the two together and then uses the frobenius norm to decide on the magnitude to adjust back too. bars!
+    # alpha = 0.5 # THIS iS JUST A STARTER VALUE, WILL LIKELY BE MADE INTO A GENE OR WHATEVER.
     alpha = 0.5 # THIS iS JUST A STARTER VALUE, WILL LIKELY BE MADE INTO A GENE OR WHATEVER.
+    # Alpha of 0 is entirely JHG, alpha of 1 is entirely SC. I started with 0.5 but worry that that might have been too flattening.
 
     if sc_influence is None:
         print("something wrong :(")
@@ -143,7 +148,9 @@ def create_game_graphs(game_logger):
     complete_grapher = CompleteGrapher()
     complete_grapher.create_game_graphs_with_logger(game_logger)
 
-
+def create_group_graphs(group_logger):
+    group_grapher = GroupGrapher()
+    group_grapher.create_graph(group_logger.get_group_data())
 
 # takes in a list of peeps (player or bot or both) and returns their player indexes as per total order
 def peeps_to_total_order(peeps, total_order):
@@ -200,7 +207,6 @@ def determine_rounds(jhg_rounds_per_sc_game_list):
                 new_list.append(f"{current}-")
                 current += 1
             new_list.append(f"{current - 1}*")  # Append the last "-" number with "*"
-        print("This is the new list ", new_list, " and here is what we were workign with ", jhg_rounds_per_sc_game_list)
 
     return new_list
 
@@ -209,11 +215,12 @@ def determine_rounds(jhg_rounds_per_sc_game_list):
 if __name__ == "__main__":
 
     #jhg_games_per_sc_round = [1,1,1,1,1,1,1,1]#,1,1,1,1,1,1,1,1,1,1,1,1]
-    #jhg_games_per_sc_round = [4,3,3,3,3,3,3,3]
-    #jhg_games_per_sc_round = [4,3,3]
+    #jhg_games_per_sc_round = [4,3,3,3,3,3,3,3] # what we trained the og assasain agents on.
+    jhg_games_per_sc_round = [4,3,3,3,3]  # what we trained the sleepy assasain bots on.
     #jhg_games_per_sc_round = [2,3,3]#,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,2]
     #jhg_games_per_sc_round = ["S", 3]
-    jhg_games_per_sc_round = [1,1,1]
+    #jhg_games_per_sc_round = [1,1,1]
+
 
 
     # so what we need to do
@@ -229,7 +236,7 @@ if __name__ == "__main__":
     num_humans = 0
     tokens_per_player = 2
     utility_per_player = 3
-    create_round_graphs_bool = True
+    create_round_graphs_bool = False
     create_game_graphs_bool = True
     create_influence = False
     chromosomes_directory = "testChromosome"
@@ -253,4 +260,5 @@ if __name__ == "__main__":
         current_sc_sim.bot_ovveride(current_jhg_sim.players) # tells the SC sim to make sure that it is using the same bots as the JHG by passing htem as a reference to both voting and allocation slots.
         round_logger.reset_up(current_jhg_sim, current_sc_sim)
         game_logger.resetup(current_jhg_sim, current_sc_sim)
+
         sc_sim, jhg_sim = run_trial(current_sc_sim, current_jhg_sim, round_list, num_cycles, group, total_order, round_logger, create_round_graphs_bool, game_logger, create_game_graphs_bool) # This is really whats getting run round times

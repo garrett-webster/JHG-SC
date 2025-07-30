@@ -1,0 +1,5 @@
+This portion of the code does a lot of REALLY weird math stuff in an attempt to try and better
+understand the graph theory aspect of this. Which is fantastic.
+However, due to this, it requires additional libraries that aren't used literally any where else.
+might need to remwove this folder for distribution purposes, as what is happening here will never need to happen
+anywhere else.

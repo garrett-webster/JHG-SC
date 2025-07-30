@@ -10,13 +10,14 @@ from matplotlib.patches import Circle
 from itertools import combinations
 
 from Client.combinedLayout.ui_functions.StudyScripts.network import NodeNetwork # just for graphing the influence matrix node edges.
-from Client.combinedLayout.colors import COLORS
 from matplotlib.collections import LineCollection
 from matplotlib.colors import to_rgba
 from matplotlib.colors import LinearSegmentedColormap, Normalize
 
 from offlineSimStuff.variousGraphingTools.influenceMatrixStuff.opsahlClustering import OpsahlClustering
 
+
+# from offlineSimStuff.variousGraphingTools.influenceMatrixStuff.Louvain import returnCommunitiesGivenInfluenceFromSignedLouvain
 
 
 class CompleteGrapher():
@@ -100,9 +101,27 @@ class CompleteGrapher():
         pop_graph = avg_pop_per_round is not None and len(avg_pop_per_round) > 0
         util_graph = avg_utility_per_round is not None and len(avg_utility_per_round) > 0
         num_graphs = int(pop_graph) + int(util_graph)
-        plot_influence = True
-        if plot_influence:
-            num_graphs += 1
+        num_graphs += 1 # influence graph always gets done
+
+        community_colors = {}
+        player_to_community = {}
+
+        #communities = returnCommunitiesGivenInfluenceFromSignedLouvain(np.array(influence))
+        #num_communities = len(communities)
+
+        # Choose a colormap with enough distinguishable colors
+        # You can try 'tab10', 'tab20', 'Set3', or others
+        # colormap = plt.get_cmap('Set3')  # Up to 20 distinct colors
+        # community_colors = {
+        #     comm_index: colormap(comm_index % 10)  # Wrap around if > 10 communities
+        #     for comm_index in range(num_communities)
+        # }
+
+        # make sure everyone knows what color they get.
+        # player_to_community = {}
+        # for comm_index, community in enumerate(communities):
+        #     for player in community:
+        #         player_to_community[player] = comm_index
 
         # I could put the starting amounts in there by hand and trace it all the way down or just accept that they are likely to never change.
 
@@ -114,16 +133,22 @@ class CompleteGrapher():
             axes = [axes]  # Make it iterable
         current_axis = 0
 
-        # -- determining line of best fit for JHG
         if pop_graph:
             ax = axes[current_axis]
 
             for i, player_scores in enumerate(pops):
-                bot_type_name = "GENE BOT"
-                label = f'P{i + 1} ({bot_type_name})'
+                # bot_type_name = "GENE BOT"
+                # label = f'P{i + 1} ({bot_type_name})'
+                label = f'P{i + 1}'
                 ax.plot(jhg_rounds, player_scores, label=label)
+                # dot_y = player_scores[-1]
+                # dot_x = jhg_rounds[-1]
+                # community_idx = player_to_community.get(i, -1)
+                # dot_color = community_colors.get(community_idx, 'gray')
+                # ax.scatter(dot_x, dot_y, color=dot_color, s=40, edgecolors='black', zorder=5)
 
-            ax.plot(jhg_rounds, avg_pop_per_round, color='black', linewidth=3, label='Avg Popularity')
+            ax.plot(jhg_rounds, avg_pop_per_round, color='black', linewidth=3, label='Avg')
+
             ax.set_title('Average Popularity Over Time', loc="left")
             ax.set_xlabel('Round')
             ax.set_ylabel('Popularity')
@@ -165,12 +190,32 @@ class CompleteGrapher():
             sc_rounds = range(1, len(utility_per_round[0]) + 1) # get the number of SC rounds, not players
 
             for i, player_scores in enumerate(utility_per_round):
-                bot_type_name = "GENE BOT"
-                alloc_type_name = "GEEN BOT"
-                label = f'P{i + 1} ({bot_type_name} {alloc_type_name})'
+                # bot_type_name = "GENE BOT"
+                # alloc_type_name = "GEEN BOT"
+                # label = f'P{i + 1} ({bot_type_name} {alloc_type_name})'
+                label = f'P{i + 1}'
                 ax.plot(sc_rounds, player_scores, label=label)
+                # dot_y = player_scores[-1]
+                # dot_x = sc_rounds[-1]
+                # community_idx = player_to_community.get(i, -1)
+                # dot_color = community_colors.get(community_idx, 'gray')
+                # ax.scatter(dot_x, dot_y, color=dot_color, s=40, edgecolors='black', zorder=5)
 
-            ax.plot(sc_rounds, avg_utility_per_round, color='black', linewidth=3, label='Avg Utility')
+            # x_fit = np.arange(1, len(avg_utility_per_round) + 1)
+            # y_vals = np.array(avg_utility_per_round)
+            #
+            # # Compute slope (m) assuming intercept is fixed at 10
+            # numerator = np.sum(x_fit * (y_vals - 10))
+            # denominator = np.sum(x_fit ** 2)
+            # m = numerator / denominator
+            #
+            # # Build fitted line
+            # y_fit = m * x_fit + 10
+            #
+            # # Plot it
+            # ax.plot(x_fit, y_fit, linestyle='--', color='red', linewidth=2, label=f'Line of Best Fit: y={m:.2f}x + 10')
+
+            ax.plot(sc_rounds, avg_utility_per_round, color='black', linewidth=3, label='Avg')
             ax.set_title('Average Utility Over Time', loc="left")
             ax.set_xlabel('Round')
             ax.set_ylabel('Utility')
@@ -405,8 +450,7 @@ class CompleteGrapher():
         ax.set_aspect("equal")
         ax.axis("off")
         for i, (x, y) in enumerate(node_positions):
-            color = COLORS[i % len(COLORS)]
-            ax.scatter(x, y, s=150, c=color, edgecolors="none", zorder=2)
+            ax.scatter(x, y, s=150, edgecolors="none", zorder=2)
             ax.text(x, y, str(i), fontsize=10, ha="center", va="center", color="black", zorder=3)
 
         min_weight = np.min(np.abs(influence_matrix))
@@ -528,8 +572,9 @@ class CompleteGrapher():
         return matrix / max_val
 
     def plot_influence_graph(self, ax, influence_matrix, popularity):
-        influence_matrix = self.normalize_matrix(np.array(influence_matrix))
-        node_clustering, global_clustering = OpsahlClustering(influence_matrix) # leave the alpha at 0.5 rn
+        influence_matrix = self.normalize_matrix(np.array(influence_matrix)) # might want to get rid of this?
+        node_clustering, global_clustering = OpsahlClustering(np.array(influence_matrix)) # leave the alpha at 0.5 rn
+
         print("this is the global clustering that we are returning ", global_clustering)
         net = NodeNetwork()
         net.setupPlayers([f"{i}" for i in range(np.shape(popularity)[0])])
@@ -542,9 +587,8 @@ class CompleteGrapher():
         ax.set_aspect("equal")
         ax.axis("off")
         for i, (x, y) in enumerate(node_positions):
-            color = COLORS[i % len(COLORS)]
-            ax.scatter(x, y, s=150, c=color, edgecolors="none", zorder=2)
-            ax.text(x, y, str(i), fontsize=10, ha="center", va="center", color="black", zorder=3)
+            ax.scatter(x, y, s=150, edgecolors="none", zorder=2)
+            ax.text(x, y, str(i+1), fontsize=10, ha="center", va="center", color="black", zorder=3)
 
         min_weight = np.min(np.abs(influence_matrix))
         max_weight = np.max(np.abs(influence_matrix))

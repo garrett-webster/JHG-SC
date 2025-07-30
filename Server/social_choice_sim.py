@@ -628,6 +628,17 @@ class Social_Choice_Sim:
         cv = std / abs(mean)  # measures distribution bet  ter than, say, std or mean on their own.
         return cv, sums_per_round
 
+
+    def get_groups(self):
+        group_assumptions = []
+        for i, plyr in enumerate(self.bots):
+            if plyr.getType() == "Human":
+                group_assumptions.append([-1]) # its a human, I don't have access to da numbers.
+            else:
+                group_assumptions.append(plyr.get_selected_community())
+
+        return group_assumptions
+
     ########################################################################
     ###--- NODE CREATION FOR FRONT END. NOT USEFUL FOR GENETIC STUFF. ---###
     ########################################################################

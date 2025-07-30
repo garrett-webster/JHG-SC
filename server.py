@@ -176,8 +176,7 @@ class Server():
                     new_list.append(f"{current}-")
                     current += 1
                 new_list.append(f"{current - 1}*")  # Append the last "-" number with "*"
-            print("This is the new list ", new_list, " and here is what we were workign with ",
-                  jhg_rounds_per_sc_game_list)
+
 
         return new_list
 

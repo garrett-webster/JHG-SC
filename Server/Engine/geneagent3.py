@@ -1,5 +1,7 @@
 import os
 
+from igraph import community_to_membership
+
 from Server.Engine.baseagent import AbstractAgent
 import numpy as np
 import sys
@@ -63,6 +65,7 @@ class GeneAgent3(AbstractAgent):
         self.gameParams = {}
         self.tokens_per_player = tokens_per_player
         self.pop_history = [] # just slap this up here.
+        self.selected_community = [-1] # sign that nothing has changed
 
         # Changes in May
         if geneStr == "":
@@ -332,8 +335,14 @@ class GeneAgent3(AbstractAgent):
             # if round_num > 0:
             #     self.compute_homophily(num_players)
 
-        # group analysis and choice
         communities, selected_community = self.group_analysis(round_num, num_players, player_idx, popularities, influence)
+        self.selected_community = selected_community.s
+
+        # group analysis and choice
+        if round_num == 24:
+            print("communities ", communities, " and selected communiyt ", selected_community)
+
+        #print("here are the communities ", communities, " and the selected community ", selected_community)
 
         # figure out how many tokens to keep
         self.estimate_keeping(player_idx, num_players, num_tokens, communities)
@@ -417,6 +426,8 @@ class GeneAgent3(AbstractAgent):
             print(transaction_vec)
         return transaction_vec
 
+    def get_selected_community(self):
+        return self.selected_community
 
     def initVars(self, player_idx, extra_data, num_players, popularities):
         # Change on Sep 21
@@ -1608,6 +1619,7 @@ class GeneAgent3(AbstractAgent):
 
             #self.printT(player_idx, "chosen community: " + str(elijo.s))
         else:
+
             A_pos = self.compute_adjacency(num_players)
             A_neg = self.compute_neg_adjacency(num_players)
 
