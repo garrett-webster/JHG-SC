@@ -2,6 +2,7 @@
 import os
 import sys
 
+from setuptools.logging import configure
 
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 from Server.Engine.geneagent3 import GeneAgent3
@@ -9,6 +10,8 @@ from Server.Engine.humanagent import HumanAgent
 from Server.Engine.socialwelfaragent import SocialWelfareAgent
 from Server.Engine.randomagent import RandomAgent
 from Server.Engine.simulator import GameSimulator
+from Server.Engine.jakecat import JakeCAT
+from Server.Engine.kitty import KittyAgent
 
 import numpy as np
 import random
@@ -23,7 +26,7 @@ class JHG_simulator():
         self.players = None
         # went ahead and gave this a default. the currently trained agents have this baked into them that they need to have 2 tokens per player, curious in expanding that.
         if start_game:
-            self.start_game(num_human_players, num_players, tokens_per_player, bot_type)
+            self.start_game(num_human_players, num_players, tokens_per_player, bot_type, add_kitties=2)
         else:
             self.create_sim(num_human_players)
         self.T = None
@@ -61,13 +64,18 @@ class JHG_simulator():
         self.T = np.array([[0.0 for _ in range(num_players)] for _ in range(num_players)])
 
 
-    def start_game(self, num_human_players, num_players, tokens_per_player, bot_type):
+    def start_game(self, num_human_players, num_players, tokens_per_player, bot_type, add_kitties=0):
         init_pop = "equal"
 
         numAgents = num_players - num_human_players
         configured_players = []
+        if add_kitties != 0:
+            for i in range(add_kitties):
+                configured_players.append(KittyAgent())
+
+
         popSize = 60  # ??? I think? based on the command line arguemnts
-        player_idxs = list(np.arange(0, numAgents))  # where numAgents is the number of actual agents, not players.
+        player_idxs = list(np.arange(0, numAgents-add_kitties))  # where numAgents is the number of actual agents, not players.
 
         for _ in range(num_human_players):
             configured_players.append(HumanAgent())
@@ -76,9 +84,11 @@ class JHG_simulator():
         for i in range(0, len(configured_players)):
             player_idxs = np.append(player_idxs, popSize + i)
 
+
         theFolder = "Server/Engine"
         theGen = 199
         num_gene_copies = 3
+
 
         # should be formatted appropraitely?
         theGenePools = self.create_pools(popSize, theFolder, theGen, num_gene_copies, tokens_per_player, bot_type)
@@ -90,7 +100,6 @@ class JHG_simulator():
             else:
                 plyrs.append(theGenePools[player_idxs[i]])
 
-                    # lets try something silly.
         plyrs = self.reorder_agents(plyrs) # reorder them so we like them better.
 
         players = np.array(plyrs)
@@ -328,7 +337,8 @@ def loadPopulationFromFile(popSize, generationFolder, startIndex, num_gene_pools
     fnombre = "Kill me"
     try:
         #fnombre = generationFolder + "/gen_" + str(startIndex) + ".csv"
-        fnombre = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\offlineSimStuff\geneticStuff\AssasainResults\theGenerations\gen_175.csv"
+        #fnombre = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\offlineSimStuff\geneticStuff\AssasainResults\theGenerations\gen_175.csv"
+        fnombre = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\Server\Engine\gen_199.csv"
         fp = open(fnombre, "r")
     except FileNotFoundError:
         try:

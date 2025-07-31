@@ -21,12 +21,12 @@ class GameLogger():
         self.game_data["HEADER"] = num_players, gen_number # might not need
 
 
-    def save_game(self):
+    def save_game(self, played_sc, played_jhg):
         # save game is going to need a metadata header
         # needs bot types, num_players.
-        if self.sc_sim:
+        if played_sc:
             self.game_data["SC_STUFF"] = self.sc_sim.get_game_deets()
-        if self.jhg_sim:
+        if played_jhg:
             self.game_data["JHG_STUFF"] = self.jhg_sim.get_game_deets()
 
 

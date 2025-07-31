@@ -267,7 +267,8 @@ class CompleteGrapher():
         init_pop = 10 if util_graph and not pop_graph else 100
         init_pops = [init_pop for _ in range(int(num_players))]
         ax = axes[current_axis]
-        self.plot_influence_graph(ax, influence, init_pops)
+        curr_influence = influence if influence is not None else jhg_influence # one of em is in there, just gotta find which one.
+        self.plot_influence_graph(ax, curr_influence, init_pops)
 
         plt.show()
 

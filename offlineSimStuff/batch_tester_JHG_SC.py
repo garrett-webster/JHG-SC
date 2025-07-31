@@ -35,6 +35,8 @@ def run_trial(sc_sim: "Social_Choice_Sim", jhg_sim, round_list, num_cycles, grou
     influence_matrix = None # this should get overwritten pretty quick, but its there so there's no error.
     for list_index in (range(0, len(round_list))): # fixed, we start at 0 now.
 
+
+
         sc_rounds = round_list[list_index][-1] == "*"
         jhg_rounds = round_list[list_index][-1] == "-"
         curr_round = int(round_list[list_index][:-1]) # useful, yes, but not quite the logger round
@@ -56,7 +58,7 @@ def run_trial(sc_sim: "Social_Choice_Sim", jhg_sim, round_list, num_cycles, grou
             create_round_graphs(round_logger, curr_round, played_sc, played_jhg)
 
     if create_game_graphs_bool:
-        game_logger.save_game()
+        game_logger.save_game(played_sc, played_jhg)
         create_game_graphs(game_logger)
 
     return sc_sim, jhg_sim
@@ -216,9 +218,9 @@ if __name__ == "__main__":
 
     #jhg_games_per_sc_round = [1,1,1,1,1,1,1,1]#,1,1,1,1,1,1,1,1,1,1,1,1]
     #jhg_games_per_sc_round = [4,3,3,3,3,3,3,3] # what we trained the og assasain agents on.
-    jhg_games_per_sc_round = [4,3,3,3,3]  # what we trained the sleepy assasain bots on.
+    #jhg_games_per_sc_round = [4,3,3,3,3]  # what we trained the sleepy assasain bots on.
     #jhg_games_per_sc_round = [2,3,3]#,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,2]
-    #jhg_games_per_sc_round = ["S", 3]
+    jhg_games_per_sc_round = ["J", 30]
     #jhg_games_per_sc_round = [1,1,1]
 
 
@@ -236,7 +238,7 @@ if __name__ == "__main__":
     num_humans = 0
     tokens_per_player = 2
     utility_per_player = 3
-    create_round_graphs_bool = False
+    create_round_graphs_bool = True
     create_game_graphs_bool = True
     create_influence = False
     chromosomes_directory = "testChromosome"

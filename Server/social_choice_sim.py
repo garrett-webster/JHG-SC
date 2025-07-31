@@ -9,6 +9,7 @@ import numpy as np
 
 from Server.Engine.geneagent3 import GeneAgent3
 from Server.Engine.humanagent import HumanAgent
+from Server.Engine.jakecat import JakeCAT
 from Server.Node import Node
 from Server.OptionGenerators.options_creation import generate_two_plus_one_groups
 NUM_CAUSES = 3 # if its ever not this a LOT of math breaks, so just leave it be.
@@ -184,7 +185,7 @@ class Social_Choice_Sim:
         for i, bot in enumerate(self.bots):
             # print("this is the bot id ", bot.self_id, " an dthis is the i index ", i)
             # print("this is the cycle we are working with ", cycle, " and the round ", round)
-            if isinstance(bot, GeneAgent3):
+            if isinstance(bot, GeneAgent3) or isinstance(bot, JakeCAT):
                 if cycle == 0:
                     votes_put_in = None
                 else:

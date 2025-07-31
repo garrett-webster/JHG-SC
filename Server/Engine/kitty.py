@@ -1,13 +1,15 @@
-from baseagent import AbstractAgent
-from utils.blackboard import BlackBoard
-from utils.reversejhg import JHGReverse
-from engine import JHGEngine
+from Server.Engine.baseagent import AbstractAgent
+from Server.Engine.blackboard import BlackBoard  # get micheal to hand these over at some point and work with em when you can.
+from Server.Engine.reversejhg import JHGReverse
+from Server.Engine.engine import JHGEngine
 
 import numpy as np
 from copy import deepcopy
 from time import time
 from scipy.optimize import minimize, NonlinearConstraint
 import warnings
+
+from Server.SC_Bots.transVecTranslator import translateVecToIndex
 
 # Suppress specific warning
 warnings.filterwarnings('ignore', message='delta_grad == 0.0. Check if the approximated')
@@ -65,7 +67,7 @@ class KittyAgent(AbstractAgent):
         super().__init__()
         self.pay_taxes = pay_taxes
         self.blackboard = BlackBoard()
-        self.whoami = 'kitty-kat'
+        self.whoami = 'kitty_kat'
         self.class_weights = {
             self.PLAYER_CLASS_CAT: 100,
             self.PLAYER_CLASS_ENEMY: -100,
@@ -207,7 +209,7 @@ class KittyAgent(AbstractAgent):
         self.blackboard.scribe('player_classes', player_classes)
 
 
-    def play_round(self, player_idx, round_num, recieved, popularities, influence, extra_data):
+    def play_round(self, player_idx, round_num, recieved, popularities, influence, extra_data, extra_flag=False):
         start_time = time()
         self.blackboard.scribe(f'recieved_{round_num}', recieved)
         self.blackboard.scribe(f'popularities_{round_num}', popularities)
@@ -302,3 +304,16 @@ class KittyAgent(AbstractAgent):
         #print(f'Total time: {time() - start_time}\n\n')
 
         return transaction_vec
+
+
+    def setGameParams(self, gameParams, _forcedRandom):
+        self.gameParams = gameParams
+        self.forced_random = _forcedRandom
+
+    def getType(self):
+        return self.whoami
+
+    def get_vote(self, player_idx, round_num, received, popularities, influence, extra_data, current_options_matrix):
+        transaction_vector = self.play_round(player_idx, round_num, received, popularities, influence, extra_data, True)
+        final_vote = translateVecToIndex(transaction_vector, current_options_matrix)
+        return final_vote # please let this work

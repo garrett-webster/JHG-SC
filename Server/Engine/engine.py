@@ -194,7 +194,7 @@ class JHGEngine():
         self.base_popularity = new_base
         self.P[0] = np.ones(self.N) * self.base_popularity
 
-    def apply_transaction(self, T):
+    def apply_transaction(self, T, normalize=True):
         self.t += 1
         T = T / np.sum(np.abs(T), axis=1)[:, np.newaxis]
         self.T.append(T)
