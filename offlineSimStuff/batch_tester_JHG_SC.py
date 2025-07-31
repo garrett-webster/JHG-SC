@@ -40,17 +40,23 @@ def run_trial(sc_sim: "Social_Choice_Sim", jhg_sim, round_list, num_cycles, grou
         sc_rounds = round_list[list_index][-1] == "*"
         jhg_rounds = round_list[list_index][-1] == "-"
         curr_round = int(round_list[list_index][:-1]) # useful, yes, but not quite the logger round
-        print("*****************************ROUND ", curr_round, "********************************")
+        # print("*****************************ROUND ", curr_round, "********************************")
 
         if jhg_rounds:
             influence_matrix = run_jhg_stuff(jhg_sim, curr_round)
             played_jhg = True
 
         if sc_rounds:
-            influence_matrix, winning_vote = run_sc_stuff(sc_sim, jhg_sim, total_order, influence_matrix, curr_sc_round, num_cycles)
+            old_influence_matrix = copy.copy(influence_matrix)
+            influence_matrix, winning_vote = run_sc_stuff(sc_sim, jhg_sim, total_order, influence_matrix, curr_round, num_cycles)
+            if old_influence_matrix is influence_matrix:
+                print("What WHAT WHAT")
             sc_sim.set_rounds(curr_sc_round) # ???
             curr_sc_round += 1
             played_sc = True
+
+        print("Here is played JHG, ", jhg_rounds, " and here si played_sc ", sc_rounds)
+        print("here is the influence matrix at the end of that round ", influence_matrix)
 
         round_logger.save_round(curr_round, played_sc, played_jhg)
 
@@ -66,10 +72,10 @@ def run_trial(sc_sim: "Social_Choice_Sim", jhg_sim, round_list, num_cycles, grou
 
 
 def run_sc_stuff(sc_sim, jhg_sim, total_order, influence_matrix, curr_round, num_cycles):
-    sc_sim.set_rounds(curr_round)
+    # sc_sim.set_rounds(curr_round) # don't set that here methinks, let it ride.
     possible_peeps, indexes = generate_peeps(total_order, jhg_sim, sc_sim)  # people who are needed to create the matrix
     if influence_matrix is not None:
-        new_influence = reconcile_influence(influence_matrix, sc_sim.get_influence_matrix())
+        new_influence = influence_matrix
     else:
         new_influence = sc_sim.get_influence_matrix() # if there is no JHG influence, we are flying solo, leach off of own influence
     # should I make this, you know, an entirely different bot? having them in the same file feels wrong becuase they are doing differen things.
@@ -81,11 +87,9 @@ def run_sc_stuff(sc_sim, jhg_sim, total_order, influence_matrix, curr_round, num
         bot_votes[cycle] = sc_sim.get_votes(bot_votes, curr_round, cycle, num_cycles, new_influence)
         sc_sim.record_votes(bot_votes[cycle], cycle)
 
-    if influence_matrix is not None: # we need to re run this after pushing it through to make sure that it actually changes.
-        new_influence = reconcile_influence(influence_matrix, sc_sim.get_influence_matrix())
-
     # make sure that this happens IMMEDIATELY afterward.
     winning_vote, round_results = sc_sim.return_win(bot_votes[num_cycles - 1])
+    new_influence = np.array(sc_sim.get_influence_matrix()) # ACTUALLY UPDATE THE FETCHER
     sc_sim.save_results()
     return new_influence, winning_vote # takes our modified influence and makes sure to feed it back into the jhg sim so we get a cyclical affect.
 
@@ -219,10 +223,11 @@ if __name__ == "__main__":
 
     #jhg_games_per_sc_round = [1,1,1,1,1,1,1,1]#,1,1,1,1,1,1,1,1,1,1,1,1]
     # jhg_games_per_sc_round = [4,3,3,3,3,3,3,3] # what we trained the og assasain agents on.
-    jhg_games_per_sc_round = [4,3,3,3,3]  # what we trained the sleepy assasain bots on.
+    # jhg_games_per_sc_round = [4,3,3,3,3]  # what we trained the sleepy assasain bots on.
     #jhg_games_per_sc_round = [2,3,3]#,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,2]
-    #jhg_games_per_sc_round = ["J", 30]
-    #jhg_games_per_sc_round = [1,1,1]
+    # jhg_games_per_sc_round = ["S", 10]
+    # jhg_games_per_sc_round = [1,1,1]
+    jhg_games_per_sc_round = [2,2,2]
 
 
 

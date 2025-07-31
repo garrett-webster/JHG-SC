@@ -125,7 +125,7 @@ class CompleteGrapher():
 
         # I could put the starting amounts in there by hand and trace it all the way down or just accept that they are likely to never change.
 
-        jhg_rounds = range(1, len(avg_pop_per_round)+1)
+
 
         # Set up figure and axes
         fig, axes = plt.subplots(1, num_graphs, figsize=(7 * num_graphs, 6))
@@ -134,6 +134,7 @@ class CompleteGrapher():
         current_axis = 0
 
         if pop_graph:
+            jhg_rounds = range(1, len(avg_pop_per_round) + 1)
             ax = axes[current_axis]
 
             for i, player_scores in enumerate(pops):
