@@ -10,6 +10,7 @@ import numpy as np
 from Server.Engine.geneagent3 import GeneAgent3
 from Server.Engine.humanagent import HumanAgent
 from Server.Engine.jakecat import JakeCAT
+from Server.Engine.improvedJakeCate import ImprovedJakeCat
 from Server.Node import Node
 from Server.OptionGenerators.options_creation import generate_two_plus_one_groups
 NUM_CAUSES = 3 # if its ever not this a LOT of math breaks, so just leave it be.
@@ -167,7 +168,7 @@ class Social_Choice_Sim:
     def get_votes(self, previous_votes=None, round=0, cycle=0,
                   max_cycle=3, influence=None):  # generic get votes for all bot types. Not optimized for a single chromosome
         # print("this is the round we are dealing with ", round, " and this is the self.I we are dealing with ", self.I)
-        if influence == None: influence = self.I[round]
+        if influence is None: influence = self.I[round]
         self.round = round
         self.cycle = cycle
         all_votes = {}
@@ -185,7 +186,7 @@ class Social_Choice_Sim:
         for i, bot in enumerate(self.bots):
             # print("this is the bot id ", bot.self_id, " an dthis is the i index ", i)
             # print("this is the cycle we are working with ", cycle, " and the round ", round)
-            if isinstance(bot, GeneAgent3) or isinstance(bot, JakeCAT):
+            if isinstance(bot, GeneAgent3) or isinstance(bot, JakeCAT) or isinstance(bot, ImprovedJakeCat):
                 if cycle == 0:
                     votes_put_in = None
                 else:

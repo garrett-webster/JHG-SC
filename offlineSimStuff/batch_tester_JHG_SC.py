@@ -40,6 +40,7 @@ def run_trial(sc_sim: "Social_Choice_Sim", jhg_sim, round_list, num_cycles, grou
         sc_rounds = round_list[list_index][-1] == "*"
         jhg_rounds = round_list[list_index][-1] == "-"
         curr_round = int(round_list[list_index][:-1]) # useful, yes, but not quite the logger round
+        print("*****************************ROUND ", curr_round, "********************************")
 
         if jhg_rounds:
             influence_matrix = run_jhg_stuff(jhg_sim, curr_round)
@@ -77,7 +78,7 @@ def run_sc_stuff(sc_sim, jhg_sim, total_order, influence_matrix, curr_round, num
 
     bot_votes = {}
     for cycle in range(num_cycles):
-        bot_votes[cycle] = sc_sim.get_votes(bot_votes, curr_round, cycle, num_cycles)
+        bot_votes[cycle] = sc_sim.get_votes(bot_votes, curr_round, cycle, num_cycles, new_influence)
         sc_sim.record_votes(bot_votes[cycle], cycle)
 
     if influence_matrix is not None: # we need to re run this after pushing it through to make sure that it actually changes.
@@ -217,10 +218,10 @@ def determine_rounds(jhg_rounds_per_sc_game_list):
 if __name__ == "__main__":
 
     #jhg_games_per_sc_round = [1,1,1,1,1,1,1,1]#,1,1,1,1,1,1,1,1,1,1,1,1]
-    #jhg_games_per_sc_round = [4,3,3,3,3,3,3,3] # what we trained the og assasain agents on.
-    #jhg_games_per_sc_round = [4,3,3,3,3]  # what we trained the sleepy assasain bots on.
+    # jhg_games_per_sc_round = [4,3,3,3,3,3,3,3] # what we trained the og assasain agents on.
+    jhg_games_per_sc_round = [4,3,3,3,3]  # what we trained the sleepy assasain bots on.
     #jhg_games_per_sc_round = [2,3,3]#,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,2]
-    jhg_games_per_sc_round = ["J", 30]
+    #jhg_games_per_sc_round = ["J", 30]
     #jhg_games_per_sc_round = [1,1,1]
 
 
@@ -238,7 +239,7 @@ if __name__ == "__main__":
     num_humans = 0
     tokens_per_player = 2
     utility_per_player = 3
-    create_round_graphs_bool = True
+    create_round_graphs_bool = False
     create_game_graphs_bool = True
     create_influence = False
     chromosomes_directory = "testChromosome"
