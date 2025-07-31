@@ -33,7 +33,7 @@ class CompleteGrapher():
             self.create_sc_graphs(all_nodes, all_votes, winning_vote_list, current_options_matrix, types_list,
                                   group, round, influence_matrix, results_sums, results, peeps)
 
-        if played_jhg:
+        if played_jhg: # don't print these rn, not particualr interestd in them.
             allocations, popularity, influence, old_popularity = round_logger.get_round_data(curr_round, False, True)
             self.create_jhg_graphs(allocations, popularity, influence, curr_round, old_popularity)
 
@@ -577,7 +577,6 @@ class CompleteGrapher():
         influence_matrix = self.normalize_matrix(np.array(influence_matrix)) # might want to get rid of this?
         node_clustering, global_clustering = OpsahlClustering(np.array(influence_matrix)) # leave the alpha at 0.5 rn
 
-        print("this is the global clustering that we are returning ", global_clustering)
         net = NodeNetwork()
         net.setupPlayers([f"{i}" for i in range(np.shape(popularity)[0])])
         net.initNodes(

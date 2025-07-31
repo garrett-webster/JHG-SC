@@ -168,7 +168,10 @@ class Social_Choice_Sim:
     def get_votes(self, previous_votes=None, round=0, cycle=0,
                   max_cycle=3, influence=None):  # generic get votes for all bot types. Not optimized for a single chromosome
         # print("this is the round we are dealing with ", round, " and this is the self.I we are dealing with ", self.I)
-        if influence is None: influence = self.I[round]
+        index = len(self.I)
+        if influence is None: influence = self.I[index-1]
+        else: self.I[index-1] = influence
+
         self.round = round
         self.cycle = cycle
         all_votes = {}
@@ -265,7 +268,9 @@ class Social_Choice_Sim:
                     current_options_matrix_columns[all_votes[plyr_idx]])  # add the column of what they did to the new v.
 
         self.new_v = new_v
-        self.calculate_influence_matrix(new_v)
+        new_v = list((np.array(new_v) * 8)) # TODO: fix this magic number, becuase right now it doesn't actually come from anywhere.
+        #TODO: however, having this as a learned trait by bot creates a lot of problems, becuase then each bot has its OWN
+        self.calculate_influence_matrix(new_v) # some attempt to scale the two together. maybe?
         return winning_vote, self.current_results
 
     # version uses the wining vote rather than the attempted vote. swapping them out to see if it makes a difference.
@@ -554,7 +559,7 @@ class Social_Choice_Sim:
                 new_columns.append(self.allocation_bots[i].play_round(
                     i,
                     curr_round,
-                    T_prev[:, i], # should be a 9x9 ndarray (from numpy)
+                    T_prev[:, i], # should be a 9x9 ndarray (from numFpy)
                     self.results_sums,
                     np.array(influence_matrix),
                     extra_data, # yes this is blank. no I don't know why.
@@ -582,17 +587,18 @@ class Social_Choice_Sim:
     #########################################################################
 
     def get_game_deets(self):
-        cooperation_score = self.cooperation_score / (self.num_rounds+1) if self.num_rounds > 0 else 0  # as a percent, how often we cooperated. (had a non negative cause pass)
+        actual_round_num = self.num_rounds + 1 # off by one error
+        cooperation_score = self.cooperation_score / (actual_round_num+1) if self.num_rounds > 0 else 0  # as a percent, how often we cooperated. (had a non negative cause pass)
         sc_bot_type = 0 # don't return anything here rn.
         results = self.results # do I actually need this?
         results_sums = self.results_sums
-        num_rounds = self.num_rounds
         cv, sums_per_round = self.get_sums_per_round_and_cv()
         influence = self.most_recent_influence
         #utility_per_round = list(zip(*self.get_results_per_round()))
         utility_per_round = self.get_results_per_round()
         avg_utility_per_round = self.get_average_utility_per_round()
-        avg_rise = (avg_utility_per_round[-1]-10) / num_rounds
+        avg_rise = (avg_utility_per_round[-1]-10) / actual_round_num
+        num_rounds = actual_round_num
 
         total_data = {
             "cooperation_score": cooperation_score,

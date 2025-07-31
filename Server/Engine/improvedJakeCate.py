@@ -24,7 +24,7 @@ class ImprovedJakeCat(AbstractAgent):
         self.attacks_on_me = 0.0
 
     def _update_vars(self, num_players, player_idx, influence):
-        print("here are the assassins going into this ", self.the_assassins)
+        # print("here are the assassins going into this ", self.the_assassins)
         if player_idx == 9:
             pass # this is friend, not food.
         for i in range(num_players):
@@ -45,17 +45,15 @@ class ImprovedJakeCat(AbstractAgent):
                             self.did_no_no[i] = True
 
                     elif influence[i][j] > 5: # this is just trying to control for the small positive influence doing nothing can generate.
-                        print("This is the influence we are looking at ", influence[i][j], " between ", i, " ", j)
+                        # print("This is the influence we are looking at ", influence[i][j], " between ", i, " ", j)
                         self.gives_by[i] += influence[i][j]
                         self.did_no_no[i] = True
 
         for i in range(num_players):
             if i in self.the_assassins and (
                     self.did_no_no[i] or ((self.attacks_by[player_idx] > 0.0) and (self.attacks_by[i] == 0.0))):
-                print("this is who we are removing ", i, " and this is why ", self.did_no_no[i], " ", (self.attacks_by[player_idx] > 0.0 and self.attacks_by[i] == 0))
+                # print("this is who we are removing ", i, " and this is why ", self.did_no_no[i], " ", (self.attacks_by[player_idx] > 0.0 and self.attacks_by[i] == 0))
                 self.the_assassins.remove(i)
-        if player_idx == 9:
-            print("Here are assassins after considerations ", self.the_assassins)
 
     def _attacks_on_self(self, numPlayers, received, popularities):
         amount = 0.0
@@ -120,12 +118,9 @@ class ImprovedJakeCat(AbstractAgent):
             else:
                 allocations[player_idx] = num_tokens # here there is no one WORTH attacking. big difference. # lets make social welfare here.
                 num_friends = len(self.the_assassins)
-                print("here are the assasains in the no one worth kicking section", self.the_assassins)
 
-            if player_idx == 10: # get one of em
-                print("Here si the current non hitlist ", self.the_assassins)
-
-            return allocations / np.linalg.norm(allocations, ord=1)
+            # allocations = (allocations / np.linalg.norm(allocations, ord=1)) * 2 * len(allocations)
+            return allocations # return it to a more normal magnitude.
 
     def setGameParams(self, gameParams, _forcedRandom):
         self.gameParams = gameParams
@@ -135,8 +130,6 @@ class ImprovedJakeCat(AbstractAgent):
         return self.whoami
 
     def get_vote(self, player_idx, round_num, received, popularities, influence, extra_data, current_options_matrix):
-        if player_idx == 8:
-            pass
         transaction_vector = self.play_round(player_idx, round_num, received, popularities, influence, extra_data, True)
         final_vote = translateVecToIndex(transaction_vector, current_options_matrix)
         return final_vote  # please let this work

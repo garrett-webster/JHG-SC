@@ -49,14 +49,10 @@ def run_trial(sc_sim: "Social_Choice_Sim", jhg_sim, round_list, num_cycles, grou
         if sc_rounds:
             old_influence_matrix = copy.copy(influence_matrix)
             influence_matrix, winning_vote = run_sc_stuff(sc_sim, jhg_sim, total_order, influence_matrix, curr_round, num_cycles)
-            if old_influence_matrix is influence_matrix:
-                print("What WHAT WHAT")
             sc_sim.set_rounds(curr_sc_round) # ???
             curr_sc_round += 1
             played_sc = True
 
-        print("Here is played JHG, ", jhg_rounds, " and here si played_sc ", sc_rounds)
-        print("here is the influence matrix at the end of that round ", influence_matrix)
 
         round_logger.save_round(curr_round, played_sc, played_jhg)
 
@@ -84,7 +80,7 @@ def run_sc_stuff(sc_sim, jhg_sim, total_order, influence_matrix, curr_round, num
 
     bot_votes = {}
     for cycle in range(num_cycles):
-        bot_votes[cycle] = sc_sim.get_votes(bot_votes, curr_round, cycle, num_cycles, new_influence)
+        bot_votes[cycle] = sc_sim.get_votes(bot_votes, curr_round, cycle, num_cycles, influence_matrix)
         sc_sim.record_votes(bot_votes[cycle], cycle)
 
     # make sure that this happens IMMEDIATELY afterward.
@@ -223,11 +219,11 @@ if __name__ == "__main__":
 
     #jhg_games_per_sc_round = [1,1,1,1,1,1,1,1]#,1,1,1,1,1,1,1,1,1,1,1,1]
     # jhg_games_per_sc_round = [4,3,3,3,3,3,3,3] # what we trained the og assasain agents on.
-    # jhg_games_per_sc_round = [4,3,3,3,3]  # what we trained the sleepy assasain bots on.
+    jhg_games_per_sc_round = [4,3,3,3,3]  # what we trained the sleepy assasain bots on.
     #jhg_games_per_sc_round = [2,3,3]#,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,2]
     # jhg_games_per_sc_round = ["S", 10]
     # jhg_games_per_sc_round = [1,1,1]
-    jhg_games_per_sc_round = [2,2,2]
+    # jhg_games_per_sc_round = [2,2,2]
 
 
 

@@ -74,22 +74,6 @@ class JHGEngine():
         Itemp = self.scaleBackMurder(tau, Itemp, V)
         self.Ptemp[tau] = Itemp.sum(axis=0) +  + pow((1.0 - self.alpha), tau) * self.P[0]
         return Itemp
-        
-        # old clipping method
-        # # Rescale the influence if the incoming negative influence is greater than the expected popularity
-        # if np.any(I_tilde < 0):
-        #     with np.errstate(divide='ignore', invalid='ignore'):
-        #         omega = np.minimum(1, (self.P[tau - 1] + np.sum(self.alpha * np.abs(I_tilde * (I_tilde > 0)), axis=0) ) / np.sum(self.alpha * np.abs(I_tilde * (I_tilde < 0)), axis=0))
-        #         omega[np.isnan(omega)] = 1.0
-        #         omega[np.isinf(omega)] = 1.0
-        #     omega = np.ones_like(I_tilde) * omega
-        #     omega[I_tilde >= 0] = 1.0
-        #     I_tilde = I_tilde * omega - np.diag(np.sum(np.abs(I_tilde * (1 - omega)), axis=1))
-
-        # self.Ptemp[tau] = [ sum(y) for y in zip(*(self.alpha * I_tilde + (1 - self.alpha) * I_bar)) ] + pow((1.0 - self.alpha), tau) * self.P[0]
-        # return self.alpha * I_tilde + (1 - self.alpha) * I_bar
-
-        
 
     ## Raw round influence
     def I_hat(self, tau, t):
