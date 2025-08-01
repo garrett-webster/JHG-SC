@@ -11,6 +11,7 @@ from Server.Engine.geneagent3 import GeneAgent3
 from Server.Engine.humanagent import HumanAgent
 from Server.Engine.jakecat import JakeCAT
 from Server.Engine.improvedJakeCate import ImprovedJakeCat
+from Server.Engine.projectCat import ProjectCat
 from Server.Node import Node
 from Server.OptionGenerators.options_creation import generate_two_plus_one_groups
 NUM_CAUSES = 3 # if its ever not this a LOT of math breaks, so just leave it be.
@@ -23,6 +24,8 @@ class Social_Choice_Sim:
             self.total_order = self.create_total_order(total_players, num_humans)
         else:  # if created with server, spoon feed it.
             self.total_order = total_order
+
+        self.enforce_majority = False
         # just a bunch of base setters.
         self.utility_per_player = utility_per_player
         self.bot_index_dict = {}
@@ -189,14 +192,14 @@ class Social_Choice_Sim:
         for i, bot in enumerate(self.bots):
             # print("this is the bot id ", bot.self_id, " an dthis is the i index ", i)
             # print("this is the cycle we are working with ", cycle, " and the round ", round)
-            if isinstance(bot, GeneAgent3) or isinstance(bot, JakeCAT) or isinstance(bot, ImprovedJakeCat):
+            if isinstance(bot, GeneAgent3) or isinstance(bot, JakeCAT) or isinstance(bot, ImprovedJakeCat) or isinstance(bot, ProjectCat):
                 if cycle == 0:
                     votes_put_in = None
                 else:
                     votes_put_in = previous_votes[cycle-1]
                 # ok what the FETCH should received be. I think just its list in V is probably the way to go.
                 recieved = self.reconcile_received(i, votes_put_in) # gotta figure out if we HAVE recieved anything yet. could use a round=0check.
-                final_votes = bot.get_vote(i, round, recieved, self.results_sums, np.array(influence), extra_data, self.current_options_matrix)
+                final_votes = bot.get_vote(i, round, recieved, self.results_sums, np.array(influence), extra_data, self.current_options_matrix, self.enforce_majority)
             elif isinstance(bot, HumanAgent):
                 continue # he doesn't get to vote :(
             else:
@@ -228,33 +231,26 @@ class Social_Choice_Sim:
     def return_win(self, all_votes):
         self.current_results = []
         total_votes = all_votes
-        # self.final_votes = all_votes
         winning_vote_count = Counter(total_votes.values()).most_common(1)[0][1]
         winning_vote = Counter(total_votes.values()).most_common(1)[0][0]
+        if not self.enforce_majority: # can't let abstention happen, so lets fix that.
+            if winning_vote == -1:
+                print("here is the winning vote when the thing threatens to crash ", all_votes)
+                winning_vote = Counter(total_votes.values()).most_common(2)[1][0] # grab the 2 most common, grab the second entry and the vote id. simple as.
 
-        col_sums = [sum(col) for col in zip(*self.current_options_matrix)]
-        col_sums.insert(0, 0)
 
-        sorted_column_sums = sorted(col_sums, reverse=True)
-
-        index = int(winning_vote) + 1
-        self.choice_matrix[sorted_column_sums.index(col_sums[index])] += 1
-        self.last_option = sorted_column_sums.index(col_sums[index])
-
-        if not (winning_vote_count > len(total_votes) // 2):
-            winning_vote = -1
+        if self.enforce_majority: # modifies it to check for teh majority and whatnot.
+            if not (winning_vote_count > len(total_votes) // 2):
+                winning_vote = -1
+        # nothing else to do here. the winning vote is just the winning vote.
 
         if winning_vote != -1:  # if its -1, then nothing happend. NOT the last entry in the fetcher. that was a big bug that flew under the radar.
             for i in range(len(total_votes)):
                 self.current_results.append(self.current_options_matrix[i][winning_vote])
-            self.add_coop_score()
+            self.add_coop_score() # cop score doesn't make a ton of sense here unfortunately.
         else:
             for i in range(len(total_votes)):
                 self.current_results.append(0)
-
-        choice_list = self.create_choice_matrix(self.current_options_matrix)
-        self.winning_probability.append(choice_list[winning_vote + 1])
-
         # creates the new utilty effort matrix based on the actual votes. Doesn't matter what actually won, just what you voted for in the end.
         # this fetcher right here contains using the actual player votes to decide the new v. the below version is going to use the winning vote.
         new_v = []
@@ -269,7 +265,7 @@ class Social_Choice_Sim:
 
         self.new_v = new_v
         new_v = list((np.array(new_v) * 8)) # TODO: fix this magic number, becuase right now it doesn't actually come from anywhere.
-        #TODO: however, having this as a learned trait by bot creates a lot of problems, becuase then each bot has its OWN
+        #TODO: however, having this as a learned trait by bot creates a lot of problems, becuase then each bot has its OWN influence matrix.
         self.calculate_influence_matrix(new_v) # some attempt to scale the two together. maybe?
         return winning_vote, self.current_results
 
@@ -304,15 +300,20 @@ class Social_Choice_Sim:
                                  previous_votes[plyr_idx]])  # add the column of what they did to the new v.
         return new_v
 
-    # this one has one goal. is there a winning vote.
+    # this one has one goal. is there a winning vote. (Doesn't change the coop score or anything else)
     def return_win_without_silly(self, all_votes):
         self.current_results = []
         total_votes = all_votes
         winning_vote_count = Counter(total_votes.values()).most_common(1)[0][1]
         winning_vote = Counter(total_votes.values()).most_common(1)[0][0]
 
-        if not (winning_vote_count > len(total_votes) // 2):
-            winning_vote = -1
+        if not self.enforce_majority: # can't let abstention happen, so lets fix that.
+            if winning_vote == -1:
+                winning_vote = Counter(total_votes.values()).most_common(2)[1][0] # grab the 2 most common, grab the second entry and the vote id. simple as.
+
+        if self.enforce_majority:
+            if not (winning_vote_count > len(total_votes) // 2):
+                winning_vote = -1
 
         if winning_vote != -1:  # if its -1, then nothing happend. NOT the last entry in the fetcher. that was a big bug that flew under the radar.
             for i in range(len(total_votes)):

@@ -120,7 +120,7 @@ class ImprovedJakeCat(AbstractAgent):
                 num_friends = len(self.the_assassins)
 
             # allocations = (allocations / np.linalg.norm(allocations, ord=1)) * 2 * len(allocations)
-            return allocations # return it to a more normal magnitude.
+            return allocations # return it to a more normal magnitude. # the engine doesn't care if its normalized or not, but the SC sim does care. deeply.
 
     def setGameParams(self, gameParams, _forcedRandom):
         self.gameParams = gameParams
@@ -129,8 +129,8 @@ class ImprovedJakeCat(AbstractAgent):
     def getType(self):
         return self.whoami
 
-    def get_vote(self, player_idx, round_num, received, popularities, influence, extra_data, current_options_matrix):
+    def get_vote(self, player_idx, round_num, received, popularities, influence, extra_data, current_options_matrix, enforce_majority):
         transaction_vector = self.play_round(player_idx, round_num, received, popularities, influence, extra_data, True)
-        final_vote = translateVecToIndex(transaction_vector, current_options_matrix)
+        final_vote = translateVecToIndex(transaction_vector, current_options_matrix, enforce_majority)
         return final_vote  # please let this work
 

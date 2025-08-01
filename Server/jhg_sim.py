@@ -12,7 +12,7 @@ from Server.Engine.randomagent import RandomAgent
 from Server.Engine.simulator import GameSimulator
 from Server.Engine.jakecat import JakeCAT
 from Server.Engine.improvedJakeCate import ImprovedJakeCat
-from Server.Engine.kitty import KittyAgent
+from Server.Engine.projectCat import ProjectCat
 
 import numpy as np
 import random
@@ -27,7 +27,7 @@ class JHG_simulator():
         self.players = None
         # went ahead and gave this a default. the currently trained agents have this baked into them that they need to have 2 tokens per player, curious in expanding that.
         if start_game:
-            self.start_game(num_human_players, num_players, tokens_per_player, bot_type, add_kitties=3)
+            self.start_game(num_human_players, num_players, tokens_per_player, bot_type, add_kitties=2)
         else:
             self.create_sim(num_human_players)
         self.T = None
@@ -72,7 +72,7 @@ class JHG_simulator():
         configured_players = []
         if add_kitties != 0:
             for i in range(add_kitties):
-                configured_players.append(ImprovedJakeCat())
+                configured_players.append(ProjectCat())
 
 
         popSize = 60  # ??? I think? based on the command line arguemnts
