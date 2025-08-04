@@ -40,6 +40,7 @@ def run_trial(sc_sim: "Social_Choice_Sim", jhg_sim, round_list, num_cycles, grou
         sc_rounds = round_list[list_index][-1] == "*"
         jhg_rounds = round_list[list_index][-1] == "-"
         curr_round = int(round_list[list_index][:-1]) # useful, yes, but not quite the logger round
+
         # print("*****************************ROUND ", curr_round, "********************************")
 
         if jhg_rounds:
@@ -55,7 +56,6 @@ def run_trial(sc_sim: "Social_Choice_Sim", jhg_sim, round_list, num_cycles, grou
 
 
         round_logger.save_round(curr_round, played_sc, played_jhg)
-
 
         if create_round_graphs_bool:
             create_round_graphs(round_logger, curr_round, played_sc, played_jhg)
@@ -219,11 +219,11 @@ if __name__ == "__main__":
 
     #jhg_games_per_sc_round = [1,1,1,1,1,1,1,1]#,1,1,1,1,1,1,1,1,1,1,1,1]
     # jhg_games_per_sc_round = [4,3,3,3,3,3,3,3] # what we trained the og assasain agents on.
-    # jhg_games_per_sc_round = [4,3,3,3,3]  # what we trained the sleepy assasain bots on.
+    jhg_games_per_sc_round = [4,3,3,3,3]  # what we trained the sleepy assasain bots on.
     #jhg_games_per_sc_round = [2,3,3]#,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,2]
-    jhg_games_per_sc_round = ["S", 10]
+    # jhg_games_per_sc_round = ["S", 10]
     # jhg_games_per_sc_round = [1,1,1]
-    # jhg_games_per_sc_round = [2,2,2]
+    #jhg_games_per_sc_round = [2,2,2]
 
 
 
@@ -240,7 +240,7 @@ if __name__ == "__main__":
     num_humans = 0
     tokens_per_player = 2
     utility_per_player = 3
-    create_round_graphs_bool = True
+    create_round_graphs_bool = False
     create_game_graphs_bool = True
     create_influence = False
     chromosomes_directory = "testChromosome"
@@ -266,3 +266,4 @@ if __name__ == "__main__":
         game_logger.resetup(current_jhg_sim, current_sc_sim)
 
         sc_sim, jhg_sim = run_trial(current_sc_sim, current_jhg_sim, round_list, num_cycles, group, total_order, round_logger, create_round_graphs_bool, game_logger, create_game_graphs_bool) # This is really whats getting run round times
+        print("here are the final utilities ", sc_sim.results_sums)

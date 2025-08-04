@@ -8,6 +8,7 @@ import numpy as np
 from Server.SC_Bots.transVecTranslator import translateVecToIndex
 
 
+
 class ProjectCat(AbstractAgent):
 
     def __init__(self):
@@ -20,6 +21,7 @@ class ProjectCat(AbstractAgent):
         self.did_no_no = None
         self.attacks_on_me = 0.0
         self.gameParams = {}
+        self.previous_sc_prey = None
 
     def _init_vars(self, num_players):
         self.attacks_by = np.zeros(num_players)
@@ -28,32 +30,50 @@ class ProjectCat(AbstractAgent):
         self.the_assassins = {i for i in range(num_players)}
         self.attacks_on_me = 0.0
 
-    def _update_vars(self, num_players, player_idx, influence):
+    def _update_vars(self, num_players, player_idx, influence, round_num):
         # print("here are the assassins going into this ", self.the_assassins)
-        for i in range(num_players):
-            self.attacks_by[i] = 0.0
-            self.gives_by[i] = 0.0
-            self.did_no_no[i] = False
-            if i in self.the_assassins:
-                for j in range(num_players):
-                    if i == j:
-                        continue
+        if round_num == 1: # this checks SPECIFICALLY for all 0 saved in the first round.
+            to_remove = []
+            for i in range(num_players):
+                if i in self.the_assassins:
+                    for j in range(num_players):
+                        if i == j:
+                            continue
+                        else:
+                            if influence[i][j] > 0:
+                                to_remove.append(i)
+            for i in range(num_players):
+                if i in self.the_assassins and i in to_remove:
+                    self.the_assassins.remove(i)
 
-                    if influence[i][j] < 0.0:
-                        self.attacks_by[i] -= influence[i][j]
-                        if j in self.the_assassins:
-                            self.did_no_no[i] = True
 
-                    # lets make it so that they can in fact give to other assassins.
-                    elif influence[i][j] > 5 and i not in self.the_assassins: # this is just trying to control for the small positive influence doing nothing can generate.
-                        self.gives_by[i] += influence[i][j]
-                        self.did_no_no[i] = True
+        else: # this one is more general, and checks for transactions between kitties and non kitties. anyone who gives to a non kitty
+                # get a stick to the face.
+            for i in range(num_players):
+                self.attacks_by[i] = 0.0
+                self.gives_by[i] = 0.0
+                self.did_no_no[i] = False
+                if i in self.the_assassins:
+                    for j in range(num_players):
+                        if i == j: # don't check self references, just gets weird.
+                            continue
 
-        for i in range(num_players):
-            if i in self.the_assassins and (
-                    self.did_no_no[i] or ((self.attacks_by[player_idx] > 0.0) and (self.attacks_by[i] == 0.0))):
-                # print("this is who we are removing ", i, " and this is why ", self.did_no_no[i], " ", (self.attacks_by[player_idx] > 0.0 and self.attacks_by[i] == 0))
-                self.the_assassins.remove(i)
+                        if influence[i][j] < 0.0: # if there has been an attack
+                            self.attacks_by[i] -= influence[i][j] # make sure we can guard ourselves
+                            if j in self.the_assassins: # if this was an attack on a fellow kitty
+                                self.did_no_no[i] = True # he is no longer a brother.
+
+                        # lets make it so that they can in fact give to other assassins.
+                        elif influence[i][j] > 0.0: # if a "give" has taken place
+                            self.gives_by[i] += influence[i][j]
+                            if j not in self.the_assassins: # if he has given to a non assassin
+                                self.did_no_no[i] = True # he is no longer a brother.
+
+            for i in range(num_players): # iterate through and throw out all of the no no squares
+                if i in self.the_assassins and (
+                        self.did_no_no[i] or ((self.attacks_by[player_idx] > 0.0) and (self.attacks_by[i] == 0.0))):
+                    # print("this is who we are removing ", i, " and this is why ", self.did_no_no[i], " ", (self.attacks_by[player_idx] > 0.0 and self.attacks_by[i] == 0))
+                    self.the_assassins.remove(i)
 
     def _attacks_on_self(self, numPlayers, received, popularities):
         amount = 0.0
@@ -72,22 +92,19 @@ class ProjectCat(AbstractAgent):
 
     def play_round(self, player_idx, round_num, recieved, popularities, influence, extra_data, extra_flag=False):
         # the extra flag does not matter to him, but it matters to teh other bots.
+        #print("This is if we are playing SC ", extra_flag, " and here are the assassins ", self.the_assassins)
 
         if not extra_flag: # normal stuff
             allocations = self.jhg_kitty_behavior(player_idx, round_num, recieved, popularities, influence, extra_data)
 
         else:
-            if player_idx == 10:
-                pass # wanna see whats goign on here.
             allocations = self.sc_kitty_behavior(player_idx, round_num, recieved, popularities, influence, extra_data)
-            if player_idx == 10: # guranteed to be a cat.
-                print("this is the allocation we are returning from the SC kitty ", allocations)
-                print("these are who we think are the other cats btw ", self.the_assassins)
 
         return allocations
 
 
     def sc_kitty_behavior(self, player_idx, round_num, recieved, popularities, influence, extra_data):
+        # Don't allow the agent to update the init_vars or assassin list here, becuase it doesn't have the information it needs. just don't touch it.
         allocations = np.zeros_like(popularities)
         num_players = len(popularities)
         num_tokens = 2 * num_players
@@ -101,51 +118,54 @@ class ProjectCat(AbstractAgent):
             steal_coef = self.gameParams.get('steal', 1.6)
             keep_coef = self.gameParams.get('keep', 0.95)
 
-            self._update_vars(num_players, player_idx, influence)  # try to figure out who the other kitties are.
+            # don't attempt to update kitties here, it gets all sorts of weird.
 
-            keep_tokens = 0
 
-            if popularities[player_idx] >= 0.5:  # if they have more than half a popularity point, nuke em.
-                attacked = self._attacks_on_self(num_players, recieved, popularities)
-                w = 0.65
-                self.attacks_on_me = w * attacked + (1 - w) * self.attacks_on_me
-                keep_tokens = min((int)((self.attacks_on_me / popularities[player_idx]) + 0.5),
-                                  num_tokens)  # figure out how many people attacked me last round and try to plan accordinly
+            attacked = self._attacks_on_self(num_players, recieved, popularities)
+            w = 0.65
+            self.attacks_on_me = w * attacked + (1 - w) * self.attacks_on_me
+            keep_tokens = min((int)((self.attacks_on_me / popularities[player_idx]) + 0.5),
+                              num_tokens)  # figure out how many people attacked me last round and try to plan accordinly
 
-                prey_idx = None  # Changed from -1 cause python (This was weird)
-                prey_pop = 99999.0
-                attack_proportion = 0.0
-                prop_assassin_attack = self._get_my_proportion(player_idx)
-                attack_power = (popularities[
-                                    player_idx] / prop_assassin_attack) * steal_coef * alpha  # figure out how much power I am actually weilding
+            prey_idx = None  # Changed from -1 cause python (This was weird)
+            prey_pop = -99999.0
+            attack_proportion = 0.0
+            prop_assassin_attack = self._get_my_proportion(player_idx)
+            attack_power = (popularities[
+                                player_idx] / prop_assassin_attack) * steal_coef * alpha  # figure out how much power I am actually weilding
+
+            for i in range(num_players):
+                if i not in self.the_assassins: # find the highest utility person to strike. gives a nice rotation system.
+                    if popularities[i] > prey_pop:  # can I actually take them out? Do I have the attack power and do they have low enough popularity?
+                        prey_idx = i  # pop them in my sights
+                        prey_pop = popularities[i]
+
+            if prey_idx is not None:  # just how bad can we mash them up
+                print("this is the sc target index! ", prey_idx)
+                # we can't take more than 10 from a person
+                steal_tokens = 10 # we can always steal 10 https://www.reddit.com/r/MemeRestoration/comments/mqoiv7/its_morally_correct_requested_by_ujustvolted/
+                allocations[prey_idx] = -steal_tokens
+                available_tokens = num_tokens + steal_tokens # utility works different here
+                # split everyone into followers
+                num_followers = num_players - len(self.the_assassins) - 1 # there is a prey index that we need to blow up
+                total_allocation = (num_followers * 0.8) + len(self.the_assassins)
+                allocation_tokens = available_tokens // total_allocation
 
                 for i in range(num_players):
-                    if i not in self.the_assassins:  # check all the non friends
-                        if (popularities[i] < prey_pop) and (popularities[i] >= (
-                                attack_power / 2.0)):  # can I actually take them out? Do I have the attack power and do they have low enough popularity?
-                            prey_idx = i  # pop them in my sights
-                            prey_pop = popularities[i]
-                            attack_proportion = min(popularities[i] / attack_power,
-                                                    1.0)  # calculate just how badly we will destroy them
+                    if i == prey_idx: # https://www.tiktok.com/@b0bch3rry_2/video/7485691586265926958
+                        allocations[prey_idx] = -10
+                    else: # friends! depends on by how much tho
+                        if i in self.the_assassins: # big friend :)
+                            allocations[i] = allocation_tokens
+                        else: # we need them for tax purposes.
+                            allocations[i] = allocation_tokens // 1.25 # make sure this is an integer.
 
-                if prey_idx is not None:  # just how bad can we mash them up
-                    # we can't take more than 10 from a person
-                    steal_tokens = min(10, (int)((attack_proportion * 0.9) * (num_tokens - keep_tokens)))
-                    allocations[prey_idx] = -steal_tokens
-                    available_tokens = num_tokens + steal_tokens # utility works different here
-                    num_friends = max (len(self.the_assassins), 1)
-                    friend_allocation = int(min(10, (available_tokens / num_friends)))
-                    for player in self.the_assassins:
-                        allocations[player] = friend_allocation
 
-                else:  # this is what we need to change, her and here.
-                    allocations[player_idx] = num_tokens  # here we have no prey, so there is no one to attack
-                    num_tokens_to_allocate = num_tokens / (len(self.the_assassins))
-                    for i in self.the_assassins:
-                        allocations[i] = num_tokens_to_allocate
+                self.previous_sc_prey = prey_idx
 
-            else:
-                allocations[player_idx] = num_tokens  # here there is no one WORTH attacking. big difference. # lets make social welfare here.
+
+            else:  # there is no prey, play social welfare with yo buddies. or something like that.
+                allocations[player_idx] = num_tokens  # here we have no prey, so there is no one to attack
                 num_tokens_to_allocate = num_tokens / (len(self.the_assassins))
                 for i in self.the_assassins:
                     allocations[i] = num_tokens_to_allocate
@@ -198,11 +218,10 @@ class ProjectCat(AbstractAgent):
             steal_coef = self.gameParams.get('steal', 1.6)
             keep_coef = self.gameParams.get('keep', 0.95)
 
-            self._update_vars(num_players, player_idx, influence) # try to figure out who the other kitties are.
+            self._update_vars(num_players, player_idx, influence, round_num) # try to figure out who the other kitties are.
 
-            keep_tokens = 0
 
-            if popularities[player_idx] >= 0.5: # if they have more than half a popularity point, nuke em.
+            if popularities[player_idx] >= 0.5: # if we have more than half a rating point, nuke someone.
                 attacked = self._attacks_on_self(num_players, recieved, popularities)
                 w = 0.65
                 self.attacks_on_me = w * attacked + (1 - w) * self.attacks_on_me
@@ -226,11 +245,14 @@ class ProjectCat(AbstractAgent):
                     allocations[prey_idx] = -steal_tokens
                     allocations[player_idx] = num_tokens - steal_tokens
                 else: # this is what we need to change, her and here.
-                    allocations[player_idx] = num_tokens # here we have no prey, so there is no one to attack
+                        # we have no prey, so we give to our friends :)
+                    new_tokens = (num_tokens - keep_tokens) // len(self.the_assassins)
+                    for i in self.the_assassins:
+                        allocations[i] = new_tokens
+                    #allocations[player_idx] = num_tokens # here we have no prey, so there is no one to attack
 
             else:
                 allocations[player_idx] = num_tokens # here there is no one WORTH attacking. big difference. # lets make social welfare here.
-                num_friends = len(self.the_assassins)
 
             # allocations = (allocations / np.linalg.norm(allocations, ord=1)) * 2 * len(allocations)
             return allocations # return it to a more normal magnitude. # the engine doesn't care if its normalized or not, but the SC sim does care. deeply.

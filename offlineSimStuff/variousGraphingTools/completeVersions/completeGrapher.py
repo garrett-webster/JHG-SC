@@ -35,7 +35,7 @@ class CompleteGrapher():
 
         if played_jhg: # don't print these rn, not particualr interestd in them.
             allocations, popularity, influence, old_popularity = round_logger.get_round_data(curr_round, False, True)
-            self.create_jhg_graphs(allocations, popularity, influence, curr_round, old_popularity)
+            #self.create_jhg_graphs(allocations, popularity, influence, curr_round, old_popularity)#  don't worry about these rn.
 
 
     def create_game_graphs_with_logger(self, game_logger):
@@ -608,10 +608,13 @@ class CompleteGrapher():
         for i, node in enumerate(net.nodes):
             for j, weight in enumerate(influence_matrix[
                                            i]):  # yeah I think this will graph to much, I htink I need to do this at just the mcfreakin uhh curr Round.
+
                 if weight != 0:
                     x0, y0 = node_positions[i]
                     x1, y1 = node_positions[j]
+
                     color, alpha = get_edge_color_and_opacity(weight)
+
                     segments.append([(x0, y0), (x1, y1)])
                     colors.append(to_rgba(color, alpha))
 

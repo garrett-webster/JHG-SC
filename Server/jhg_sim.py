@@ -27,7 +27,7 @@ class JHG_simulator():
         self.players = None
         # went ahead and gave this a default. the currently trained agents have this baked into them that they need to have 2 tokens per player, curious in expanding that.
         if start_game:
-            self.start_game(num_human_players, num_players, tokens_per_player, bot_type, add_kitties=2)
+            self.start_game(num_human_players, num_players, tokens_per_player, bot_type, add_kitties=3)
         else:
             self.create_sim(num_human_players)
         self.T = None
@@ -338,8 +338,8 @@ def loadPopulationFromFile(popSize, generationFolder, startIndex, num_gene_pools
     fnombre = "Kill me"
     try:
         #fnombre = generationFolder + "/gen_" + str(startIndex) + ".csv"
-        fnombre = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\offlineSimStuff\geneticStuff\AssasainResults\theGenerations\gen_175.csv"
-        # fnombre = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\Server\Engine\gen_199.csv"
+        # fnombre = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\offlineSimStuff\geneticStuff\AssasainResults\theGenerations\gen_175.csv"
+        fnombre = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\Server\Engine\gen_199.csv"
         # fnombre = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\offlineSimStuff\geneticStuff\Results\theGenerations\gen_299.csv"
         fp = open(fnombre, "r")
     except FileNotFoundError:

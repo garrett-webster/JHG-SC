@@ -564,6 +564,7 @@ class Social_Choice_Sim:
                     self.results_sums,
                     np.array(influence_matrix),
                     extra_data, # yes this is blank. no I don't know why.
+                    True, # this indicates that it is happening within the SC testbed.
                 ))
             total_columns = []
             for peep in bot_peeps:
