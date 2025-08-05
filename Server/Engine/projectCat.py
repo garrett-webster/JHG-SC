@@ -21,7 +21,21 @@ class ProjectCat(AbstractAgent):
         self.did_no_no = None
         self.attacks_on_me = 0.0
         self.gameParams = {}
-        self.previous_sc_prey = None
+        # completley made up btyw
+        self.max_size = {
+            1: 1,
+            2: 1,
+            3: 1,
+            4: 1,
+            5: 1,
+            6: 2,
+            7: 2,
+            8: 2,
+            9: 2,
+            10: 1,
+            11: 8,
+            12: 3,
+        }
 
     def _init_vars(self, num_players):
         self.attacks_by = np.zeros(num_players)
@@ -114,46 +128,37 @@ class ProjectCat(AbstractAgent):
             allocations[player_idx] = min(10, num_tokens)
             return allocations
         else:  # now we ahve to do like, actual math. bleh.
-            alpha = self.gameParams.get('alpha', 0.15)
-            steal_coef = self.gameParams.get('steal', 1.6)
-            keep_coef = self.gameParams.get('keep', 0.95)
 
-            # don't attempt to update kitties here, it gets all sorts of weird.
-
-
-            attacked = self._attacks_on_self(num_players, recieved, popularities)
-            w = 0.65
-            self.attacks_on_me = w * attacked + (1 - w) * self.attacks_on_me
-            keep_tokens = min((int)((self.attacks_on_me / popularities[player_idx]) + 0.5),
-                              num_tokens)  # figure out how many people attacked me last round and try to plan accordinly
-
-            prey_idx = None  # Changed from -1 cause python (This was weird)
+            prey_idxs = []
             prey_pop = -99999.0
-            attack_proportion = 0.0
-            prop_assassin_attack = self._get_my_proportion(player_idx)
-            attack_power = (popularities[
-                                player_idx] / prop_assassin_attack) * steal_coef * alpha  # figure out how much power I am actually weilding
 
             for i in range(num_players):
                 if i not in self.the_assassins: # find the highest utility person to strike. gives a nice rotation system.
-                    if popularities[i] > prey_pop:  # can I actually take them out? Do I have the attack power and do they have low enough popularity?
-                        prey_idx = i  # pop them in my sights
-                        prey_pop = popularities[i]
+                    if len(prey_idxs) < self.max_size[num_players]: # we are appending, sire.
+                        prey_idxs.append(i)
+                    else: # lets try rotation again just to see what happens.
+                        for prey in prey_idxs:
+                            if popularities[i] > popularities[prey] and i != prey and i not in prey_idxs: # this statement is starting to smell.
+                                prey_idxs.remove(prey)
+                                prey_idxs.append(i)
 
-            if prey_idx is not None:  # just how bad can we mash them up
-                print("this is the sc target index! ", prey_idx)
+
+            if len(prey_idxs) != 0:  # just how bad can we mash them up
                 # we can't take more than 10 from a person
                 steal_tokens = 10 # we can always steal 10 https://www.reddit.com/r/MemeRestoration/comments/mqoiv7/its_morally_correct_requested_by_ujustvolted/
-                allocations[prey_idx] = -steal_tokens
-                available_tokens = num_tokens + steal_tokens # utility works different here
+                for prey in prey_idxs:
+                    allocations[prey] = -steal_tokens
+                available_tokens = num_tokens + (steal_tokens * len(prey_idxs)) # utility works different here
                 # split everyone into followers
-                num_followers = num_players - len(self.the_assassins) - 1 # there is a prey index that we need to blow up
+                num_followers = num_players - len(self.the_assassins) - len(prey_idxs)
                 total_allocation = (num_followers * 0.8) + len(self.the_assassins)
                 allocation_tokens = available_tokens // total_allocation
+                if allocation_tokens > 10:
+                    allocation_tokens = 10
 
                 for i in range(num_players):
-                    if i == prey_idx: # https://www.tiktok.com/@b0bch3rry_2/video/7485691586265926958
-                        allocations[prey_idx] = -10
+                    if i in prey_idxs: # https://www.tiktok.com/@b0bch3rry_2/video/7485691586265926958
+                        allocations[i] = -10
                     else: # friends! depends on by how much tho
                         if i in self.the_assassins: # big friend :)
                             allocations[i] = allocation_tokens
@@ -161,10 +166,9 @@ class ProjectCat(AbstractAgent):
                             allocations[i] = allocation_tokens // 1.25 # make sure this is an integer.
 
 
-                self.previous_sc_prey = prey_idx
-
 
             else:  # there is no prey, play social welfare with yo buddies. or something like that.
+                print("NO MORE PREY! GIVE TO FREN :)")
                 allocations[player_idx] = num_tokens  # here we have no prey, so there is no one to attack
                 num_tokens_to_allocate = num_tokens / (len(self.the_assassins))
                 for i in self.the_assassins:
@@ -173,6 +177,9 @@ class ProjectCat(AbstractAgent):
 
             # allocations = (allocations / np.linalg.norm(allocations, ord=1)) * 2 * len(allocations)
             #allocations = self.adjust_for_sc(allocations, num_tokens)
+            # print("this is the player idx ", player_idx, " and here is the allocation ", allocations)
+            if sum(allocations) < -50:
+                print("hey something si wrong ", player_idx, " has an allocatino of ", allocations, " . on standby")
             return allocations  # return it to a more normal magnitude. # the engine doesn't care if its normalized or not, but the SC sim does care. deeply.
 
     # def adjust_for_sc(self, allocations, num_tokens):

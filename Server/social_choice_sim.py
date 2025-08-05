@@ -235,7 +235,6 @@ class Social_Choice_Sim:
         winning_vote = Counter(total_votes.values()).most_common(1)[0][0]
         if not self.enforce_majority: # can't let abstention happen, so lets fix that.
             if winning_vote == -1:
-                print("here is the winning vote when the thing threatens to crash ", all_votes)
                 winning_vote = Counter(total_votes.values()).most_common(2)[1][0] # grab the 2 most common, grab the second entry and the vote id. simple as.
 
 
@@ -267,6 +266,7 @@ class Social_Choice_Sim:
         new_v = list((np.array(new_v) * 8)) # TODO: fix this magic number, becuase right now it doesn't actually come from anywhere.
         #TODO: however, having this as a learned trait by bot creates a lot of problems, becuase then each bot has its OWN influence matrix.
         self.calculate_influence_matrix(new_v) # some attempt to scale the two together. maybe?
+        # print("here are hte most recent results ", self.current_results)
         return winning_vote, self.current_results
 
     # version uses the wining vote rather than the attempted vote. swapping them out to see if it makes a difference.
@@ -443,6 +443,7 @@ class Social_Choice_Sim:
         }
 
         #return current_node_json, self.all_votes, winning_vote_list, self.current_options_matrix, self.total_types, self.scenario_string, group, self.round, self.cycle, self.chromosome_string, self.get_influence_matrix(), self.results_sums, self.results, self.peeps
+        # print("this is the current optisons matrix ", self.current_options_matrix, " for round ", self.round)
         return total_data
 
     def set_new_options_matrix(self, new_optins_matrix):
@@ -461,7 +462,7 @@ class Social_Choice_Sim:
         theGen = 199
         num_gene_copies = 3
         thePopulation = []
-        fnombre = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\offlineSimStuff\geneticStuff\SCResults\theGenerations\gen_1.csv"
+        fnombre = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\Server\Engine\assassins_gen_175.csv"
         fp = open(fnombre, "r")
 
         for i in range(0, popSize):
@@ -539,7 +540,6 @@ class Social_Choice_Sim:
 
     # this functin is used for simulation purposes ONLY. should never be called with live players.
     def let_others_create_options_matrix(self, bot_peeps, curr_round, influence_matrix):
-
         indexes = [] # this gest used regardless.
         for peep in bot_peeps:
             indexes.append(bot_peeps.index(peep) + 1)
@@ -568,7 +568,7 @@ class Social_Choice_Sim:
                 ))
             total_columns = []
             for peep in bot_peeps:
-                peep_index = peep[1]
+                peep_index = peep[1:] # THIS WAS WRONG YOU FETCHER
                 total_columns.append(new_columns[int(peep_index)])
             current_options_matrix = np.transpose(total_columns).tolist()
             return current_options_matrix, indexes

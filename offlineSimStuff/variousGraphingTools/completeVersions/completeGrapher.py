@@ -35,7 +35,7 @@ class CompleteGrapher():
 
         if played_jhg: # don't print these rn, not particualr interestd in them.
             allocations, popularity, influence, old_popularity = round_logger.get_round_data(curr_round, False, True)
-            #self.create_jhg_graphs(allocations, popularity, influence, curr_round, old_popularity)#  don't worry about these rn.
+            # self.create_jhg_graphs(allocations, popularity, influence, curr_round, old_popularity)#  don't worry about these rn.
 
 
     def create_game_graphs_with_logger(self, game_logger):
@@ -70,7 +70,8 @@ class CompleteGrapher():
             fig.suptitle(f"Round: {curr_round}  Situation: something  Cycle: {int(cycle_key) + 1}  Group: {group}", fontsize=16, fontweight='bold', y=0.98)
             # Reduce space between matrix and graph and the overall layout
             fig.subplots_adjust(wspace=0.01, left=0.05, right=0.95, top=0.95, bottom=0.15)  # Adjust bottom margin
-
+            plt.show()
+            plt.close(fig)
             # path = self.build_save_path(, group, curr_round, cycle_key)
             # self.save_figure(fig, path)
 
@@ -92,6 +93,7 @@ class CompleteGrapher():
         fig.suptitle(f"Round {curr_round}: Popularity, Allocations, Influence", fontsize=16, weight="bold")
         plt.tight_layout()
         plt.show()
+        plt.close(fig) # apparently this is important or something.
 
 
     def draw_two_long_graphs_simplified(self, num_players, cooperation_score, avg_rise, results, results_sums, num_rounds,
@@ -272,6 +274,7 @@ class CompleteGrapher():
         self.plot_influence_graph(ax, curr_influence, init_pops)
 
         plt.show()
+        plt.close(fig)
 
 
     def draw_matrix_panel(self, ax_matrix, current_options_matrix, curr_votes, winning_vote, peeps, results_sums):

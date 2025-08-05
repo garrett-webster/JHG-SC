@@ -58,6 +58,8 @@ def run_trial(sc_sim: "Social_Choice_Sim", jhg_sim, round_list, num_cycles, grou
         round_logger.save_round(curr_round, played_sc, played_jhg)
 
         if create_round_graphs_bool:
+            if played_sc:
+                pass
             create_round_graphs(round_logger, curr_round, played_sc, played_jhg)
 
     if create_game_graphs_bool:
@@ -74,8 +76,9 @@ def run_sc_stuff(sc_sim, jhg_sim, total_order, influence_matrix, curr_round, num
         new_influence = influence_matrix
     else:
         new_influence = sc_sim.get_influence_matrix() # if there is no JHG influence, we are flying solo, leach off of own influence
-    # should I make this, you know, an entirely different bot? having them in the same file feels wrong becuase they are doing differen things.
+    # should I make this, you know, an entirely different bot? having them in the same file feels wrong beuase they are doing differen things.
     current_options_matrix, peeps = sc_sim.let_others_create_options_matrix(possible_peeps.tolist(), curr_round, new_influence)  # actually creates the matrix
+    # print("these are the peeps" , peeps)
     sc_sim.start_round((current_options_matrix, indexes))
 
     bot_votes = {}
@@ -220,7 +223,7 @@ if __name__ == "__main__":
     #jhg_games_per_sc_round = [1,1,1,1,1,1,1,1]#,1,1,1,1,1,1,1,1,1,1,1,1]
     # jhg_games_per_sc_round = [4,3,3,3,3,3,3,3] # what we trained the og assasain agents on.
     jhg_games_per_sc_round = [4,3,3,3,3]  # what we trained the sleepy assasain bots on.
-    #jhg_games_per_sc_round = [2,3,3]#,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,2]
+    # jhg_games_per_sc_round = [2,3,3]#,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,2]
     # jhg_games_per_sc_round = ["S", 10]
     # jhg_games_per_sc_round = [1,1,1]
     #jhg_games_per_sc_round = [2,2,2]
@@ -240,7 +243,7 @@ if __name__ == "__main__":
     num_humans = 0
     tokens_per_player = 2
     utility_per_player = 3
-    create_round_graphs_bool = False
+    create_round_graphs_bool = True
     create_game_graphs_bool = True
     create_influence = False
     chromosomes_directory = "testChromosome"
@@ -256,6 +259,7 @@ if __name__ == "__main__":
     round_logger = RoundLogger()
     game_logger = GameLogger(num_players, 199) # might be the wrong place to ahve this, as I don't actually have the gen number yet.
     complete_grapher = CompleteGrapher()
+    results_to_log = []
 
     for attempt in tqdm(range(num_attempts)): # create a new sim for each attempt to prevent bleeding over.
         offset = num_rounds * attempt # for logging purposes, lets us know the relationship between the logger round and current round
@@ -266,4 +270,12 @@ if __name__ == "__main__":
         game_logger.resetup(current_jhg_sim, current_sc_sim)
 
         sc_sim, jhg_sim = run_trial(current_sc_sim, current_jhg_sim, round_list, num_cycles, group, total_order, round_logger, create_round_graphs_bool, game_logger, create_game_graphs_bool) # This is really whats getting run round times
-        print("here are the final utilities ", sc_sim.results_sums)
+        results_to_log.append(sc_sim.results_sums)
+        #print("here are the final utilities ", sc_sim.results_sums)
+    inverted_results = list(zip(*results_to_log))
+    new_results = []
+    for i in range(len(inverted_results)):
+        new_sum = sum(inverted_results[i]) / len(inverted_results[i])
+        new_results.append(new_sum)
+
+    print("here are the average scores acorss all rounds per agent ", new_results)
