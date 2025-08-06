@@ -23,7 +23,7 @@ class GeneAgent3(GeneAgentMixin, AbstractAgent):
         self.gameParams = {}
         self.tokens_per_player = tokens_per_player
         self.pop_history = [] # just slap this up here.
-        self.selected_community = [-1] # sign that nothing has changed
+        self.selected_community = {-1} # sign that nothing has changed
 
         # Changes in May
         if geneStr == "":
@@ -287,12 +287,13 @@ class GeneAgent3(GeneAgentMixin, AbstractAgent):
 
         self.computeUsefulQuantities(round_num, num_players, influence, player_idx, num_tokens)
 
-
         if player_idx == self.theTracked:
             print(" Punishable debt: " + str(self.punishable_debt))
             # if round_num > 0:
             #     self.compute_homophily(num_players)
 
+        if not extra_flag:
+            pass
         communities, selected_community = self.group_analysis(round_num, num_players, player_idx, popularities, influence)
         if not extra_flag:
             self.selected_community = selected_community.s
@@ -345,6 +346,7 @@ class GeneAgent3(GeneAgentMixin, AbstractAgent):
         else: # we are in the sc one.
             giving_tokens = (num_tokens + num_attack_toks) - guardo_toks
             groups_alloc, num_group_gives = self.group_givings(round_num, num_players, num_tokens, giving_tokens, player_idx, influence, popularities, selected_community, attack_alloc, extra_flag)
+            print("here is the groups alloc ", groups_alloc)
             #output += ("here is the groups alloc ", groups_alloc, " and here is the num_group_gives ", num_group_gives, " \n")
 
         # update some variables
@@ -366,7 +368,7 @@ class GeneAgent3(GeneAgentMixin, AbstractAgent):
         self.prev_popularities = popularities
         self.prev_allocations = transaction_vec
         self.prev_influence = influence
-
+        print('testting 9')
         self.updateIndebtedness(round_num, player_idx, transaction_vec, popularities)
 
         if player_idx == self.theTracked:
@@ -379,17 +381,14 @@ class GeneAgent3(GeneAgentMixin, AbstractAgent):
 
 
         if extra_flag: # not sure how to redistribute these in a way that makes sense.
+            print("testing 10")
             for i in range(len(transaction_vec)):
                 if transaction_vec[i] > 10:
                     excess = transaction_vec[i] - 10
                     transaction_vec[i] = 10
                     # num_allocated -= excess
 
-        if max(transaction_vec) > 10 and extra_flag:
-            print("here is the playerID, ", player_idx, " the guardo toks ", guardo_toks, " and here is the groups alloc ", groups_alloc)
-            print("WAAAH")
-
-        if extra_flag:
+        if extra_flag: # Not entirelyt sure whats going on here but I have broked it broked it
             self.selected_community.add(player_idx) # just go ahead and stick that back in there.
 
         if sum(transaction_vec) < -50:
@@ -638,7 +637,6 @@ class GeneAgent3(GeneAgentMixin, AbstractAgent):
 
         homophily_alloc = np.zeros(num_players, dtype=float)
         num_tokens_h = 0
-
         group_alloc, num_tokens_g = self.group_allocate_tokens(player_idx, num_players, num_giving_tokens - num_tokens_h, round_num, influence, popularities, selected_community, attack_alloc, extra_flag)
 
         if not extra_flag: # standard JHG behavior, play it safe.
@@ -646,7 +644,6 @@ class GeneAgent3(GeneAgentMixin, AbstractAgent):
             group_alloc[player_idx] += (num_giving_tokens - (num_tokens_h + num_tokens_g))
         # lets distribute these to our friends instead. power of friendship and all that.
         else: # non standard behavior, play it SC safe.
-
             extra_tokens = num_giving_tokens - (num_tokens_h + num_tokens_g)
             giving_tokens = extra_tokens // len(selected_community.s)
             for friend in selected_community.s:
@@ -733,6 +730,7 @@ class GeneAgent3(GeneAgentMixin, AbstractAgent):
         toks = np.zeros(num_players, dtype=float)
 
         num_allocated = num_tokens
+
         if round_num == 0:
             if len(s_modified) == 1:
                 toks[player_idx] = num_tokens
@@ -764,6 +762,7 @@ class GeneAgent3(GeneAgentMixin, AbstractAgent):
                     
                     toks[sel] += 1
         else:
+            print('testing 1')
             # print("this is the size of s_modified ", len(s_modified))
             comm_size = len(s_modified)
             if comm_size <= 1:
@@ -778,7 +777,7 @@ class GeneAgent3(GeneAgentMixin, AbstractAgent):
                             val = (self.infl_pos[i][player_idx]+0.01) * sb
                             profile.append((i, val))
                             mag += val
-
+                print("testing 2")
                 ...
                 if mag > 0.0:
                     profile.sort(key=lambda a: a[1], reverse=True)
@@ -802,7 +801,7 @@ class GeneAgent3(GeneAgentMixin, AbstractAgent):
                             give_em = min(remaining_toks, 10 - toks[target_idx])
                             toks[target_idx] += give_em
                             remaining_toks -= give_em
-
+                    print("testing 3")
                     while remaining_toks > 0:
                         all_full = True
                         for i in range(comm_size):
@@ -815,10 +814,8 @@ class GeneAgent3(GeneAgentMixin, AbstractAgent):
                                     break
                         if all_full:
                             break  # No one can take more tokens, stop
-
+                    print("testing 4")
                     num_allocated = int(np.sum(toks))
-
-
 
 
         return toks, num_allocated

@@ -543,7 +543,6 @@ class Social_Choice_Sim:
         indexes = [] # this gest used regardless.
         for peep in bot_peeps:
             indexes.append(bot_peeps.index(peep) + 1)
-
         if isinstance(self.allocation_bots[0], GeneAgent3):
             if self.new_v is not None:
                 T_prev = self.new_v # constructs the previous, like, received matrix. kind of.
@@ -566,10 +565,12 @@ class Social_Choice_Sim:
                     extra_data, # yes this is blank. no I don't know why.
                     True, # this indicates that it is happening within the SC testbed.
                 ))
+            print("testing 4")
             total_columns = []
             for peep in bot_peeps:
                 peep_index = peep[1:] # THIS WAS WRONG YOU FETCHER
                 total_columns.append(new_columns[int(peep_index)])
+            print("testing 5")
             current_options_matrix = np.transpose(total_columns).tolist()
             return current_options_matrix, indexes
 
@@ -581,6 +582,7 @@ class Social_Choice_Sim:
 
 
             self.current_options_matrix = current_options_matrix
+            print("so do we make it all the way to the end or what ")
             return current_options_matrix, indexes
 
 

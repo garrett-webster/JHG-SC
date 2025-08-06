@@ -35,7 +35,7 @@ class CompleteGrapher():
 
         if played_jhg: # don't print these rn, not particualr interestd in them.
             allocations, popularity, influence, old_popularity = round_logger.get_round_data(curr_round, False, True)
-            # self.create_jhg_graphs(allocations, popularity, influence, curr_round, old_popularity)#  don't worry about these rn.
+            self.create_jhg_graphs(allocations, popularity, influence, curr_round, old_popularity)#  don't worry about these rn.
 
 
     def create_game_graphs_with_logger(self, game_logger):

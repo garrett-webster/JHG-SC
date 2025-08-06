@@ -20,6 +20,7 @@ def translateVecToIndex(transVec, currentOptionsMatrix, enforce_majority):
             np.array(transVec) - np.array(column))  # remember that euclidian distances are always positive
         total_distances.append(distance)
     index_to_return = total_distances.index(min(total_distances))  # ge the min of the abs
+    # print("these are the total distances ", total_distances)
     # print("this was the distance between allocation and vote ", total_distances[index_to_return]) # want to see pos or neg for fun
     return index_to_return - 1  # the vote that was the closest. (rememnber, 0 shoudl be represented as -1, off by one erorr here.
 

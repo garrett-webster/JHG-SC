@@ -34,6 +34,8 @@ def run_trial(sc_sim: "Social_Choice_Sim", jhg_sim, round_list, num_cycles, grou
     curr_sc_round = 0
     influence_matrix = None # this should get overwritten pretty quick, but its there so there's no error.
     for list_index in (range(0, len(round_list))): # fixed, we start at 0 now.
+        jhg_round = False
+        sc_round = False
 
 
 
@@ -46,6 +48,7 @@ def run_trial(sc_sim: "Social_Choice_Sim", jhg_sim, round_list, num_cycles, grou
         if jhg_rounds:
             influence_matrix = run_jhg_stuff(jhg_sim, curr_round)
             played_jhg = True
+            jhg_round = True
 
         if sc_rounds:
             old_influence_matrix = copy.copy(influence_matrix)
@@ -53,14 +56,14 @@ def run_trial(sc_sim: "Social_Choice_Sim", jhg_sim, round_list, num_cycles, grou
             sc_sim.set_rounds(curr_sc_round) # ???
             curr_sc_round += 1
             played_sc = True
+            sc_round = True
 
 
         round_logger.save_round(curr_round, played_sc, played_jhg)
+        print("here is the influence matrix after all that ", )
 
         if create_round_graphs_bool:
-            if played_sc:
-                pass
-            create_round_graphs(round_logger, curr_round, played_sc, played_jhg)
+            create_round_graphs(round_logger, curr_round, sc_round, jhg_round)
 
     if create_game_graphs_bool:
         game_logger.save_game(played_sc, played_jhg)
@@ -175,8 +178,8 @@ def create_sim(total_players, scenario=None, chromosomes=None, group="", total_o
     return sc_sim
 
 
-def create_jhg_sim(num_humans, num_players, total_order, tokens_per_player, jhg_bot_type):
-    jhg_sim = JHG_simulator(num_humans, num_players, total_order, tokens_per_player, jhg_bot_type)
+def create_jhg_sim(num_humans, num_players, total_order, tokens_per_player, jhg_bot_type, num_kitties):
+    jhg_sim = JHG_simulator(num_humans, num_players, total_order, tokens_per_player, jhg_bot_type, add_kitties=num_kitties)
     return jhg_sim
 
 
@@ -244,7 +247,7 @@ if __name__ == "__main__":
     tokens_per_player = 2
     utility_per_player = 3
     create_round_graphs_bool = False
-    create_game_graphs_bool = True
+    create_game_graphs_bool = False
     create_influence = False
     chromosomes_directory = "testChromosome"
     group = ""
@@ -254,16 +257,17 @@ if __name__ == "__main__":
     allocation_bot_type = "allocations_scenarios/random"
     jhg_bot_type = 0 # 0 is gene bots, 2 is social welfare and 3 is random.
     total_order = create_total_order(num_players, num_humans)
-    num_attempts = 20 # number of batches to do.
+    num_attempts = 1 # number of batches to do.
     num_rounds = sum(jhg_games_per_sc_round) if len(jhg_games_per_sc_round) > 2 else jhg_games_per_sc_round[-1] # if its a list, len of list. else, grab the second identifier
     round_logger = RoundLogger()
     game_logger = GameLogger(num_players, 199) # might be the wrong place to ahve this, as I don't actually have the gen number yet.
     complete_grapher = CompleteGrapher()
     results_to_log = []
+    num_kitties = 3
 
     for attempt in tqdm(range(num_attempts)): # create a new sim for each attempt to prevent bleeding over.
         offset = num_rounds * attempt # for logging purposes, lets us know the relationship between the logger round and current round
-        current_jhg_sim = create_jhg_sim(num_humans, num_players, total_order, tokens_per_player, jhg_bot_type)
+        current_jhg_sim = create_jhg_sim(num_humans, num_players, total_order, tokens_per_player, jhg_bot_type, num_kitties)
         current_sc_sim = create_sim(num_players, scenario, chromosome, group, total_order, allocation_bot_type, utility_per_player)
         current_sc_sim.bot_ovveride(current_jhg_sim.players) # tells the SC sim to make sure that it is using the same bots as the JHG by passing htem as a reference to both voting and allocation slots.
         round_logger.reset_up(current_jhg_sim, current_sc_sim)
@@ -279,3 +283,9 @@ if __name__ == "__main__":
         new_results.append(new_sum)
 
     print("here are the average scores acorss all rounds per agent ", new_results)
+    non_cats = (num_players - num_kitties)
+    cumulative_cat_score = sum(new_results[non_cats:])
+    cumulative_non_cat_score = sum(new_results) - cumulative_cat_score
+    avg_cat_score = cumulative_cat_score / num_kitties
+    avg_non_cat_score = cumulative_non_cat_score / non_cats
+    print('here is the average cat score ', avg_cat_score, " and here is the average non_cat_score ", avg_non_cat_score)
