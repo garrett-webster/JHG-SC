@@ -145,7 +145,12 @@ class GeneAgentMixin:
             multiplicador = self.genes["defendFriendMultiplier"] / 33.0
             tokens_needed *= multiplicador
             attack_strength = np.dot(popularities, my_comm_vec) * self.inflicted_damage_ratio
-            my_part = tokens_needed * (popularities[player_idx] / attack_strength)
+            if attack_strength = 0:
+                attack_strength = 1
+            player_pop = popularities[player_idx]
+            if player_pop == 0:
+                player_pop = 1
+            my_part = tokens_needed * (player_pop / attack_strength)
             # print("this is my part ", my_part)
             if my_part == float("inf"): # literally no clue where this is coming from
                 my_part = 200
@@ -527,7 +532,13 @@ class GeneAgentMixin:
         for i in communities[s_idx]:
             # self.printT(player_idx, str(popularities[i]))
             cur_comm_size += popularities[i]
-        cur_comm_size /= sum(popularities)
+
+        sum_pops = sum(popularities)
+
+        if sum_pops == 0:
+            popularities = 1
+
+        cur_comm_size /= sum_pops
 
         c = self.make_deep_copy(communities)
 

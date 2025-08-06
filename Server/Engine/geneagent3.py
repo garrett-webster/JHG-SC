@@ -346,7 +346,6 @@ class GeneAgent3(GeneAgentMixin, AbstractAgent):
         else: # we are in the sc one.
             giving_tokens = (num_tokens + num_attack_toks) - guardo_toks
             groups_alloc, num_group_gives = self.group_givings(round_num, num_players, num_tokens, giving_tokens, player_idx, influence, popularities, selected_community, attack_alloc, extra_flag)
-            print("here is the groups alloc ", groups_alloc)
             #output += ("here is the groups alloc ", groups_alloc, " and here is the num_group_gives ", num_group_gives, " \n")
 
         # update some variables
@@ -368,7 +367,6 @@ class GeneAgent3(GeneAgentMixin, AbstractAgent):
         self.prev_popularities = popularities
         self.prev_allocations = transaction_vec
         self.prev_influence = influence
-        print('testting 9')
         self.updateIndebtedness(round_num, player_idx, transaction_vec, popularities)
 
         if player_idx == self.theTracked:
@@ -381,7 +379,6 @@ class GeneAgent3(GeneAgentMixin, AbstractAgent):
 
 
         if extra_flag: # not sure how to redistribute these in a way that makes sense.
-            print("testing 10")
             for i in range(len(transaction_vec)):
                 if transaction_vec[i] > 10:
                     excess = transaction_vec[i] - 10
@@ -481,6 +478,11 @@ class GeneAgent3(GeneAgentMixin, AbstractAgent):
 
         # compute the mean
         m = sum(popularities) / len(popularities)
+
+        if m == 0:
+            m += 1
+        if popularities[player_idx] == 0:
+            popularities[player_idx] += 1
 
         ratio = popularities[player_idx] / m
 
@@ -588,6 +590,8 @@ class GeneAgent3(GeneAgentMixin, AbstractAgent):
             mx_ind = -1
             fuerza = []
             tot_pop = sum(popularities)
+            if tot_pop == 0:
+                tot_pop = 1
             for s in communities:
                 tot = 0.0
                 for i in s:
@@ -645,9 +649,10 @@ class GeneAgent3(GeneAgentMixin, AbstractAgent):
         # lets distribute these to our friends instead. power of friendship and all that.
         else: # non standard behavior, play it SC safe.
             extra_tokens = num_giving_tokens - (num_tokens_h + num_tokens_g)
-            giving_tokens = extra_tokens // len(selected_community.s)
-            for friend in selected_community.s:
-                group_alloc[friend] += giving_tokens
+            if len(selected_community.s) != 0:
+                giving_tokens = extra_tokens // len(selected_community.s)
+                for friend in selected_community.s:
+                    group_alloc[friend] += giving_tokens
 
         # Change on June 21 and July 12
         if popularities[player_idx] > 0.01: # we might need to elevate this
@@ -762,7 +767,6 @@ class GeneAgent3(GeneAgentMixin, AbstractAgent):
                     
                     toks[sel] += 1
         else:
-            print('testing 1')
             # print("this is the size of s_modified ", len(s_modified))
             comm_size = len(s_modified)
             if comm_size <= 1:
@@ -777,7 +781,6 @@ class GeneAgent3(GeneAgentMixin, AbstractAgent):
                             val = (self.infl_pos[i][player_idx]+0.01) * sb
                             profile.append((i, val))
                             mag += val
-                print("testing 2")
                 ...
                 if mag > 0.0:
                     profile.sort(key=lambda a: a[1], reverse=True)
@@ -801,7 +804,6 @@ class GeneAgent3(GeneAgentMixin, AbstractAgent):
                             give_em = min(remaining_toks, 10 - toks[target_idx])
                             toks[target_idx] += give_em
                             remaining_toks -= give_em
-                    print("testing 3")
                     while remaining_toks > 0:
                         all_full = True
                         for i in range(comm_size):
@@ -814,7 +816,6 @@ class GeneAgent3(GeneAgentMixin, AbstractAgent):
                                     break
                         if all_full:
                             break  # No one can take more tokens, stop
-                    print("testing 4")
                     num_allocated = int(np.sum(toks))
 
 

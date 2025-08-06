@@ -34,7 +34,8 @@ class ProjectCat(AbstractAgent):
             9: 2,
             10: 1,
             11: 8,
-            12: 3,
+            12: 9,
+            13: 10,
         }
 
     def _init_vars(self, num_players):
@@ -178,8 +179,8 @@ class ProjectCat(AbstractAgent):
             # allocations = (allocations / np.linalg.norm(allocations, ord=1)) * 2 * len(allocations)
             #allocations = self.adjust_for_sc(allocations, num_tokens)
             # print("this is the player idx ", player_idx, " and here is the allocation ", allocations)
-            if sum(allocations) < -50:
-                print("hey something si wrong ", player_idx, " has an allocatino of ", allocations, " . on standby")
+            # if sum(allocations) < -50:
+            #     print("hey something si wrong ", player_idx, " has an allocatino of ", allocations, " . on standby")
             return allocations  # return it to a more normal magnitude. # the engine doesn't care if its normalized or not, but the SC sim does care. deeply.
 
     # def adjust_for_sc(self, allocations, num_tokens):

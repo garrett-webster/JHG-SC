@@ -117,7 +117,6 @@ def make_sims():
         "steal": steal,
         "poverty_line": poverty_line,
     }
-    num_kitties = 3
     generator = generator_factory(2, numPlayers, 5, -10, 10, 3, None, None)
     jhg_engine = JHGEngine(alpha, beta, give, keep, steal, numPlayers, base_pop, povertyLine)
     sc_sim = Social_Choice_Sim(numPlayers, num_causes, num_humans, generator, cycle, curr_round, chromosomes, scenario, group, total_order, allocation_bot_type, utility_per_player)
@@ -431,7 +430,7 @@ if __name__ == "__main__":
     popSize = 100 # number of agnets in the gene pool (use 100 here)
     numGeneGopies = 3 # numbers of sets of genes (3 was the number used in the paper)
     startIndex = 0 # generation to start training (0 to start form scratch)
-    num_gens = 100 # generation to end traning trains up to 99
+    num_gens = 200 # generation to end traning trains up to 99
     games_per_gen = 10 # agents from the gene pool are selected at random, 100 times.
     agentsPerGame = 10 # number of agents per game
     roundsPerGame = 30 # number fo rounds per game
@@ -461,7 +460,8 @@ if __name__ == "__main__":
     agents = [AbstractAgent() for _ in range(popSize)]  # the fetchers we will be training
 
     # jhg_games_per_round = [4,3,3,3,3,3,3,3] # just give me an easy place to start.
-    jhg_games_per_round = [4,3,3,3,3] # just give me an easy place to start.
+    #jhg_games_per_round = [4,3,3,3,3] # just give me an easy place to start.
+    jhg_games_per_round = [2,2,2]
     rounds_list = determine_rounds(jhg_games_per_round)
     mxPlayers = numPlayers
 
@@ -477,6 +477,7 @@ if __name__ == "__main__":
             for i in range(agentsPerGame, mxPlayers, 1):
                 plyrIdxs[numPlayers] = popSize + i
                 agents[numPlayers] = configured_players[i-agentsPerGame]
+                numPlayers += 1
 
             if initPops == "varied":
                 sel = random.randint(0, 4)
@@ -496,7 +497,6 @@ if __name__ == "__main__":
             num_rounds = sum(jhg_games_per_round)
 
             pmetrics = playGame(agents, numPlayers, num_rounds, gen, game, initUtilities, povertyLine, False, rounds_list)
-            print("happens here doesn't it ", game)
 
 
             # now we gotta calcualte relative popularity

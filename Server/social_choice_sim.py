@@ -565,12 +565,11 @@ class Social_Choice_Sim:
                     extra_data, # yes this is blank. no I don't know why.
                     True, # this indicates that it is happening within the SC testbed.
                 ))
-            print("testing 4")
             total_columns = []
+            # print("here ar ethe enw columsn ", new_columns)
             for peep in bot_peeps:
                 peep_index = peep[1:] # THIS WAS WRONG YOU FETCHER
                 total_columns.append(new_columns[int(peep_index)])
-            print("testing 5")
             current_options_matrix = np.transpose(total_columns).tolist()
             return current_options_matrix, indexes
 
