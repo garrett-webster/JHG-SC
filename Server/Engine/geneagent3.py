@@ -393,7 +393,8 @@ class GeneAgent3(GeneAgentMixin, AbstractAgent):
             self.selected_community.add(player_idx) # just go ahead and stick that back in there.
 
         if sum(transaction_vec) < -50:
-            print("hey something si wrong ", player_idx, " has an allocatino of ", transaction_vec, " . on standby")
+            print("hey something si wrong ", player_idx, " has an allocatino of ", transaction_vec, " . and here is the flag ", extra_flag)
+            print("This is the group allocatinos ", groups_alloc, " and here is the attack alloc ", attack_alloc)
 
         return transaction_vec
 
@@ -645,22 +646,23 @@ class GeneAgent3(GeneAgentMixin, AbstractAgent):
             group_alloc[player_idx] += (num_giving_tokens - (num_tokens_h + num_tokens_g))
         # lets distribute these to our friends instead. power of friendship and all that.
         else: # non standard behavior, play it SC safe.
+
             extra_tokens = num_giving_tokens - (num_tokens_h + num_tokens_g)
             giving_tokens = extra_tokens // len(selected_community.s)
             for friend in selected_community.s:
                 group_alloc[friend] += giving_tokens
 
         # Change on June 21 and July 12
-        if popularities[player_idx] > 0.0001:
+        if popularities[player_idx] > 0.01: # we might need to elevate this
             group_alloc, shave = self.dial_back(num_players, num_tokens, player_idx, homophily_alloc + group_alloc, popularities)
             # self.printT(player_idx, "     shave " + str(shave) + " tokens")
-            self.printT(player_idx, "   group_alloc: " + str(group_alloc))
         self.printT(player_idx, "")
 
         # return homophily_alloc + group_alloc, num_tokens_h + num_tokens_g
         return group_alloc, sum(group_alloc)
 
 
+    # so turns out that when the players have a very low popularity, sometimes this does NOT behave as inteded. 
     def dial_back(self, num_players, num_tokens, player_idx, give_alloc, popularities):
         perc_lmt = self.genes["limitingGive"] / 100.0
 
@@ -670,6 +672,8 @@ class GeneAgent3(GeneAgentMixin, AbstractAgent):
                 continue
 
             if give_alloc[i] > 0:
+                if popularities[i] <= 0 or popularities[player_idx] <= 0: # if others pops are negative WEIRD stuff happens.
+                    continue
                 lmt = int(((popularities[i] / popularities[player_idx]) * num_tokens * perc_lmt) + 0.5)
                 if lmt < give_alloc[i]:
                     shave += give_alloc[i] - lmt

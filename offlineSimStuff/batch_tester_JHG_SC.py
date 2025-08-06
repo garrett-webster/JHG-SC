@@ -243,7 +243,7 @@ if __name__ == "__main__":
     num_humans = 0
     tokens_per_player = 2
     utility_per_player = 3
-    create_round_graphs_bool = True
+    create_round_graphs_bool = False
     create_game_graphs_bool = True
     create_influence = False
     chromosomes_directory = "testChromosome"
@@ -254,7 +254,7 @@ if __name__ == "__main__":
     allocation_bot_type = "allocations_scenarios/random"
     jhg_bot_type = 0 # 0 is gene bots, 2 is social welfare and 3 is random.
     total_order = create_total_order(num_players, num_humans)
-    num_attempts = 1 # number of batches to do.
+    num_attempts = 20 # number of batches to do.
     num_rounds = sum(jhg_games_per_sc_round) if len(jhg_games_per_sc_round) > 2 else jhg_games_per_sc_round[-1] # if its a list, len of list. else, grab the second identifier
     round_logger = RoundLogger()
     game_logger = GameLogger(num_players, 199) # might be the wrong place to ahve this, as I don't actually have the gen number yet.
