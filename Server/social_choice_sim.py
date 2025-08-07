@@ -231,14 +231,29 @@ class Social_Choice_Sim:
     def return_win(self, all_votes):
         self.current_results = []
         total_votes = all_votes
-        winning_vote_count = Counter(total_votes.values()).most_common(1)[0][1]
-        winning_vote = Counter(total_votes.values()).most_common(1)[0][0]
+
         if not self.enforce_majority: # can't let abstention happen, so lets fix that.
+            valid_votes = [vote for vote in all_votes.values() if vote >= 0]
+            cause_vote_counts = Counter(valid_votes)
+
+            max_votes = max(cause_vote_counts.values())
+
+            # Get all causes that have the max vote count
+            top_causes = [cause for cause, count in cause_vote_counts.items() if count == max_votes]
+
+            if len(top_causes) != 1:
+                winning_vote = random.choice(top_causes) # I am a lazy fetcher your honor.
+            else:
+                winning_vote = top_causes[0] # just return the normal fetcher.
+
             if winning_vote == -1:
                 winning_vote = Counter(total_votes.values()).most_common(2)[1][0] # grab the 2 most common, grab the second entry and the vote id. simple as.
 
 
+
         if self.enforce_majority: # modifies it to check for teh majority and whatnot.
+            winning_vote_count = Counter(total_votes.values()).most_common(1)[0][1]
+            winning_vote = Counter(total_votes.values()).most_common(1)[0][0]
             if not (winning_vote_count > len(total_votes) // 2):
                 winning_vote = -1
         # nothing else to do here. the winning vote is just the winning vote.

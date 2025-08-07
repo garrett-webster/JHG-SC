@@ -60,7 +60,6 @@ def run_trial(sc_sim: "Social_Choice_Sim", jhg_sim, round_list, num_cycles, grou
 
 
         round_logger.save_round(curr_round, played_sc, played_jhg)
-        print("here is the influence matrix after all that ", )
 
         if create_round_graphs_bool:
             create_round_graphs(round_logger, curr_round, sc_round, jhg_round)
@@ -243,6 +242,12 @@ if __name__ == "__main__":
     round_list = determine_rounds(jhg_games_per_sc_round)
     num_cycles = 3
     num_players = 11
+    num_kitties = 3
+    # total_num_players = [4,5,6,7,8,9,10,11]
+    # total_num_kitties = [3]
+    # total_num_players = [3]
+    # total_num_kitties = [1]
+
     num_humans = 0
     tokens_per_player = 2
     utility_per_player = 3
@@ -256,16 +261,23 @@ if __name__ == "__main__":
     chromosome = "chromosomes/experiment"
     allocation_bot_type = "allocations_scenarios/random"
     jhg_bot_type = 0 # 0 is gene bots, 2 is social welfare and 3 is random.
-    total_order = create_total_order(num_players, num_humans)
-    num_attempts = 1 # number of batches to do.
-    num_rounds = sum(jhg_games_per_sc_round) if len(jhg_games_per_sc_round) > 2 else jhg_games_per_sc_round[-1] # if its a list, len of list. else, grab the second identifier
-    round_logger = RoundLogger()
-    game_logger = GameLogger(num_players, 199) # might be the wrong place to ahve this, as I don't actually have the gen number yet.
-    complete_grapher = CompleteGrapher()
-    results_to_log = []
-    num_kitties = 3
 
-    for attempt in tqdm(range(num_attempts)): # create a new sim for each attempt to prevent bleeding over.
+    num_attempts = 30 # number of batches to do.
+    num_rounds = sum(jhg_games_per_sc_round) if len(jhg_games_per_sc_round) > 2 else jhg_games_per_sc_round[-1] # if its a list, len of list. else, grab the second identifier
+
+
+    # for num_kitties in total_num_kitties:
+    #     for num_players in total_num_players:
+    #         print("Using ", num_players, " players and ", num_kitties, " kitties")
+    #         # for attempt in tqdm(range(num_attempts)): # create a new sim for each attempt to prevent bleeding over.
+    for attempt in (range(num_attempts)): # create a new sim for each attempt to prevent bleeding over.
+        # stuff that we used to od outside that we now have to do inside.
+        total_order = create_total_order(num_players, num_humans) # unfortunately we have to make that in here now just bc we are changing the num players
+        round_logger = RoundLogger()
+        game_logger = GameLogger(num_players, 199)  # might be the wrong place to ahve this, as I don't actually have the gen number yet.
+        complete_grapher = CompleteGrapher()
+        results_to_log = []
+
         offset = num_rounds * attempt # for logging purposes, lets us know the relationship between the logger round and current round
         current_jhg_sim = create_jhg_sim(num_humans, num_players, total_order, tokens_per_player, jhg_bot_type, num_kitties)
         current_sc_sim = create_sim(num_players, scenario, chromosome, group, total_order, allocation_bot_type, utility_per_player)

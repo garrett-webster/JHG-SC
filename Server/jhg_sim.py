@@ -338,9 +338,11 @@ def loadPopulationFromFile(popSize, generationFolder, startIndex, num_gene_pools
     fnombre = "Kill me"
     try:
         #fnombre = generationFolder + "/gen_" + str(startIndex) + ".csv"
-        # fnombre = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\Server\Engine\assassins_gen_175.csv"
-        # fnombre = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\Server\Engine\gen_199.csv"
-        fnombre = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\offlineSimStuff\geneticStuff\Results\theGenerations\gen_299.csv"
+        fnombre = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\Server\Engine\assassins_gen_175.csv" # trying to be better and mroe aggressive on group forming
+        # fnombre = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\Server\Engine\gen_199.csv" # JHG cab agents as used in the study
+        # fnombre = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\offlineSimStuff\geneticStuff\Results\theGenerations\gen_299.csv" # # JHG_SC agnets I trained. 
+        # fnombre = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\Server\Engine\w_kitties_gen_256.csv" # Trained with the cats. not sure if they are any good.
+        # fnombre = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\offlineSimStuff\geneticStuff\Results\theGenerations\gen_20.csv"
         fp = open(fnombre, "r")
     except FileNotFoundError:
         try:

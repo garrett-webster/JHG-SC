@@ -135,7 +135,7 @@ class ProjectCat(AbstractAgent):
 
             for i in range(num_players):
                 if i not in self.the_assassins: # find the highest utility person to strike. gives a nice rotation system.
-                    if len(prey_idxs) < self.max_size[num_players]: # we are appending, sire.
+                    if len(prey_idxs) < num_players - len(self.the_assassins): # we are appending, sire.
                         prey_idxs.append(i)
                     else: # lets try rotation again just to see what happens.
                         for prey in prey_idxs:

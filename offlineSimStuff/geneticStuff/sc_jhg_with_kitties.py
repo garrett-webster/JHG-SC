@@ -430,7 +430,7 @@ if __name__ == "__main__":
     popSize = 100 # number of agnets in the gene pool (use 100 here)
     numGeneGopies = 3 # numbers of sets of genes (3 was the number used in the paper)
     startIndex = 0 # generation to start training (0 to start form scratch)
-    num_gens = 200 # generation to end traning trains up to 99
+    num_gens = 300 # generation to end traning trains up to 99
     games_per_gen = 10 # agents from the gene pool are selected at random, 100 times.
     agentsPerGame = 10 # number of agents per game
     roundsPerGame = 30 # number fo rounds per game
@@ -440,7 +440,7 @@ if __name__ == "__main__":
     initPops = "varied" # starts eveyrone at different initial popularities when training.
     tokens_per_player = 2 # probably best if I just reduce this back to whatever. (Added by me just in case we wanted to be silly)
     num_humans = 0 # we discriminate in this fetcher
-    num_kitties = 3
+    num_kitties = 2
     current_logger = geneticLogger()
 
     configured_players = []
@@ -460,8 +460,8 @@ if __name__ == "__main__":
     agents = [AbstractAgent() for _ in range(popSize)]  # the fetchers we will be training
 
     # jhg_games_per_round = [4,3,3,3,3,3,3,3] # just give me an easy place to start.
-    #jhg_games_per_round = [4,3,3,3,3] # just give me an easy place to start.
-    jhg_games_per_round = [2,2,2]
+    jhg_games_per_round = [4,3,3,3,3] # just give me an easy place to start.
+    # jhg_games_per_round = [2,2,2]
     rounds_list = determine_rounds(jhg_games_per_round)
     mxPlayers = numPlayers
 

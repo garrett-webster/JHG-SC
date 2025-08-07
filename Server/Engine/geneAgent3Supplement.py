@@ -145,7 +145,7 @@ class GeneAgentMixin:
             multiplicador = self.genes["defendFriendMultiplier"] / 33.0
             tokens_needed *= multiplicador
             attack_strength = np.dot(popularities, my_comm_vec) * self.inflicted_damage_ratio
-            if attack_strength = 0:
+            if attack_strength == 0:
                 attack_strength = 1
             player_pop = popularities[player_idx]
             if player_pop == 0:
@@ -533,10 +533,13 @@ class GeneAgentMixin:
             # self.printT(player_idx, str(popularities[i]))
             cur_comm_size += popularities[i]
 
+        if cur_comm_size == 0:
+            cur_comm_size = 1
+
         sum_pops = sum(popularities)
 
         if sum_pops == 0:
-            popularities = 1
+            sum_pops = 1
 
         cur_comm_size /= sum_pops
 
@@ -978,7 +981,14 @@ class GeneAgentMixin:
         proposed = 0.0
         for i in s:
             proposed += popularities[i]
-        proposed /= sum(popularities)
+        if proposed == 0:
+            proposed = 1
+
+        pop_sum = sum(popularities)
+        if pop_sum == 0:
+            pop_sum = 1
+
+        proposed /= pop_sum
 
         if self.genes["coalitionTarget"] == 0:
             target = 0.01
