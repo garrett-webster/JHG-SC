@@ -241,8 +241,8 @@ if __name__ == "__main__":
 
     round_list = determine_rounds(jhg_games_per_sc_round)
     num_cycles = 3
-    num_players = 11
-    num_kitties = 3
+    num_players = 12
+    num_kitties = 2
     # total_num_players = [4,5,6,7,8,9,10,11]
     # total_num_kitties = [3]
     # total_num_players = [3]
@@ -252,7 +252,7 @@ if __name__ == "__main__":
     tokens_per_player = 2
     utility_per_player = 3
     create_round_graphs_bool = False
-    create_game_graphs_bool = False
+    create_game_graphs_bool = True
     create_influence = False
     chromosomes_directory = "testChromosome"
     group = ""
@@ -260,17 +260,17 @@ if __name__ == "__main__":
     scenario = "scenarioIndicator/allRandom"
     chromosome = "chromosomes/experiment"
     allocation_bot_type = "allocations_scenarios/random"
-    jhg_bot_type = 0 # 0 is gene bots, 2 is social welfare and 3 is random.
+    jhg_bot_type = 4 # 0 is gene bots, 2 is social welfare and 3 is random. 4 is the new social welfare that I am developing that is just a hair smarter.
 
-    num_attempts = 30 # number of batches to do.
+    num_attempts = 1 # number of batches to do.
     num_rounds = sum(jhg_games_per_sc_round) if len(jhg_games_per_sc_round) > 2 else jhg_games_per_sc_round[-1] # if its a list, len of list. else, grab the second identifier
 
 
     # for num_kitties in total_num_kitties:
     #     for num_players in total_num_players:
     #         print("Using ", num_players, " players and ", num_kitties, " kitties")
-    #         # for attempt in tqdm(range(num_attempts)): # create a new sim for each attempt to prevent bleeding over.
-    for attempt in (range(num_attempts)): # create a new sim for each attempt to prevent bleeding over.
+    for attempt in tqdm(range(num_attempts)): # create a new sim for each attempt to prevent bleeding over.
+    # for attempt in (range(num_attempts)): # create a new sim for each attempt to prevent bleeding over.
         # stuff that we used to od outside that we now have to do inside.
         total_order = create_total_order(num_players, num_humans) # unfortunately we have to make that in here now just bc we are changing the num players
         round_logger = RoundLogger()

@@ -8,6 +8,7 @@ from pathlib import Path
 import numpy as np
 
 from Server.Engine.geneagent3 import GeneAgent3
+from Server.Engine.completeSocialWelfare import SocialWelfare
 from Server.Engine.humanagent import HumanAgent
 from Server.Engine.jakecat import JakeCAT
 from Server.Engine.improvedJakeCate import ImprovedJakeCat
@@ -192,7 +193,7 @@ class Social_Choice_Sim:
         for i, bot in enumerate(self.bots):
             # print("this is the bot id ", bot.self_id, " an dthis is the i index ", i)
             # print("this is the cycle we are working with ", cycle, " and the round ", round)
-            if isinstance(bot, GeneAgent3) or isinstance(bot, JakeCAT) or isinstance(bot, ImprovedJakeCat) or isinstance(bot, ProjectCat):
+            if isinstance(bot, GeneAgent3) or isinstance(bot, JakeCAT) or isinstance(bot, ImprovedJakeCat) or isinstance(bot, ProjectCat) or isinstance(bot, SocialWelfare):
                 if cycle == 0:
                     votes_put_in = None
                 else:
@@ -234,20 +235,23 @@ class Social_Choice_Sim:
 
         if not self.enforce_majority: # can't let abstention happen, so lets fix that.
             valid_votes = [vote for vote in all_votes.values() if vote >= 0]
-            cause_vote_counts = Counter(valid_votes)
+            if len(valid_votes) == 0: # if everyone abstains
+                winning_vote = random.choice([1,2,3]) # pick and pass one at random
+            else: # figure out whoch one has the most support
+                cause_vote_counts = Counter(valid_votes)
 
-            max_votes = max(cause_vote_counts.values())
+                max_votes = max(cause_vote_counts.values())
 
-            # Get all causes that have the max vote count
-            top_causes = [cause for cause, count in cause_vote_counts.items() if count == max_votes]
+                # Get all causes that have the max vote count
+                top_causes = [cause for cause, count in cause_vote_counts.items() if count == max_votes]
 
-            if len(top_causes) != 1:
-                winning_vote = random.choice(top_causes) # I am a lazy fetcher your honor.
-            else:
-                winning_vote = top_causes[0] # just return the normal fetcher.
-
-            if winning_vote == -1:
-                winning_vote = Counter(total_votes.values()).most_common(2)[1][0] # grab the 2 most common, grab the second entry and the vote id. simple as.
+                if len(top_causes) != 1: # if there si a lot of ties
+                    winning_vote = random.choice(top_causes) # I am a lazy fetcher your honor.
+                else:# fetch it
+                    winning_vote = top_causes[0] # just return the normal fetcher.
+                #
+                # if winning_vote == -1:
+                #     winning_vote = Counter(total_votes.values()).most_common(2)[1][0] # grab the 2 most common, grab the second entry and the vote id. simple as.
 
 
 
@@ -558,7 +562,7 @@ class Social_Choice_Sim:
         indexes = [] # this gest used regardless.
         for peep in bot_peeps:
             indexes.append(bot_peeps.index(peep) + 1)
-        if isinstance(self.allocation_bots[0], GeneAgent3):
+        if isinstance(self.allocation_bots[0], GeneAgent3) or isinstance(self.allocation_bots[0], SocialWelfare): # make sure he is in there too
             if self.new_v is not None:
                 T_prev = self.new_v # constructs the previous, like, received matrix. kind of.
             else:
@@ -590,7 +594,7 @@ class Social_Choice_Sim:
 
         else:
             list_of_columns = []
-            for peep in bot_peeps:
+            for peep in bot_peeps: # as far as I can tell this is no longer used ever.
                 list_of_columns.append(self.allocation_bots[self.bot_index_dict[peep]].create_column(self.total_players))
             current_options_matrix = np.transpose(list_of_columns).tolist()
 

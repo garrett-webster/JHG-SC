@@ -13,6 +13,7 @@ from Server.Engine.simulator import GameSimulator
 from Server.Engine.jakecat import JakeCAT
 from Server.Engine.improvedJakeCate import ImprovedJakeCat
 from Server.Engine.projectCat import ProjectCat
+from Server.Engine.completeSocialWelfare import SocialWelfare
 
 import numpy as np
 import random
@@ -292,6 +293,9 @@ class JHG_simulator():
         if bot_type == 3:
             for i in range(popSize):
                 thePopulation.append(RandomAgent(tokens_per_player))
+        if bot_type == 4:
+            for i in range(popSize):
+                thePopulation.append(SocialWelfare())
 
         return thePopulation
 
