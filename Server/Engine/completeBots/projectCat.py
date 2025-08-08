@@ -3,7 +3,7 @@
 # should be easier than trying to adapt the gene3 bot.
 # lets find out.
 
-from Server.Engine.baseagent import AbstractAgent
+from Server.Engine.completeBots.baseagent import AbstractAgent
 import numpy as np
 from Server.SC_Bots.transVecTranslator import translateVecToIndex
 

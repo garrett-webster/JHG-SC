@@ -1,10 +1,5 @@
-from Server.Engine.baseagent import AbstractAgent
-from os.path import exists
+from Server.Engine.completeBots.baseagent import AbstractAgent
 
-import numpy as np
-import os
-import platform # need to know if this is windows or linux (or mac)
-import time
 
 class SocialWelfareAgent(AbstractAgent):
 

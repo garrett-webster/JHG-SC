@@ -1,4 +1,4 @@
-from Server.Engine.baseagent import AbstractAgent
+from Server.Engine.completeBots.baseagent import AbstractAgent
 from Server.Engine.blackboard import BlackBoard  # get micheal to hand these over at some point and work with em when you can.
 from Server.Engine.reversejhg import JHGReverse
 from Server.Engine.engine import JHGEngine

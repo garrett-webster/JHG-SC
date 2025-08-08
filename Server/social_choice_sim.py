@@ -1,18 +1,15 @@
 import copy
 import math
 import random
-from asyncio import current_task
 from collections import Counter
-from functools import total_ordering
-from pathlib import Path
 import numpy as np
 
-from Server.Engine.geneagent3 import GeneAgent3
-from Server.Engine.completeSocialWelfare import SocialWelfare
-from Server.Engine.humanagent import HumanAgent
-from Server.Engine.jakecat import JakeCAT
-from Server.Engine.improvedJakeCate import ImprovedJakeCat
-from Server.Engine.projectCat import ProjectCat
+from Server.Engine.completeBots.geneagent3 import GeneAgent3
+from Server.Engine.completeBots.completeSocialWelfare import SocialWelfare
+from Server.Engine.completeBots.humanagent import HumanAgent
+from Server.Engine.completeBots.jakecat import JakeCAT
+from Server.Engine.completeBots.improvedJakeCate import ImprovedJakeCat
+from Server.Engine.completeBots.projectCat import ProjectCat
 from Server.Node import Node
 from Server.OptionGenerators.options_creation import generate_two_plus_one_groups
 NUM_CAUSES = 3 # if its ever not this a LOT of math breaks, so just leave it be.
@@ -481,7 +478,7 @@ class Social_Choice_Sim:
         theGen = 199
         num_gene_copies = 3
         thePopulation = []
-        fnombre = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\Server\Engine\assassins_gen_175.csv"
+        fnombre = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\Server\Engine\botGenerations\assassins_gen_175.csv"
         fp = open(fnombre, "r")
 
         for i in range(0, popSize):

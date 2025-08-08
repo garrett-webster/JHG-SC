@@ -1,14 +1,12 @@
 import copy
 import math
 import random
-from asyncio import current_task
 from collections import Counter
-from functools import total_ordering
 from pathlib import Path
 import numpy as np
 
-from Server.Engine.geneagent3 import GeneAgent3
-from Server.Engine.humanagent import HumanAgent
+from Server.Engine.completeBots.geneagent3 import GeneAgent3
+from Server.Engine.completeBots.humanagent import HumanAgent
 from Server.Node import Node
 from Server.SC_Bots.legacyBots.humanAttempt2 import humanAttempt2
 from Server.OptionGenerators.options_creation import generate_two_plus_one_groups

@@ -8,9 +8,8 @@
 # wish me luck, https://www.youtube.com/watch?v=LhjmIgfGDMc
 
 import os
-from igraph import community_to_membership
 
-from Server.Engine.baseagent import AbstractAgent
+from Server.Engine.completeBots.baseagent import AbstractAgent
 import numpy as np
 import sys
 import copy

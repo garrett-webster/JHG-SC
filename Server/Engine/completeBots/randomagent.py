@@ -1,5 +1,4 @@
-from Server.Engine.baseagent import AbstractAgent
-import random
+from Server.Engine.completeBots.baseagent import AbstractAgent
 import numpy as np
 
 class RandomAgent(AbstractAgent):

@@ -2,18 +2,14 @@
 import os
 import sys
 
-from setuptools.logging import configure
-
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
-from Server.Engine.geneagent3 import GeneAgent3
-from Server.Engine.humanagent import HumanAgent
-from Server.Engine.socialwelfaragent import SocialWelfareAgent
-from Server.Engine.randomagent import RandomAgent
+from Server.Engine.completeBots.geneagent3 import GeneAgent3
+from Server.Engine.completeBots.humanagent import HumanAgent
+from Server.Engine.completeBots.socialwelfaragent import SocialWelfareAgent
+from Server.Engine.completeBots.randomagent import RandomAgent
 from Server.Engine.simulator import GameSimulator
-from Server.Engine.jakecat import JakeCAT
-from Server.Engine.improvedJakeCate import ImprovedJakeCat
-from Server.Engine.projectCat import ProjectCat
-from Server.Engine.completeSocialWelfare import SocialWelfare
+from Server.Engine.completeBots.projectCat import ProjectCat
+from Server.Engine.completeBots.completeSocialWelfare import SocialWelfare
 
 import numpy as np
 import random
@@ -21,14 +17,14 @@ import random
 np.set_printoptions(precision=2, suppress=True)
 
 class JHG_simulator():
-    def __init__(self, num_human_players, num_players, total_order, tokens_per_player=2, bot_type=0, start_game=True, add_kitties=0):
+    def __init__(self, num_human_players, num_players, total_order, tokens_per_player=2, bot_type=0, start_game=True, agent_config=""):
         self.num_players = num_players
         self.total_order = total_order
         self.sim = None
         self.players = None
         # went ahead and gave this a default. the currently trained agents have this baked into them that they need to have 2 tokens per player, curious in expanding that.
         if start_game:
-            self.start_game(num_human_players, num_players, tokens_per_player, bot_type, add_kitties)
+            self.start_game(num_human_players, num_players, tokens_per_player, bot_type, agent_config)
         else:
             self.create_sim(num_human_players)
         self.T = None
@@ -66,18 +62,22 @@ class JHG_simulator():
         self.T = np.array([[0.0 for _ in range(num_players)] for _ in range(num_players)])
 
 
-    def start_game(self, num_human_players, num_players, tokens_per_player, bot_type, add_kitties=0):
+    def start_game(self, num_human_players, num_players, tokens_per_player, bot_type, agent_config):
         init_pop = "equal"
 
         numAgents = num_players - num_human_players
         configured_players = []
-        if add_kitties != 0:
-            for i in range(add_kitties):
-                configured_players.append(ProjectCat())
+        if agent_config != "":
+            fp = open(agent_config, "r")
+            for line in fp:
+                if line.startswith("Kitty"):
+                    configured_players.append(ProjectCat())
+                if line.startswith("SocialWelfare"):
+                    configured_players.append(SocialWelfare())
 
 
         popSize = 60  # ??? I think? based on the command line arguemnts
-        player_idxs = list(np.arange(0, numAgents-add_kitties))  # where numAgents is the number of actual agents, not players.
+        player_idxs = list(np.arange(0, numAgents-len(configured_players)))  # where numAgents is the number of actual agents, not players.
 
         for _ in range(num_human_players):
             configured_players.append(HumanAgent())
@@ -337,16 +337,14 @@ class JHG_simulator():
         return cv
 
 
-
 def loadPopulationFromFile(popSize, generationFolder, startIndex, num_gene_pools, tokens_per_player):
     fnombre = "Kill me"
     try:
         #fnombre = generationFolder + "/gen_" + str(startIndex) + ".csv"
-        fnombre = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\Server\Engine\assassins_gen_175.csv" # trying to be better and mroe aggressive on group forming
-        # fnombre = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\Server\Engine\gen_199.csv" # JHG cab agents as used in the study
-        # fnombre = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\offlineSimStuff\geneticStuff\Results\theGenerations\gen_299.csv" # # JHG_SC agnets I trained. 
-        # fnombre = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\Server\Engine\w_kitties_gen_256.csv" # Trained with the cats. not sure if they are any good.
-        # fnombre = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\offlineSimStuff\geneticStuff\Results\theGenerations\gen_20.csv"
+        # fnombre = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\Server\Engine\assassins_gen_175.csv" # trying to be better and mroe aggressive on group forming
+        # fnombre = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\Server\Engine\botGenerations\gen_199.csv" # JHG cab agents as used in the study
+        fnombre = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\Server\Engine\botGenerations\sc_jhg_gen_299.csv" # # JHG_SC agnets I trained.
+        # fnombre = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\Server\Engine\botGenerations\w_kitties_gen_256.csv" # Trained with the cats. not sure if they are any good.
         fp = open(fnombre, "r")
     except FileNotFoundError:
         try:

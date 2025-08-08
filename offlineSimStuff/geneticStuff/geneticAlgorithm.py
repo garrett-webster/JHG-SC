@@ -1,8 +1,6 @@
-import copy
-
 from Server.Engine.engine import JHGEngine
-from Server.Engine.geneagent3 import GeneAgent3
-from Server.Engine.baseagent import AbstractAgent
+from Server.Engine.completeBots.geneagent3 import GeneAgent3
+from Server.Engine.completeBots.baseagent import AbstractAgent
 from dataclasses import dataclass
 import random
 import csv # WHEEE. make sure this doesn't leak over the client or server otherwise I have to update the venv on the chromebooks.

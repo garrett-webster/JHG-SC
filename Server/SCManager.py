@@ -3,7 +3,7 @@ import time
 
 import numpy as np
 
-from Server.Engine.geneagent3 import GeneAgent3
+from Server.Engine.completeBots.geneagent3 import GeneAgent3
 from Server.social_choice_sim import Social_Choice_Sim
 
 import copy

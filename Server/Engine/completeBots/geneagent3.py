@@ -1,14 +1,12 @@
 import os
 
-from igraph import community_to_membership
-
-from Server.Engine.baseagent import AbstractAgent
+from Server.Engine.completeBots.baseagent import AbstractAgent
 import numpy as np
 import sys
 import copy
 from pathlib import Path
 from Server.SC_Bots.transVecTranslator import translateVecToIndex
-from Server.Engine.geneAgent3Supplement import GeneAgentMixin
+from Server.Engine.completeBots.geneAgent3Supplement import GeneAgentMixin
 
 # make sure to put the GeneAgentMixin first, then the abstractAgent. Base class goes last, mixin classes go on top.
 class GeneAgent3(GeneAgentMixin, AbstractAgent):

@@ -1,8 +1,8 @@
 
 from Server.Engine.engine import JHGEngine
-from Server.Engine.geneagent3 import GeneAgent3
-from Server.Engine.baseagent import AbstractAgent
-from Server.Engine.projectCat import ProjectCat
+from Server.Engine.completeBots.geneagent3 import GeneAgent3
+from Server.Engine.completeBots.baseagent import AbstractAgent
+from Server.Engine.completeBots.projectCat import ProjectCat
 from Server.OptionGenerators.generators import generator_factory # i don't like him
 from dataclasses import dataclass
 import random
@@ -11,9 +11,8 @@ import os
 import math
 import numpy as np
 
-from Server.jhg_sim import JHG_simulator # using the sim instead of the engine. is it a bad idea? yeah. Am I doing it anyway? Nope!
 from Server.social_choice_sim import Social_Choice_Sim
-from offlineSimStuff.batch_tester_JHG_SC import determine_rounds, reconcile_influence
+from offlineSimStuff.batch_tester_JHG_SC import determine_rounds
 from offlineSimStuff.geneticStuff.geneticLogger import geneticLogger
 
 

@@ -3,7 +3,7 @@
 # should be easier than trying to adapt the gene3 bot.
 # lets find out.
 
-from Server.Engine.baseagent import AbstractAgent
+from Server.Engine.completeBots.baseagent import AbstractAgent
 import numpy as np
 from Server.SC_Bots.transVecTranslator import translateVecToIndex
 
@@ -11,9 +11,10 @@ from Server.SC_Bots.transVecTranslator import translateVecToIndex
 
 class SocialWelfare(AbstractAgent):
 
+
     def __init__(self):
         super().__init__()
-        self.whoami = 'SW'
+        self.whoami = "SW"
         self.friends = set()
         self.enemies = set()
         self.gameParams = {}
@@ -33,7 +34,6 @@ class SocialWelfare(AbstractAgent):
         self.attacks_on_me = 0.0
 
     def _update_vars(self, num_players, player_idx, influence, round_num):
-        print("CURRENT RECOGNIZED FRIENDS ", self.friends)
         for i in range(num_players):
             self.attacks_by[i] = 0.0
             self.gives_by[i] = 0.0
@@ -56,14 +56,14 @@ class SocialWelfare(AbstractAgent):
 
         for i in range(num_players): # iterate through and throw out all of the no no squares
             if i in self.friends and self.did_no_no[i]:
-                if i == 0:
-                    print("Ayo waht the fetch is happening")
                 self.friends.remove(i)
                 self.enemies.add(i)
 
     def play_round(self, player_idx, round_num, recieved, popularities, influence, extra_data, extra_flag=False):
         # the extra flag does not matter to him, but it matters to teh other bots.
         #print("This is if we are playing SC ", extra_flag, " and here are the assassins ", self.the_assassins)
+        if round_num == 1:
+            pass # un poco de investigacion
         num_players = len(popularities)
         if round_num == 0:
             self._init_vars(num_players) # we creative in this house
@@ -82,9 +82,6 @@ class SocialWelfare(AbstractAgent):
 
     # need to check if we are in JHG or SC. start giving to eachtoerh more in SC
     def jhg_sw_behavior(self, player_idx, round_num, recieved, popularities, influence, extra_data):
-        # the steali
-        if round_num == 12:
-            pass
 
         allocations = np.zeros_like(popularities)
         num_players = len(popularities)
@@ -104,14 +101,10 @@ class SocialWelfare(AbstractAgent):
         else:  # this is icky and I don't like it but here we go anyway.
             allocations[player_idx] = num_tokens
 
-        if player_idx == 0:
-            print("here are the allocations ", allocations)
-
         return allocations  # return it to a more normal magnitude. # the engine doesn't care if its normalized or not, but the SC sim does care. deeply.
 
     def sc_sw_behavior(self, player_idx, round_num, recieved, popularities, influence, extra_data):
         # the steali
-        print("this si the round num here ", round_num)
 
         allocations = np.zeros_like(popularities)
         num_players = len(popularities)
@@ -131,9 +124,6 @@ class SocialWelfare(AbstractAgent):
                 allocations[i] = -10
         else:  # this is icky and I don't like it but here we go anyway.
             allocations[player_idx] = num_tokens
-
-        if player_idx == 0:
-            print("here are the allocations ", allocations)
 
         return allocations  # return it to a more normal magnitude. # the engine doesn't care if its normalized or not, but the SC sim does care. deeply.
 

@@ -177,8 +177,8 @@ def create_sim(total_players, scenario=None, chromosomes=None, group="", total_o
     return sc_sim
 
 
-def create_jhg_sim(num_humans, num_players, total_order, tokens_per_player, jhg_bot_type, num_kitties):
-    jhg_sim = JHG_simulator(num_humans, num_players, total_order, tokens_per_player, jhg_bot_type, add_kitties=num_kitties)
+def create_jhg_sim(num_humans, num_players, total_order, tokens_per_player, jhg_bot_type, addAgents):
+    jhg_sim = JHG_simulator(num_humans, num_players, total_order, tokens_per_player, jhg_bot_type, agent_config=addAgents)
     return jhg_sim
 
 
@@ -242,17 +242,15 @@ if __name__ == "__main__":
     round_list = determine_rounds(jhg_games_per_sc_round)
     num_cycles = 3
     num_players = 12
-    num_kitties = 2
-    # total_num_players = [4,5,6,7,8,9,10,11]
-    # total_num_kitties = [3]
-    # total_num_players = [3]
-    # total_num_kitties = [1]
+    #addAgents = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\Server\Engine\scenarios\2SmartWelfare"
+    addAgents = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\Server\Engine\scenarios\workingDirectory"
+
 
     num_humans = 0
     tokens_per_player = 2
     utility_per_player = 3
     create_round_graphs_bool = False
-    create_game_graphs_bool = True
+    create_game_graphs_bool = False
     create_influence = False
     chromosomes_directory = "testChromosome"
     group = ""
@@ -260,15 +258,14 @@ if __name__ == "__main__":
     scenario = "scenarioIndicator/allRandom"
     chromosome = "chromosomes/experiment"
     allocation_bot_type = "allocations_scenarios/random"
-    jhg_bot_type = 4 # 0 is gene bots, 2 is social welfare and 3 is random. 4 is the new social welfare that I am developing that is just a hair smarter.
+    jhg_bot_type = 0 # 0 is gene bots, 2 is social welfare and 3 is random. 4 is the new social welfare that I am developing that is just a hair smarter.
 
-    num_attempts = 1 # number of batches to do.
+    num_attempts = 20 # number of batches to do.
     num_rounds = sum(jhg_games_per_sc_round) if len(jhg_games_per_sc_round) > 2 else jhg_games_per_sc_round[-1] # if its a list, len of list. else, grab the second identifier
 
+    utility_to_log = []
+    popularity_to_log = []
 
-    # for num_kitties in total_num_kitties:
-    #     for num_players in total_num_players:
-    #         print("Using ", num_players, " players and ", num_kitties, " kitties")
     for attempt in tqdm(range(num_attempts)): # create a new sim for each attempt to prevent bleeding over.
     # for attempt in (range(num_attempts)): # create a new sim for each attempt to prevent bleeding over.
         # stuff that we used to od outside that we now have to do inside.
@@ -276,28 +273,55 @@ if __name__ == "__main__":
         round_logger = RoundLogger()
         game_logger = GameLogger(num_players, 199)  # might be the wrong place to ahve this, as I don't actually have the gen number yet.
         complete_grapher = CompleteGrapher()
-        results_to_log = []
+
 
         offset = num_rounds * attempt # for logging purposes, lets us know the relationship between the logger round and current round
-        current_jhg_sim = create_jhg_sim(num_humans, num_players, total_order, tokens_per_player, jhg_bot_type, num_kitties)
+        current_jhg_sim = create_jhg_sim(num_humans, num_players, total_order, tokens_per_player, jhg_bot_type, addAgents)
         current_sc_sim = create_sim(num_players, scenario, chromosome, group, total_order, allocation_bot_type, utility_per_player)
         current_sc_sim.bot_ovveride(current_jhg_sim.players) # tells the SC sim to make sure that it is using the same bots as the JHG by passing htem as a reference to both voting and allocation slots.
         round_logger.reset_up(current_jhg_sim, current_sc_sim)
         game_logger.resetup(current_jhg_sim, current_sc_sim)
 
         sc_sim, jhg_sim = run_trial(current_sc_sim, current_jhg_sim, round_list, num_cycles, group, total_order, round_logger, create_round_graphs_bool, game_logger, create_game_graphs_bool) # This is really whats getting run round times
-        results_to_log.append(sc_sim.results_sums)
+        utility_to_log.append(sc_sim.results_sums)
+        popularity_to_log.append(jhg_sim.get_popularities())
+
+
+
         #print("here are the final utilities ", sc_sim.results_sums)
-    inverted_results = list(zip(*results_to_log))
+    inverted_results = list(zip(*utility_to_log))
     new_results = []
     for i in range(len(inverted_results)):
         new_sum = sum(inverted_results[i]) / len(inverted_results[i])
         new_results.append(new_sum)
 
-    print("here are the average scores acorss all rounds per agent ", new_results)
+
+
+
+    num_kitties = 3
     non_cats = (num_players - num_kitties)
     cumulative_cat_score = sum(new_results[non_cats:])
-    cumulative_non_cat_score = sum(new_results) - cumulative_cat_score
+    cumulative_non_cat_score = sum(new_results)- cumulative_cat_score
     avg_cat_score = cumulative_cat_score / num_kitties
     avg_non_cat_score = cumulative_non_cat_score / non_cats
-    print('here is the average cat score ', avg_cat_score, " and here is the average non_cat_score ", avg_non_cat_score)
+    print('here is the average cat utility ', avg_cat_score, " and here is the average non cat utility ", avg_non_cat_score)
+    # print("here is the average Gene3agent score ", avg_non_cat_score)
+    inverted_results.clear()
+
+
+    # man this sucks
+    popularity_to_log = np.round(np.array(popularity_to_log).astype(float), 2).tolist()
+
+    inverted_results = list(zip(*popularity_to_log))
+    new_results = []
+    for i in range(len(inverted_results)):
+        new_sum = sum(inverted_results[i]) / len(inverted_results[i])
+        new_results.append(new_sum)
+
+    num_kitties = 3
+    non_cats = (num_players - num_kitties)
+    cumulative_cat_score = sum(new_results[non_cats:])
+    cumulative_non_cat_score = sum(new_results)   - cumulative_cat_score
+    avg_cat_score = cumulative_cat_score / num_kitties
+    avg_non_cat_score = cumulative_non_cat_score / non_cats
+    print('here is the average cat popualrity ', avg_cat_score, " and here is the average non cat popularity ", avg_non_cat_score)

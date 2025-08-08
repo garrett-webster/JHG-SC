@@ -1,4 +1,4 @@
-from Server.Engine.baseagent import AbstractAgent
+from Server.Engine.completeBots.baseagent import AbstractAgent
 from os.path import exists
 
 import numpy as np
