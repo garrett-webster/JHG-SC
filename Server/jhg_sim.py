@@ -10,6 +10,7 @@ from Server.Engine.completeBots.randomagent import RandomAgent
 from Server.Engine.simulator import GameSimulator
 from Server.Engine.completeBots.projectCat import ProjectCat
 from Server.Engine.completeBots.completeSocialWelfare import SocialWelfare
+from Server.Engine.completeBots.antiCat import AntiCat
 
 import numpy as np
 import random
@@ -287,15 +288,18 @@ class JHG_simulator():
             return thePopulation
         # I know what you're thinking. wheres the human? He won't fall under pools, thankfully. he'll go other places.
 
-        if bot_type == 2: # just go all teh way through. get us the whole thing even though we dont' need it bc its just easier that way.
-            for i in range(popSize):
-                thePopulation.append(SocialWelfareAgent(tokens_per_player))
+        # if bot_type == 2: # just go all teh way through. get us the whole thing even though we dont' need it bc its just easier that way.
+        #     for i in range(popSize):
+        #         thePopulation.append(SocialWelfareAgent(tokens_per_player))
         if bot_type == 3:
             for i in range(popSize):
                 thePopulation.append(RandomAgent(tokens_per_player))
         if bot_type == 4:
             for i in range(popSize):
                 thePopulation.append(SocialWelfare())
+        if bot_type == 5:
+            for i in range(popSize):
+                thePopulation.append(AntiCat())
 
         return thePopulation
 

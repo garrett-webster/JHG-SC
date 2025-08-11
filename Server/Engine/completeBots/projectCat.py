@@ -12,6 +12,7 @@ from Server.SC_Bots.transVecTranslator import translateVecToIndex
 class ProjectCat(AbstractAgent):
 
     def __init__(self):
+        print("This is the cat awgent we ar eusing right ?)")
         super().__init__()
         self.whoami = 'jake cat'
         self.is_initialized = False
@@ -229,6 +230,7 @@ class ProjectCat(AbstractAgent):
             self._update_vars(num_players, player_idx, influence, round_num) # try to figure out who the other kitties are.
 
 
+
             if popularities[player_idx] >= 0.5: # if we have more than half a rating point, nuke someone.
                 attacked = self._attacks_on_self(num_players, recieved, popularities)
                 w = 0.65
@@ -240,15 +242,16 @@ class ProjectCat(AbstractAgent):
                 attack_proportion = 0.0
                 prop_assassin_attack = self._get_my_proportion(player_idx)
                 attack_power = (popularities[player_idx] / prop_assassin_attack) * steal_coef * alpha # figure out how much power I am actually weilding
-
                 for i in range(num_players):
                     if i not in self.the_assassins: # check all the non friends
+                        # teh 2 is a magical little number, I assume its do the to the presencse of 2 cats but I can't actually confirm that.
                         if (popularities[i] < prey_pop) and (popularities[i] >= (attack_power / 2.0)): # can I actually take them out? Do I have the attack power and do they have low enough popularity?
                             prey_idx = i # pop them in my sights
                             prey_pop = popularities[i]
                             attack_proportion = min(popularities[i] / attack_power, 1.0) # calculate just how badly we will destroy them
 
                 if prey_idx is not None: # just how bad can we mash them up
+
                     steal_tokens = (int)((attack_proportion * 0.9) * (num_tokens - keep_tokens))
                     allocations[prey_idx] = -steal_tokens
                     allocations[player_idx] = num_tokens - steal_tokens

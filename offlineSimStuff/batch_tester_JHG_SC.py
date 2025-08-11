@@ -61,7 +61,7 @@ def run_trial(sc_sim: "Social_Choice_Sim", jhg_sim, round_list, num_cycles, grou
 
         round_logger.save_round(curr_round, played_sc, played_jhg)
 
-        if create_round_graphs_bool:
+        if create_round_graphs_bool and curr_round < 5:
             create_round_graphs(round_logger, curr_round, sc_round, jhg_round)
 
     if create_game_graphs_bool:
@@ -250,7 +250,7 @@ if __name__ == "__main__":
     tokens_per_player = 2
     utility_per_player = 3
     create_round_graphs_bool = False
-    create_game_graphs_bool = False
+    create_game_graphs_bool = True
     create_influence = False
     chromosomes_directory = "testChromosome"
     group = ""
@@ -258,9 +258,9 @@ if __name__ == "__main__":
     scenario = "scenarioIndicator/allRandom"
     chromosome = "chromosomes/experiment"
     allocation_bot_type = "allocations_scenarios/random"
-    jhg_bot_type = 0 # 0 is gene bots, 2 is social welfare and 3 is random. 4 is the new social welfare that I am developing that is just a hair smarter.
+    jhg_bot_type = 4 # 0 is gene bots, 2 is social welfare and 3 is random. 4 is the new social welfare that I am developing that is just a hair smarter.
 
-    num_attempts = 20 # number of batches to do.
+    num_attempts = 1 # number of batches to do.
     num_rounds = sum(jhg_games_per_sc_round) if len(jhg_games_per_sc_round) > 2 else jhg_games_per_sc_round[-1] # if its a list, len of list. else, grab the second identifier
 
     utility_to_log = []
@@ -318,7 +318,7 @@ if __name__ == "__main__":
         new_sum = sum(inverted_results[i]) / len(inverted_results[i])
         new_results.append(new_sum)
 
-    num_kitties = 3
+    num_kitties = 2
     non_cats = (num_players - num_kitties)
     cumulative_cat_score = sum(new_results[non_cats:])
     cumulative_non_cat_score = sum(new_results)   - cumulative_cat_score

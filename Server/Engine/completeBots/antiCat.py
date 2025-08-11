@@ -1,7 +1,9 @@
-# purpose is to make these cats like
-# actually viable within the SC thing.
-# should be easier than trying to adapt the gene3 bot.
-# lets find out.
+# takes our better social welfare bot
+# and tries to weak it to be more resistant to cat bots specifically
+# is this a good idea? prolly not
+# but! It gives me something to do haha.
+
+
 
 from Server.Engine.completeBots.baseagent import AbstractAgent
 import numpy as np
@@ -9,7 +11,7 @@ from Server.SC_Bots.transVecTranslator import translateVecToIndex
 
 
 
-class SocialWelfare(AbstractAgent):
+class AntiCat(AbstractAgent):
 
 
     def __init__(self):
@@ -83,6 +85,9 @@ class SocialWelfare(AbstractAgent):
     # need to check if we are in JHG or SC. start giving to eachtoerh more in SC
     def jhg_sw_behavior(self, player_idx, round_num, recieved, popularities, influence, extra_data):
 
+        if round_num == 3:
+            pass
+
         allocations = np.zeros_like(popularities)
         num_players = len(popularities)
         num_tokens = 2 * num_players
@@ -91,45 +96,80 @@ class SocialWelfare(AbstractAgent):
         self.alpha = self.gameParams.get('alpha', 0.15)
         self.steal_coef = self.gameParams.get('steal', 1.6)
         self.keep_coef = self.gameParams.get('keep', 0.95)
+        danger_from_enemies = False
+        floor = self.create_floor(popularities, player_idx)
+        min_friend_score = 99999
+        min_friend_index = -1
+        for friend in self.friends:
+            if popularities[friend] < min_friend_score and min_friend_score > floor:
+                # TODO: fix code. Chat am I cooked
+                min_friend_score = popularities[friend]
+                min_friend_index = friend
+
 
         if popularities[player_idx] >= 0.5: # we actually can DO anything
-            hypothetical_recieved = self.create_hypothetical_received(popularities, num_tokens)
-            floor = self.create_floor(popularities, player_idx)
-            attacked = self._attacks_on_self(num_players, hypothetical_recieved, popularities)
-            w = 0.65
-            self.attacks_on_me = w * attacked + (1 - w) * self.attacks_on_me
-            keep_tokens = min((int)((self.attacks_on_me / popularities[player_idx]) + 0.5),
-                              num_tokens)  # figure out how many people attacked me last round and try to plan accordinly
-            # if list(popularities).index(min(popularities)) == player_idx and round != 0:
-            #     self.attacks_on_me = w * attacked + (1 - w) * self.attacks_on_me
-            new_index = -1
-            if round_num != 0:
+            if min_friend_score < 50: # crappy and bad but lets see
+                # we want to rally aorund everyone and everything
+                # so yeah take that min index, if thats you keep all ya tokens.
+                hypothetical_recieved = self.create_hypothetical_received(popularities, num_tokens)
+                attacked = self._attacks_on_self(num_players, hypothetical_recieved, popularities)
+                keep_tokens = min((int)((self.attacks_on_me / popularities[player_idx]) + 0.5), num_tokens)
+                if player_idx == min_friend_index: # you are the target of the machinations
+                    allocations[player_idx] = keep_tokens
+                    num_tokens -= keep_tokens
+                    tokens_to_share = num_tokens // (len(self.friends) - 1)
+                    for friend in self.friends:
+                        allocations[friend] = tokens_to_share
+                    return allocations # simple as
+                else:
+                    print("This is the enemy we are targeting ", enemy_to_target)
+                    allocations[enemy_to_target] = -10
+                    num_tokens -= 10
+                    toks_to_share = num_tokens / (len(self.friends) - 1)
+                    for i in self.friends:
+                        if i == player_idx:
+                            continue
+                        else:
+                            allocations[i] = toks_to_share
 
-                sorted_popularites = sorted(popularities.tolist())
-                min_popularity = 9999
-                for popularity in sorted_popularites:
-                    if popularity > floor and popularity < min_popularity:
-                        min_popularity = popularity
+            else:
+                hypothetical_recieved = self.create_hypothetical_received(popularities, num_tokens)
 
-                new_index = list(popularities).index(min_popularity)
+                attacked = self._attacks_on_self(num_players, hypothetical_recieved, popularities)
+                w = 0.65
+                self.attacks_on_me = w * attacked + (1 - w) * self.attacks_on_me
+                keep_tokens = min((int)((self.attacks_on_me / popularities[player_idx]) + 0.5),
+                                  num_tokens)  # figure out how many people attacked me last round and try to plan accordinly
+                # if list(popularities).index(min(popularities)) == player_idx and round != 0:
+                #     self.attacks_on_me = w * attacked + (1 - w) * self.attacks_on_me
+                new_index = -1
+                if round_num != 0:
 
+                    sorted_popularites = sorted(popularities.tolist())
+                    min_popularity = 9999
+                    for popularity in sorted_popularites:
+                        if popularity > floor and popularity < min_popularity:
+                            min_popularity = popularity
 
-            if len(self.friends) > 0:
-                if len(self.enemies) > 0:
-                    for i in self.enemies:
-                        if popularities[i] > 1: # only steal if there is something worth stealing
-                            allocations[i] = -10
-                            toks_to_share += 10
+                    new_index = list(popularities).index(min_popularity)
 
-                token_allocation = ((num_tokens + toks_to_share - keep_tokens) // len(self.friends)) # don't forget floor division!
+                # print("I know what you did Sean") # thanks ryan
+                if len(self.friends) > 0:
+                    if len(self.enemies) > 0:
+                        for i in self.enemies:
+                            if popularities[i] > 1: # only steal if there is something worth stealing
+                                allocations[i] = -10
+                                toks_to_share += 10
 
-                for i in self.friends:
-                    if i == player_idx: # i must assume we are friends with ourselves.
-                        allocations[i] = keep_tokens
-                    else:
-                        allocations[i] = token_allocation
-            else:  # we have no friends, hunker in da bunker
-                allocations[player_idx] = num_tokens
+                    token_allocation = ((num_tokens + toks_to_share) // len(self.friends)-1) # don't forget floor division! and don't include yourself here.
+
+                    for i in self.friends:
+                        if i == player_idx: # i must assume we are friends with ourselves.
+                            continue
+                        else:
+                            allocations[i] = token_allocation
+                else:  # we have no friends, hunker in da bunker
+                    allocations[player_idx] = num_tokens
         else:
             allocations[player_idx] = num_tokens  # we have no legs, we have no legs. Doesn't matter what we do.
 

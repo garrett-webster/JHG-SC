@@ -10,6 +10,7 @@ from Server.Engine.completeBots.humanagent import HumanAgent
 from Server.Engine.completeBots.jakecat import JakeCAT
 from Server.Engine.completeBots.improvedJakeCate import ImprovedJakeCat
 from Server.Engine.completeBots.projectCat import ProjectCat
+from Server.Engine.completeBots.antiCat import AntiCat
 from Server.Node import Node
 from Server.OptionGenerators.options_creation import generate_two_plus_one_groups
 NUM_CAUSES = 3 # if its ever not this a LOT of math breaks, so just leave it be.
@@ -190,7 +191,7 @@ class Social_Choice_Sim:
         for i, bot in enumerate(self.bots):
             # print("this is the bot id ", bot.self_id, " an dthis is the i index ", i)
             # print("this is the cycle we are working with ", cycle, " and the round ", round)
-            if isinstance(bot, GeneAgent3) or isinstance(bot, JakeCAT) or isinstance(bot, ImprovedJakeCat) or isinstance(bot, ProjectCat) or isinstance(bot, SocialWelfare):
+            if isinstance(bot, GeneAgent3) or isinstance(bot, JakeCAT) or isinstance(bot, ImprovedJakeCat) or isinstance(bot, ProjectCat) or isinstance(bot, SocialWelfare) or isinstance(bot, AntiCat):
                 if cycle == 0:
                     votes_put_in = None
                 else:
@@ -559,7 +560,7 @@ class Social_Choice_Sim:
         indexes = [] # this gest used regardless.
         for peep in bot_peeps:
             indexes.append(bot_peeps.index(peep) + 1)
-        if isinstance(self.allocation_bots[0], GeneAgent3) or isinstance(self.allocation_bots[0], SocialWelfare): # make sure he is in there too
+        if isinstance(self.allocation_bots[0], GeneAgent3) or isinstance(self.allocation_bots[0], SocialWelfare) or isinstance(self.allocation_bots[0], AntiCat): # make sure he is in there too
             if self.new_v is not None:
                 T_prev = self.new_v # constructs the previous, like, received matrix. kind of.
             else:
