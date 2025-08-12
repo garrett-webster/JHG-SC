@@ -6,6 +6,14 @@ import numpy as np
 from Server.Engine.completeBots.geneagent3 import GeneAgent3
 from Server.social_choice_sim import Social_Choice_Sim
 
+from Server.Engine.completeBots.completeSocialWelfare import SocialWelfare
+from Server.Engine.completeBots.humanagent import HumanAgent
+from Server.Engine.completeBots.jakecat import JakeCAT
+from Server.Engine.completeBots.improvedJakeCate import ImprovedJakeCat
+from Server.Engine.completeBots.projectCat import ProjectCat
+from Server.Engine.completeBots.antiCat import AntiCat
+
+
 import copy
 
 def create_empty_vote_matrix(num_players):
@@ -189,7 +197,7 @@ class SCManager:
         for i in range(self.num_players):
             extra_data[i] = None  # we never use government or anything.
         for i, bot in enumerate(self.sc_sim.allocation_bots):
-            if isinstance(bot, GeneAgent3):
+            if isinstance(bot, GeneAgent3) or isinstance(bot, JakeCAT) or isinstance(bot, ImprovedJakeCat) or isinstance(bot, ProjectCat) or isinstance(bot, SocialWelfare) or isinstance(bot, AntiCat):
                 if self.sc_sim.new_v is not None:
                     T_prev = self.sc_sim.new_v  # constructs the previous, like, received matrix. kind of.
                 else:
@@ -208,7 +216,7 @@ class SCManager:
                     i,
                     curr_round,
                     T_prev[:, i],  # should be a 9x9 ndarray (from numpy)
-                    self.sc_sim.results_sums,
+                    np.array(self.sc_sim.results_sums),
                     np.array(influence_matrix),
                     extra_data,  # yes this is blank. no I don't know why.
                 ))

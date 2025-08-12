@@ -104,7 +104,8 @@ class SocialWelfare(AbstractAgent):
             #     self.attacks_on_me = w * attacked + (1 - w) * self.attacks_on_me
             new_index = -1
             if round_num != 0:
-
+                if isinstance(popularities, list):
+                    pass
                 sorted_popularites = sorted(popularities.tolist())
                 min_popularity = 9999
                 for popularity in sorted_popularites:

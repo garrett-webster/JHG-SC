@@ -262,7 +262,8 @@ class Social_Choice_Sim:
 
         if winning_vote != -1:  # if its -1, then nothing happend. NOT the last entry in the fetcher. that was a big bug that flew under the radar.
             for i in range(len(total_votes)):
-                self.current_results.append(self.current_options_matrix[i][winning_vote])
+                print("this is the winning vote ", winning_vote)
+                self.current_results.append(self.current_options_matrix[i][winning_vote-1])
             self.add_coop_score() # cop score doesn't make a ton of sense here unfortunately.
         else:
             for i in range(len(total_votes)):
@@ -321,25 +322,37 @@ class Social_Choice_Sim:
     def return_win_without_silly(self, all_votes):
         self.current_results = []
         total_votes = all_votes
-        winning_vote_count = Counter(total_votes.values()).most_common(1)[0][1]
-        winning_vote = Counter(total_votes.values()).most_common(1)[0][0]
 
-        if not self.enforce_majority: # can't let abstention happen, so lets fix that.
-            if winning_vote == -1:
-                winning_vote = Counter(total_votes.values()).most_common(2)[1][0] # grab the 2 most common, grab the second entry and the vote id. simple as.
+        if not self.enforce_majority:  # can't let abstention happen, so lets fix that.
+            valid_votes = [vote for vote in all_votes.values() if vote >= 0]
+            if len(valid_votes) == 0:  # if everyone abstains
+                winning_vote = random.choice([1, 2, 3])  # pick and pass one at random
+            else:  # figure out whoch one has the most support
+                cause_vote_counts = Counter(valid_votes)
 
-        if self.enforce_majority:
+                max_votes = max(cause_vote_counts.values())
+
+                # Get all causes that have the max vote count
+                top_causes = [cause for cause, count in cause_vote_counts.items() if count == max_votes]
+
+                if len(top_causes) != 1:  # if there si a lot of ties
+                    winning_vote = random.choice(top_causes)  # I am a lazy fetcher your honor.
+                else:  # fetch it
+                    winning_vote = top_causes[0]  # just return the normal fetcher.
+                #
+                # if winning_vote == -1:
+                #     winning_vote = Counter(total_votes.values()).most_common(2)[1][0] # grab the 2 most common, grab the second entry and the vote id. simple as.
+
+        if self.enforce_majority:  # modifies it to check for teh majority and whatnot.
+            winning_vote_count = Counter(total_votes.values()).most_common(1)[0][1]
+            winning_vote = Counter(total_votes.values()).most_common(1)[0][0]
             if not (winning_vote_count > len(total_votes) // 2):
                 winning_vote = -1
+        # nothing else to do here. the winning vote is just the winning vote.
 
-        if winning_vote != -1:  # if its -1, then nothing happend. NOT the last entry in the fetcher. that was a big bug that flew under the radar.
-            for i in range(len(total_votes)):
-                self.current_results.append(self.current_options_matrix[i][winning_vote])
-        else:
-            for i in range(len(total_votes)):
-                self.current_results.append(0)
 
-        return winning_vote, self.current_results  # literally just returns who won. thats it.
+
+        return winning_vote, self.current_results
 
     def calculate_influence_matrix(self, new_v):
         new_index = len(self.I)  # lets see if this works any better.

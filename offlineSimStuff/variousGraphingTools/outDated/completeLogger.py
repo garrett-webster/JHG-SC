@@ -38,10 +38,10 @@ class CompleteLogger():
     def save_jhg_round(self, curr_round, curr_logger_round):
         if curr_logger_round not in self.big_boy_data: # make sure he exists.
             self.big_boy_data[curr_logger_round] = {}
-        new_var = self.jhg_logger.return_round_for_writing(curr_round)
+        # new_var = self.jhg_logger.return_round_for_writing(curr_round)
         #print("this is the total size ", sys.getsizeof(new_var))
 
-        self.big_boy_data[curr_logger_round]["JHG_STUFF"] = self.jhg_logger.return_round_for_writing(curr_round)
+        # self.big_boy_data[curr_logger_round]["JHG_STUFF"] = self.jhg_logger.return_round_for_writing(curr_round)
 
     # this no longer closes the json. It grabs the concluding details and slaps them in where appropriate.
     def gather_ending_deets(self, attempt):

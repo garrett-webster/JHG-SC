@@ -3,11 +3,11 @@ from offlineSimStuff.variousGraphingTools.outDated.jhg_tools.jhgLogger import JH
 
 
 class JHGManager:
-    def __init__(self, connection_manager, num_humans, num_players, num_bots, total_order, tokens_per_player):
+    def __init__(self, connection_manager, num_humans, num_players, num_bots, total_order, tokens_per_player, jhg_bot_types, addAgents):
         self.current_round = 1
         self.connection_manager = connection_manager
         self.num_players = num_players
-        self.jhg_sim = JHG_simulator(num_humans, num_players, total_order, tokens_per_player)
+        self.jhg_sim = JHG_simulator(num_humans, num_players, total_order, tokens_per_player, jhg_bot_types, True, addAgents)
         self.num_bots = num_bots
         self.currentLogger : JHGLogger = JHGLogger(self.jhg_sim)
         self.alpha = self.jhg_sim.sim.engine.alpha

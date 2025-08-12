@@ -2,16 +2,17 @@ from Server.JHGManager import JHGManager
 from Server.OptionGenerators.generators import generator_factory
 from Server.SCManager import SCManager
 from Server.ServerConnectionManager import ServerConnectionManager
-from offlineSimStuff.variousGraphingTools.outDated.completeLogger import CompleteLogger
+from offlineSimStuff.variousGraphingTools.individualLoggers.roundLogger import RoundLogger
+from offlineSimStuff.variousGraphingTools.individualLoggers.gameLogger import GameLogger
 import numpy as np
 
 
 OPTIONS = {
     #General settings
-    "NUM_HUMANS": 2, # utterly fetched but can I run this headless
+    "NUM_HUMANS": 0, # utterly fetched but can I run this headless
     "TOTAL_PLAYERS": 8,
-    "JHG_ROUNDS_PER_SC_ROUND" : [2,2,2,2], # Number of JHG rounds to play between each social choice round
-    #"JHG_ROUNDS_PER_SC_ROUND" : [1,1,1], # Number of JHG rounds to play between each social choice round
+    # "JHG_ROUNDS_PER_SC_ROUND" : [2,2,2,2], # Number of JHG rounds to play between each social choice round
+    "JHG_ROUNDS_PER_SC_ROUND" : [4,3,3,3,3] , # Number of JHG rounds to play between each social choice round
     "SC_GROUP_OPTION": 0, # See options_creation.py -> group_size_options to understand what this means
     "SC_VOTE_CYCLES": 3, # Number of cycles to play each social choice round. Players will vote this many times, with the nth vote being final.
     "LOGGING" : True,
@@ -57,6 +58,9 @@ class Server():
 
 
     def start_server(self, host='0.0.0.0', port=12345):
+        jhg_bot_type = 0
+        addAgents = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\Server\Engine\scenarios\workingDirectory"
+
         self.connection_manager = ServerConnectionManager(host, port, OPTIONS["TOTAL_PLAYERS"], OPTIONS["NUM_BOTS"])
 
         self.total_order = self.connection_manager.get_total_list()
@@ -65,15 +69,17 @@ class Server():
         self.connection_manager.add_clients(OPTIONS["NUM_HUMANS"], OPTIONS["NUM_BOTS"], OPTIONS["SC_VOTE_CYCLES"], OPTIONS["NUM_TOKENS_PER_PLAYER"], OPTIONS["UTILITY_PER_PLAYER"], OPTIONS["STARTING_UTILITY"], OPTIONS["ALL_ALLOCATIONS"])
 
         # we will get here in a minute.
-        self.JHG_manager = JHGManager(self.connection_manager, self.num_humans, self.num_players, self.num_bots, self.total_order, self.tokens_per_player)
+        self.JHG_manager = JHGManager(self.connection_manager, self.num_humans, self.num_players, self.num_bots, self.total_order, self.tokens_per_player, jhg_bot_type, addAgents)
         self.generator = generator_factory(OPTIONS["OPTION_GENERATOR"], OPTIONS["TOTAL_PLAYERS"], OPTIONS["NOISE_MAGNITUDE"],
                                            OPTIONS["MAX_UTILITY"], OPTIONS["MIN_UTILITY"], OPTIONS["NUM_OPTIONS"],
                                            self.JHG_manager, self.connection_manager)
         self.SC_manager = SCManager(self.connection_manager, self.num_humans, self.generator, self.num_players, self.num_bots,
                                     self.sc_group_option, self.sc_vote_cycles, self.total_order, self.utility_per_player, self.JHG_manager.jhg_sim.players)
 
-        self.current_logger = CompleteLogger()
-        self.current_logger.resetup(self.JHG_manager.jhg_sim, self.SC_manager.sc_sim)
+        self.round_logger = RoundLogger()
+        self.game_logger = GameLogger(self.num_players, 199)
+        self.round_logger.reset_up(self.JHG_manager.jhg_sim, self.SC_manager.sc_sim)
+        self.game_logger.resetup(self.JHG_manager.jhg_sim, self.SC_manager.sc_sim)
 
 
     def play_game(self):
@@ -82,9 +88,11 @@ class Server():
         curr_sc_round = 0
         influence_matrix = None
 
+
         for list_index in range(len(self.rounds_list)):
+            jhg_round = False
+            sc_round = False
             is_last_jhg_round = False
-            print("This is the current list index ", list_index)
 
             if list_index + 1 < len(self.rounds_list) and self.rounds_list[list_index + 1]:
                 if self.rounds_list[list_index + 1][-1] == "*":
@@ -94,13 +102,13 @@ class Server():
             jhg_rounds = self.rounds_list[list_index][-1] == "-"
             curr_round = int(self.rounds_list[list_index][:-1])  # useful, yes, but not quite the logger round
             curr_logger_round = curr_round
-            print("this is the current round")
+            print("this is the curr round ", curr_round)
 
             if jhg_rounds:
                 influence_matrix = self.JHG_manager.play_jhg_round(self.JHG_manager.current_round, is_last_jhg_round)
-                self.current_logger.save_jhg_round(curr_round, curr_logger_round)
 
             if sc_rounds:
+                print("this is the curr_round we are throwing in there, somewhere")
                 if self.player_allocations:
                     peeps, total_order_index = self.generate_peeps(self.total_order, self.JHG_manager, self.SC_manager)
                     if influence_matrix is not None:
@@ -114,14 +122,14 @@ class Server():
                     self.SC_manager.init_next_round((current_options_matrix, total_order_index))
                 else:
                     self.SC_manager.init_next_round()
-                self.SC_manager.play_social_choice_round(curr_sc_round, new_influence)
-                self.current_logger.save_sc_round(curr_sc_round, curr_logger_round)
+                self.SC_manager.play_social_choice_round(curr_round, new_influence)
+                self.SC_manager.sc_sim.set_rounds(curr_sc_round)
                 curr_sc_round += 1 # WHEE.
 
+            self.round_logger.save_round(curr_round, sc_rounds, jhg_rounds)
+
+
         # https://www.youtube.com/watch?v=FU0dOV2gSts
-        self.current_logger.create_big_boy_graphs(len(self.rounds_list), 0)
-        self.current_logger.gather_ending_deets(0) # so the logger has been mad adjusted to work with other stuff, just trust me.
-        self.current_logger.actually_close_the_thing("I'mNotLikeTheOtherLogs") # pick me log
         print("game over")
 
     def generate_peeps(self, total_order, jhg_manager, sc_manager):
@@ -168,6 +176,7 @@ class Server():
                 for i in range(num_rounds):
                     new_list.append(str(i) + "*")
 
+
         else:
             new_list = []
             current = 0  # Tracks number for "-" entries
@@ -176,7 +185,6 @@ class Server():
                     new_list.append(f"{current}-")
                     current += 1
                 new_list.append(f"{current - 1}*")  # Append the last "-" number with "*"
-
 
         return new_list
 
