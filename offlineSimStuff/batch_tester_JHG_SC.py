@@ -60,10 +60,10 @@ def run_trial(sc_sim: "Social_Choice_Sim", jhg_sim, round_list, num_cycles, grou
             sc_round = True
 
 
-        round_logger.save_round(curr_round, sc_round, jhg_round)
+        round_logger.save_round(curr_round, sc_rounds, jhg_rounds)
 
         if create_round_graphs_bool:
-            create_round_graphs(round_logger, curr_round, sc_round, jhg_round)
+            create_round_graphs(round_logger, curr_round, sc_rounds, jhg_rounds)
 
     if create_game_graphs_bool:
         game_logger.save_game(played_sc, played_jhg)
@@ -192,6 +192,7 @@ def create_total_order(total_players, num_humans):
     for human in range(num_humans):
         total_order.append("P" + str(human))
     return total_order
+
 
 def determine_rounds(jhg_rounds_per_sc_game_list):
     new_list = [] # WHEEE gotta start somewhere

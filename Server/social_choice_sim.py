@@ -262,7 +262,6 @@ class Social_Choice_Sim:
 
         if winning_vote != -1:  # if its -1, then nothing happend. NOT the last entry in the fetcher. that was a big bug that flew under the radar.
             for i in range(len(total_votes)):
-                print("this is the winning vote ", winning_vote)
                 self.current_results.append(self.current_options_matrix[i][winning_vote-1])
             self.add_coop_score() # cop score doesn't make a ton of sense here unfortunately.
         else:

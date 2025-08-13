@@ -2,6 +2,7 @@ from Server.JHGManager import JHGManager
 from Server.OptionGenerators.generators import generator_factory
 from Server.SCManager import SCManager
 from Server.ServerConnectionManager import ServerConnectionManager
+from offlineSimStuff.batch_tester_JHG_SC import create_round_graphs, create_game_graphs
 from offlineSimStuff.variousGraphingTools.individualLoggers.roundLogger import RoundLogger
 from offlineSimStuff.variousGraphingTools.individualLoggers.gameLogger import GameLogger
 import numpy as np
@@ -10,7 +11,7 @@ import numpy as np
 OPTIONS = {
     #General settings
     "NUM_HUMANS": 0, # utterly fetched but can I run this headless
-    "TOTAL_PLAYERS": 8,
+    "TOTAL_PLAYERS": 12,
     # "JHG_ROUNDS_PER_SC_ROUND" : [2,2,2,2], # Number of JHG rounds to play between each social choice round
     "JHG_ROUNDS_PER_SC_ROUND" : [4,3,3,3,3] , # Number of JHG rounds to play between each social choice round
     "SC_GROUP_OPTION": 0, # See options_creation.py -> group_size_options to understand what this means
@@ -83,65 +84,66 @@ class Server():
 
 
     def play_game(self):
-        # Main game loop -- Play as many rounds as specified in OPTIONS
+        sc_sim = self.SC_manager.sc_sim
+        jhg_sim = self.JHG_manager.jhg_sim
+        round_list = self.rounds_list
 
+        sc_sim.set_group("") # just a null setting
+        played_sc = False
+        played_jhg = False
         curr_sc_round = 0
         influence_matrix = None
 
-
-        for list_index in range(len(self.rounds_list)):
-            jhg_round = False
-            sc_round = False
+        for list_index in (range(0, len(round_list))):
+            sc_rounds = round_list[list_index][-1] == "*"
+            jhg_rounds = round_list[list_index][-1] == "-"
             is_last_jhg_round = False
-
             if list_index + 1 < len(self.rounds_list) and self.rounds_list[list_index + 1]:
                 if self.rounds_list[list_index + 1][-1] == "*":
                     is_last_jhg_round = True
 
-            sc_rounds = self.rounds_list[list_index][-1] == "*"
-            jhg_rounds = self.rounds_list[list_index][-1] == "-"
-            curr_round = int(self.rounds_list[list_index][:-1])  # useful, yes, but not quite the logger round
-            curr_logger_round = curr_round
-            print("this is the curr round ", curr_round)
 
-            if jhg_rounds:
-                influence_matrix = self.JHG_manager.play_jhg_round(self.JHG_manager.current_round, is_last_jhg_round)
-
-            if sc_rounds:
-                print("this is the curr_round we are throwing in there, somewhere")
-                if self.player_allocations:
-                    peeps, total_order_index = self.generate_peeps(self.total_order, self.JHG_manager, self.SC_manager)
-                    if influence_matrix is not None:
-                        sc_influence = self.SC_manager.sc_sim.get_influence_matrix()
-                        new_influence = self.reconcile_influence(influence_matrix, sc_influence)
-                    else:
-                        new_influence = self.SC_manager.sc_sim.get_influence_matrix()
+            curr_round = int(round_list[list_index][:-1])
+            print("this i s the curr_round ", curr_round)
 
 
-                    current_options_matrix = self.SC_manager.server_side_options_matrix(peeps, new_influence, curr_round)
-                    self.SC_manager.init_next_round((current_options_matrix, total_order_index))
+            if jhg_rounds: # this SHOULD be it. fingers crossed.
+                influence_matrix = self.JHG_manager.play_jhg_round(curr_round, is_last_jhg_round)
+                played_jhg = True
+
+            if sc_rounds: # lets be so real no allocations aren't THAT interesting.
+                peeps, indexes = self.generate_peeps(self.total_order, jhg_sim, sc_sim)
+                if influence_matrix is not None:
+                    new_influence = influence_matrix
                 else:
-                    self.SC_manager.init_next_round()
+                    new_influence = sc_sim.get_influence_matrix
+
+                current_options_matrix, peeps = self.SC_manager.server_side_options_matrix(peeps, influence_matrix, curr_round)
+                sc_sim.start_round((current_options_matrix, peeps)) # this might be screwing stuff up honestly....
+                self.SC_manager.current_options_matrix = current_options_matrix
                 self.SC_manager.play_social_choice_round(curr_round, new_influence)
-                self.SC_manager.sc_sim.set_rounds(curr_sc_round)
-                curr_sc_round += 1 # WHEE.
+                sc_sim.set_rounds(curr_sc_round)
+                curr_sc_round += 1
+                played_sc = True
 
-            self.round_logger.save_round(curr_round, sc_rounds, jhg_rounds)
+            # self.round_logger.save_round(curr_round, sc_rounds, jhg_rounds)
+            # create_round_graphs(self.round_logger, curr_round, sc_rounds, jhg_rounds)
+        self.game_logger.save_game(played_sc, played_jhg)
+        create_game_graphs(self.game_logger)
+        print("GAME OVER")
 
 
-        # https://www.youtube.com/watch?v=FU0dOV2gSts
-        print("game over")
-
-    def generate_peeps(self, total_order, jhg_manager, sc_manager):
-        popularity_array = jhg_manager.get_popularity_array(total_order)
+    def generate_peeps(self, total_order, jhg_sim, sc_sim):
+        popularity_array = (jhg_sim.get_popularities())  # huh
         total = sum(popularity_array)
         # this is easy bc this will always be positive
         normalized_popularity_array = [val / total for val in popularity_array]
-        utilities_array = sc_manager.sc_sim.results_sums
+        # THIS IS WORSE.
+        utilities_array = sc_sim.results_sums
         global_shift = min(0, min(utilities_array))
         # shift everything over. subtract bc its either 0 or a negative number.
         utilities_array = [val - global_shift for val in utilities_array]
-        total = sum(utilities_array) # yeah override this why not.
+        total = sum(utilities_array)  # yeah override this why not.
         normalized_utility_array = [val / total if total != 0 else 1 / len(total_order) for val in utilities_array]
         # new goal -- figure out how zip works
         overall_probability_array = [(p + u) / 2 for p, u in zip(normalized_popularity_array, normalized_utility_array)]
@@ -149,7 +151,7 @@ class Server():
         new_world_order = np.array(total_order)
         # shoudl pull without replacement from total order using the overall probability array, gives 3 choies without replacement.
         new_peeps = np.random.choice(new_world_order, p=probabilities, size=3, replace=False)
-        indexes = self.peeps_to_total_order(new_peeps, self.total_order)
+        indexes = self.peeps_to_total_order(new_peeps, total_order)
         return new_peeps, indexes
 
     # takes in a list of peeps (player or bot or both) and returns their player indexes as per total order

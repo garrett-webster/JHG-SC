@@ -66,15 +66,15 @@ class SCManager:
 
 
 
-    def play_social_choice_round(self, curr_sc_round, influence_matrix):
+    def play_social_choice_round(self, curr_round, influence_matrix):
         # first we gotta GET the new current options matrix. thats a pain.
         # Run the voting and collect the votes
-        player_votes = self.run_sc_voting(curr_sc_round, influence_matrix)
+        player_votes = self.run_sc_voting(curr_round, influence_matrix)
 
         # this is the line where we get the bot votes as well.
         previous_votes = {}
         # always start from cycle 0, don't use the max one. methinks.
-        zero_idx_votes, one_idx_votes = self.compile_sc_votes(player_votes, curr_sc_round, 0, previous_votes, influence_matrix) # no clue what cycle this is or why this runs.
+        zero_idx_votes, one_idx_votes = self.compile_sc_votes(player_votes, curr_round, 0, previous_votes, influence_matrix) # no clue what cycle this is or why this runs.
         self.sc_sim.set_final_votes(zero_idx_votes)
         # this is weird garrett stuff Imma not touch it.
         self.update_vote_effects(zero_idx_votes, self.current_options_matrix,
@@ -118,27 +118,24 @@ class SCManager:
                     except KeyError:
                         print("SOMEONE SHOULDN't BE ALLOWED TO TOUCH THIS YET. FIX THAT")
 
-            if cycle == 1:
-                print("check previous here ")
+
             zero_idx_votes, one_idx_votes = self.compile_sc_votes(player_votes,
                                                                   curr_sc_round, cycle, previous_votes, influence_matrix)
             previous_votes[cycle] = zero_idx_votes
-            print("zero idx votes in hot oevr here ", zero_idx_votes)
+
             if cycle == self.vote_cycles - 1: is_last_cycle = True
             self.connection_manager.distribute_message("SC_VOTES", zero_idx_votes, cycle + 1, is_last_cycle)
 
         return player_votes
 
     def compile_sc_votes(self, player_votes, round_num, cycle, previous_votes, influence_matrix):
-        bot_votes = self.sc_sim.get_votes(previous_votes, round_num, cycle, self.vote_cycles)
+        bot_votes = self.sc_sim.get_votes(previous_votes, round_num, cycle, self.vote_cycles, influence_matrix)
 
         all_votes = {**bot_votes, **player_votes} # player votes being second is MANDATORY.
-        print("here ar ethe bot votes ", bot_votes, " and here ar ethe player votes ", player_votes)
         all_votes_list = [option_num + 1 if option_num != -1 else -1 for option_num in
                           all_votes.values()]  # Convert 0-based votes to 1-based for display, but leave voters of -1 as they are
         self.options_votes_history[round_num] = all_votes  # Saves the history of votes
         if cycle < self.vote_cycles:
-            #print("recording for cycle " , cycle)
             self.sc_sim.record_votes(all_votes, cycle)
         return all_votes, all_votes_list
 
@@ -216,9 +213,10 @@ class SCManager:
                     i,
                     curr_round,
                     T_prev[:, i],  # should be a 9x9 ndarray (from numpy)
-                    np.array(self.sc_sim.results_sums),
+                    self.sc_sim.results_sums,
                     np.array(influence_matrix),
                     extra_data,  # yes this is blank. no I don't know why.
+                    True,
                 ))
             else:
                 bot_columns.append(bot.create_column(len(self.total_order))) # something like that?
@@ -239,7 +237,7 @@ class SCManager:
         # we gotta hope this works
         total_columns = (np.array(total_columns).transpose()).tolist()
 
-        return total_columns # this should be the new current options matix. maybe.
+        return total_columns, peeps # this should be the new current options matix. maybe.
 
     def generate_peeps(self, sc_sim, jhg_sim, total_order):
         highest_utility = sc_sim.get_highest_utility_player()

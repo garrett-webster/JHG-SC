@@ -15,12 +15,12 @@ class JHGManager:
         self.num_humans = num_humans
 
     def play_jhg_round(self, round_num, is_last_jhg_round):
-        # Occasionally if the JHG round was played to quickly after the SC round, this would catch the SC vote and brick the server.
-        # UPDATE: It appears that if the SC submit vote button is spammed quick enough, it would send an additional,
-        # unexpected vote. That's the root cause that should get fixed, but this seems to stop it from breaking for now
+
+        # this section of code (next 11 lines or so) exist only to grab any and all instances of player input for JHG engine.
         client_input = None
         if self.num_humans > 0:
             while True:
+                print("IF THIS GOES OFF DURING SOLO SIM IM AFFECTING THE LOCAL TROUT POPULATION")
                 client_input = self.connection_manager.get_responses()  # Gets responses of type "JHG"
 
                 try:
@@ -29,26 +29,21 @@ class JHGManager:
                     break
                 except KeyError:
                     print("Error processinging client_input: ", client_input)
-        current_popularity = self.jhg_sim.execute_round(client_input, round_num - 1)
+
+        # only thing that actually matters for offline play. just run the new round. (don't use round num - 1 ig)
+        current_popularity = self.jhg_sim.execute_round(client_input, round_num)
+
+        # go ahead and grab everything we need and send it out ot the relavent clients.
         # Creates a 2d array where each row corresponds to the allocation list of the player with the associated id
         allocations_matrix = self.jhg_sim.get_T()
-
-
         sent_dict, received_dict = self.get_sent_and_received(allocations_matrix)
         unique_messages = [received_dict, sent_dict]
-
         init_pop_influence = (1 - self.alpha) ** round_num * 100
-
-        #print("Here are the influences ", self.jhg_sim.get_influence().tolist())
-        #print("here is the init pop influence ", init_pop_influence)
-        #print("here is the current_popualrity", list(current_popularity))
-
         self.connection_manager.distribute_message("JHG_OVER", round_num, list(current_popularity),
                                                    self.jhg_sim.get_influence().tolist(), init_pop_influence, is_last_jhg_round,
                                                    unique_messages=unique_messages)
 
 
-        self.current_round += 1
         return self.jhg_sim.get_influence()
 
 
