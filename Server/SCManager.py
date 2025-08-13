@@ -51,6 +51,20 @@ class SCManager:
 
         self.total_order = total_order # keeps track of which are players and which are bots.
 
+    def play_sc_round(self, influence_matrix, possible_peeps, curr_round, curr_sc_round, indexes):
+        if influence_matrix is not None:
+            new_influence = influence_matrix
+        else:
+            new_influence = self.sc_sim.get_influence_matrix
+
+        current_options_matrix, peeps = self.server_side_options_matrix(possible_peeps.tolist(), curr_round, new_influence)
+        self.init_next_round((current_options_matrix, indexes))
+        self.sc_sim.start_round((current_options_matrix, peeps))  # this might be screwing stuff up honestly....
+        self.current_options_matrix = current_options_matrix
+        self.play_social_choice_round(curr_round, new_influence, current_options_matrix)
+        self.sc_sim.set_rounds(curr_sc_round)
+
+
     def init_next_round(self, options_and_peeps=None):
         # Initialize the round
         self.sc_sim.start_round(options_and_peeps) # make sure this actually gets hard set.
@@ -66,7 +80,7 @@ class SCManager:
 
 
 
-    def play_social_choice_round(self, curr_round, influence_matrix):
+    def play_social_choice_round(self, curr_round, influence_matrix, current_options_matrix):
         # first we gotta GET the new current options matrix. thats a pain.
         # Run the voting and collect the votes
         player_votes = self.run_sc_voting(curr_round, influence_matrix)
@@ -77,15 +91,21 @@ class SCManager:
         zero_idx_votes, one_idx_votes = self.compile_sc_votes(player_votes, curr_round, 0, previous_votes, influence_matrix) # no clue what cycle this is or why this runs.
         self.sc_sim.set_final_votes(zero_idx_votes)
         # this is weird garrett stuff Imma not touch it.
-        self.update_vote_effects(zero_idx_votes, self.current_options_matrix,
-                                 self.round_num)  # Tracks the effects of each player's vote on everyone else
+        self.update_vote_effects(zero_idx_votes, current_options_matrix,
+                                 curr_round)  # Tracks the effects of each player's vote on everyone else
 
 
         # Calculate the winning vote
+        self.sc_sim.current_options_matrix = current_options_matrix # maybe??
+        if curr_round == 9:
+            pass
         winning_vote, new_utilities = self.sc_sim.return_win(zero_idx_votes)
+        if winning_vote != -1:
+            winning_vote -= 1
         #print("did we have a winning vote ?", winning_vote)
         #print("These are the utilities ", new_utilities)
-
+        print("Here ar ethe result sums ", self.sc_sim.results_sums)
+        print("here are the new utilities ", new_utilities)
         self.sc_sim.save_results()
         self.sc_sim.set_rounds(self.round_num) # should set it to the last number of rounds before calculation. I hope this works.
         new_utilities = copy.copy(self.sc_sim.get_new_utilities())
@@ -99,7 +119,6 @@ class SCManager:
                                                    self.current_options_matrix, self.sc_sim.get_influence_matrix())
 
         time.sleep(.5)  # Without this, messages get sent out of order, and the sc_history gets screwed up.
-        self.round_num += 1
 
 
     def run_sc_voting(self, curr_sc_round, influence_matrix):
@@ -164,80 +183,67 @@ class SCManager:
     def get_highest_utility_player(self):
         return self.sc_sim.get_highest_utility_player()
 
-    def server_side_options_matrix(self, peeps, influence_matrix, curr_round):
+    def server_side_options_matrix(self, peeps, curr_round, influence_matrix):
         player_peeps = []
         bot_peeps = []
-        total_columns = []
-        player_columns = []
         total_order_index = []
         actual_total_order_index = []
-        for peep in peeps: # find all player peeps first
+        for peep in peeps:  # find all player peeps first
             actual_total_order_index.append(self.total_order.index(peep))
-            if peep[0] == "B": bot_peeps.append(peep)
-            else: player_peeps.append(peep), total_order_index.append(self.total_order.index(peep)) # actual client ID.
+            if peep[0] == "B":
+                bot_peeps.append(peep)
+            else:
+                player_peeps.append(peep), total_order_index.append(self.total_order.index(peep))  # actual client ID.
 
-        #total_columns.append(self.sc_sim.let_others_create_options_matrix(bot_peeps, influence_matrix))
-        # now we have to get teh player input. I don't know how to handle this as well to be entirely honesty.
-
-        self.connection_manager.distribute_message("SC_OPTIONS_CREATE", total_order_index, actual_total_order_index)  # reset all the utilities and whatnot, just in case.
+        # here we have the client creation stuff
+        self.connection_manager.distribute_message("SC_OPTIONS_CREATE", total_order_index,
+                                                   actual_total_order_index)  # reset all the utilities and whatnot, just in case.
         client_input = self.connection_manager.get_responses()
         player_columns = {}
         for client_id, response in client_input.items():
             try:
                 player_columns[self.total_order[client_id]] = (response["UTILITIES"])
             except KeyError:
-                print("Error processing client_input (yes where you think it is): " , client_input)
+                print("Error processing client_input (yes where you think it is): ", client_input)
 
+        allocation_bots = self.sc_sim.allocation_bots
+        new_v = self.sc_sim.new_v
 
-        bot_columns = []
-        extra_data = {} # we only use or initalize if gene3 agent but its just so smol its fine
-        for i in range(self.num_players):
-            extra_data[i] = None  # we never use government or anything.
-        for i, bot in enumerate(self.sc_sim.allocation_bots):
-            if isinstance(bot, GeneAgent3) or isinstance(bot, JakeCAT) or isinstance(bot, ImprovedJakeCat) or isinstance(bot, ProjectCat) or isinstance(bot, SocialWelfare) or isinstance(bot, AntiCat):
-                if self.sc_sim.new_v is not None:
-                    T_prev = self.sc_sim.new_v  # constructs the previous, like, received matrix. kind of.
-                else:
-                    T_prev = [[0 for _ in range(self.num_players)] for _ in
-                              range(self.num_players)]  # 2d nxn array filled w/ zeros.
+        if isinstance(allocation_bots[0], GeneAgent3) or isinstance(allocation_bots[0], SocialWelfare) or isinstance(allocation_bots[0], AntiCat):  # make sure he is in there too
+            if new_v is not None:
+                T_prev = new_v  # constructs the previous, like, received matrix. kind of.
+            else:
+                T_prev = [[0 for _ in range(self.num_players)] for _ in range(self.num_players)]  # 2d nxn array filled w/ zeros.
 
-
-
-                T_prev = np.array(T_prev)
-                extra_data = {}
-                for i in range(self.num_players):
-                    extra_data[i] = None  # we never use government or anything.
-                # go ahead and queyr everyone and then organize it later.
-
-                bot_columns.append(bot.play_round(
+            T_prev = np.array(T_prev)
+            new_columns = []
+            extra_data = {}
+            for i in range(self.num_players):
+                extra_data[i] = None  # we never use government or anything.
+            # go ahead and queyr everyone and then organize it later.
+            for i in range(len(allocation_bots)):
+                new_columns.append(allocation_bots[i].play_round(
                     i,
                     curr_round,
-                    T_prev[:, i],  # should be a 9x9 ndarray (from numpy)
+                    T_prev[:, i],  # should be a 9x9 ndarray (from numFpy)
                     self.sc_sim.results_sums,
                     np.array(influence_matrix),
                     extra_data,  # yes this is blank. no I don't know why.
-                    True,
+                    True,  # this indicates that it is happening within the SC testbed.
                 ))
-            else:
-                bot_columns.append(bot.create_column(len(self.total_order))) # something like that?
+            final_columns = {}
+            for bot, i in enumerate(bot_peeps): # fingers crossed this ends up where we want it to go
+                final_columns[i] = new_columns[bot]
+            for player, i in enumerate(player_peeps):
+                final_columns[i] = player_columns[i]
+            total_columns = []
+            for peep in peeps:
+                total_columns.append(final_columns[peep])
+                # we gotta hope this works
+            total_columns = (np.array(total_columns).transpose()).tolist()
 
-        final_columns = {}
-        for bot, i in enumerate(bot_peeps):
-            final_columns[i] = bot_columns[bot] # hopefully
-        for player, i in enumerate(player_peeps):
-            print("THIS IS THE I WE ARE DEALING WITH, WHAT IS THE I ", i)
-            final_columns[i] = player_columns[i]
+            return total_columns, peeps  # this should be the new current options matix. maybe.
 
-        # should do all the orginization of the final columns and leave it in the original peeps thing.
-        for peep in peeps:
-            total_columns.append(final_columns[peep])
-
-
-
-        # we gotta hope this works
-        total_columns = (np.array(total_columns).transpose()).tolist()
-
-        return total_columns, peeps # this should be the new current options matix. maybe.
 
     def generate_peeps(self, sc_sim, jhg_sim, total_order):
         highest_utility = sc_sim.get_highest_utility_player()

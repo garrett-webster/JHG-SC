@@ -106,28 +106,20 @@ class Server():
             curr_round = int(round_list[list_index][:-1])
             print("this i s the curr_round ", curr_round)
 
-
             if jhg_rounds: # this SHOULD be it. fingers crossed.
                 influence_matrix = self.JHG_manager.play_jhg_round(curr_round, is_last_jhg_round)
                 played_jhg = True
 
             if sc_rounds: # lets be so real no allocations aren't THAT interesting.
-                peeps, indexes = self.generate_peeps(self.total_order, jhg_sim, sc_sim)
-                if influence_matrix is not None:
-                    new_influence = influence_matrix
-                else:
-                    new_influence = sc_sim.get_influence_matrix
-
-                current_options_matrix, peeps = self.SC_manager.server_side_options_matrix(peeps, influence_matrix, curr_round)
-                sc_sim.start_round((current_options_matrix, peeps)) # this might be screwing stuff up honestly....
-                self.SC_manager.current_options_matrix = current_options_matrix
-                self.SC_manager.play_social_choice_round(curr_round, new_influence)
-                sc_sim.set_rounds(curr_sc_round)
+                possible_peeps, indexes = self.generate_peeps(self.total_order, jhg_sim, sc_sim)
+                self.SC_manager.play_sc_round(influence_matrix, possible_peeps, curr_round, curr_sc_round, indexes)
                 curr_sc_round += 1
                 played_sc = True
 
-            # self.round_logger.save_round(curr_round, sc_rounds, jhg_rounds)
-            # create_round_graphs(self.round_logger, curr_round, sc_rounds, jhg_rounds)
+            # if sc_rounds:
+            #     self.round_logger.save_round(curr_round, sc_rounds, jhg_rounds)
+            #     create_round_graphs(self.round_logger, curr_round, sc_rounds, jhg_rounds)
+
         self.game_logger.save_game(played_sc, played_jhg)
         create_game_graphs(self.game_logger)
         print("GAME OVER")

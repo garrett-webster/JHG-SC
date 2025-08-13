@@ -228,6 +228,7 @@ class Social_Choice_Sim:
 
     # tallies if there is a winning vote and does a bunch of stuff with it for tracking purposes.
     def return_win(self, all_votes):
+        print("here are all the votes ", all_votes)
         self.current_results = []
         total_votes = all_votes
 
@@ -260,9 +261,11 @@ class Social_Choice_Sim:
                 winning_vote = -1
         # nothing else to do here. the winning vote is just the winning vote.
 
+        if winning_vote == 0:
+            pass
         if winning_vote != -1:  # if its -1, then nothing happend. NOT the last entry in the fetcher. that was a big bug that flew under the radar.
             for i in range(len(total_votes)):
-                self.current_results.append(self.current_options_matrix[i][winning_vote-1])
+                self.current_results.append(self.current_options_matrix[i][winning_vote]) # PLEASE let that fix it.
             self.add_coop_score() # cop score doesn't make a ton of sense here unfortunately.
         else:
             for i in range(len(total_votes)):
@@ -610,7 +613,6 @@ class Social_Choice_Sim:
 
 
             self.current_options_matrix = current_options_matrix
-            print("so do we make it all the way to the end or what ")
             return current_options_matrix, indexes
 
 
