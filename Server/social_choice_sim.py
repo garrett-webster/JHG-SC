@@ -228,7 +228,6 @@ class Social_Choice_Sim:
 
     # tallies if there is a winning vote and does a bunch of stuff with it for tracking purposes.
     def return_win(self, all_votes):
-        print("here are all the votes ", all_votes)
         self.current_results = []
         total_votes = all_votes
 
@@ -245,6 +244,7 @@ class Social_Choice_Sim:
                 top_causes = [cause for cause, count in cause_vote_counts.items() if count == max_votes]
 
                 if len(top_causes) != 1: # if there si a lot of ties
+                    print("THERE IS A TIE YOUR HONOR THATS WHY EVERYTHING IS GOING LEFT")
                     winning_vote = random.choice(top_causes) # I am a lazy fetcher your honor.
                 else:# fetch it
                     winning_vote = top_causes[0] # just return the normal fetcher.
@@ -287,6 +287,7 @@ class Social_Choice_Sim:
         #TODO: however, having this as a learned trait by bot creates a lot of problems, becuase then each bot has its OWN influence matrix.
         self.calculate_influence_matrix(new_v) # some attempt to scale the two together. maybe?
         # print("here are hte most recent results ", self.current_results)
+        print("This is the winning vote as returned by the machine ", winning_vote)
         return winning_vote, self.current_results
 
     # version uses the wining vote rather than the attempted vote. swapping them out to see if it makes a difference.

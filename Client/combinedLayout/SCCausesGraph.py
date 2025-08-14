@@ -51,7 +51,7 @@ class SCCausesGraph(QWidget):
         self.nodes_ax.cla()
 
     def update_sc_nodes_graph_gritty(self, round_num, winning_vote=None):
-
+        print("here is the winning vot e", winning_vote)
         if self.round_state.nodes:
             # Clear graph
             self.nodes_ax.cla()
@@ -114,6 +114,7 @@ class SCCausesGraph(QWidget):
                     player_alphas.append(alpha)
 
                 elif full_text.startswith("Cause "):
+                    print("this is the full_text ", full_text, " and this is the winning vote ", winning_vote)
                     display_text = full_text.replace("Cause ", "")
                     if winning_vote and full_text == f"Cause {winning_vote}":
                         color = "#e41e1e"  # red for winning cause
@@ -163,7 +164,6 @@ class SCCausesGraph(QWidget):
 
     def update_arrows(self, votes, current_round_tab = False):
         # checks for existing arrows, and removes them.
-        print("here are the votes we are looking at ", votes)
 
         if votes:  # only run this if there are actual potential votes.
             for arrow in self.arrows:  # if there is anything in there.
@@ -192,6 +192,7 @@ class SCCausesGraph(QWidget):
             self.nodes_canvas.draw()
 
     def draw_causes_graph(self, votes, utilities, winning_vote, round_num):
+        print("This is the winning vote as passed on on line 195 ", winning_vote)
         self.update_sc_nodes_graph_gritty(round_num, winning_vote)
         self.update_arrows(votes)
 
@@ -207,8 +208,8 @@ class SCCausesGraph(QWidget):
                 color='white',  # adjust for contrast; white looks good on dark bg
                 bbox=dict(boxstyle='round,pad=0.3', facecolor='#444444', edgecolor='none')
             )
-        if self.nodes_canvas.figure: # make sure this exists before attempting to draw on it.
-            self.nodes_canvas.draw()
+            if self.nodes_canvas.figure: # make sure this exists before attempting to draw on it.
+                self.nodes_canvas.draw()
 
     # no longer used. replacing it with something different, maybe. hard to say.
     # def update_sc_nodes_given_allocations(self):

@@ -55,22 +55,23 @@ class HumanAgent(AbstractAgent):
     def get_vote(self, current_options_matrix, previous_votes, cycle, max_cycle):
         return -1 # SO we SHOUDL be overwriting this, we shall see.
 
-    def play_round(self, player_idx, round_num, received, popularities, influence, extra_data):
+    def play_round(self, player_idx, round_num, received, popularities, influence, extra_data, flag):
         numPlayers = len(received)
+        return [0 for _ in range(numPlayers)]
 
-        while True:
-            if exists("../State/HumanAllocations.txt"):
-                input = open("../State/HumanAllocations.txt", "r")
-                r = int(input.readline())
-                if r == round_num:
-                    allocations = np.zeros(len(popularities), dtype=int)
-                    for i in range(0, numPlayers):
-                        allocations[i] = int(input.readline())
-
-                    return allocations
-                else:
-                    input.close()
-                    time.sleep(0.1)
-            else:
-                # human allocations not found
-                time.sleep(0.1)
+        # while True:
+        #     if exists("../State/HumanAllocations.txt"):
+        #         input = open("../State/HumanAllocations.txt", "r")
+        #         r = int(input.readline())
+        #         if r == round_num:
+        #             allocations = np.zeros(len(popularities), dtype=int)
+        #             for i in range(0, numPlayers):
+        #                 allocations[i] = int(input.readline())
+        #
+        #             return allocations
+        #         else:
+        #             input.close()
+        #             time.sleep(0.1)
+        #     else:
+        #         # human allocations not found
+        #         time.sleep(0.1)

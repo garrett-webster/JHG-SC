@@ -100,12 +100,12 @@ class SCManager:
         if curr_round == 9:
             pass
         winning_vote, new_utilities = self.sc_sim.return_win(zero_idx_votes)
-        if winning_vote != -1:
-            winning_vote -= 1
-        #print("did we have a winning vote ?", winning_vote)
-        #print("These are the utilities ", new_utilities)
-        print("Here ar ethe result sums ", self.sc_sim.results_sums)
-        print("here are the new utilities ", new_utilities)
+        print("this is the winning vote we are passing over ", winning_vote)
+        # if winning_vote != -1:
+        #     winning_vote -= 1
+        # #print("did we have a winning vote ?", winning_vote)
+        # #print("These are the utilities ", new_utilities)
+        # print("this is what we are sending over as the winning vote ", winning_vote)
         self.sc_sim.save_results()
         self.sc_sim.set_rounds(self.round_num) # should set it to the last number of rounds before calculation. I hope this works.
         new_utilities = copy.copy(self.sc_sim.get_new_utilities())
@@ -198,6 +198,7 @@ class SCManager:
         # here we have the client creation stuff
         self.connection_manager.distribute_message("SC_OPTIONS_CREATE", total_order_index,
                                                    actual_total_order_index)  # reset all the utilities and whatnot, just in case.
+        print("prolly makes it here")
         client_input = self.connection_manager.get_responses()
         player_columns = {}
         for client_id, response in client_input.items():
@@ -205,7 +206,7 @@ class SCManager:
                 player_columns[self.total_order[client_id]] = (response["UTILITIES"])
             except KeyError:
                 print("Error processing client_input (yes where you think it is): ", client_input)
-
+        print("betcha it crashes BEFORE this one ")
         allocation_bots = self.sc_sim.allocation_bots
         new_v = self.sc_sim.new_v
 
@@ -241,27 +242,7 @@ class SCManager:
                 total_columns.append(final_columns[peep])
                 # we gotta hope this works
             total_columns = (np.array(total_columns).transpose()).tolist()
+            print("here are the total columns and the peeps ", total_columns, " " , peeps)
 
             return total_columns, peeps  # this should be the new current options matix. maybe.
 
-
-    def generate_peeps(self, sc_sim, jhg_sim, total_order):
-        highest_utility = sc_sim.get_highest_utility_player()
-        highest_pop = jhg_sim.get_highest_popularity_player()
-        if highest_utility == highest_pop:
-            pass  # well fetch, what DO we do here? let them create it twice?
-        possible_players = copy.deepcopy(total_order)
-        for player in {highest_utility,
-                       highest_pop}:  # lets me use a set to make sure that I only erase it once. This should allow for both to be the same thing in the list and have the same player make 2 things.
-            if player in possible_players:
-                possible_players.remove(player)
-        random_player = random.choice(possible_players)
-        peeps = [highest_utility, highest_pop, random_player]
-        return peeps
-
-    # pretty sure I don't every use this actually.
-    # def get_sim(self):
-    #     return self
-
-    def get_results_sums(self):
-        return self.sc_sim.results_sums

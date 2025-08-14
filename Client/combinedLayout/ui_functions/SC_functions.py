@@ -42,13 +42,14 @@ def SC_round_init(main_window):
     main_window.SC_panel.setCurrentIndex(0) # should forcefully move them over if they aren't there already.
    # print("This si the main_window_round staet round num thingy ", main_window.round_state.sc_round_num)
     # I think this just needs to always go off now in this branch, at least.
+    print("Here is it getting called again number 2 ")
     main_window.SC_cause_graph.update_sc_nodes_graph_gritty(main_window.round_state.sc_round_num)
 
 
 # Triggered by SC_OVER
 def update_sc_utilities_labels(main_window, round_num, new_utilities, winning_vote, last_round_votes, last_round_utilities):
     history_grid = main_window.sc_history_grid
-    history_grid.update_sc_history(round_num, last_round_votes, last_round_utilities)
+    history_grid.update_sc_history(round_num, last_round_votes, last_round_utilities, winning_vote)
     main_window.SC_panel.setCurrentIndex(1)
     main_window.SC_cause_graph.update_arrows(history_grid.sc_history[str(round_num)]["votes"], True)
     main_window.SC_panel.setTabText(1, "Results")
@@ -63,6 +64,7 @@ def tab_changed(main_window, index):
     current_tab = main_window.SC_panel.widget(index)
     cause_graph = main_window.SC_cause_graph
     if current_tab == main_window.SC_voting_grid:
+        print("here is where it is getign called 3")
         cause_graph.update_sc_nodes_graph_gritty(main_window.round_state.sc_round_num)
         cause_graph.update_arrows(main_window.round_state.current_votes, True)
 
@@ -72,7 +74,8 @@ def tab_changed(main_window, index):
         sc_history_tab = main_window.sc_history_grid
         selected_round = sc_history_tab.round_drop_down.currentIndex() + 1
         votes = sc_history_tab.sc_history[str(selected_round)]["votes"]
-        winning_vote = get_winning_vote(votes)
+        winning_vote = sc_history_tab.sc_history[str(selected_round)]["winning_vote"]
+        print("PART 4")
         print("ayo here's the winning vote over here ", winning_vote)
         cause_graph.update_sc_nodes_graph_gritty(selected_round, winning_vote)
         cause_graph.update_arrows(votes)

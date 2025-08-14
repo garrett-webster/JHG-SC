@@ -42,7 +42,7 @@ def run_trial(sc_sim: "Social_Choice_Sim", jhg_sim, round_list, num_cycles, grou
         sc_rounds = round_list[list_index][-1] == "*"
         jhg_rounds = round_list[list_index][-1] == "-"
         curr_round = int(round_list[list_index][:-1]) # useful, yes, but not quite the logger round
-        print("this si the curr round ", curr_round)
+        # print("this si the curr round ", curr_round)
 
         # print("*****************************ROUND ", curr_round, "********************************")
 
@@ -251,7 +251,7 @@ if __name__ == "__main__":
     num_humans = 0
     tokens_per_player = 2
     utility_per_player = 3
-    create_round_graphs_bool = True
+    create_round_graphs_bool = False
     create_game_graphs_bool = True
     create_influence = False
     chromosomes_directory = "testChromosome"

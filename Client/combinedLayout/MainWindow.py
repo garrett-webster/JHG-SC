@@ -210,7 +210,7 @@ class MainWindow(QMainWindow):
     def update_tornado_graph(self, tornado_ax, positive_vote_effects, negative_vote_effects):
         update_sc_tornado_graph(self, tornado_ax, positive_vote_effects, negative_vote_effects)
 
-    def update_sc_nodes_graph(self, winning_vote):
+    def update_sc_nodes_graph(self, winning_vote, round_num):
         self.sc_history_grid.winning_vote = winning_vote
         self.SC_cause_graph.update_arrows(self.round_state.current_votes)
         self.round_state.current_votes = {i: -1 for i in range(self.round_state.num_players)}
