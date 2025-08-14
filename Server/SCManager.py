@@ -16,6 +16,7 @@ from Server.Engine.completeBots.antiCat import AntiCat
 
 import copy
 
+# this is garrett code. Yo no touchy.
 def create_empty_vote_matrix(num_players):
     return [[0 for _ in range(num_players)] for _ in range(num_players)]
 
@@ -51,26 +52,19 @@ class SCManager:
 
         self.total_order = total_order # keeps track of which are players and which are bots.
 
+    # this is the runner, and what main window and server will actually call.
     def play_sc_round(self, influence_matrix, possible_peeps, curr_round, curr_sc_round, indexes):
-        if influence_matrix is not None:
+        if influence_matrix is not None: # just incase we are playing SC on its own.
             new_influence = influence_matrix
         else:
             new_influence = self.sc_sim.get_influence_matrix
+        # not a refactor per se, but made the code much more readable.
+        current_options_matrix = self.init_next_round(possible_peeps, curr_round, new_influence) # gets the current options matrix and starts SC_init
+        self.play_social_choice_round(curr_round, new_influence, current_options_matrix, curr_sc_round) # actually does the voting and whatnot.
 
-        current_options_matrix, peeps = self.server_side_options_matrix(possible_peeps.tolist(), curr_round, new_influence)
-
-        self.init_next_round((current_options_matrix, indexes)) # sets some sim stuff and then sends out packets
-
-        self.sc_sim.start_round((current_options_matrix, peeps))  # this runs as intended and dives down in
-
-        self.current_options_matrix = current_options_matrix
-
-        self.play_social_choice_round(curr_round, new_influence, current_options_matrix)
-
-        self.sc_sim.set_rounds(curr_sc_round) # this we could probably
-
-
-    def init_next_round(self, options_and_peeps=None):
+    # starts the next round, prepares the packet and gets the new options matrix. gets all ducks in a row.
+    def init_next_round(self, possible_peeps, curr_round, new_influence):
+        options_and_peeps = self.server_side_options_matrix(possible_peeps.tolist(), curr_round, new_influence)
         # Initialize the round
         self.sc_sim.start_round(options_and_peeps) # make sure this actually gets hard set.
         self.current_options_matrix = self.sc_sim.current_options_matrix
@@ -82,37 +76,25 @@ class SCManager:
         self.connection_manager.distribute_message("SC_INIT", self.round_num, self.current_options_matrix,
                                                    [node.to_json() for node in self.all_nodes],
                                                    self.current_options_matrix)
+        return self.current_options_matrix
 
 
-    # how good is this at keeping stuff upstream
-    def play_social_choice_round(self, curr_round, influence_matrix, current_options_matrix):
+    # ...yeah the naming convention isn't great but IDK what else to call it.
+    def play_social_choice_round(self, curr_round, influence_matrix, current_options_matrix, curr_sc_round):
 
         # Run the voting and collect the votes
         zero_idx_votes, one_idx_votes = self.run_sc_voting(curr_round, influence_matrix)
-
-        # this is the line where we get the bot votes as well.
-        previous_votes = {}
-        # always start from cycle 0, don't use the max one. methinks.
         self.sc_sim.set_final_votes(zero_idx_votes)
-        # this is weird garrett stuff Imma not touch it.
         self.update_vote_effects(zero_idx_votes, current_options_matrix,
                                  curr_round)  # Tracks the effects of each player's vote on everyone else
 
 
         # Calculate the winning vote
         self.sc_sim.current_options_matrix = current_options_matrix # maybe??
-        winning_vote, new_utilities = self.sc_sim.return_win(zero_idx_votes)
-        # if winning_vote != -1:
-        #     winning_vote -= 1
-        # #print("did we have a winning vote ?", winning_vote)
-        # #print("These are the utilities ", new_utilities)
-        # print("this is what we are sending over as the winning vote ", winning_vote)
-        self.sc_sim.save_results()
-        self.sc_sim.set_rounds(self.round_num) # should set it to the last number of rounds before calculation. I hope this works.
+        winning_vote, new_utilities = self.sc_sim.return_win(zero_idx_votes) # actually runs the backround math
+        self.sc_sim.save_results() # just gets all our ducks in a row.
         new_utilities = copy.copy(self.sc_sim.get_new_utilities())
         new_utilities = {str(k): sum(v) for k,v in new_utilities.items()}
-        #print("here are the new utilities ", new_utilities)
-
 
         self.connection_manager.distribute_message("SC_OVER", self.round_num, winning_vote, new_utilities,
                                                    self.positive_vote_effects_history,
@@ -120,8 +102,9 @@ class SCManager:
                                                    self.current_options_matrix, self.sc_sim.get_influence_matrix())
 
         time.sleep(.5)  # Without this, messages get sent out of order, and the sc_history gets screwed up.
+        self.sc_sim.set_rounds(curr_sc_round)  # last thing we do, thats da rule.
 
-    # not a good way to condense this, as we need to get all the votes every cycle.
+    # get the bot votes and the player votes, let everyone know what was happening last time.
     def run_sc_voting(self, curr_sc_round, influence_matrix):
         player_votes = {}
         is_last_cycle = False
@@ -150,9 +133,9 @@ class SCManager:
             self.connection_manager.distribute_message("SC_VOTES", zero_idx_votes, cycle + 1, is_last_cycle)
 
         # zero clue why this is what we are returning Imma be so real
-        print("this si what we are returning ", player_votes)
-        return zero_idx_votes, one_idx_votes
+        return zero_idx_votes, one_idx_votes # no reason to ask for these again, only ask for em once.
 
+    # just combines them and updates the backround history.
     def compile_sc_votes(self, player_votes, round_num, cycle, previous_votes, influence_matrix):
         bot_votes = self.sc_sim.get_votes(previous_votes, round_num, cycle, self.vote_cycles, influence_matrix)
 
@@ -164,6 +147,7 @@ class SCManager:
             self.sc_sim.record_votes(all_votes, cycle)
         return all_votes, all_votes_list
 
+    # Garrett code I no touchy.
     def update_vote_effects(self, all_votes, current_options_matrix, round_num):
         round_vote_effects = create_empty_vote_matrix(self.num_players)
         for i in range(self.num_players):
@@ -180,15 +164,7 @@ class SCManager:
                         self.negative_vote_effects_history[i][j] += vote_effect
         self.vote_effects_history[str(round_num)] = round_vote_effects
 
-    def get_bot_votes(self):
-        self.sc_sim.get_votes()
-
-    def finish_results(self, filename):
-        self.current_logger.finish_json(filename)
-
-    def get_highest_utility_player(self):
-        return self.sc_sim.get_highest_utility_player()
-
+    # this just runs getting the optison matrix, but from the server. distribut the poacket and whatnot.
     def server_side_options_matrix(self, peeps, curr_round, influence_matrix):
         player_peeps = []
         bot_peeps = []
@@ -204,7 +180,6 @@ class SCManager:
         # here we have the client creation stuff
         self.connection_manager.distribute_message("SC_OPTIONS_CREATE", total_order_index,
                                                    actual_total_order_index)  # reset all the utilities and whatnot, just in case.
-        print("prolly makes it here")
         client_input = self.connection_manager.get_responses()
         player_columns = {}
         for client_id, response in client_input.items():
@@ -212,7 +187,8 @@ class SCManager:
                 player_columns[self.total_order[client_id]] = (response["UTILITIES"])
             except KeyError:
                 print("Error processing client_input (yes where you think it is): ", client_input)
-        print("betcha it crashes BEFORE this one ")
+
+        # copied as much as I could directly from the sim, these are a little uggly but they work.
         allocation_bots = self.sc_sim.allocation_bots
         new_v = self.sc_sim.new_v
 
@@ -248,7 +224,5 @@ class SCManager:
                 total_columns.append(final_columns[peep])
                 # we gotta hope this works
             total_columns = (np.array(total_columns).transpose()).tolist()
-            print("here are the total columns and the peeps ", total_columns, " " , peeps)
-
             return total_columns, peeps  # this should be the new current options matix. maybe.
 
