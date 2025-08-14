@@ -13,6 +13,7 @@ OPTIONS = {
     "SC_VOTE_CYCLES": 3, # Number of cycles to play each social choice round. Players will vote this many times, with the nth vote being final.
     "JHG_LOGGING": False,
     "SC_LOGGING": True,
+    "CAPTAIN_MODEL": False,
 
     # Generator options
     "OPTION_GENERATOR": 2, # Defines what behavior the options generator should use. See Server.OptionsGenerators.generators for the full list
@@ -35,6 +36,7 @@ class Server():
         self.sc_vote_cycles = options["SC_VOTE_CYCLES"]
         self.SC_logging = options["SC_LOGGING"]
         self.JHG_logging = options["JHG_LOGGING"]
+        self.captain_model = options["CAPTAIN_MODEL"]
         self.total_order = None
         self.generator = None
         self.SC_manager = None
