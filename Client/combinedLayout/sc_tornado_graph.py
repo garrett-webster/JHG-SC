@@ -56,6 +56,7 @@ def update_sc_tornado_graph(main_window, ax, positive_vote_effects, negative_vot
     # Set labels and title
     ax.set_yticklabels([])
     for i, y_pos in enumerate(y_positions):
+        #print("Here is the x position ", max_extent, " and here is the ypos ", y_pos)
         ax.text(-max_extent * 1.05, y_pos, f"Player {i + 1}", va='center', ha='right', fontsize=10, color=COLORS[i])
 
     ax.axvline(0, color='#EBEBEB', linewidth=2, linestyle='-')

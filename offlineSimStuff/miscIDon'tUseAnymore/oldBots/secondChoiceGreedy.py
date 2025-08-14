@@ -1,4 +1,4 @@
-# this brother doesn't even think, he just votes greedy, then takes his second option. testing / edgecases, not really for actual use.
+# this brother doesn't even think, he just votes greediest, then takes his second option. testing / edgecases, not really for actual use.
 
 
 class secondChoiceGreedy():

@@ -20,8 +20,8 @@ class GameSimulator:
         return self.engine.get_prev_influence()
 
 
-    def get_popularity(self):
-        return self.engine.get_popularity()
+    def get_popularity(self, curr_round=None):
+        return self.engine.get_popularity(curr_round)
 
 
     def get_transaction(self):
@@ -38,6 +38,9 @@ class GameSimulator:
 
     def play_round(self, T):
         self.engine.apply_transaction(T)
+
+    def return_bot_type(self):
+        return self.engine.bots
 
 
     def save(self, outFilePath):

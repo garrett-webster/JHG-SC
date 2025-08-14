@@ -3,9 +3,9 @@ import time
 from Server.social_choice_sim import Social_Choice_Sim
 from tqdm import tqdm
 import statistics
-from offlineSimStuff.variousGraphingTools.causeNodeGraphVisualizer import causeNodeGraphVisualizer
-from offlineSimStuff.variousGraphingTools.longTermGrapher import longTermGrapher
-from offlineSimStuff.variousGraphingTools.simLogger import simLogger
+from offlineSimStuff.variousGraphingTools.outDated.sc_tools import causeNodeGraphVisualizer
+from offlineSimStuff.variousGraphingTools.outDated.sc_tools import longTermGrapher
+from offlineSimStuff.variousGraphingTools.outDated.sc_tools import simLogger
 
 
 # starts the sim, could make this take command line arguments
@@ -71,7 +71,7 @@ def create_sim(scenario=None, chromosomes=None, group=""):
     return sim
 
 
-
+# if you attempt to run this, just know that it will
 if __name__ == "__main__":
     num_rounds = 10
     num_cycles = 3
@@ -79,8 +79,10 @@ if __name__ == "__main__":
     total_groups = ["", 0, 1, 2]
     chromosomes_directory = "testChromosome"
     group = ""
-    scenario = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\offlineSimStuff\scenarioIndicator\somewhatMoreAwareGreedy"
-    chromosome = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\offlineSimStuff\chromosomes\highestFromTesting"
+    scenario = "../../offlineSimStuff/scenarioIndicator/somewhatMoreAwareGreedy"
+    chromosome = "../../offlineSimStuff/chromosomes/highestFromTesting"
+
+
     current_sim = create_sim(scenario, chromosome, group)
     updated_sim = run_trial(current_sim, num_rounds, num_cycles, create_graphs, group)
     current_visualizer = longTermGrapher()

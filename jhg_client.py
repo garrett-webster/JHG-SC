@@ -13,7 +13,7 @@ def resource_path(relative_path):
         return os.path.join(sys._MEIPASS, relative_path)
     return os.path.join(os.path.abspath("Client"), relative_path)
 
-import pyqtgraph
+# import pyqtgraph
 
 
 # --- Everything above this line is necessary for building the executable --- #
@@ -31,9 +31,10 @@ if __name__ == "__main__":
     app.setStyleSheet(load_stylesheet("combinedLayout/style.qss"))
 
     #host = '10.55.10.49'
-    host = '127.0.0.1'
+    host = '127.0.0.1'  # if testing on personal machine or whatever
+    #host = '192.168.36.5' # if testing on jonathons machine (note: sometimes that last number likes to change)
     #port = 12346
-    port = 12346
+    port = 12345
 
     connection_manager = ClientConnectionManager(host, port)
 
@@ -41,7 +42,12 @@ if __name__ == "__main__":
     client_id = init_vals["CLIENT_ID"]
     num_players = init_vals["NUM_PLAYERS"]
     num_cycles = init_vals["NUM_CYCLES"]
+    num_tokens_per_player = init_vals["TOKENS_PER_PLAYER"]
+    utility_per_player = init_vals["UTILITY_PER_PLAYER"]
+    starting_utility = init_vals["STARTING_UTILITY"]
+    all_allocations = init_vals["ALL_ALLOCATIONS"]
 
-    window = MainWindow(connection_manager, num_players, client_id, num_cycles)
+    window = MainWindow(connection_manager, num_players, client_id, num_cycles, num_tokens_per_player, utility_per_player, starting_utility, all_allocations)
+    #window.showFullScreen() # this enables full screen on the chromebooks
     window.show()
     app.exec()

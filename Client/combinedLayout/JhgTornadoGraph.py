@@ -48,11 +48,12 @@ class JhgTornadoGraph(FigureCanvas):
                 max_extent = max(max_extent, abs(positive_influence_total), abs(negative_influence_total))
 
         # Set symmetric x-axis limits
-        self.ax.set_xlim(-max_extent + 100, max_extent)
+        self.ax.set_xlim(-max_extent, max_extent)
+        self.ax.yaxis.set_visible(False)
 
         # Set labels and title
-        self.ax.set_yticklabels([])
         for i, y_pos in enumerate(y_positions):
+            #print("Here is the x position ", max_extent, " and here is the ypos ", y_pos)
             self.ax.text(-max_extent * 1.05, y_pos, f"Player {i + 1}", va='center', ha='right', fontsize=10, color=COLORS[i])
 
         self.ax.axvline(0, color='#EBEBEB', linewidth=2, linestyle='-')

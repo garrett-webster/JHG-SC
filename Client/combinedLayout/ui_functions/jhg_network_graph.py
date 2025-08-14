@@ -2,6 +2,7 @@ import numpy as np
 from Client.combinedLayout.ui_functions.StudyScripts.network import NodeNetwork
 from Client.combinedLayout.colors import COLORS
 import pyqtgraph as pg
+from Client.combinedLayout.hoverScatter import HoverScatter
 
 def update_jhg_network_graph(main_window):
     if main_window.round_state.jhg_round_num == 0:
@@ -21,11 +22,20 @@ def update_jhg_network_graph(main_window):
 
     spots = []
     for i, (x, y) in enumerate(node_positions):
-        color = COLORS[i % len(COLORS)]  # Cycle through COLORS if there are more nodes than COLORS
-        spots.append({'pos': (x, y), 'size': 15, 'brush': pg.mkBrush(color), 'pen': None})
+        data = str(i+1)
+        if (i + i) == main_window.round_state.client_id:
+            data = "You (" + str(i+1) + ")"
+        color = COLORS[i % len(COLORS)]  # Cycle through COLORS
+        spots.append({
+            'pos': (x, y),
+            'size': 15,
+            'brush': pg.mkBrush(color),
+            'pen': None,
+            'data': f"{data}"  # Tooltip text
+        })
 
-    scatter = pg.ScatterPlotItem()
-    scatter.addPoints(spots)  # Add all nodes with individual COLORS
+    # Use the custom HoverScatter class
+    scatter = HoverScatter(spots=spots)
     main_window.jhg_network.addItem(scatter)
 
     # Normalize the influence weights for color mapping and opacity

@@ -20,26 +20,28 @@ class SCHistoryGrid(SCGrid):
         self.selector_layout.addWidget(self.round_drop_down)
 
         self.layout.insertLayout(0, self.selector_layout)
+        self.winning_vote = -1
 
     def change_round(self, index):
         round_key = str(index + 1)
         if round_key in self.sc_history:
-            self.update_grid(self.sc_history[round_key]["votes"], self.sc_history[round_key]["utilities"], round_key)
+            self.update_sc_grid(self.sc_history[round_key]["votes"], self.sc_history[round_key]["utilities"], round_key)
         self.parent().parent().setTabText(1, "History")
 
 
-    def update_sc_history(self, round, votes, utilities):
+    def update_sc_history(self, round, votes, utilities, winning_vote):
         self.round_drop_down.addItem(f"Round {round}")
-        self.sc_history[str(round)] = {"votes": votes, "utilities": utilities}
+        self.sc_history[str(round)] = {"votes": votes, "utilities": utilities, "winning_vote": winning_vote}
 
         self.round_drop_down.repaint()
         self.round_drop_down.setCurrentIndex(round - 1)
 
 
-    def update_grid(self, votes, utilities, round_num):
+    def update_sc_grid(self, votes, utilities, round_num, winning_vote):
         one_idx_votes = {key: value + 1 for key, value in votes.items()}
         super().update_grid(one_idx_votes, utilities)
-        winning_vote = get_winning_vote(votes)
+        # winning_vote = get_winning_vote(votes)
+        #winning_vote += 1
 
         # Color the labels for each player coinciding with the winning vote. Green if that cause has positive utility
         # for that player, red if it has negative utility for the player, and white if it is zero. Also resets the labels
@@ -62,5 +64,7 @@ class SCHistoryGrid(SCGrid):
                 if i - 1 == winning_vote:
                     label.setStyleSheet("color: green;")
 
+
+        # winning_vote -= 1
         # Draw the graph for the selected round
         self.causes_graph.draw_causes_graph(votes, utilities, winning_vote, int(round_num))

@@ -1,0 +1,77 @@
+from Server.Engine.completeBots.baseagent import AbstractAgent
+from os.path import exists
+
+import numpy as np
+import os
+import platform # need to know if this is windows or linux (or mac)
+import time
+
+class HumanAgent(AbstractAgent):
+
+    def __init__(self):
+        super().__init__()
+        self.whoami = "Human"
+        if platform.system() == "Windows":
+            # print("Running on Windows...")
+
+            # Define the files to be deleted
+            human_allocations_file = "../State/HumanAllocations.txt"
+            visual_traits_file = "../State/visualTraits.txt"
+
+            # Attempt to delete HumanAllocations.txt
+            if os.path.exists(human_allocations_file):
+                try:
+                    os.remove(human_allocations_file)
+                    print("Deleted HumanAllocations.txt successfully.")
+                except Exception as e:
+                    print(f"Failed to delete HumanAllocations.txt: {e}")
+            else:
+                pass
+                #print("HumanAllocations.txt does not exist.")
+
+            # Attempt to delete visualTraits.txt
+            if os.path.exists(visual_traits_file):
+                try:
+                    os.remove(visual_traits_file)
+                    print("Deleted visualTraits.txt successfully.")
+                except Exception as e:
+                    print(f"Failed to delete visualTraits.txt: {e}")
+            else:
+                pass
+                #print("visualTraits.txt does not exist.")
+        self.gameParams = {}
+
+
+    def setGameParams(self, gameParams, _forcedRandom):
+        self.gameParams = gameParams
+
+
+    def getType(self):
+        return self.whoami
+
+    def create_column(self, num_players):
+        return [0 for _ in range(num_players)]
+
+    def get_vote(self, current_options_matrix, previous_votes, cycle, max_cycle):
+        return -1 # SO we SHOUDL be overwriting this, we shall see.
+
+    def play_round(self, player_idx, round_num, received, popularities, influence, extra_data, flag):
+        numPlayers = len(received)
+        return [0 for _ in range(numPlayers)]
+
+        # while True:
+        #     if exists("../State/HumanAllocations.txt"):
+        #         input = open("../State/HumanAllocations.txt", "r")
+        #         r = int(input.readline())
+        #         if r == round_num:
+        #             allocations = np.zeros(len(popularities), dtype=int)
+        #             for i in range(0, numPlayers):
+        #                 allocations[i] = int(input.readline())
+        #
+        #             return allocations
+        #         else:
+        #             input.close()
+        #             time.sleep(0.1)
+        #     else:
+        #         # human allocations not found
+        #         time.sleep(0.1)

@@ -21,12 +21,14 @@ class ServerConnectionManager(ConnectionManager):
 
         self.message_type_names = {
             "SC_INIT": ["ROUND_NUM", "OPTIONS", "NODES", "UTILITIES"],
-            "SETUP": ["CLIENT_ID", "NUM_PLAYERS", "NUM_CYCLES"],
+            "SETUP": ["CLIENT_ID", "NUM_PLAYERS", "NUM_CYCLES", "TOKENS_PER_PLAYER", "UTILITY_PER_PLAYER", "STARTING_UTILITY", "ALL_ALLOCATIONS"],
+            "SC_OPTIONS_CREATE": ["CLIENT_IDS", "TOTAL_IDS"],
             "JHG": ["CURRENT_VOTES"],
             "JHG_OVER": ["ROUND", "POPULARITY", "INFLUENCE_MAT", "INIT_POP_INFLUENCE", "IS_LAST", "RECEIVED", "SENT"],
             "SC_VOTES": ["VOTES", "CYCLE", "IS_LAST_CYCLE"],
             "SC_OVER": ["ROUND_NUM", "WINNING_VOTE", "NEW_UTILITIES", "POSITIVE_VOTE_EFFECTS",
-                        "NEGATIVE_VOTE_EFFECTS", "VOTES", "UTILITIES"],
+                        "NEGATIVE_VOTE_EFFECTS", "VOTES", "UTILITIES", "INFLUENCE_MATRIX"],
+
         }
 
         # NOTE: All messages also receive the CLIENT_ID, but it is not included in the message_type specification
@@ -34,6 +36,8 @@ class ServerConnectionManager(ConnectionManager):
             "JHG_ALLOCATIONS": ["ROUND_NUMBER", "ALLOCATIONS"],
             "SUBMIT_JHG": ["ROUND_NUMBER", "ALLOCATIONS"],
             "SUBMIT_SC": ["FINAL_VOTE"],
+            "SUBMIT_UTILITY": ["ROUND_NUMBER", "UTILITIES"],
+
         }
 
     def create_total_order(self, num_players, num_bots):
@@ -48,11 +52,11 @@ class ServerConnectionManager(ConnectionManager):
         total_list = client_list + bots_list
         random.shuffle(total_list)  # bars
         self.total_order = total_list
-        print("This is the total order ", self.total_order)
+        #print("This is the total order ", self.total_order)
         # now we need to list out hte player ID's.
         self.player_only_ids = [self.total_order.index(val) for val in total_list if
                                 val.startswith("P")]  # this ID is zero indexed.
-        print("these are the player only ID's ", self.player_only_ids)
+        # print("these are the player only ID's ", self.player_only_ids)
 
     def get_total_list(self):
         return self.total_order
@@ -117,6 +121,30 @@ class ServerConnectionManager(ConnectionManager):
 
         return responses
 
+    # ''' Custom function to get reponses from only a selected number of players. used for creating the options matrix '''
+    # def custom_get_responses(self, num_expecting, client_ids_expected, continuous_distribution_type = None):
+    #     responses = {}
+    #     num_received = 0
+    #     while num_received < num_expecting:
+    #         data = self.read_responses()
+    #         for client, received_json in data.items():
+    #             message_type = received_json["TYPE"]
+    #             client_id = received_json["CLIENT_ID"]
+    #             if client_id in client_ids_expected:
+    #                 if client_id not in responses:
+    #                     num_received += 1
+    #             response = {"TYPE": message_type, "CLIENT_ID": client_id}
+    #             for name in self.received_message_type_names[message_type]:
+    #                 response[name] = received_json[name]
+    #
+    #             responses[client_id] = response
+    #
+    #         if continuous_distribution_type is not None:
+    #             self.distribute_message(continuous_distribution_type, responses)
+    #
+    #     return responses
+
+
 
     # Checks for any clients that have sent a response and reads that response.
     def read_responses(self):
@@ -140,7 +168,7 @@ class ServerConnectionManager(ConnectionManager):
     # Wait until the expected number of clients have connected and initialize those connections
     # NOTE: This is somewhat hard coded for JHG/SC.
     # If trying to make this a more general use codebase, this needs some refactoring.
-    def add_clients(self, num_clients, num_bots, num_cycles):
+    def add_clients(self, num_clients, num_bots, num_cycles, num_tkns_plyr, util_plyr, util_start, all_allocations):
         # LETS SEE IF THIS WORKS
         # Accept new connections and add them to the connection manager until the specified number of connections have been made
         while len(self.clients) < num_clients:
@@ -149,5 +177,5 @@ class ServerConnectionManager(ConnectionManager):
             print("Received new client from: ", client_address)
             self.clients[player_specific_id] = client_socket
             self.num_clients += 1
-            self.send_message(client_socket, "SETUP", player_specific_id, num_clients + num_bots, num_cycles)
+            self.send_message(client_socket, "SETUP", player_specific_id, num_clients + num_bots, num_cycles, num_tkns_plyr, util_plyr, util_start, all_allocations)
 

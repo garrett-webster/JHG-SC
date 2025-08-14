@@ -74,22 +74,6 @@ class JHGEngine():
         Itemp = self.scaleBackMurder(tau, Itemp, V)
         self.Ptemp[tau] = Itemp.sum(axis=0) +  + pow((1.0 - self.alpha), tau) * self.P[0]
         return Itemp
-        
-        # old clipping method
-        # # Rescale the influence if the incoming negative influence is greater than the expected popularity
-        # if np.any(I_tilde < 0):
-        #     with np.errstate(divide='ignore', invalid='ignore'):
-        #         omega = np.minimum(1, (self.P[tau - 1] + np.sum(self.alpha * np.abs(I_tilde * (I_tilde > 0)), axis=0) ) / np.sum(self.alpha * np.abs(I_tilde * (I_tilde < 0)), axis=0))
-        #         omega[np.isnan(omega)] = 1.0
-        #         omega[np.isinf(omega)] = 1.0
-        #     omega = np.ones_like(I_tilde) * omega
-        #     omega[I_tilde >= 0] = 1.0
-        #     I_tilde = I_tilde * omega - np.diag(np.sum(np.abs(I_tilde * (1 - omega)), axis=1))
-
-        # self.Ptemp[tau] = [ sum(y) for y in zip(*(self.alpha * I_tilde + (1 - self.alpha) * I_bar)) ] + pow((1.0 - self.alpha), tau) * self.P[0]
-        # return self.alpha * I_tilde + (1 - self.alpha) * I_bar
-
-        
 
     ## Raw round influence
     def I_hat(self, tau, t):
@@ -125,7 +109,7 @@ class JHGEngine():
 
     ## weight of player's actions at time tau based on i's populatiry at time tau - 1 and t - 1
     def W(self, tau, t):
-        # experiment so that we don't ruin explode exponential in fame networks
+        # mostHumanFromTesting so that we don't ruin explode exponential in fame networks
         eta = sum(self.P[tau - 1]) / sum(self.P[t-1])
         # print("eta at " + str(tau) + ": " + str(eta))
         # eta = 1
@@ -194,7 +178,7 @@ class JHGEngine():
         self.base_popularity = new_base
         self.P[0] = np.ones(self.N) * self.base_popularity
 
-    def apply_transaction(self, T):
+    def apply_transaction(self, T, normalize=True):
         self.t += 1
         T = T / np.sum(np.abs(T), axis=1)[:, np.newaxis]
         self.T.append(T)
@@ -213,6 +197,7 @@ class JHGEngine():
             return self.I[self.t-1]
         else:
             return self.I[0]
+
 
     def get_popularity(self, t=None):
         return self.P[t] if t is not None else self.P[self.t]

@@ -4,26 +4,31 @@ from collections import defaultdict
 import numpy as np
 from PyQt6.QtCore import QObject, pyqtSignal
 from matplotlib.axes import Axes
+from pyexpat.errors import messages
 
 
 class ServerListener(QObject):
     update_jhg_round_signal = pyqtSignal()
     update_sc_round_signal = pyqtSignal()
+    enable_allocations_interface = pyqtSignal()
     disable_sc_buttons_signal = pyqtSignal()
     enable_jhg_buttons_signal = pyqtSignal()
     jhg_over_signal = pyqtSignal(bool, float)
     update_sc_votes_signal = pyqtSignal(dict, int, bool)
     update_sc_utilities_labels_signal = pyqtSignal(int, dict, int, dict, list)
     update_tornado_graph_signal = pyqtSignal(Axes, list, list)
-    update_sc_nodes_graph_signal = pyqtSignal(int)
     switch_to_jhg_signal = pyqtSignal()
+    update_sc_nodes_graph_signal = pyqtSignal(int, int)
+    sc_create_stuff = pyqtSignal(list, list)
+    update_sc_influence = pyqtSignal(list, list)
 
 
-    def __init__(self, main_window, connection_manager, round_state, round_counter, token_label, jhg_popularity_graph, tabs, utility_qlabels):
+    def __init__(self, main_window, connection_manager, round_state, round_counter, token_label, allocations_label, jhg_popularity_graph, tabs):
         super().__init__()
         self.response_functions = defaultdict(lambda: self.unknown_message_type_handler, {
             "JHG_OVER": self.JHG_OVER,
             "SC_INIT": self.SC_INIT,
+            "SC_OPTIONS_CREATE": self.SC_CREATE,
             "SC_VOTES": self.SC_VOTES,
             "SC_OVER": self.SC_OVER,
         })
@@ -33,9 +38,9 @@ class ServerListener(QObject):
         self.round_counter = round_counter
         self.main_window = main_window
         self.token_label = token_label
+        self.allocations_label = allocations_label
         self.jhg_popularity_graph = jhg_popularity_graph
         self.tabs = tabs
-        self.utility_qlabels = utility_qlabels
 
 
     # Once connected to the server, this method is called on a threaded object. Once the thread calls it, it
@@ -56,6 +61,7 @@ class ServerListener(QObject):
 
 
     def JHG_OVER(self, message):
+        time.sleep(0.1)
         self.round_state.influence_mat = np.array(message["INFLUENCE_MAT"])
         self.update_jhg_state(message)
         self.jhg_over_signal.emit(message["IS_LAST"], message["INIT_POP_INFLUENCE"])
@@ -66,10 +72,14 @@ class ServerListener(QObject):
         self.round_state.sc_round_num = message["ROUND_NUM"]
         self.round_state.options = message["OPTIONS"]
         self.round_state.nodes[self.round_state.sc_round_num] = message["NODES"]
-        self.round_state.utilities = message["UTILITIES"]
+        self.round_state.utilities_mat = message["UTILITIES"]
 
-        self.update_sc_round_signal.emit()
+        self.update_sc_round_signal.emit()  # go ahead and adjust all the SC stuff appropriately as well.
 
+
+    def SC_CREATE(self, message):
+        self.sc_create_stuff.emit(message["CLIENT_IDS"], message["TOTAL_IDS"])
+        # this actually does a lot of stuff, its just all hidden under main window.
 
     def SC_VOTES(self, message):
         self.round_state.current_votes = message["VOTES"]
@@ -78,17 +88,21 @@ class ServerListener(QObject):
 
     def SC_OVER(self, message):
         # This is the only time that the user won't switch the tab to see a round it the history tab, so it needs a little manual help.
-        if self.round_state.jhg_round_num == 1:
-            self.main_window.sc_history_grid.update_grid(message["VOTES"], message["UTILITIES"], self.round_state.sc_round_num)
+        # if self.round_state.jhg_round_num == 1:
+        winning_vote = message["WINNING_VOTE"]
+        winning_vote += 1
+        self.main_window.sc_history_grid.update_sc_grid(message["VOTES"], message["UTILITIES"], self.round_state.sc_round_num, winning_vote)
 
         self.disable_sc_buttons_signal.emit()
         new_utilities = message["NEW_UTILITIES"]
 
-        self.update_sc_utilities_labels_signal.emit(message["ROUND_NUM"], new_utilities, message["WINNING_VOTE"], message["VOTES"], message["UTILITIES"])
+        self.update_sc_utilities_labels_signal.emit(message["ROUND_NUM"], new_utilities, winning_vote, message["VOTES"], message["UTILITIES"])
 
         self.update_tornado_graph_signal.emit(self.main_window.tornado_ax, message["POSITIVE_VOTE_EFFECTS"],
                                               message["NEGATIVE_VOTE_EFFECTS"])
-        self.update_sc_nodes_graph_signal.emit(message["WINNING_VOTE"])
+        self.update_sc_nodes_graph_signal.emit(winning_vote, message["ROUND_NUM"])
+
+        self.update_sc_influence.emit(message["INFLUENCE_MATRIX"], message["NEW_UTILITIES"])
 
         # Switch to JHG
         self.switch_to_jhg_signal.emit()
@@ -100,13 +114,15 @@ class ServerListener(QObject):
 
     # Prepares the client for the next round by updating self.round_state and the gui
     def update_jhg_state(self, json_data):
+        time.sleep(0.1)
         self.round_state.message = json_data
 
         self.round_state.received = json_data["RECEIVED"]
         self.round_state.sent = json_data["SENT"]
         self.round_state.jhg_round_num = json_data["ROUND"]
-        self.round_state.tokens = self.round_state.num_players * 2
+        self.round_state.tokens = self.round_state.num_players * self.round_state.tokens_per_player
         self.round_state.current_popularities = json_data["POPULARITY"]
+        #print("this si the new round_state.current_popularities ", self.round_state.current_popularities)
         self.jhg_popularity_graph.clear()
 
         self.update_jhg_round_signal.emit()

@@ -1,7 +1,8 @@
-from PyQt6.QtWidgets import QVBoxLayout, QTabWidget
+from PyQt6.QtWidgets import QVBoxLayout, QTabWidget, QHBoxLayout, QLabel
 
 from Client.combinedLayout.sc_tornado_graph import sc_create_tornado_graph
 from Client.combinedLayout.SCVotingGrid import SCVotingGrid
+from Client.combinedLayout.ScCreationPanel import ScCreationPanel
 
 
 def create_sc_ui_elements(main_window):
@@ -17,28 +18,42 @@ def create_sc_ui_elements(main_window):
 
     # Set up the SC history panel
     main_window.SC_voting_grid = SCVotingGrid(main_window.round_state.num_players, client_id, graphs_layout, main_window)
-    main_window.SC_voting_grid.update_grid([0 for _ in range(main_window.round_state.num_players)], [[0 for _ in range(3)] for _ in range(main_window.round_state.num_players)])
+    main_window.SC_voting_grid.update_grid([main_window.starting_util for _ in range(main_window.round_state.num_players)], [[0 for _ in range(3)] for _ in range(main_window.round_state.num_players)])
 
     main_window.SC_panel.setMinimumWidth(400)
     main_window.SC_panel.addTab(main_window.SC_voting_grid, "Next Round")
+    main_window.SC_panel.setTabEnabled(0, False)
+    main_window.SC_panel.setCurrentIndex(1) # don't let them touch it yet
+
+    # Set up the SC allocations panel
+
 
 
 # Triggered by SC_INIT
 def SC_round_init(main_window):
     # Update sc ui elements
-    main_window.SC_voting_grid.update_utilities(main_window.round_state.utilities)
-    if main_window.round_state.sc_round_num == 1:
-        main_window.SC_cause_graph.update_sc_nodes_graph(main_window.round_state.sc_round_num)
+    for button in main_window.SC_voting_grid.buttons: # WHEE
+        if button.objectName() != "clear_button":
+            button.setEnabled(True)
+    main_window.SC_panel.setTabEnabled(0, True) # I think? this is whwere this needs to happen? Maybe?
+    main_window.SC_panel.setCurrentIndex(0)  # make sure to move the fetcher back to the first panel here, regardless of where they were.
+    main_window.SC_panel.setTabVisible(2, False)  # should disable it for everyone
+    main_window.SC_voting_grid.update_utilities(main_window.round_state.utilities_mat)
+    main_window.SC_panel.setCurrentIndex(0) # should forcefully move them over if they aren't there already.
+   # print("This si the main_window_round staet round num thingy ", main_window.round_state.sc_round_num)
+    # I think this just needs to always go off now in this branch, at least.
+    main_window.SC_cause_graph.update_sc_nodes_graph_gritty(main_window.round_state.sc_round_num)
 
 
 # Triggered by SC_OVER
 def update_sc_utilities_labels(main_window, round_num, new_utilities, winning_vote, last_round_votes, last_round_utilities):
     history_grid = main_window.sc_history_grid
-    history_grid.update_sc_history(round_num, last_round_votes, last_round_utilities)
+    history_grid.update_sc_history(round_num, last_round_votes, last_round_utilities, winning_vote)
     main_window.SC_panel.setCurrentIndex(1)
     main_window.SC_cause_graph.update_arrows(history_grid.sc_history[str(round_num)]["votes"], True)
     main_window.SC_panel.setTabText(1, "Results")
     main_window.SC_panel.setTabText(0, "Next Round")
+    main_window.SC_panel.setTabEnabled(0, False)
 
     if winning_vote != -1:
         main_window.SC_voting_grid.update_col_2(new_utilities)
@@ -48,7 +63,7 @@ def tab_changed(main_window, index):
     current_tab = main_window.SC_panel.widget(index)
     cause_graph = main_window.SC_cause_graph
     if current_tab == main_window.SC_voting_grid:
-        cause_graph.update_sc_nodes_graph(main_window.round_state.sc_round_num)
+        cause_graph.update_sc_nodes_graph_gritty(main_window.round_state.sc_round_num)
         cause_graph.update_arrows(main_window.round_state.current_votes, True)
 
         if main_window.SC_panel.tabText(1) == "Results":
@@ -57,10 +72,9 @@ def tab_changed(main_window, index):
         sc_history_tab = main_window.sc_history_grid
         selected_round = sc_history_tab.round_drop_down.currentIndex() + 1
         votes = sc_history_tab.sc_history[str(selected_round)]["votes"]
-
-        cause_graph.update_sc_nodes_graph(selected_round)
+        winning_vote = sc_history_tab.sc_history[str(selected_round)]["winning_vote"]
+        cause_graph.update_sc_nodes_graph_gritty(selected_round, winning_vote)
         cause_graph.update_arrows(votes)
-
 
 def sc_vote(main_window, vote):
     main_window.SC_voting_grid.current_vote = vote
@@ -89,6 +103,4 @@ def get_winning_vote(votes):
     if vote_counts[str(winning_vote)] <= len(votes) // 2:
         winning_vote = -1
 
-    winning_vote += 1  # Winning vote is zero indexed, so it needs to be converted to 1 index
-
-    return winning_vote
+    return winning_vote + 1

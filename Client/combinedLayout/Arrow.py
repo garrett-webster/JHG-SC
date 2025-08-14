@@ -12,6 +12,7 @@ class Arrow:
         self.start = start
         self.end = end
         self.color = kwargs.pop('color', 'black')  # Default to black if not provided
+        self.line_thickness = kwargs.pop('line_thickness', 1)  # Default thickness
 
         self.kwargs = kwargs
 
@@ -26,7 +27,7 @@ class Arrow:
             posA=self.start, posB=self.end,
             arrowstyle='->', color=self.color,
             mutation_scale=self.kwargs.get('mutation_scale', 15),  # Adjust arrowhead size
-            linewidth=self.kwargs.get('linewidth', 1), # Arrow line thickness
+            linewidth=self.line_thickness, # Arrow line thickness
             zorder=10,
             **self.kwargs
         )
@@ -34,11 +35,9 @@ class Arrow:
 
 
     def remove(self):
-        """
-        Removes the arrow from the canvas (axes)
-        :param ax: Matplotlib Axes object to remove the arrow from
-        """
-        if self.arrow_patch:  # Check if the arrow exists
-            self.arrow_patch.remove()  # Remove the arrow from the axes
-            self.arrow_patch = None  # Reset the reference to the arrow
-            #ax.figure.canvas.draw()  # Redraw the canvas to update the figure
+        if self.arrow_patch and self.arrow_patch.axes:
+            try:
+                self.arrow_patch.remove()
+            except Exception as e:
+                print(f"Error removing arrow: {e}")
+            self.arrow_patch = None

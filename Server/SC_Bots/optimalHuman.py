@@ -7,14 +7,17 @@
 # cause sums - how many people on average voted for a particular cause, given bayesian prior and evidence as gathered
 # col probs - probability distribution of each cause passing, given their total sums.
 
+from Server.SC_Bots.abstractVotingBot import AbstractVotingBot
 
-class optimalHuman:
+class optimalHuman(AbstractVotingBot):
     def __init__(self, self_id):
         self.self_id = self_id # the id of ourself in realtion to other bots.
         self.type = "BG" # used for graphing purposes
         self.chromosome = None # used as a default holder, will be assinged later.
         self.risk_adversity = "MAX" # never used, actually.
         self.number_type = 6 # used for logging purposes.
+        super(optimalHuman, self).__init__()
+
 
     def set_chromosome(self, chromosome): # allows me to set the chromosome at will.
         self.chromosome = chromosome
@@ -160,5 +163,5 @@ class optimalHuman:
             # consider the probability of that cuase passing with the expected value
             expected_values = [new_row[i] * cause_sums.get(i, 0) for i in range(len(new_row))]
             return expected_values.index(max(expected_values)) - 1 # off by one error
-        else: # no prior information, just return the greedy solution.
+        else: # no prior information, just return the greediest solution.
             return new_row.index(max(new_row)) - 1
