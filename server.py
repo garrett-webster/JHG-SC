@@ -16,14 +16,9 @@ OPTIONS = {
     # "JHG_ROUNDS_PER_SC_ROUND" : [4,3,3,3,3] , # Number of JHG rounds to play between each social choice round
     "SC_GROUP_OPTION": 0, # See options_creation.py -> group_size_options to understand what this means
     "SC_VOTE_CYCLES": 3, # Number of cycles to play each social choice round. Players will vote this many times, with the nth vote being final.
-    "LOGGING" : True,
-    "NUM_TOKENS_PER_PLAYER": 4,
-    "UTILITY_PER_PLAYER": 6,
-    "STARTING_UTILITY": 10,
-
-    #Misc (Wasn't sure where to put this)
-    "PLAYER_ALLOCATIONS" : True,
-    "ALL_ALLOCATIONS" : True,
+    "JHG_LOGGING": False,
+    "SC_LOGGING": True,
+    "CAPTAIN_MODEL": False,
 
     # Generator options
     "OPTION_GENERATOR": 2, # Defines what behavior the options generator should use. See Server.OptionsGenerators.generators for the full list
@@ -43,12 +38,10 @@ class Server():
         self.sc_group_option = options["SC_GROUP_OPTION"]
         self.jhg_rounds_per_sc_round = options["JHG_ROUNDS_PER_SC_ROUND"]
         self.sc_vote_cycles = options["SC_VOTE_CYCLES"]
-        self.logging = options["LOGGING"]
-        self.tokens_per_player = options["NUM_TOKENS_PER_PLAYER"]
-        self.utility_per_player = options["UTILITY_PER_PLAYER"]
-        self.player_allocations = options["PLAYER_ALLOCATIONS"]
-        self.all_allocations = options["ALL_ALLOCATIONS"]
-        self.starting_utility = options["STARTING_UTILITY"]
+        self.SC_logging = options["SC_LOGGING"]
+        self.JHG_logging = options["JHG_LOGGING"]
+        self.captain_model = options["CAPTAIN_MODEL"]
+
         self.total_order = None
         self.generator = None
         self.SC_manager = None
