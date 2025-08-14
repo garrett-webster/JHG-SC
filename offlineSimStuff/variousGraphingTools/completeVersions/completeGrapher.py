@@ -14,9 +14,8 @@ from matplotlib.collections import LineCollection
 from matplotlib.colors import to_rgba
 from matplotlib.colors import LinearSegmentedColormap, Normalize
 
-from offlineSimStuff.variousGraphingTools.influenceMatrixStuff.opsahlClustering import OpsahlClustering
-
-
+# both of these are no longer relevant, do with them what you will.
+# from offlineSimStuff.variousGraphingTools.influenceMatrixStuff.opsahlClustering import OpsahlClustering
 # from offlineSimStuff.variousGraphingTools.influenceMatrixStuff.Louvain import returnCommunitiesGivenInfluenceFromSignedLouvain
 
 
@@ -578,7 +577,8 @@ class CompleteGrapher():
 
     def plot_influence_graph(self, ax, influence_matrix, popularity):
         influence_matrix = self.normalize_matrix(np.array(influence_matrix)) # might want to get rid of this?
-        node_clustering, global_clustering = OpsahlClustering(np.array(influence_matrix)) # leave the alpha at 0.5 rn
+        # this section was trying to  help me understnad how clustered the fetcher was. I have since removed it, but you can stick it back in if you so desire.
+        # node_clustering, global_clustering = OpsahlClustering(np.array(influence_matrix)) # leave the alpha at 0.5 rn
 
         net = NodeNetwork()
         net.setupPlayers([f"{i}" for i in range(np.shape(popularity)[0])])
@@ -624,16 +624,16 @@ class CompleteGrapher():
         lc = LineCollection(segments, colors=colors, zorder=1)
         ax.add_collection(lc)
         ax.set_title('Final Influence Matrix', loc="left")
-        ax.text(
-            0.5, -0.15,  # Bottom center of the axis
-            f"global cluster score: {global_clustering:.2f}",
-            transform=ax.transAxes,
-            ha="center",
-            va="top",
-            fontsize=12,
-            color="black",
-            weight="bold",
-        )
+        # ax.text(
+        #     0.5, -0.15,  # Bottom center of the axis
+        #     f"global cluster score: {global_clustering:.2f}",
+        #     transform=ax.transAxes,
+        #     ha="center",
+        #     va="top",
+        #     fontsize=12,
+        #     color="black",
+        #     weight="bold",
+        # )
 
 
 

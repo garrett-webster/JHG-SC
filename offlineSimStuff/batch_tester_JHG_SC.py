@@ -62,6 +62,7 @@ def run_trial(sc_sim: "Social_Choice_Sim", jhg_sim, round_list, num_cycles, grou
 
         round_logger.save_round(curr_round, sc_rounds, jhg_rounds)
 
+
         if create_round_graphs_bool and sc_rounds:
             create_round_graphs(round_logger, curr_round, sc_rounds, jhg_rounds)
 

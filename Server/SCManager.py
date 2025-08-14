@@ -58,11 +58,16 @@ class SCManager:
             new_influence = self.sc_sim.get_influence_matrix
 
         current_options_matrix, peeps = self.server_side_options_matrix(possible_peeps.tolist(), curr_round, new_influence)
-        self.init_next_round((current_options_matrix, indexes))
-        self.sc_sim.start_round((current_options_matrix, peeps))  # this might be screwing stuff up honestly....
+
+        self.init_next_round((current_options_matrix, indexes)) # sets some sim stuff and then sends out packets
+
+        self.sc_sim.start_round((current_options_matrix, peeps))  # this runs as intended and dives down in
+
         self.current_options_matrix = current_options_matrix
+
         self.play_social_choice_round(curr_round, new_influence, current_options_matrix)
-        self.sc_sim.set_rounds(curr_sc_round)
+
+        self.sc_sim.set_rounds(curr_sc_round) # this we could probably
 
 
     def init_next_round(self, options_and_peeps=None):
@@ -79,16 +84,15 @@ class SCManager:
                                                    self.current_options_matrix)
 
 
-
+    # how good is this at keeping stuff upstream
     def play_social_choice_round(self, curr_round, influence_matrix, current_options_matrix):
-        # first we gotta GET the new current options matrix. thats a pain.
+
         # Run the voting and collect the votes
-        player_votes = self.run_sc_voting(curr_round, influence_matrix)
+        zero_idx_votes, one_idx_votes = self.run_sc_voting(curr_round, influence_matrix)
 
         # this is the line where we get the bot votes as well.
         previous_votes = {}
         # always start from cycle 0, don't use the max one. methinks.
-        zero_idx_votes, one_idx_votes = self.compile_sc_votes(player_votes, curr_round, 0, previous_votes, influence_matrix) # no clue what cycle this is or why this runs.
         self.sc_sim.set_final_votes(zero_idx_votes)
         # this is weird garrett stuff Imma not touch it.
         self.update_vote_effects(zero_idx_votes, current_options_matrix,
@@ -97,8 +101,6 @@ class SCManager:
 
         # Calculate the winning vote
         self.sc_sim.current_options_matrix = current_options_matrix # maybe??
-        if curr_round == 9:
-            pass
         winning_vote, new_utilities = self.sc_sim.return_win(zero_idx_votes)
         # if winning_vote != -1:
         #     winning_vote -= 1
@@ -119,11 +121,13 @@ class SCManager:
 
         time.sleep(.5)  # Without this, messages get sent out of order, and the sc_history gets screwed up.
 
-
+    # not a good way to condense this, as we need to get all the votes every cycle.
     def run_sc_voting(self, curr_sc_round, influence_matrix):
         player_votes = {}
         is_last_cycle = False
         previous_votes = {}
+        zero_idx_votes = {}
+        one_idx_votes = {}
 
         for cycle in range(self.vote_cycles):
             player_votes.clear()
@@ -136,15 +140,18 @@ class SCManager:
                     except KeyError:
                         print("SOMEONE SHOULDN't BE ALLOWED TO TOUCH THIS YET. FIX THAT")
 
-
+            # combines bots and player votes and saves the appropraite votes to all they spots
             zero_idx_votes, one_idx_votes = self.compile_sc_votes(player_votes,
                                                                   curr_sc_round, cycle, previous_votes, influence_matrix)
             previous_votes[cycle] = zero_idx_votes
 
+            # send out the stubbins
             if cycle == self.vote_cycles - 1: is_last_cycle = True
             self.connection_manager.distribute_message("SC_VOTES", zero_idx_votes, cycle + 1, is_last_cycle)
 
-        return player_votes
+        # zero clue why this is what we are returning Imma be so real
+        print("this si what we are returning ", player_votes)
+        return zero_idx_votes, one_idx_votes
 
     def compile_sc_votes(self, player_votes, round_num, cycle, previous_votes, influence_matrix):
         bot_votes = self.sc_sim.get_votes(previous_votes, round_num, cycle, self.vote_cycles, influence_matrix)

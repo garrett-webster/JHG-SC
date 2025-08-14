@@ -63,7 +63,6 @@ def tab_changed(main_window, index):
     current_tab = main_window.SC_panel.widget(index)
     cause_graph = main_window.SC_cause_graph
     if current_tab == main_window.SC_voting_grid:
-        print("here is where it is getign called 3")
         cause_graph.update_sc_nodes_graph_gritty(main_window.round_state.sc_round_num)
         cause_graph.update_arrows(main_window.round_state.current_votes, True)
 

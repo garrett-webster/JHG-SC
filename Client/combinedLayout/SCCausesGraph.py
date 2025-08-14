@@ -51,7 +51,6 @@ class SCCausesGraph(QWidget):
         self.nodes_ax.cla()
 
     def update_sc_nodes_graph_gritty(self, round_num, winning_vote=None):
-        print("here is the winning vot e", winning_vote)
         if self.round_state.nodes:
             # Clear graph
             self.nodes_ax.cla()
