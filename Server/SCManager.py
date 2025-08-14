@@ -100,7 +100,6 @@ class SCManager:
         if curr_round == 9:
             pass
         winning_vote, new_utilities = self.sc_sim.return_win(zero_idx_votes)
-        print("this is the winning vote we are passing over ", winning_vote)
         # if winning_vote != -1:
         #     winning_vote -= 1
         # #print("did we have a winning vote ?", winning_vote)

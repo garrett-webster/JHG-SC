@@ -1,3 +1,5 @@
+import os
+import json
 
 class GameLogger():
 
@@ -51,6 +53,16 @@ class GameLogger():
 
     def extract_keys(self, d, keys, default=None):
         return tuple(d.get(k, default) for k in keys)
+
+
+
+    def actually_close_the_thing(self, filename):  # actually closes the thing.
+        base_dir = os.path.dirname(os.path.abspath(__file__))  # gets our current location
+        relative_path = os.path.join(base_dir, "gameFiles", filename + ".json")  # assembles the full file path
+        os.makedirs(os.path.dirname(relative_path), exist_ok=True)  # double check that we are free to boogy
+
+        with open(relative_path, "w") as file:  # opens and then writes the file.
+            json.dump(self.game_data, file, indent=4)
 
 
 

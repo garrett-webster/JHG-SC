@@ -114,7 +114,6 @@ class SCCausesGraph(QWidget):
                     player_alphas.append(alpha)
 
                 elif full_text.startswith("Cause "):
-                    print("this is the full_text ", full_text, " and this is the winning vote ", winning_vote)
                     display_text = full_text.replace("Cause ", "")
                     if winning_vote and full_text == f"Cause {winning_vote}":
                         color = "#e41e1e"  # red for winning cause
@@ -192,7 +191,6 @@ class SCCausesGraph(QWidget):
             self.nodes_canvas.draw()
 
     def draw_causes_graph(self, votes, utilities, winning_vote, round_num):
-        print("This is the winning vote as passed on on line 195 ", winning_vote)
         self.update_sc_nodes_graph_gritty(round_num, winning_vote)
         self.update_arrows(votes)
 

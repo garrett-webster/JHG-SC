@@ -287,7 +287,6 @@ class Social_Choice_Sim:
         #TODO: however, having this as a learned trait by bot creates a lot of problems, becuase then each bot has its OWN influence matrix.
         self.calculate_influence_matrix(new_v) # some attempt to scale the two together. maybe?
         # print("here are hte most recent results ", self.current_results)
-        print("This is the winning vote as returned by the machine ", winning_vote)
         return winning_vote, self.current_results
 
     # version uses the wining vote rather than the attempted vote. swapping them out to see if it makes a difference.
@@ -628,7 +627,7 @@ class Social_Choice_Sim:
         results = self.results # do I actually need this?
         results_sums = self.results_sums
         cv, sums_per_round = self.get_sums_per_round_and_cv()
-        influence = self.most_recent_influence
+        influence = (self.most_recent_influence).tolist()
         #utility_per_round = list(zip(*self.get_results_per_round()))
         utility_per_round = self.get_results_per_round()
         avg_utility_per_round = self.get_average_utility_per_round()

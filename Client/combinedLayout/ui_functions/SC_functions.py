@@ -42,7 +42,6 @@ def SC_round_init(main_window):
     main_window.SC_panel.setCurrentIndex(0) # should forcefully move them over if they aren't there already.
    # print("This si the main_window_round staet round num thingy ", main_window.round_state.sc_round_num)
     # I think this just needs to always go off now in this branch, at least.
-    print("Here is it getting called again number 2 ")
     main_window.SC_cause_graph.update_sc_nodes_graph_gritty(main_window.round_state.sc_round_num)
 
 
@@ -75,8 +74,6 @@ def tab_changed(main_window, index):
         selected_round = sc_history_tab.round_drop_down.currentIndex() + 1
         votes = sc_history_tab.sc_history[str(selected_round)]["votes"]
         winning_vote = sc_history_tab.sc_history[str(selected_round)]["winning_vote"]
-        print("PART 4")
-        print("ayo here's the winning vote over here ", winning_vote)
         cause_graph.update_sc_nodes_graph_gritty(selected_round, winning_vote)
         cause_graph.update_arrows(votes)
 

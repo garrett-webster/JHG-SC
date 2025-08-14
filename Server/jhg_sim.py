@@ -312,7 +312,7 @@ class JHG_simulator():
         # jhg_bot_type = 0 ## ignore this for now, its not terribly relavent atm.
         pops = list(zip(*self.game_popularities))
         cv = self.get_cv()
-        influence = self.get_influence()
+        influence = (self.get_influence()).tolist()
         pop_per_round = list(self.avg_pop_per_round)
 
         total_data = {
