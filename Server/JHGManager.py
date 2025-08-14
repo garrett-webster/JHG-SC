@@ -20,7 +20,6 @@ class JHGManager:
         client_input = None
         if self.num_humans > 0:
             while True:
-                print("IF THIS GOES OFF DURING SOLO SIM IM AFFECTING THE LOCAL TROUT POPULATION")
                 client_input = self.connection_manager.get_responses()  # Gets responses of type "JHG"
 
                 try:
