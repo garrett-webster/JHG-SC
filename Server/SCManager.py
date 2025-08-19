@@ -80,10 +80,10 @@ class SCManager:
 
 
     # ...yeah the naming convention isn't great but IDK what else to call it.
-    def play_social_choice_round(self, curr_round, influence_matrix, current_options_matrix, curr_sc_round):
+    def play_social_choice_round(self, curr_round, influence_matrix, current_options_matrix, curr_sc_round, captain_model, highest_pop_player):
 
         # Run the voting and collect the votes
-        zero_idx_votes, one_idx_votes = self.run_sc_voting(curr_round, influence_matrix)
+        zero_idx_votes, one_idx_votes = self.run_sc_voting(curr_round, influence_matrix, captain_model, highest_pop_player)
         self.sc_sim.set_final_votes(zero_idx_votes)
         self.update_vote_effects(zero_idx_votes, current_options_matrix,
                                  curr_round)  # Tracks the effects of each player's vote on everyone else
@@ -105,7 +105,7 @@ class SCManager:
         self.sc_sim.set_rounds(curr_sc_round)  # last thing we do, thats da rule.
 
     # get the bot votes and the player votes, let everyone know what was happening last time.
-    def run_sc_voting(self, curr_sc_round, influence_matrix):
+    def run_sc_voting(self, curr_sc_round, influence_matrix, captain_model, highest_pop_player):
         player_votes = {}
         is_last_cycle = False
         previous_votes = {}
@@ -114,14 +114,19 @@ class SCManager:
 
         for cycle in range(self.vote_cycles):
             player_votes.clear()
-            # Waits for a vote from each client
-            while len(player_votes) < self.connection_manager.num_clients:
-                responses = self.connection_manager.get_responses()
-                for response in responses.values():
-                    try:
-                        player_votes[response["CLIENT_ID"]] = response["FINAL_VOTE"]
-                    except KeyError:
-                        print("SOMEONE SHOULDN't BE ALLOWED TO TOUCH THIS YET. FIX THAT")
+            if captain_model:
+                # Waits for a vote from only the highest popularity player -- create new thing in ServerConnectionManager and put response in player_votes
+                # will this screw things up since not everyone is gonna give a response?
+                pass
+            else:    
+                # Waits for a vote from each client
+                while len(player_votes) < self.connection_manager.num_clients:
+                    responses = self.connection_manager.get_responses()
+                    for response in responses.values():
+                        try:
+                            player_votes[response["CLIENT_ID"]] = response["FINAL_VOTE"]
+                        except KeyError:
+                            print("SOMEONE SHOULDN't BE ALLOWED TO TOUCH THIS YET. FIX THAT")
 
             # combines bots and player votes and saves the appropraite votes to all they spots
             zero_idx_votes, one_idx_votes = self.compile_sc_votes(player_votes,

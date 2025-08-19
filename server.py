@@ -17,6 +17,7 @@ OPTIONS = {
     "SC_GROUP_OPTION": 0, # See options_creation.py -> group_size_options to understand what this means
     "SC_VOTE_CYCLES": 3, # Number of cycles to play each social choice round. Players will vote this many times, with the nth vote being final.
     "CAPTAIN_MODEL": False,
+    "HIGHEST_POP_PLAYER": 0,
     "LOGGING" : True,
     "NUM_TOKENS_PER_PLAYER": 4,
     "UTILITY_PER_PLAYER": 6,
@@ -45,6 +46,7 @@ class Server():
         self.jhg_rounds_per_sc_round = options["JHG_ROUNDS_PER_SC_ROUND"]
         self.sc_vote_cycles = options["SC_VOTE_CYCLES"]
         self.captain_model = options["CAPTAIN_MODEL"]
+        self.highest_pop_player = options["HIGHEST_POP_PLAYER"]     # may have more than one. stored as the index number of the player
         self.logging = options["LOGGING"]
         self.tokens_per_player = options["NUM_TOKENS_PER_PLAYER"]
         self.utility_per_player = options["UTILITY_PER_PLAYER"]
@@ -113,7 +115,8 @@ class Server():
 
             if sc_rounds: # lets be so real no allocations aren't THAT interesting.
                 possible_peeps, indexes = self.generate_peeps(self.total_order, jhg_sim, sc_sim)
-                self.SC_manager.play_sc_round(influence_matrix, possible_peeps, curr_round, curr_sc_round, indexes)
+                self.highest_pop_player = self.JHG_manager.get_highest_popularity_player
+                self.SC_manager.play_sc_round(influence_matrix, possible_peeps, curr_round, curr_sc_round, indexes, self.captain_model, self.highest_pop_player)
                 curr_sc_round += 1
                 played_sc = True
 
