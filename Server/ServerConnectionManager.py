@@ -90,7 +90,7 @@ class ServerConnectionManager(ConnectionManager):
 
 
     ''' Functions to accept input from clients '''
-
+    # TODO change these to get input from only one client -- the one with the highest popularity
     def get_responses(self, continuous_distribution_type = None):
         responses = {}
         num_received = 0
