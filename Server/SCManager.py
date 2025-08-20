@@ -88,7 +88,7 @@ class SCManager:
         self.update_vote_effects(zero_idx_votes, current_options_matrix,
                                  curr_round)  # Tracks the effects of each player's vote on everyone else
 
-
+        # TODO make it so that background math isn't needed with the captain model
         # Calculate the winning vote
         self.sc_sim.current_options_matrix = current_options_matrix # maybe??
         winning_vote, new_utilities = self.sc_sim.return_win(zero_idx_votes) # actually runs the backround math
@@ -117,7 +117,13 @@ class SCManager:
             if captain_model:
                 # Waits for a vote from only the highest popularity player -- create new thing in ServerConnectionManager and put response in player_votes
                 # will this screw things up since not everyone is gonna give a response?
-                pass
+                while len(player_votes) < 1:
+                    responses = self.connection_manager.get_highest_response(highest_pop_player)
+                    for response in responses.values():
+                        try:
+                            player_votes[response["CLIENT_ID"]] = response["FINAL_VOTE"]
+                        except KeyError:
+                            print("Man I really gotta redo this code")
             else:    
                 # Waits for a vote from each client
                 while len(player_votes) < self.connection_manager.num_clients:

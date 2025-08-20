@@ -90,7 +90,6 @@ class ServerConnectionManager(ConnectionManager):
 
 
     ''' Functions to accept input from clients '''
-    # TODO change these to get input from only one client -- the one with the highest popularity
     def get_responses(self, continuous_distribution_type = None):
         responses = {}
         num_received = 0
@@ -120,6 +119,22 @@ class ServerConnectionManager(ConnectionManager):
                 self.distribute_message(continuous_distribution_type, responses)
 
         return responses
+    
+    def get_highest_response(self, highest_player_id):
+        responses = {}
+
+        while not response:
+            data = self.read_highest_response()
+
+            client, received_json = list(data.items())[0]
+            message_type = received_json["TYPE"]
+            client_id = received_json["CLIENT_ID"]
+            response = {"TYPE": message_type, "CLIENT_ID": client_id}
+
+            responses[client_id] = response
+        
+        return responses
+
 
     # ''' Custom function to get reponses from only a selected number of players. used for creating the options matrix '''
     # def custom_get_responses(self, num_expecting, client_ids_expected, continuous_distribution_type = None):
@@ -147,6 +162,24 @@ class ServerConnectionManager(ConnectionManager):
 
 
     # Checks for any clients that have sent a response and reads that response.
+    # 
+
+    def read_highest_response(self, client_id):
+        client = self.clients[client_id]
+        data = {}
+        try:
+            msg = ''
+            while True:
+                chunk = client.recv(4096)
+                msg += chunk
+                if len(chunk) < 4096:
+                    break
+                if msg:
+                    data[client] = json.loads(msg)
+        except Exception as e:
+            pass
+        return data
+
     def read_responses(self):
         ready_to_read, _, _ = select.select(list(self.clients.values()), [], [], 0.1)
         data = {}
