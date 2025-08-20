@@ -91,7 +91,10 @@ class SCManager:
         # TODO make it so that background math isn't needed with the captain model
         # Calculate the winning vote
         self.sc_sim.current_options_matrix = current_options_matrix # maybe??
-        winning_vote, new_utilities = self.sc_sim.return_win(zero_idx_votes) # actually runs the backround math
+        if captain_model:
+            winning_vote, new_utilities = self.sc_sim.return_captain_win(zero_idx_votes)
+        else: 
+            winning_vote, new_utilities = self.sc_sim.return_win(zero_idx_votes) # actually runs the backround math
         self.sc_sim.save_results() # just gets all our ducks in a row.
         new_utilities = copy.copy(self.sc_sim.get_new_utilities())
         new_utilities = {str(k): sum(v) for k,v in new_utilities.items()}
@@ -133,7 +136,8 @@ class SCManager:
                             player_votes[response["CLIENT_ID"]] = response["FINAL_VOTE"]
                         except KeyError:
                             print("SOMEONE SHOULDN't BE ALLOWED TO TOUCH THIS YET. FIX THAT")
-
+                            
+            # TODO what does zero_idx_votes actually hold? Is this info still gonna work for the captain model?
             # combines bots and player votes and saves the appropraite votes to all they spots
             zero_idx_votes, one_idx_votes = self.compile_sc_votes(player_votes,
                                                                   curr_sc_round, cycle, previous_votes, influence_matrix)

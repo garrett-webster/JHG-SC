@@ -288,6 +288,10 @@ class Social_Choice_Sim:
         self.calculate_influence_matrix(new_v) # some attempt to scale the two together. maybe?
         # print("here are hte most recent results ", self.current_results)
         return winning_vote, self.current_results
+    
+    def return_captain_win(self, vote):
+        # TODO make sure that I'm also updating the self.current_results -- can probably yoink those range loops above to do that. Return the winning vote
+        pass
 
     # version uses the wining vote rather than the attempted vote. swapping them out to see if it makes a difference.
     # worried this version de-teeths them in a way that flattens their possible animosity
