@@ -138,6 +138,7 @@ class SCManager:
                             print("SOMEONE SHOULDN't BE ALLOWED TO TOUCH THIS YET. FIX THAT")
                             
             # TODO what does zero_idx_votes actually hold? Is this info still gonna work for the captain model?
+            # Looks like I might just have to fill in votes with some dummy value -- what is the mark for not voting/abstaining? Looks like -1
             # combines bots and player votes and saves the appropraite votes to all they spots
             zero_idx_votes, one_idx_votes = self.compile_sc_votes(player_votes,
                                                                   curr_sc_round, cycle, previous_votes, influence_matrix)
@@ -152,6 +153,7 @@ class SCManager:
 
     # just combines them and updates the backround history.
     def compile_sc_votes(self, player_votes, round_num, cycle, previous_votes, influence_matrix):
+        # TODO also bots should NOT have their normal votes, just stuff it with -1s
         bot_votes = self.sc_sim.get_votes(previous_votes, round_num, cycle, self.vote_cycles, influence_matrix)
 
         all_votes = {**bot_votes, **player_votes} # player votes being second is MANDATORY.
