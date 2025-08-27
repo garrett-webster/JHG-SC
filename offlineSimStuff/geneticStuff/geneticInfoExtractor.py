@@ -43,5 +43,5 @@ if __name__ == "__main__":
 
     print("Generation | Avg relative utiliyt | Avg absolute utiliyt")
     print("___________|______________________|_____________________")
-    for gen, (avg_rel, avg_abs) in sorted(generation_stats.items(), key=lambda item: item[1][0], reverse=True):
+    for gen, (avg_rel, avg_abs) in sorted(generation_stats.items(), key=lambda item: item[1][1], reverse=True):
         print(f"{gen:10} | {avg_rel:20.4f} | {avg_abs:20.4f}")

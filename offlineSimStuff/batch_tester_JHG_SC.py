@@ -6,6 +6,7 @@ from Server.social_choice_sim import Social_Choice_Sim
 from Server.JHGManager import JHG_simulator
 from tqdm import tqdm
 import numpy as np
+import os
 
 
 
@@ -226,8 +227,8 @@ def determine_rounds(jhg_rounds_per_sc_game_list):
 if __name__ == "__main__":
 
     #jhg_games_per_sc_round = [1,1,1,1,1,1,1,1]#,1,1,1,1,1,1,1,1,1,1,1,1]
-    # jhg_games_per_sc_round = [4,3,3,3,3,3,3,3] # what we trained the og assasain agents on.
-    jhg_games_per_sc_round = [4,3,3,3,3]  # what we trained the sleepy assasain bots on.
+    jhg_games_per_sc_round = [4,3,3,3,3,3,3,3] # what we trained the og assasain agents on.
+    # jhg_games_per_sc_round = [4,3,3,3,3]  # what we trained the sleepy assasain bots on.
     # jhg_games_per_sc_round = [2,3,3]#,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,2]
     # jhg_games_per_sc_round = ["S", 10]
     # jhg_games_per_sc_round = [1,1,1]
@@ -246,7 +247,13 @@ if __name__ == "__main__":
     num_cycles = 3
     num_players = 12
     #addAgents = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\Server\Engine\scenarios\2SmartWelfare"
-    addAgents = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\Server\Engine\scenarios\workingDirectory"
+
+    file_name = os.path.join("..", "Server", "Engine", "scenarios", "workingDirectory")
+    my_path = os.path.dirname(os.path.abspath(__file__))
+    file_path = os.path.normpath(os.path.join(my_path, file_name))
+    addAgents = file_path
+
+    # addAgents = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\Server\Engine\scenarios\workingDirectory"
 
 
     num_humans = 0

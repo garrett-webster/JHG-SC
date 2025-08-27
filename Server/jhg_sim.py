@@ -29,8 +29,9 @@ class JHG_simulator():
         else:
             self.create_sim(num_human_players)
         self.T = None
-        self.avg_pop_per_round = []
-        self.game_popularities = []
+        self.avg_pop_per_round = [100]
+        self.game_popularities = [[100] * num_players]
+
 
     # just sets us up a sim, quick and dirty like
     def create_sim(self, num_players):
@@ -344,11 +345,18 @@ class JHG_simulator():
 def loadPopulationFromFile(popSize, generationFolder, startIndex, num_gene_pools, tokens_per_player):
     fnombre = "Kill me"
     try:
-        #fnombre = generationFolder + "/gen_" + str(startIndex) + ".csv"
-        fnombre = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\Server\Engine\botGenerations\assassins_gen_175.csv" # trying to be better and mroe aggressive on group forming
-        # fnombre = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\Server\Engine\botGenerations\gen_199.csv" # JHG cab agents as used in the study
-        # fnombre = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\Server\Engine\botGenerations\sc_jhg_gen_299.csv" # # JHG_SC agnets I trained.
-        # fnombre = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\Server\Engine\botGenerations\w_kitties_gen_256.csv" # Trained with the cats. not sure if they are any good.
+        file_name = os.path.join("Engine", "botGenerations") # creates standard file path. we then append to this.
+
+        # file_name = os.path.join(file_name, "assassins_gen_175")  # trying to be better and mroe aggressive on group forming
+        # file_name = os.path.join(file_name, "gen_199.csv") # JHG cab agents as used in the study
+        file_name = os.path.join(file_name, "sc_jhg_gen_299.csv") # the smartest vanilla agents
+        # file_name = os.path.join(file_name, "w_kitties_gen_256.csv") # attempting to overcome cats
+
+
+        my_path = os.path.dirname(os.path.abspath(__file__))
+        file_path = os.path.join(my_path, file_name)
+        fnombre = file_path
+
         fp = open(fnombre, "r")
     except FileNotFoundError:
         try:

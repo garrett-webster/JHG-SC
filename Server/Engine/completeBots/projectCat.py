@@ -12,7 +12,6 @@ from Server.SC_Bots.transVecTranslator import translateVecToIndex
 class ProjectCat(AbstractAgent):
 
     def __init__(self):
-        print("This is the cat awgent we ar eusing right ?)")
         super().__init__()
         self.whoami = 'jake cat'
         self.is_initialized = False

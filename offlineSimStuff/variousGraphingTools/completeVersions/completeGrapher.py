@@ -135,7 +135,7 @@ class CompleteGrapher():
         current_axis = 0
 
         if pop_graph:
-            jhg_rounds = range(1, len(avg_pop_per_round) + 1)
+            jhg_rounds = range(0, len(avg_pop_per_round))
             ax = axes[current_axis]
 
             for i, player_scores in enumerate(pops):
@@ -189,7 +189,7 @@ class CompleteGrapher():
         if util_graph:
 
             ax = axes[current_axis]
-            sc_rounds = range(1, len(utility_per_round[0]) + 1) # get the number of SC rounds, not players
+            sc_rounds = range(0, len(utility_per_round[0])) # get the number of SC rounds, not players
 
             for i, player_scores in enumerate(utility_per_round):
                 # bot_type_name = "GENE BOT"
