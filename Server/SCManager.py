@@ -142,6 +142,12 @@ class SCManager:
             # combines bots and player votes and saves the appropraite votes to all they spots
             zero_idx_votes, one_idx_votes = self.compile_sc_votes(player_votes,
                                                                   curr_sc_round, cycle, previous_votes, influence_matrix)
+            
+            if captain_model:
+                pass
+            # check who is the highest popularity player. If they are a player, get the response. Then, make a loop where all votes except the highest popularity is stuffed with -1s. The highest pop player returns index number of total order. Check total order to find if it's a P or B
+            # does the highest pop player return the ID? Like P1? Also, the P and B are capitalized in ID names
+
             previous_votes[cycle] = zero_idx_votes
 
             # send out the stubbins
