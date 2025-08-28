@@ -260,7 +260,7 @@ if __name__ == "__main__":
     tokens_per_player = 2
     utility_per_player = 3
     create_round_graphs_bool = False
-    create_game_graphs_bool = True
+    create_game_graphs_bool = False
     create_influence = False
     chromosomes_directory = "testChromosome"
     group = ""
@@ -270,7 +270,7 @@ if __name__ == "__main__":
     allocation_bot_type = "allocations_scenarios/random"
     jhg_bot_type = 0 # 0 is gene bots, 2 is social welfare and 3 is random. 4 is the new social welfare that I am developing that is just a hair smarter.
 
-    num_attempts = 1 # number of batches to do.
+    num_attempts = 20 # number of batches to do.
     num_rounds = sum(jhg_games_per_sc_round) if len(jhg_games_per_sc_round) > 2 else jhg_games_per_sc_round[-1] # if its a list, len of list. else, grab the second identifier
 
     utility_to_log = []
@@ -314,7 +314,7 @@ if __name__ == "__main__":
     cumulative_non_cat_score = sum(new_results)- cumulative_cat_score
     avg_cat_score = cumulative_cat_score / num_kitties
     avg_non_cat_score = cumulative_non_cat_score / non_cats
-    print('here is the average added agent ', avg_cat_score, " and here is the average non cat utility ", avg_non_cat_score)
+    print('here is the average cat / added agent ', avg_cat_score, " and here is the average non cat utility ", avg_non_cat_score)
     # print("here is the average Gene3agent score ", avg_non_cat_score)
     inverted_results.clear()
 
@@ -333,4 +333,4 @@ if __name__ == "__main__":
     cumulative_non_cat_score = sum(new_results)   - cumulative_cat_score
     avg_cat_score = cumulative_cat_score / num_kitties
     avg_non_cat_score = cumulative_non_cat_score / non_cats
-    print('here is the average added agent popualrity ', avg_cat_score, " and here is the average non cat popularity ", avg_non_cat_score)
+    print('here is the average cat / added agent popualrity ', avg_cat_score, " and here is the average non cat popularity ", avg_non_cat_score)
