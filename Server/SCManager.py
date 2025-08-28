@@ -53,14 +53,14 @@ class SCManager:
         self.total_order = total_order # keeps track of which are players and which are bots.
 
     # this is the runner, and what main window and server will actually call.
-    def play_sc_round(self, influence_matrix, possible_peeps, curr_round, curr_sc_round, indexes):
+    def play_sc_round(self, influence_matrix, possible_peeps, curr_round, curr_sc_round, indexes, captain_model, highest_pop_player):
         if influence_matrix is not None: # just incase we are playing SC on its own.
             new_influence = influence_matrix
         else:
             new_influence = self.sc_sim.get_influence_matrix
         # not a refactor per se, but made the code much more readable.
         current_options_matrix = self.init_next_round(possible_peeps, curr_round, new_influence) # gets the current options matrix and starts SC_init
-        self.play_social_choice_round(curr_round, new_influence, current_options_matrix, curr_sc_round) # actually does the voting and whatnot.
+        self.play_social_choice_round(curr_round, new_influence, current_options_matrix, curr_sc_round, captain_model, highest_pop_player) # actually does the voting and whatnot.
 
     # starts the next round, prepares the packet and gets the new options matrix. gets all ducks in a row.
     def init_next_round(self, possible_peeps, curr_round, new_influence):
