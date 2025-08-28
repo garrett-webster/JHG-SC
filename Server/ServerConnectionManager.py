@@ -165,7 +165,7 @@ class ServerConnectionManager(ConnectionManager):
     # 
 
     def read_highest_response(self, client_id):
-        client = self.clients[client_id]
+        client = self.clients[client_id - self.num_bots]
         data = {}
         try:
             msg = ''
