@@ -121,8 +121,9 @@ class SCManager:
 
                 for i in range(self.connection_manager.num_clients):
                     player_votes[f"P{i}"] = -1
-                
-                if self.total_order[highest_pop_player][0] == 'P':
+
+                print("highest_pop_player", highest_pop_player)
+                if self.total_order[int(highest_pop_player)][0] == 'P':
                     responses = self.connection_manager.get_highest_response(highest_pop_player)
                     for response in responses.values():
                         try:

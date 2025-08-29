@@ -10,7 +10,7 @@ import numpy as np
 
 OPTIONS = {
     #General settings
-    "NUM_HUMANS": 3, # utterly fetched but can I run this headless
+    "NUM_HUMANS": 1, # utterly fetched but can I run this headless
     "TOTAL_PLAYERS": 12,
     "JHG_ROUNDS_PER_SC_ROUND" : [2,2,2], # Number of JHG rounds to play between each social choice round
     # "JHG_ROUNDS_PER_SC_ROUND" : [4,3,3,3,3] , # Number of JHG rounds to play between each social choice round
@@ -57,6 +57,7 @@ class Server():
         self.connection_manager = None
         self.current_logger = None
         self.rounds_list = self.determine_rounds(self.jhg_rounds_per_sc_round)
+        self.captain_model = options["CAPTAIN_MODEL"]
 
 
     def start_server(self, host='0.0.0.0', port=12345):
@@ -112,7 +113,7 @@ class Server():
 
             if sc_rounds: # lets be so real no allocations aren't THAT interesting.
                 possible_peeps, indexes = self.generate_peeps(self.total_order, jhg_sim, sc_sim)
-                self.highest_pop_player = self.JHG_manager.get_highest_popularity_player
+                self.highest_pop_player = self.JHG_manager.get_highest_popularity_player()
                 self.SC_manager.play_sc_round(influence_matrix, possible_peeps, curr_round, curr_sc_round, indexes, self.captain_model, self.highest_pop_player)
                 curr_sc_round += 1
                 played_sc = True
