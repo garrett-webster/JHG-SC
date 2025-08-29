@@ -425,7 +425,8 @@ if __name__ == "__main__":
     numGeneGopies = 3 # numbers of sets of genes (3 was the number used in the paper)
     startIndex = 0 # generation to start training (0 to start form scratch)
     num_gens = 300 # generation to end traning trains up to 99
-    games_per_gen = 10 # agents from the gene pool are selected at random, 100 times.
+    games_per_gen = popSize # agents from the gene pool are selected at random, 100 times.
+    # BIG NOTICE --> THIS NEEDS TO BE EQUAL TO GAMES_PER_GEN.
     agentsPerGame = 10 # number of agents per game
     roundsPerGame = 30 # number fo rounds per game
     povertyLine = 0 # see SM-1
@@ -463,8 +464,8 @@ if __name__ == "__main__":
         for game in range(games_per_gen): # however many games we want per generation
 
             for i in range(agentsPerGame): # wait is that it???
-                plyrIdxs[i] = game # this is where the homogenity is, this might be helpful.
-                agents[i] = theGenePools[plyrIdxs[i]]
+                plyrIdxs[i] = game % popSize # trying with modulo pop size to make sure that we dont' get any out of bounds errors
+                agents[i] = theGenePools[plyrIdxs[i]] # YIPEEE
 
             # not adding in the configured players yet, leave that alone for now.
             numPlayers = agentsPerGame
@@ -501,25 +502,6 @@ if __name__ == "__main__":
             if s != 0.0:
                 for i in range(numPlayers):
                     pmetrics[i].relUtility = pmetrics[i].avgUtility / s
-
-            # print some stuff to the terminal for the purposes of understanding other stuf.f
-            # print("Indicies: ")
-            # for i in range(numPlayers):
-            #     print("i, ", plyrIdxs[i])
-            #
-            # print("\n")
-            # print("averageUtility :")
-            # for i in range(numPlayers):
-            #     print(f"{pmetrics[i].avgUtility}.2")
-            # print("\n")
-            # print("\n")
-            #
-            # print("relUtility: ")
-            # for i in range(numPlayers):
-            #     print(f"{pmetrics[i].relUtility}.2")
-            #
-            # print("\n")
-            #print("Average Utility ", s / agentsPerGame)
 
             # we gotta update fitness - fitness whole pizza in they mouth
             for i in range(agentsPerGame):
