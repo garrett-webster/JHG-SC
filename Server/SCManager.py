@@ -91,10 +91,9 @@ class SCManager:
         # TODO make it so that background math isn't needed with the captain model
         # Calculate the winning vote
         self.sc_sim.current_options_matrix = current_options_matrix # maybe??
-        if captain_model:
-            winning_vote, new_utilities = self.sc_sim.return_captain_win(zero_idx_votes)
-        else: 
-            winning_vote, new_utilities = self.sc_sim.return_win(zero_idx_votes) # actually runs the backround math
+
+        winning_vote, new_utilities = self.sc_sim.return_win(zero_idx_votes) # actually runs the backround math
+        # print("here is the winning vote ", winning_vote)
         self.sc_sim.save_results() # just gets all our ducks in a row.
         new_utilities = copy.copy(self.sc_sim.get_new_utilities())
         new_utilities = {str(k): sum(v) for k,v in new_utilities.items()}
@@ -115,34 +114,34 @@ class SCManager:
         zero_idx_votes = {}
         one_idx_votes = {}
 
+
         for cycle in range(self.vote_cycles):
             player_votes.clear()
-            if captain_model:
-
-                for i in range(self.connection_manager.num_clients):
-                    player_votes[f"P{i}"] = -1
-
-                print("highest_pop_player", highest_pop_player)
-                if self.total_order[int(highest_pop_player)][0] == 'P':
-                    responses = self.connection_manager.get_highest_response(highest_pop_player)
-                    for response in responses.values():
-                        try:
-                            player_votes[response["CLIENT_ID"]] = response["FINAL_VOTE"]
-                        except KeyError:
-                            print("Man I really gotta redo this code")
-            else:    
-                # Waits for a vote from each client
-                while len(player_votes) < self.connection_manager.num_clients:
-                    responses = self.connection_manager.get_responses()
-                    for response in responses.values():
-                        try:
-                            player_votes[response["CLIENT_ID"]] = response["FINAL_VOTE"]
-                        except KeyError:
-                            print("SOMEONE SHOULDN't BE ALLOWED TO TOUCH THIS YET. FIX THAT")
+            while len(player_votes) < self.connection_manager.num_clients:
+                responses = self.connection_manager.get_responses()
+                for response in responses.values():
+                    try:
+                        player_votes[response["CLIENT_ID"]] = response["FINAL_VOTE"]
+                    except KeyError:
+                        print("SOMEONE SHOULDN't BE ALLOWED TO TOUCH THIS YET. FIX THAT")
                             
             # combines bots and player votes and saves the appropraite votes to all they spots
             zero_idx_votes, one_idx_votes = self.compile_sc_votes(player_votes,
                                                                   curr_sc_round, cycle, previous_votes, influence_matrix, captain_model)
+
+            if captain_model: # save the captain vote, clear everything out, and go from there.
+                highest_pop_index = self.total_order.index(highest_pop_player)
+                captain_vote = zero_idx_votes[highest_pop_index]
+                if captain_vote == 3:
+                    print("Something is very very very wrong")
+                    print("here are the zero index votes ", zero_idx_votes)
+                    print("here are the one index votes ", one_idx_votes)
+
+                zero_idx_votes = {i: -1 for i in range(len(zero_idx_votes))}
+                one_idx_votes = [-1 for _ in range(len(one_idx_votes))]
+                zero_idx_votes[highest_pop_index] = captain_vote
+                one_idx_votes[highest_pop_index] = captain_vote # not sure if that will work but we can try.
+
 
             previous_votes[cycle] = zero_idx_votes
 
@@ -155,11 +154,7 @@ class SCManager:
 
     # just combines them and updates the backround history.
     def compile_sc_votes(self, player_votes, round_num, cycle, previous_votes, influence_matrix, captain_model):
-        if captain_model:
-            for i in range(self.num_bots):
-                bot_votes[f"B{i}"] = -1
-        else:
-            bot_votes = self.sc_sim.get_votes(previous_votes, round_num, cycle, self.vote_cycles, influence_matrix)
+        bot_votes = self.sc_sim.get_votes(previous_votes, round_num, cycle, self.vote_cycles, influence_matrix)
 
         all_votes = {**bot_votes, **player_votes} # player votes being second is MANDATORY.
         all_votes_list = [option_num + 1 if option_num != -1 else -1 for option_num in

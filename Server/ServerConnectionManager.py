@@ -124,7 +124,7 @@ class ServerConnectionManager(ConnectionManager):
         responses = {}
 
         while not response:
-            data = self.read_highest_response()
+            data = self.read_highest_response(highest_player_id)
 
             client, received_json = list(data.items())[0]
             message_type = received_json["TYPE"]

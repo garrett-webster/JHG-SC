@@ -235,8 +235,8 @@ class Social_Choice_Sim:
 
         if not self.enforce_majority: # can't let abstention happen, so lets fix that.
             valid_votes = [vote for vote in all_votes.values() if vote >= 0]
-            if len(valid_votes) == 0: # if everyone abstains
-                winning_vote = random.choice([1,2,3]) # pick and pass one at random
+            if len(valid_votes) == 0: # if everyone abstains (maybe change this logic)(
+                winning_vote = random.choice([0,1,2]) # pick and pass one at random
             else: # figure out whoch one has the most support
                 cause_vote_counts = Counter(valid_votes)
 
@@ -252,7 +252,8 @@ class Social_Choice_Sim:
                 #
                 # if winning_vote == -1:
                 #     winning_vote = Counter(total_votes.values()).most_common(2)[1][0] # grab the 2 most common, grab the second entry and the vote id. simple as.
-
+                if winning_vote == 3:
+                    print("uhh, yeah, newsflash pal")
 
 
         if self.enforce_majority: # modifies it to check for teh majority and whatnot.
@@ -262,11 +263,14 @@ class Social_Choice_Sim:
                 winning_vote = -1
         # nothing else to do here. the winning vote is just the winning vote.
 
-        if winning_vote == 0:
-            pass
+
         if winning_vote != -1:  # if its -1, then nothing happend. NOT the last entry in the fetcher. that was a big bug that flew under the radar.
             for i in range(len(total_votes)):
-                self.current_results.append(self.current_options_matrix[i][winning_vote]) # PLEASE let that fix it.
+                try:
+                    self.current_results.append(self.current_options_matrix[i][winning_vote]) # PLEASE let that fix it.
+                except IndexError:
+                    print("here is the vote that broke it ", winning_vote)
+                    print("here are all the votes ", all_votes)
             self.add_coop_score() # cop score doesn't make a ton of sense here unfortunately.
         else:
             for i in range(len(total_votes)):
