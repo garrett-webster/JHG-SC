@@ -143,6 +143,8 @@ class JHG_simulator():
         self.sim = GameSimulator(
             game_params)  # sets up our sim object - might need to make this global so we can grab it wherever we need it.
 
+
+
     def reorder_agents(self, plyrs):
         bots = [a for a in plyrs if a.whoami != "Human"]
         players = [a for a in plyrs if a.whoami == "Human"]
@@ -351,7 +353,8 @@ def loadPopulationFromFile(popSize, generationFolder, startIndex, num_gene_pools
         # file_name = os.path.join(file_name, "gen_199.csv") # JHG cab agents as used in the study
         # file_name = os.path.join(file_name, "sc_jhg_gen_299.csv") # the smartest vanilla agents
         # file_name = os.path.join(file_name, "w_kitties_gen_256.csv") # attempting to overcome cats
-        file_name = os.path.join(file_name, "jhg_sc_w_one_cat.csv")
+        # file_name = os.path.join(file_name, "jhg_sc_w_one_cat.csv") # another not great attmept
+        file_name = os.path.join(file_name, "earlyAttempt2.csv") # maybe better?
 
 
         my_path = os.path.dirname(os.path.abspath(__file__))

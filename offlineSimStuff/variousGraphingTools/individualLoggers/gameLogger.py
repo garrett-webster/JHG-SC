@@ -4,11 +4,11 @@ import json
 class GameLogger():
 
 
-    def __init__(self, num_players, gen_number):
+    def __init__(self, num_players, bot_types):
         self.game_data = {}
         self.jhg_sim = None
         self.sc_sim = None
-        self.create_header(num_players, gen_number)
+        self.create_header(num_players, bot_types)
 
     def resetup(self, jhg_sim, sc_sim):
         self.jhg_sim = jhg_sim
@@ -18,9 +18,10 @@ class GameLogger():
         if self.jhg_sim:
             self.game_data["JHG_STUFF"] = {}
 
-    def create_header(self, num_players, gen_number):
+    def create_header(self, num_players, bot_types):
         self.game_data["HEADER"] = {}
-        self.game_data["HEADER"] = num_players, gen_number # might not need
+        self.game_data["HEADER"]["num_players"] = num_players
+        self.game_data["HEADER"]["bot_types"] = bot_types
 
 
     def save_game(self, played_sc, played_jhg):
@@ -49,7 +50,7 @@ class GameLogger():
 
 
     def get_header(self):
-        return self.game_data["HEADER"]
+        return self.game_data["HEADER"]["num_players"], self.game_data["HEADER"]["bot_types"]
 
     def extract_keys(self, d, keys, default=None):
         return tuple(d.get(k, default) for k in keys)

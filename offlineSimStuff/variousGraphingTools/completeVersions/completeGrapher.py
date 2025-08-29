@@ -38,11 +38,11 @@ class CompleteGrapher():
 
 
     def create_game_graphs_with_logger(self, game_logger):
-        num_players, gen_number = game_logger.get_header()
+        num_players, bot_types = game_logger.get_header()
         cooperation_score, avg_rise, results, results_sums, num_rounds, sums_per_round, cv, influence, utility_per_round, average_utility_per_round = game_logger.get_game_data(True, False)
         b, pops, jhg_cv, jhg_influence, pop_per_round = game_logger.get_game_data(False, True)
         self.draw_two_long_graphs_simplified(num_players, cooperation_score, avg_rise, results, results_sums, num_rounds,
-                                             sums_per_round, cv, influence, utility_per_round, average_utility_per_round, b, pops, jhg_cv, jhg_influence, pop_per_round)
+                                             sums_per_round, cv, influence, utility_per_round, average_utility_per_round, b, pops, jhg_cv, jhg_influence, pop_per_round, bot_types)
 
     def create_sc_graphs(self, all_nodes, all_votes, winning_vote_list, current_options_matrix, types_list,
                          group, curr_round, influence_matrix, results_sums, results, peeps):
@@ -96,13 +96,16 @@ class CompleteGrapher():
 
 
     def draw_two_long_graphs_simplified(self, num_players, cooperation_score, avg_rise, results, results_sums, num_rounds,
-                                        sums_per_round, cv, influence, utility_per_round, avg_utility_per_round, b, pops, jhg_cv, jhg_influence, avg_pop_per_round):
+                                        sums_per_round, cv, influence, utility_per_round, avg_utility_per_round, b, pops, jhg_cv, jhg_influence, avg_pop_per_round, bot_types):
         # aight we might need to draw two different graphs, lets find out.
+
+        print("here are the bot typews we have been given", bot_types)
 
         pop_graph = avg_pop_per_round is not None and len(avg_pop_per_round) > 0
         util_graph = avg_utility_per_round is not None and len(avg_utility_per_round) > 0
         num_graphs = int(pop_graph) + int(util_graph)
-        num_graphs += 1 # influence graph always gets done
+        num_graphs += 1 # influence graph always gets done\
+        print('this is the ')
 
         community_colors = {}
         player_to_community = {}
@@ -134,6 +137,11 @@ class CompleteGrapher():
             axes = [axes]  # Make it iterable
         current_axis = 0
 
+        color_library = {
+            -1: "red",
+            0: "blue",
+        }
+
         if pop_graph:
             jhg_rounds = range(0, len(avg_pop_per_round))
             ax = axes[current_axis]
@@ -141,8 +149,9 @@ class CompleteGrapher():
             for i, player_scores in enumerate(pops):
                 # bot_type_name = "GENE BOT"
                 # label = f'P{i + 1} ({bot_type_name})'
+                color = color_library[bot_types[i]]
                 label = f'P{i + 1}'
-                ax.plot(jhg_rounds, player_scores, label=label)
+                ax.plot(jhg_rounds, player_scores, label=label, color=color)
                 # dot_y = player_scores[-1]
                 # dot_x = jhg_rounds[-1]
                 # community_idx = player_to_community.get(i, -1)
@@ -195,8 +204,9 @@ class CompleteGrapher():
                 # bot_type_name = "GENE BOT"
                 # alloc_type_name = "GEEN BOT"
                 # label = f'P{i + 1} ({bot_type_name} {alloc_type_name})'
+                color = color_library[bot_types[i]]
                 label = f'P{i + 1}'
-                ax.plot(sc_rounds, player_scores, label=label)
+                ax.plot(sc_rounds, player_scores, label=label, color=color)
                 # dot_y = player_scores[-1]
                 # dot_x = sc_rounds[-1]
                 # community_idx = player_to_community.get(i, -1)

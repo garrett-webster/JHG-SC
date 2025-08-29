@@ -1,3 +1,5 @@
+import os
+
 from Server.JHGManager import JHGManager
 from Server.OptionGenerators.generators import generator_factory
 from Server.SCManager import SCManager
@@ -10,7 +12,7 @@ import numpy as np
 
 OPTIONS = {
     #General settings
-    "NUM_HUMANS": 3, # utterly fetched but can I run this headless
+    "NUM_HUMANS": 1, # utterly fetched but can I run this headless
     "TOTAL_PLAYERS": 12,
     "JHG_ROUNDS_PER_SC_ROUND" : [2,2,2], # Number of JHG rounds to play between each social choice round
     # "JHG_ROUNDS_PER_SC_ROUND" : [4,3,3,3,3] , # Number of JHG rounds to play between each social choice round
@@ -60,7 +62,9 @@ class Server():
 
     def start_server(self, host='0.0.0.0', port=12345):
         jhg_bot_type = 0
-        addAgents = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\Server\Engine\scenarios\workingDirectory"
+        # addAgents = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\Server\Engine\scenarios\workingDirectory"
+        my_path = os.path.dirname(os.path.abspath(__file__))
+        addAgents = os.path.join(my_path, "Server", "Engine", "scenarios", "workingDirectory")
 
         self.connection_manager = ServerConnectionManager(host, port, OPTIONS["TOTAL_PLAYERS"], OPTIONS["NUM_BOTS"])
 
