@@ -118,9 +118,11 @@ class SCManager:
         for cycle in range(self.vote_cycles):
             player_votes.clear()
             if captain_model:
-                # Waits for a vote from only the highest popularity player -- create new thing in ServerConnectionManager and put response in player_votes
-                # will this screw things up since not everyone is gonna give a response?
-                while len(player_votes) < 1:
+
+                for i in range(self.connection_manager.num_clients):
+                    player_votes[f"P{i}"] = -1
+                
+                if self.total_order[highest_pop_player][0] == 'P':
                     responses = self.connection_manager.get_highest_response(highest_pop_player)
                     for response in responses.values():
                         try:
@@ -137,16 +139,9 @@ class SCManager:
                         except KeyError:
                             print("SOMEONE SHOULDN't BE ALLOWED TO TOUCH THIS YET. FIX THAT")
                             
-            # TODO what does zero_idx_votes actually hold? Is this info still gonna work for the captain model?
-            # Looks like I might just have to fill in votes with some dummy value -- what is the mark for not voting/abstaining? Looks like -1
             # combines bots and player votes and saves the appropraite votes to all they spots
             zero_idx_votes, one_idx_votes = self.compile_sc_votes(player_votes,
-                                                                  curr_sc_round, cycle, previous_votes, influence_matrix)
-            
-            if captain_model:
-                pass
-            # check who is the highest popularity player. If they are a player, get the response. Then, make a loop where all votes except the highest popularity is stuffed with -1s. The highest pop player returns index number of total order. Check total order to find if it's a P or B
-            # does the highest pop player return the ID? Like P1? Also, the P and B are capitalized in ID names
+                                                                  curr_sc_round, cycle, previous_votes, influence_matrix, captain_model)
 
             previous_votes[cycle] = zero_idx_votes
 
@@ -158,9 +153,12 @@ class SCManager:
         return zero_idx_votes, one_idx_votes # no reason to ask for these again, only ask for em once.
 
     # just combines them and updates the backround history.
-    def compile_sc_votes(self, player_votes, round_num, cycle, previous_votes, influence_matrix):
-        # TODO also bots should NOT have their normal votes, just stuff it with -1s
-        bot_votes = self.sc_sim.get_votes(previous_votes, round_num, cycle, self.vote_cycles, influence_matrix)
+    def compile_sc_votes(self, player_votes, round_num, cycle, previous_votes, influence_matrix, captain_model):
+        if captain_model:
+            for i in range(self.num_bots):
+                bot_votes[f"B{i}"] = -1
+        else:
+            bot_votes = self.sc_sim.get_votes(previous_votes, round_num, cycle, self.vote_cycles, influence_matrix)
 
         all_votes = {**bot_votes, **player_votes} # player votes being second is MANDATORY.
         all_votes_list = [option_num + 1 if option_num != -1 else -1 for option_num in

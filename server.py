@@ -10,18 +10,18 @@ import numpy as np
 
 OPTIONS = {
     #General settings
-    "NUM_HUMANS": 1, # utterly fetched but can I run this headless
-    "TOTAL_PLAYERS": 4,
+    "NUM_HUMANS": 3, # utterly fetched but can I run this headless
+    "TOTAL_PLAYERS": 12,
     "JHG_ROUNDS_PER_SC_ROUND" : [2,2,2], # Number of JHG rounds to play between each social choice round
     # "JHG_ROUNDS_PER_SC_ROUND" : [4,3,3,3,3] , # Number of JHG rounds to play between each social choice round
     "SC_GROUP_OPTION": 0, # See options_creation.py -> group_size_options to understand what this means
     "SC_VOTE_CYCLES": 3, # Number of cycles to play each social choice round. Players will vote this many times, with the nth vote being final.
-    "CAPTAIN_MODEL": False,
-    "HIGHEST_POP_PLAYER": 0,
     "LOGGING" : True,
     "NUM_TOKENS_PER_PLAYER": 4,
     "UTILITY_PER_PLAYER": 6,
     "STARTING_UTILITY": 10,
+    "CAPTAIN_MODEL": True,
+
 
     #Misc (Wasn't sure where to put this)
     "PLAYER_ALLOCATIONS" : True,
@@ -36,7 +36,6 @@ OPTIONS = {
 }
 OPTIONS["NUM_BOTS"] =  OPTIONS["TOTAL_PLAYERS"] - OPTIONS["NUM_HUMANS"]
 
-
 class Server():
     def __init__(self, options):
         self.num_players = options["TOTAL_PLAYERS"]
@@ -45,8 +44,6 @@ class Server():
         self.sc_group_option = options["SC_GROUP_OPTION"]
         self.jhg_rounds_per_sc_round = options["JHG_ROUNDS_PER_SC_ROUND"]
         self.sc_vote_cycles = options["SC_VOTE_CYCLES"]
-        self.captain_model = options["CAPTAIN_MODEL"]
-        self.highest_pop_player = options["HIGHEST_POP_PLAYER"]     # may have more than one. stored as the index number of the player
         self.logging = options["LOGGING"]
         self.tokens_per_player = options["NUM_TOKENS_PER_PLAYER"]
         self.utility_per_player = options["UTILITY_PER_PLAYER"]
@@ -64,7 +61,7 @@ class Server():
 
     def start_server(self, host='0.0.0.0', port=12345):
         jhg_bot_type = 0
-        addAgents = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\Server\Engine\scenarios\workingDirectory"
+        addAgents = r".\Server\Engine\scenarios\workingDirectory"
 
         self.connection_manager = ServerConnectionManager(host, port, OPTIONS["TOTAL_PLAYERS"], OPTIONS["NUM_BOTS"])
 

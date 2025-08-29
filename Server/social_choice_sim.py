@@ -3,6 +3,7 @@ import math
 import random
 from collections import Counter
 import numpy as np
+import os
 
 from Server.Engine.completeBots.geneagent3 import GeneAgent3
 from Server.Engine.completeBots.completeSocialWelfare import SocialWelfare
@@ -220,6 +221,7 @@ class Social_Choice_Sim:
         for i in range(len(new_received)):
             new_v.append((solid_received[i] + new_received[i]) / 2) # make this part of the agent chromosome at some point, for right now its just there.
         # print("this is the new v ", new_v)
+        # print("This is what the solid received looks like ", solid_received, " and here is the new_v")
         return new_v
 
     # this exists of necessity of needing to add player votes to this fetcher. Bot votes only are easy, but we need player votes as well.
@@ -244,7 +246,6 @@ class Social_Choice_Sim:
                 top_causes = [cause for cause, count in cause_vote_counts.items() if count == max_votes]
 
                 if len(top_causes) != 1: # if there si a lot of ties
-                    print("THERE IS A TIE YOUR HONOR THATS WHY EVERYTHING IS GOING LEFT")
                     winning_vote = random.choice(top_causes) # I am a lazy fetcher your honor.
                 else:# fetch it
                     winning_vote = top_causes[0] # just return the normal fetcher.
@@ -285,6 +286,7 @@ class Social_Choice_Sim:
         self.new_v = new_v
         new_v = list((np.array(new_v) * 8)) # TODO: fix this magic number, becuase right now it doesn't actually come from anywhere.
         #TODO: however, having this as a learned trait by bot creates a lot of problems, becuase then each bot has its OWN influence matrix.
+        # TODO: and thats enough of a headache taht I don't want to touch it yet. however, is there a better way to program that in?
         self.calculate_influence_matrix(new_v) # some attempt to scale the two together. maybe?
         # print("here are hte most recent results ", self.current_results)
         return winning_vote, self.current_results
@@ -494,11 +496,20 @@ class Social_Choice_Sim:
         num_agents = self.total_players
         popSize = 60
         player_idxs = list(np.arange(0, num_agents))
-        theFolder = "Server/Engine"
-        theGen = 199
+        # file_name = r"Engine\botGenerations\assassins_gen_175.csv"
+        file_name = os.path.join("Engine", "botGenerations", "assassins_gen_175.csv")
+
+
+        # file_name = r"Engine\botGenerations\sc_jhg_gen_299.csv"  # # JHG_SC agnets I trained.
+        # file_name = r"Engine\botGenerations\w_kitties_gen_256.csv" # Trained with the cats. not sure if they are any good.
+        my_path = os.path.dirname(os.path.abspath(__file__))
+        file_path = os.path.join(my_path, file_name)
+        fnombre = file_path
+
+
         num_gene_copies = 3
         thePopulation = []
-        fnombre = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\Server\Engine\botGenerations\assassins_gen_175.csv"
+        # fnombre = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\Server\Engine\botGenerations\assassins_gen_175.csv"
         fp = open(fnombre, "r")
 
         for i in range(0, popSize):
@@ -626,7 +637,7 @@ class Social_Choice_Sim:
 
     def get_game_deets(self):
         actual_round_num = self.num_rounds + 1 # off by one error
-        cooperation_score = self.cooperation_score / (actual_round_num+1) if self.num_rounds > 0 else 0  # as a percent, how often we cooperated. (had a non negative cause pass)
+        cooperation_score = self.cooperation_score / (actual_round_num) if self.num_rounds > 0 else 0  # as a percent, how often we cooperated. (had a non negative cause pass)
         sc_bot_type = 0 # don't return anything here rn.
         results = self.results # do I actually need this?
         results_sums = self.results_sums
@@ -635,6 +646,7 @@ class Social_Choice_Sim:
         #utility_per_round = list(zip(*self.get_results_per_round()))
         utility_per_round = self.get_results_per_round()
         avg_utility_per_round = self.get_average_utility_per_round()
+
         avg_rise = (avg_utility_per_round[-1]-10) / actual_round_num
         num_rounds = actual_round_num
 

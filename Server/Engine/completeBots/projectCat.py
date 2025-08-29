@@ -12,7 +12,6 @@ from Server.SC_Bots.transVecTranslator import translateVecToIndex
 class ProjectCat(AbstractAgent):
 
     def __init__(self):
-        print("This is the cat awgent we ar eusing right ?)")
         super().__init__()
         self.whoami = 'jake cat'
         self.is_initialized = False
@@ -154,6 +153,8 @@ class ProjectCat(AbstractAgent):
                 # split everyone into followers
                 num_followers = num_players - len(self.the_assassins) - len(prey_idxs)
                 total_allocation = (num_followers * 0.8) + len(self.the_assassins)
+                if total_allocation == 0:
+                    total_allocation = 0.0001
                 allocation_tokens = available_tokens // total_allocation
                 if allocation_tokens > 10:
                     allocation_tokens = 10
@@ -170,7 +171,7 @@ class ProjectCat(AbstractAgent):
 
 
             else:  # there is no prey, play social welfare with yo buddies. or something like that.
-                print("NO MORE PREY! GIVE TO FREN :)")
+                # print("NO MORE PREY! GIVE TO FREN :)")
                 allocations[player_idx] = num_tokens  # here we have no prey, so there is no one to attack
                 num_tokens_to_allocate = num_tokens / (len(self.the_assassins))
                 for i in self.the_assassins:

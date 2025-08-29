@@ -139,10 +139,7 @@ def run_sc_gen_stuff(agents, jhg_engine, sc_sim, total_order, curr_sc_round, num
         } for i in range(len(total_order))
     }
     index = len(sc_sim.I)
-    if influence_matrix is None:
-        influence = self.I[index - 1]
-    else:
-        sc_sim.I[index - 1] = influence_matrix
+
     for cycle in range(num_cycles):
         bot_votes[cycle] = {}
         if cycle == 0:
@@ -255,6 +252,7 @@ def playGame(agents, numPlayers, numRounds, gener, gamer, initialPopularities, p
                 pmetrics[i].avgUtility += changeUtility[i]
                 pmetrics[i].endUtility = overallUtility[i]
 
+    # print("These are the final utilities ", sc_sim.results_sums, " and these are the final popularities ", (jhg_engine.get_popularity()).tolist())
     return pmetrics # returns out data type
 
 # this might POOP poop the bed, pretty sure it was written with managers in mind rather than the sims, so we shall see.
@@ -433,13 +431,12 @@ if __name__ == "__main__":
     games_per_gen = 10 # agents from the gene pool are selected at random, 100 times.
     agentsPerGame = 10 # number of agents per game
     roundsPerGame = 30 # number fo rounds per game
-    num_kitties = 3 # using 3 per 11 people just sort of felt right tahts all I got. really I just want to use 3 to overwhelm teh current options matrix.
     povertyLine = 0 # see SM-1
     configFile = "basicConfig" # trains with just cab agents, no assasains.
     initPops = "varied" # starts eveyrone at different initial popularities when training.
     tokens_per_player = 2 # probably best if I just reduce this back to whatever. (Added by me just in case we wanted to be silly)
     num_humans = 0 # we discriminate in this fetcher
-    num_kitties = 2
+    num_kitties = 1
     current_logger = geneticLogger()
 
     configured_players = []
