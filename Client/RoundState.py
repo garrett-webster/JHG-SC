@@ -26,6 +26,7 @@ class RoundState:
     utilities_mat = []
 
     def __init__(self, id, num_players, num_tokens_per_player, num_utility_per_player):
+        self.captain = -1 # unless we hear anythign else, assume its a -1.
         self.num_players = num_players
         self.client_id = id
         self.tokens = num_tokens_per_player * num_players  # Number of tokens remaining for the current round

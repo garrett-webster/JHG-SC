@@ -269,6 +269,9 @@ class MainWindow(QMainWindow):
 
 
     def sc_create_allocations(self, client_id_list, total_id_list):
+        if self.round_state.captain != -1:
+            self.add_captain_label(self.round_state.captain)
+
         self.disable_jhg_buttons(self.JHG_panel)
 
         if self.all_allocations: # if we wnat everyone to send allocations, go for it
@@ -285,6 +288,45 @@ class MainWindow(QMainWindow):
         self.round_state.reset_everything()
         self.change_cause_labels(total_id_list)
         # self.update_sc_graph()  # go ahead and refresh the origin thing as well.
+
+    def add_captain_label(self, captain):
+        print("Attempting to add ", captain, " as a label ")
+        if captain == self.round_state.client_id:
+            new_label = "You are NOT the father!"
+            new_color = "blue"
+        else:
+            new_label = "You ARE the father!"
+            new_color = "red"
+
+        # Set the label as the tab's title (header)
+        # Assuming you want to add a disabled tab at the end
+        new_tab_widget = QWidget()  # This can be any QWidget, or a custom widget you need to show in the tab
+        new_tab_label = QLabel("This is a disabled tab")
+
+        # Set up the new tab widget's layout
+        new_layout = QVBoxLayout()
+        new_layout.addWidget(new_tab_label)
+        new_tab_widget.setLayout(new_layout)
+
+        # Add the tab to the end of your QTabWidget
+        for index in range(self.SC_panel.count()):
+            if self.SC_panel.tabText(index) == new_label:
+                print("this fetcher already exsits ")
+                return
+
+        new_tab_index = self.SC_panel.addTab(new_tab_widget, new_label)
+        self.change_tab_background_color(3, new_color)
+
+        # Disable the new tab (so it cannot be selected)
+        self.SC_panel.setTabEnabled(new_tab_index, False)
+
+    def change_tab_background_color(self, tab_index, color):
+        # Set the background color of the tab at tab_index
+        self.SC_panel.setStyleSheet(f"""
+            QTabWidget::tab:nth-child({tab_index + 1}) {{
+                background-color: {color};
+            }}
+        """)
 
     def sc_update_influence(self, Influence, new_utilities):
         # ok what did this need to do

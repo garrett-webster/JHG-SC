@@ -20,9 +20,9 @@ class ServerConnectionManager(ConnectionManager):
         self.create_total_order(num_players, num_bots)
 
         self.message_type_names = {
-            "SC_INIT": ["ROUND_NUM", "OPTIONS", "NODES", "UTILITIES"],
+            "SC_INIT": ["ROUND_NUM", "OPTIONS", "NODES", "UTILITIES", "CAPTAIN"],
             "SETUP": ["CLIENT_ID", "NUM_PLAYERS", "NUM_CYCLES", "TOKENS_PER_PLAYER", "UTILITY_PER_PLAYER", "STARTING_UTILITY", "ALL_ALLOCATIONS"],
-            "SC_OPTIONS_CREATE": ["CLIENT_IDS", "TOTAL_IDS"],
+            "SC_OPTIONS_CREATE": ["CLIENT_IDS", "TOTAL_IDS", "CAPTAIN"],
             "JHG": ["CURRENT_VOTES"],
             "JHG_OVER": ["ROUND", "POPULARITY", "INFLUENCE_MAT", "INIT_POP_INFLUENCE", "IS_LAST", "RECEIVED", "SENT"],
             "SC_VOTES": ["VOTES", "CYCLE", "IS_LAST_CYCLE"],

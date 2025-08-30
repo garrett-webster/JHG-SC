@@ -73,11 +73,13 @@ class ServerListener(QObject):
         self.round_state.options = message["OPTIONS"]
         self.round_state.nodes[self.round_state.sc_round_num] = message["NODES"]
         self.round_state.utilities_mat = message["UTILITIES"]
+        self.round_state.captain = message["CAPTAIN"]
 
         self.update_sc_round_signal.emit()  # go ahead and adjust all the SC stuff appropriately as well.
 
 
     def SC_CREATE(self, message):
+        self.round_state.captain = message["CAPTAIN"]
         self.sc_create_stuff.emit(message["CLIENT_IDS"], message["TOTAL_IDS"])
         # this actually does a lot of stuff, its just all hidden under main window.
 

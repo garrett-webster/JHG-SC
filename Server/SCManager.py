@@ -59,12 +59,14 @@ class SCManager:
         else:
             new_influence = self.sc_sim.get_influence_matrix
         # not a refactor per se, but made the code much more readable.
-        current_options_matrix = self.init_next_round(possible_peeps, curr_round, new_influence) # gets the current options matrix and starts SC_init
+        current_options_matrix = self.init_next_round(possible_peeps, curr_round, new_influence, captain_model, highest_pop_player) # gets the current options matrix and starts SC_init
         self.play_social_choice_round(curr_round, new_influence, current_options_matrix, curr_sc_round, captain_model, highest_pop_player) # actually does the voting and whatnot.
 
     # starts the next round, prepares the packet and gets the new options matrix. gets all ducks in a row.
-    def init_next_round(self, possible_peeps, curr_round, new_influence):
-        options_and_peeps = self.server_side_options_matrix(possible_peeps.tolist(), curr_round, new_influence)
+    def init_next_round(self, possible_peeps, curr_round, new_influence, captain_model, highest_pop_player):
+        captain = -1 if not captain_model else self.total_order.index(highest_pop_player)
+
+        options_and_peeps = self.server_side_options_matrix(possible_peeps.tolist(), curr_round, new_influence, captain)
         # Initialize the round
         self.sc_sim.start_round(options_and_peeps) # make sure this actually gets hard set.
         self.current_options_matrix = self.sc_sim.current_options_matrix
@@ -73,9 +75,12 @@ class SCManager:
         self.causes = self.sc_sim.get_causes()
         self.all_nodes = self.causes + self.player_nodes
 
+        # captain mode stuff. if not captain mode, captain is -1. else, captain gets a silly label :)
+
+
         self.connection_manager.distribute_message("SC_INIT", self.round_num, self.current_options_matrix,
                                                    [node.to_json() for node in self.all_nodes],
-                                                   self.current_options_matrix)
+                                                   self.current_options_matrix, captain)
         return self.current_options_matrix
 
 
@@ -129,13 +134,9 @@ class SCManager:
             zero_idx_votes, one_idx_votes = self.compile_sc_votes(player_votes,
                                                                   curr_sc_round, cycle, previous_votes, influence_matrix, captain_model)
 
+            highest_pop_index = self.total_order.index(highest_pop_player)
             if captain_model: # save the captain vote, clear everything out, and go from there.
-                highest_pop_index = self.total_order.index(highest_pop_player)
                 captain_vote = zero_idx_votes[highest_pop_index]
-                if captain_vote == 3:
-                    print("Something is very very very wrong")
-                    print("here are the zero index votes ", zero_idx_votes)
-                    print("here are the one index votes ", one_idx_votes)
 
                 zero_idx_votes = {i: -1 for i in range(len(zero_idx_votes))}
                 one_idx_votes = [-1 for _ in range(len(one_idx_votes))]
@@ -147,7 +148,9 @@ class SCManager:
 
             # send out the stubbins
             if cycle == self.vote_cycles - 1: is_last_cycle = True
-            self.connection_manager.distribute_message("SC_VOTES", zero_idx_votes, cycle + 1, is_last_cycle)
+            captain = -1 if not captain_model else highest_pop_index # if there is no captain, -1. else, captain time.
+
+            self.connection_manager.distribute_message("SC_VOTES", zero_idx_votes, cycle + 1, is_last_cycle, captain)
 
         # zero clue why this is what we are returning Imma be so real
         return zero_idx_votes, one_idx_votes # no reason to ask for these again, only ask for em once.
@@ -182,7 +185,7 @@ class SCManager:
         self.vote_effects_history[str(round_num)] = round_vote_effects
 
     # this just runs getting the optison matrix, but from the server. distribut the poacket and whatnot.
-    def server_side_options_matrix(self, peeps, curr_round, influence_matrix):
+    def server_side_options_matrix(self, peeps, curr_round, influence_matrix, captain):
         player_peeps = []
         bot_peeps = []
         total_order_index = []
@@ -196,7 +199,7 @@ class SCManager:
 
         # here we have the client creation stuff
         self.connection_manager.distribute_message("SC_OPTIONS_CREATE", total_order_index,
-                                                   actual_total_order_index)  # reset all the utilities and whatnot, just in case.
+                                                   actual_total_order_index, captain)  # reset all the utilities and whatnot, just in case.
         client_input = self.connection_manager.get_responses()
         player_columns = {}
         for client_id, response in client_input.items():

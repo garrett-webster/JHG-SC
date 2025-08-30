@@ -31,6 +31,10 @@ def create_sc_ui_elements(main_window):
 
 # Triggered by SC_INIT
 def SC_round_init(main_window):
+    # this is where we are going to need to work with the captain stuff.
+    if main_window.round_state.captain != -1:
+        main_window.add_captain_label(main_window.round_state.captain)
+
     # Update sc ui elements
     for button in main_window.SC_voting_grid.buttons: # WHEE
         if button.objectName() != "clear_button":
