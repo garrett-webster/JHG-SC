@@ -1,3 +1,5 @@
+import time
+
 from PyQt6.QtWidgets import QVBoxLayout, QTabWidget, QHBoxLayout, QLabel
 
 from Client.combinedLayout.sc_tornado_graph import sc_create_tornado_graph
@@ -32,11 +34,13 @@ def create_sc_ui_elements(main_window):
 # Triggered by SC_INIT
 def SC_round_init(main_window):
     # this is where we are going to need to work with the captain stuff.
-    if main_window.round_state.captain != -1:
+    if main_window.round_state.captain != -1 and main_window.round_state.captain != main_window.round_state.client_id:
         print("This is coming down from SC_round_init")
         main_window.add_captain_label(main_window.round_state.captain)
         main_window.SC_panel.setTabEnabled(0, False)
-        # also create an auto submitted vote here.   
+        # also create an auto submitted vote here.
+        time.sleep(0.5) # slow ya roll
+        main_window.connection_manager.send_message("SUBMIT_UTILITY", main_window.round_state.client_id, main_window.round_state.jhg_round_num, main_window.round_state.get_utilities_list())
 
 
     else:
