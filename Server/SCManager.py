@@ -119,32 +119,37 @@ class SCManager:
         zero_idx_votes = {}
         one_idx_votes = {}
 
+        # so if the captain model is not acgive
+        # just do everything normally. simple as.
+        if not captain_model:
+            for cycle in range(self.vote_cycles):
+                player_votes.clear()
+                while len(player_votes) < self.connection_manager.num_clients:
+                    responses = self.connection_manager.get_responses()
+                    for response in responses.values():
+                        try:
+                            player_votes[response["CLIENT_ID"]] = response["FINAL_VOTE"]
+                        except KeyError:
+                            print("SOMEONE SHOULDN't BE ALLOWED TO TOUCH THIS YET. FIX THAT")
 
-        for cycle in range(self.vote_cycles):
-            player_votes.clear()
-            while len(player_votes) < self.connection_manager.num_clients:
-                responses = self.connection_manager.get_responses()
-                for response in responses.values():
-                    try:
-                        player_votes[response["CLIENT_ID"]] = response["FINAL_VOTE"]
-                    except KeyError:
-                        print("SOMEONE SHOULDN't BE ALLOWED TO TOUCH THIS YET. FIX THAT")
-                            
-            # combines bots and player votes and saves the appropraite votes to all they spots
-            zero_idx_votes, one_idx_votes = self.compile_sc_votes(player_votes,
-                                                                  curr_sc_round, cycle, previous_votes, influence_matrix, captain_model)
+                # combines bots and player votes and saves the appropraite votes to all they spots
+                zero_idx_votes, one_idx_votes = self.compile_sc_votes(player_votes,
+                                                                      curr_sc_round, cycle, previous_votes, influence_matrix, captain_model)
 
-            highest_pop_index = self.total_order.index(highest_pop_player)
-            if captain_model: # save the captain vote, clear everything out, and go from there.
-                captain_vote = zero_idx_votes[highest_pop_index]
-
-                zero_idx_votes = {i: -1 for i in range(len(zero_idx_votes))}
-                one_idx_votes = [-1 for _ in range(len(one_idx_votes))]
-                zero_idx_votes[highest_pop_index] = captain_vote
-                one_idx_votes[highest_pop_index] = captain_vote # not sure if that will work but we can try.
-
-
-            previous_votes[cycle] = zero_idx_votes
+                highest_pop_index = self.total_order.index(highest_pop_player)
+                previous_votes[cycle] = zero_idx_votes
+        else:
+            if highest_pop_player[0] == "P": # fetch. we have to get a player vote.
+                client_id = highest_pop_player[1] # I am ALMOST sure that is how that works.
+                for cycle in range(self.vote_cycles):
+                    player_votes.clear()
+                    while len(player_votes) < 1: # we only need a single vote. tahts the whole point.
+                        responses = self.connection_manager.get_highest_response(client_id)
+                    for response in responses.values():
+                        try:
+                            player_votes[response["CLIENT_ID"]] = response["FINAL_VOTE"]
+                        except KeyError:
+                            print("SOMEONE SHOULDN't BE ALLOWED TO TOUCH THIS YET. FIX THAT")
 
             # send out the stubbins
             if cycle == self.vote_cycles - 1: is_last_cycle = True

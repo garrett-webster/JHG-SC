@@ -4,7 +4,7 @@ from functools import partial
 
 import numpy as np
 from PyQt6.QtCore import QThread
-from PyQt6.QtGui import QFont
+from PyQt6.QtGui import QFont, QColor
 from PyQt6.QtWidgets import QMainWindow, QHBoxLayout, QLabel, QWidget, QPushButton
 from Client.RoundState import RoundState
 from Client.ServerListener import ServerListener
@@ -269,12 +269,12 @@ class MainWindow(QMainWindow):
 
 
     def sc_create_allocations(self, client_id_list, total_id_list):
-        if self.round_state.captain != -1:
-            self.add_captain_label(self.round_state.captain)
+
 
         self.disable_jhg_buttons(self.JHG_panel)
 
         if self.all_allocations: # if we wnat everyone to send allocations, go for it
+            print("enabling the fetcher. might not be runing fast enough")
             self.enable_allocations_interface() # this enables it for all clients
         else: # if we only want specific people to allocatione:
             if self.round_state.client_id in client_id_list:
@@ -285,48 +285,38 @@ class MainWindow(QMainWindow):
                 self.connection_manager.send_message("SUBMIT_UTILITY", self.round_state.client_id, self.round_state.jhg_round_num, utilities_list)
                 self.SC_voting_grid.setEnabled(False) # turn this off. Should become reenabled when all is said and done.
 
+        if self.round_state.captain != -1: # DO THIS AFTER MAYBE>
+            print("this is coming down from the create allocations thing")
+            self.add_captain_label(self.round_state.captain)
+
         self.round_state.reset_everything()
         self.change_cause_labels(total_id_list)
         # self.update_sc_graph()  # go ahead and refresh the origin thing as well.
 
     def add_captain_label(self, captain):
-        print("Attempting to add ", captain, " as a label ")
+        print("This is the captain that we are getting ", captain)
         if captain == self.round_state.client_id:
-            new_label = "You are NOT the father!"
-            new_color = "blue"
+            new_label = "YOU are the captain!"
         else:
-            new_label = "You ARE the father!"
-            new_color = "red"
+            new_label = f"Captain is player {captain + 1}"
 
-        # Set the label as the tab's title (header)
-        # Assuming you want to add a disabled tab at the end
-        new_tab_widget = QWidget()  # This can be any QWidget, or a custom widget you need to show in the tab
+        for index in range(self.SC_panel.count()):
+            if self.SC_panel.tabText(index) == new_label:
+                print("This tab already exists.")
+                return
+
+        # initalize the new tab
+        new_tab_widget = QWidget()
         new_tab_label = QLabel("This is a disabled tab")
 
-        # Set up the new tab widget's layout
         new_layout = QVBoxLayout()
         new_layout.addWidget(new_tab_label)
         new_tab_widget.setLayout(new_layout)
 
-        # Add the tab to the end of your QTabWidget
-        for index in range(self.SC_panel.count()):
-            if self.SC_panel.tabText(index) == new_label:
-                print("this fetcher already exsits ")
-                return
-
         new_tab_index = self.SC_panel.addTab(new_tab_widget, new_label)
-        self.change_tab_background_color(3, new_color)
 
-        # Disable the new tab (so it cannot be selected)
+        # Disable the new tab so it can't be selected
         self.SC_panel.setTabEnabled(new_tab_index, False)
-
-    def change_tab_background_color(self, tab_index, color):
-        # Set the background color of the tab at tab_index
-        self.SC_panel.setStyleSheet(f"""
-            QTabWidget::tab:nth-child({tab_index + 1}) {{
-                background-color: {color};
-            }}
-        """)
 
     def sc_update_influence(self, Influence, new_utilities):
         # ok what did this need to do

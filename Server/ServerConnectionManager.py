@@ -25,7 +25,7 @@ class ServerConnectionManager(ConnectionManager):
             "SC_OPTIONS_CREATE": ["CLIENT_IDS", "TOTAL_IDS", "CAPTAIN"],
             "JHG": ["CURRENT_VOTES"],
             "JHG_OVER": ["ROUND", "POPULARITY", "INFLUENCE_MAT", "INIT_POP_INFLUENCE", "IS_LAST", "RECEIVED", "SENT"],
-            "SC_VOTES": ["VOTES", "CYCLE", "IS_LAST_CYCLE"],
+            "SC_VOTES": ["VOTES", "CYCLE", "IS_LAST_CYCLE", "CAPTAIN"],
             "SC_OVER": ["ROUND_NUM", "WINNING_VOTE", "NEW_UTILITIES", "POSITIVE_VOTE_EFFECTS",
                         "NEGATIVE_VOTE_EFFECTS", "VOTES", "UTILITIES", "INFLUENCE_MATRIX"],
 
@@ -123,7 +123,7 @@ class ServerConnectionManager(ConnectionManager):
     def get_highest_response(self, highest_player_id):
         responses = {}
 
-        while not response:
+        while not responses:
             data = self.read_highest_response(highest_player_id)
 
             client, received_json = list(data.items())[0]

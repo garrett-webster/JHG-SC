@@ -114,6 +114,7 @@ class Server():
             if sc_rounds: # lets be so real no allocations aren't THAT interesting.
                 possible_peeps, indexes = self.generate_peeps(self.total_order, jhg_sim, sc_sim)
                 self.highest_pop_player = self.JHG_manager.get_highest_popularity_player()
+                print("This is the highest pop player ", self.highest_pop_player)
                 self.SC_manager.play_sc_round(influence_matrix, possible_peeps, curr_round, curr_sc_round, indexes, self.captain_model, self.highest_pop_player)
                 curr_sc_round += 1
                 played_sc = True
