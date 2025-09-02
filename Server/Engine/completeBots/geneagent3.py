@@ -310,7 +310,7 @@ class GeneAgent3(GeneAgentMixin, AbstractAgent):
         else:
             safety_first = True
 
-        guardo_toks = self.cuanto_guardo(round_num, player_idx, num_players, num_tokens, popularities, received, selected_community.s)
+        guardo_toks = self.cuanto_guardo(round_num, player_idx, num_players, num_tokens, popularities, received, selected_community.s, extra_flag)
         if extra_flag: # in the sc test bed, we can give a max of 10 tokens to any person, including ourselves.
             if guardo_toks > 10:
                 guardo_toks = 10
