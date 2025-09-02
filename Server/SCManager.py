@@ -132,6 +132,7 @@ class SCManager:
             player_votes.clear()
             while len(player_votes) < self.connection_manager.num_clients:
                 responses = self.connection_manager.get_responses()
+                print("these are hte responses I am getting ", responses)
                 for response in responses.values():
                     try:
                         player_votes[response["CLIENT_ID"]] = response["FINAL_VOTE"]

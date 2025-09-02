@@ -202,6 +202,11 @@ class MainWindow(QMainWindow):
             self.SC_voting_grid.current_vote = -1
             self.SC_voting_grid.select_button(None)  # Clears the selection from the SC voting buttons
 
+        if self.round_state.captain != -1 and self.round_state.captain != self.round_state.client_id:
+            time.sleep(0.5) # should wait and then throw back a vote.
+            self.connection_manager.send_message("SUBMIT_SC", self.round_state.client_id,
+                                                        self.SC_voting_grid.current_vote)
+
 
     def update_sc_utilities_labels(self, round_num, new_utilities, winning_vote, last_round_votes,
                                    last_round_utilities):
