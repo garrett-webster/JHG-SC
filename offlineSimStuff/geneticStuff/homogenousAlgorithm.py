@@ -421,17 +421,16 @@ if __name__ == "__main__":
     # 0 -- executable (doesn't change)
     # 1 -- code directive to evolve population (doesn't change)
     theFolder = "SomeFolder" # folder where trained parameters of cab agents are stored.
-    popSize = 100 # number of agnets in the gene pool (use 100 here)
-    numGeneGopies = 3 # numbers of sets of genes (3 was the number used in the paper)
+    popSize = 50 # number of agnets in the gene pool (use 100 here)
+    numGeneGopies = 1 # numbers of sets of genes (3 was the number used in the paper, but I want to try 1 for decreased complexity)
     startIndex = 0 # generation to start training (0 to start form scratch)
     num_gens = 300 # generation to end traning trains up to 99
     games_per_gen = popSize # agents from the gene pool are selected at random, 100 times.
     # BIG NOTICE --> THIS NEEDS TO BE EQUAL TO GAMES_PER_GEN.
-    agentsPerGame = 10 # number of agents per game
-    roundsPerGame = 30 # number fo rounds per game
+    agentsPerGame = 8 # number of agents per game
+    # roundsPerGame = 30 # number fo rounds per game
     povertyLine = 0 # see SM-1
-    configFile = "basicConfig" # trains with just cab agents, no assasains.
-    initPops = "varied" # starts eveyrone at different initial popularities when training.
+    initPops = "equal" # starts eveyrone at different initial popularities when training.
     tokens_per_player = 2 # probably best if I just reduce this back to whatever. (Added by me just in case we wanted to be silly)
     num_humans = 0 # we discriminate in this fetcher
     num_kitties = 2
