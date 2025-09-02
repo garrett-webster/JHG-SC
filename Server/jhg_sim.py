@@ -91,7 +91,7 @@ class JHG_simulator():
 
         theFolder = "Server/Engine"
         theGen = 199
-        num_gene_copies = 3
+        num_gene_copies = 1
 
 
         # should be formatted appropraitely?

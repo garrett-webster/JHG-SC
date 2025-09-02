@@ -847,20 +847,25 @@ class GeneAgent3(GeneAgentMixin, AbstractAgent):
 
 
     # decide how many tokens to keep
-    def cuanto_guardo(self, round_num, player_idx, num_players, num_tokens, popularities, received, selected_community):
+    def cuanto_guardo(self, round_num, player_idx, num_players, num_tokens, popularities, received, selected_community, extra_flag):
+        self_pop = popularities[player_idx]
+
+        if extra_flag:
+            self_pop *= 10
+
         # Change on July 12
         if popularities[player_idx] <= self.gameParams["poverty_line"]:
             return 0
 
         if round_num == 0:
-            self.underAttack = (self.genes["initialDefense"] / 100.0) * popularities[player_idx]
+            self.underAttack = (self.genes["initialDefense"] / 100.0) * self_pop
         else:
             totalAttack = np.dot(np.negative(received[0:num_players]).clip(0), popularities[0:num_players])
             dUpdate = self.genes["defenseUpdate"] / 100.0
             self.underAttack = (self.underAttack * (1.0 - dUpdate)) + (totalAttack * dUpdate)
 
         caution = self.genes["defensePropensity"] / 50.0
-        self_defense_tokens = min(num_tokens, int(((self.underAttack * caution) / popularities[player_idx]) * num_tokens + 0.5))
+        self_defense_tokens = min(num_tokens, int(((self.underAttack * caution) / self_pop) * num_tokens + 0.5))
 
         # are there attacks on my friends by outsiders?  if so, consider keeping more tokens
         # this can be compared to the self.fear_keeping function
