@@ -253,27 +253,18 @@ class GeneAgent3(GeneAgentMixin, AbstractAgent):
 
 
     def play_round(self, player_idx, round_num, received, popularities, influence, extra_data, extra_flag=False):
-        # print("Here be the player idx ", player_idx)
-        #self.printT(player_idx, str(received))
-        #print("this is the round number ", round_num)
-        # set up some variables
+
         if self.theTracked != 99999:
             self.theTracked = self.getTracked()
-
-        printTransactionVector = False
-        # self.printT(player_idx, str(influence))
 
         self.pop_history.append(popularities)
 
         num_players = len(popularities)
         num_tokens = num_players * self.tokens_per_player
-        #output = ""
-        #output += (f"this is teh number of tokens that we are dealing with: {num_tokens} \n")
-        #printOutput = False
 
-        if player_idx == self.theTracked:
-            print()
-            print("\n\nRound " + str(round_num) + " (Player " + str(self.theTracked) + ")")
+        # if player_idx == self.theTracked:
+        #     print()
+        #     print("\n\nRound " + str(round_num) + " (Player " + str(self.theTracked) + ")")
 
         if round_num == 0:
             self.initVars(player_idx, extra_data, num_players, popularities)
@@ -283,6 +274,7 @@ class GeneAgent3(GeneAgentMixin, AbstractAgent):
             self.alpha = self.genes["alpha"] / 100.0
             self.updateVars(received, popularities, num_tokens, num_players, player_idx)
 
+        # none of this seems to have the bad assumption plugged into it.
         self.computeUsefulQuantities(round_num, num_players, influence, player_idx, num_tokens)
 
         if player_idx == self.theTracked:
@@ -290,34 +282,31 @@ class GeneAgent3(GeneAgentMixin, AbstractAgent):
             # if round_num > 0:
             #     self.compute_homophily(num_players)
 
-        if not extra_flag:
-            pass
+        # analyzes all the communities. no reason to touch it. (yes I double checked it)
         communities, selected_community = self.group_analysis(round_num, num_players, player_idx, popularities, influence)
         if not extra_flag:
             self.selected_community = selected_community.s
-        else:
+        else: # we don't consider ourselves to be part of our community within the SC thing. I think.
             selected_community.s.remove(player_idx)
             self.selected_community = selected_community.s
 
-        #print("here are the communities ", communities, " and the selected community ", selected_community)
-
         # figure out how many tokens to keep
+        # this estimates how much we think eveyrone else will keep. currently checking for negatives.
         self.estimate_keeping(player_idx, num_players, num_tokens, communities)
         self.printT(player_idx, "\n estimated keeping: " + str(np.round( [float(i) for i in self.keeping_strength], 1)))
 
-        if self.genes["safetyFirst"] < 50:
+        if self.genes["safetyFirst"] < 50: # literally 0 clue wha tthis does.
             safety_first = False
         else:
             safety_first = True
 
-        guardo_toks = self.cuanto_guardo(round_num, player_idx, num_players, num_tokens, popularities, received, selected_community.s)
+        guardo_toks = self.cuanto_guardo(round_num, player_idx, num_players, num_tokens, popularities, received, selected_community.s, extra_flag)
         if extra_flag: # in the sc test bed, we can give a max of 10 tokens to any person, including ourselves.
-            if guardo_toks > 10:
+            if guardo_toks > 10: # positive cap
                 guardo_toks = 10
-            if guardo_toks < -10:
+            if guardo_toks < -10: # negative cap
                 guardo_toks = -10
 
-        #output += ("Here is the guardo_toks ", guardo_toks, " \n")
         self.printT(player_idx, "   guardo_toks: " + str(guardo_toks))
 
         # # determine who to attack (if any)
@@ -639,6 +628,7 @@ class GeneAgent3(GeneAgentMixin, AbstractAgent):
 
         homophily_alloc = np.zeros(num_players, dtype=float)
         num_tokens_h = 0
+        # as near as I can tell, all the logic in group allocate tokens is solid and doesn't really take into account the weird inversions. Doesn't try to steal here.
         group_alloc, num_tokens_g = self.group_allocate_tokens(player_idx, num_players, num_giving_tokens - num_tokens_h, round_num, influence, popularities, selected_community, attack_alloc, extra_flag)
 
         if not extra_flag: # standard JHG behavior, play it safe.
@@ -726,7 +716,7 @@ class GeneAgent3(GeneAgentMixin, AbstractAgent):
     def group_allocate_tokens(self, player_idx, num_players, num_tokens, round_num, influence, popularities, the_community, attack_alloc, extra_flag):
         s_modified = sorted(the_community.s)
         for i in range(num_players):
-            if attack_alloc[i] != 0:
+            if attack_alloc[i] != 0: # so if WE are attacking them, remove them from our group. thats odd but yeah makes sense.
                 if i in s_modified:
                     s_modified.remove(i)
 
@@ -738,7 +728,7 @@ class GeneAgent3(GeneAgentMixin, AbstractAgent):
             if len(s_modified) == 1:
                 toks[player_idx] = num_tokens
             else:
-                for i in range(num_tokens):
+                for i in range(num_tokens): # for how many tokens we have left.
 
                     if self.forced_random: # forced random is always false in this fork, at least as far as I can tell.
                         v = self.getRand()
@@ -767,7 +757,7 @@ class GeneAgent3(GeneAgentMixin, AbstractAgent):
         else:
             # print("this is the size of s_modified ", len(s_modified))
             comm_size = len(s_modified)
-            if comm_size <= 1:
+            if comm_size <= 1: # OOH ok this makes sense. so if we have no community we just save all of our tokens. Good to know.
                 toks[player_idx] = num_tokens
             else:
                 profile = []
@@ -788,6 +778,7 @@ class GeneAgent3(GeneAgentMixin, AbstractAgent):
                     fixed_usage = ((self.genes["fixedUsage"] / 100.0) * num_tokens) / comm_size
                     flex_tokens = num_tokens - (fixed_usage * comm_size)
 
+                    # I don't think I added that min and max give_em, 0-10. Also don't really knwo what it does.
                     for i in range(comm_size):
                         target_idx = profile[i][0]
                         give_em = int(fixed_usage + flex_tokens * (profile[i][1] / mag) + 0.5)
@@ -847,20 +838,29 @@ class GeneAgent3(GeneAgentMixin, AbstractAgent):
 
 
     # decide how many tokens to keep
-    def cuanto_guardo(self, round_num, player_idx, num_players, num_tokens, popularities, received, selected_community):
+    def cuanto_guardo(self, round_num, player_idx, num_players, num_tokens, popularities, received, selected_community, extra_flag):
         # Change on July 12
+        self_pop = popularities[player_idx]
+        if extra_flag:
+            self_pop *= 10
+
         if popularities[player_idx] <= self.gameParams["poverty_line"]:
             return 0
 
-        if round_num == 0:
-            self.underAttack = (self.genes["initialDefense"] / 100.0) * popularities[player_idx]
+        if round_num == 0: # is it worth like, upping the popularities * 10 or something? just so the numbers play out nicely?
+            # at the same time, keeping doesn't really work the same between the two testbeds, so like
+            # its not really worth keeping here the same way that it is under JHG.
+            if extra_flag:
+                self.underAttack = (self.genes["initialDefense"] / 100.0) * (self_pop)
+            else:
+                self.underAttack = (self.genes["initialDefense"] / 100.0) * (self_pop)
         else:
             totalAttack = np.dot(np.negative(received[0:num_players]).clip(0), popularities[0:num_players])
             dUpdate = self.genes["defenseUpdate"] / 100.0
             self.underAttack = (self.underAttack * (1.0 - dUpdate)) + (totalAttack * dUpdate)
 
         caution = self.genes["defensePropensity"] / 50.0
-        self_defense_tokens = min(num_tokens, int(((self.underAttack * caution) / popularities[player_idx]) * num_tokens + 0.5))
+        self_defense_tokens = min(num_tokens, int(((self.underAttack * caution) / self_pop) * num_tokens + 0.5))
 
         # are there attacks on my friends by outsiders?  if so, consider keeping more tokens
         # this can be compared to the self.fear_keeping function

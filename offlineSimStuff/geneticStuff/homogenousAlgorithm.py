@@ -296,7 +296,7 @@ def write_generational_results(theGenePools, popSize, gen, agentsPerGame):
     # Get the absolute path to the directory containing this script
     script_dir = os.path.dirname(os.path.abspath(__file__))
     # Construct the full output directory path
-    output_dir = os.path.join(script_dir, "HomogenousResults2", "theGenerations")
+    output_dir = os.path.join(script_dir, "homoResultsLong", "theGenerations")
     # Ensure output directory exists
     os.makedirs(output_dir, exist_ok=True)
     # Construct the filename path
@@ -412,7 +412,11 @@ def create_total_order(total_players, num_humans):
         total_order.append("P" + str(human))
     return total_order
 
-
+# this one has some modifications to it, namely
+# less players, and shorter rounds.
+# however, it is still doing 100 games per gen
+# I hope this gives me a better prototype and a means to try and reason through this
+# if we see progress here, we will up it back up and run it for longer.
 if __name__ == "__main__":
     ## -- INIT STUFF , didn't feel like using the command line everytime, thats on me. heres' the init and all explanation -- ##
     #// - run the code: ./jhgsim(0) evolve(1) ../Results/theGenerations(2) 100(3) 3(4) 0(5) 100(6) 100(7) 10(8) 30(9) 0(10) basicConfig(11) varied(12)
@@ -421,11 +425,12 @@ if __name__ == "__main__":
     # 0 -- executable (doesn't change)
     # 1 -- code directive to evolve population (doesn't change)
     theFolder = "SomeFolder" # folder where trained parameters of cab agents are stored.
-    popSize = 100 # number of agnets in the gene pool (use 100 here)
+    popSize = 60 # number of agnets in the gene pool (use 100 here)
     numGeneGopies = 3 # numbers of sets of genes (3 was the number used in the paper)
     startIndex = 0 # generation to start training (0 to start form scratch)
-    num_gens = 100 # generation to end traning trains up to 99
-    games_per_gen = 10 # agents from the gene pool are selected at random, 100 times.
+    num_gens = 300 # generation to end traning trains up to 99
+    games_per_gen = popSize # agents from the gene pool are selected at random, 100 times.
+    # BIG NOTICE --> THIS NEEDS TO BE EQUAL TO GAMES_PER_GEN.
     agentsPerGame = 10 # number of agents per game
     roundsPerGame = 30 # number fo rounds per game
     povertyLine = 0 # see SM-1
@@ -452,8 +457,9 @@ if __name__ == "__main__":
     initRelativeUtilities = [0.0 for _ in range(numPlayers)]
     agents = [AbstractAgent() for _ in range(popSize)]  # the fetchers we will be training
 
-    # jhg_games_per_round = [4,3,3,3,3,3,3,3] # just give me an easy place to start.
-    jhg_games_per_round = [4,3,3,3,3] # just give me an easy place to start.
+    # lets let these guys run for a little longer, A full 30 rounds as seen in the original paper might be a good place to start.
+    jhg_games_per_round = [4,3,3,3,3,3] # just give me an easy place to start.
+    # jhg_games_per_round = [4,3,3,3,3] # just give me an easy place to start.
     # jhg_games_per_round = [2,2,2]
     rounds_list = determine_rounds(jhg_games_per_round)
     mxPlayers = numPlayers
@@ -462,8 +468,8 @@ if __name__ == "__main__":
         for game in range(games_per_gen): # however many games we want per generation
 
             for i in range(agentsPerGame): # wait is that it???
-                plyrIdxs[i] = game # this is where the homogenity is, this might be helpful.
-                agents[i] = theGenePools[plyrIdxs[i]]
+                plyrIdxs[i] = game % popSize # trying with modulo pop size to make sure that we dont' get any out of bounds errors
+                agents[i] = theGenePools[plyrIdxs[i]] # YIPEEE
 
             # not adding in the configured players yet, leave that alone for now.
             numPlayers = agentsPerGame
@@ -500,25 +506,6 @@ if __name__ == "__main__":
             if s != 0.0:
                 for i in range(numPlayers):
                     pmetrics[i].relUtility = pmetrics[i].avgUtility / s
-
-            # print some stuff to the terminal for the purposes of understanding other stuf.f
-            # print("Indicies: ")
-            # for i in range(numPlayers):
-            #     print("i, ", plyrIdxs[i])
-            #
-            # print("\n")
-            # print("averageUtility :")
-            # for i in range(numPlayers):
-            #     print(f"{pmetrics[i].avgUtility}.2")
-            # print("\n")
-            # print("\n")
-            #
-            # print("relUtility: ")
-            # for i in range(numPlayers):
-            #     print(f"{pmetrics[i].relUtility}.2")
-            #
-            # print("\n")
-            #print("Average Utility ", s / agentsPerGame)
 
             # we gotta update fitness - fitness whole pizza in they mouth
             for i in range(agentsPerGame):
