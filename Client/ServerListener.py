@@ -73,6 +73,7 @@ class ServerListener(QObject):
         self.round_state.options = message["OPTIONS"]
         self.round_state.nodes[self.round_state.sc_round_num] = message["NODES"]
         self.round_state.utilities_mat = message["UTILITIES"]
+
         self.round_state.captain = message["CAPTAIN"]
 
         self.update_sc_round_signal.emit()  # go ahead and adjust all the SC stuff appropriately as well.
@@ -93,18 +94,20 @@ class ServerListener(QObject):
         # if self.round_state.jhg_round_num == 1:
         winning_vote = message["WINNING_VOTE"]
         winning_vote += 1
-        self.main_window.sc_history_grid.update_sc_grid(message["VOTES"], message["UTILITIES"], self.round_state.sc_round_num, winning_vote)
+        new_utilities = message["UTILITIES"][winning_vote]
+
+        self.main_window.sc_history_grid.update_sc_grid(message["VOTES"], new_utilities, self.round_state.sc_round_num, winning_vote)
 
         self.disable_sc_buttons_signal.emit()
-        new_utilities = message["NEW_UTILITIES"]
+        # new_utilities = message["NEW_UTILITIES"]
 
-        self.update_sc_utilities_labels_signal.emit(message["ROUND_NUM"], new_utilities, winning_vote, message["VOTES"], message["UTILITIES"])
+        self.update_sc_utilities_labels_signal.emit(message["ROUND_NUM"], new_utilities, winning_vote, message["VOTES"], new_utilities)
 
-        self.update_tornado_graph_signal.emit(self.main_window.tornado_ax, message["POSITIVE_VOTE_EFFECTS"],
-                                              message["NEGATIVE_VOTE_EFFECTS"])
+        # self.update_tornado_graph_signal.emit(self.main_window.tornado_ax, message["POSITIVE_VOTE_EFFECTS"], message["NEGATIVE_VOTE_EFFECTS"])
+
         self.update_sc_nodes_graph_signal.emit(winning_vote, message["ROUND_NUM"])
 
-        self.update_sc_influence.emit(message["INFLUENCE_MATRIX"], message["NEW_UTILITIES"])
+        # self.update_sc_influence.emit(message["INFLUENCE_MATRIX"], message["NEW_UTILITIES"])
 
         # Switch to JHG
         self.switch_to_jhg_signal.emit()

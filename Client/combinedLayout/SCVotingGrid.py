@@ -6,7 +6,7 @@ from PyQt6.QtWidgets import QPushButton, QHBoxLayout, QWidget
 from Client.combinedLayout.SCGrid import SCGrid
 
 
-NUM_CAUSES = 3
+NUM_CAUSES = 1
 
 class SCVotingGrid(SCGrid):
     def __init__(self, num_players, player_id, graphs_layout, main_window):

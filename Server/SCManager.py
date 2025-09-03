@@ -51,6 +51,7 @@ class SCManager:
         self.negative_vote_effects_history = create_empty_vote_matrix(num_players)
 
         self.total_order = total_order # keeps track of which are players and which are bots.
+        self.allocations = False # just look that over super quick.
 
     # this is the runner, and what main window and server will actually call.
     def play_sc_round(self, influence_matrix, possible_peeps, curr_round, curr_sc_round, indexes, captain_model, highest_pop_player):
@@ -66,8 +67,13 @@ class SCManager:
     def init_next_round(self, possible_peeps, curr_round, new_influence, captain_model, highest_pop_player):
         captain = -1 if not captain_model else self.total_order.index(highest_pop_player)
 
-        options_and_peeps = self.server_side_options_matrix(possible_peeps.tolist(), curr_round, new_influence, captain)
+
         # Initialize the round
+        if self.allocations:
+            options_and_peeps = self.server_side_options_matrix(possible_peeps.tolist(), curr_round, new_influence, captain)
+        else:
+            options_and_peeps = None
+
         self.sc_sim.start_round(options_and_peeps) # make sure this actually gets hard set.
         self.current_options_matrix = self.sc_sim.current_options_matrix
         self.options_history[self.round_num] = self.current_options_matrix

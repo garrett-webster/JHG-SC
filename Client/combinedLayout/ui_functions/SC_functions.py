@@ -54,7 +54,12 @@ def SC_round_init(main_window):
     # I think? this is whwere this needs to happen? Maybe?
     main_window.SC_panel.setCurrentIndex(0)  # make sure to move the fetcher back to the first panel here, regardless of where they were.
     main_window.SC_panel.setTabVisible(2, False)  # should disable it for everyone
-    main_window.SC_voting_grid.update_utilities(main_window.round_state.utilities_mat)
+    if main_window.round_state.captain != -1:
+        if main_window.round_state.captain != main_window.round_state.client_id:
+            pass # if we are NOT the captain
+            main_window.SC_voting_grid.update_utilities([0 for _ in range(6)]) # hardcoded, fix that
+        else: # captain model enabled, and we are the captain. we need to see everything.
+            main_window.SC_voting_grid.update_utilities(main_window.round_state.utilities_mat)
     main_window.SC_panel.setCurrentIndex(0) # should forcefully move them over if they aren't there already.
    # print("This si the main_window_round staet round num thingy ", main_window.round_state.sc_round_num)
     # I think this just needs to always go off now in this branch, at least.
