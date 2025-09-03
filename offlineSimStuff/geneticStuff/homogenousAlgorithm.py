@@ -296,7 +296,7 @@ def write_generational_results(theGenePools, popSize, gen, agentsPerGame):
     # Get the absolute path to the directory containing this script
     script_dir = os.path.dirname(os.path.abspath(__file__))
     # Construct the full output directory path
-    output_dir = os.path.join(script_dir, "HomogenousResults3", "theGenerations")
+    output_dir = os.path.join(script_dir, "roughResults1", "theGenerations")
     # Ensure output directory exists
     os.makedirs(output_dir, exist_ok=True)
     # Construct the filename path
@@ -339,7 +339,7 @@ def mutateIt(gene):
 def evolvePopulationPairs(theGenePool_prev, popSize, numGeneCopies):
     genes_dict = theGenePool_prev[0].genes_long[0]  # assume [dict]
     gene_keys = list(genes_dict.keys()) # just easier this way
-    num_genes = len(gene_keys) * 3 # cycle through it 3 times, one for each one
+    num_genes = len(gene_keys) # * 3 # cycle through it 3 times, one for each one
     # represents the amount we will have to iterate through or something.
     # problem - you need to generate a list 3 times the length so we can put it all in there. trhat way you can have 3 copies. give it another whirl on monday.
 
@@ -351,16 +351,24 @@ def evolvePopulationPairs(theGenePool_prev, popSize, numGeneCopies):
 
         # the following was a fetching pain to translate over. it works but if it breaks I will have 0 idea of how to fix it. 5 stars.
         gene_values = [] # holds the new genes
+        # for g in range(num_genes):
+        #     cycle = g // len(gene_keys)
+        #     # we have 3 genes that have the same 33 repeating values. we iterate through all of them.
+        #     # would probably be easier to just go through the list three times and adjust the keys as we go. however, if this works, I won't complain.
+        #     new_g = g - (len(gene_keys) * cycle) # this should allow it to be new and not have any carry over issues.
+        #     key = gene_keys[new_g]
+        #     selected_gene = (
+        #         mutateIt(theGenePool_prev[ind1].genes_long[cycle][key])
+        #         if random.randint(0, 1) == 0
+        #         else mutateIt(theGenePool_prev[ind2].genes_long[cycle][key])
+        #     )
+        #     gene_values.append(str(selected_gene))
         for g in range(num_genes):
-            cycle = g // len(gene_keys)
-            # we have 3 genes that have the same 33 repeating values. we iterate through all of them.
-            # would probably be easier to just go through the list three times and adjust the keys as we go. however, if this works, I won't complain.
-            new_g = g - (len(gene_keys) * cycle) # this should allow it to be new and not have any carry over issues.
-            key = gene_keys[new_g]
+            key = gene_keys[g]
             selected_gene = (
-                mutateIt(theGenePool_prev[ind1].genes_long[cycle][key])
+                mutateIt(theGenePool_prev[ind1].genes_long[0][key]) # long story.
                 if random.randint(0, 1) == 0
-                else mutateIt(theGenePool_prev[ind2].genes_long[cycle][key])
+                else mutateIt(theGenePool_prev[ind2].genes_long[0][key])
             )
             gene_values.append(str(selected_gene))
 
@@ -421,7 +429,7 @@ if __name__ == "__main__":
     # 0 -- executable (doesn't change)
     # 1 -- code directive to evolve population (doesn't change)
     theFolder = "SomeFolder" # folder where trained parameters of cab agents are stored.
-    popSize = 50 # number of agnets in the gene pool (use 100 here)
+    popSize = 10 # number of agnets in the gene pool (use 100 here)
     numGeneGopies = 1 # numbers of sets of genes (3 was the number used in the paper, but I want to try 1 for decreased complexity)
     startIndex = 0 # generation to start training (0 to start form scratch)
     num_gens = 300 # generation to end traning trains up to 99
@@ -453,9 +461,9 @@ if __name__ == "__main__":
     agents = [AbstractAgent() for _ in range(popSize)]  # the fetchers we will be training
 
     # lets let these guys run for a little longer, A full 30 rounds as seen in the original paper might be a good place to start.
-    jhg_games_per_round = [4,3,3,3,3,3,3,3,3,3] # just give me an easy place to start.
+    # jhg_games_per_round = [4,3,3,3,3,3,3,3,3,3] # just give me an easy place to start.
     # jhg_games_per_round = [4,3,3,3,3] # just give me an easy place to start.
-    # jhg_games_per_round = [2,2,2]
+    jhg_games_per_round = [2,2,2]
     rounds_list = determine_rounds(jhg_games_per_round)
     mxPlayers = numPlayers
 
