@@ -99,8 +99,6 @@ class CompleteGrapher():
                                         sums_per_round, cv, influence, utility_per_round, avg_utility_per_round, b, pops, jhg_cv, jhg_influence, avg_pop_per_round, bot_types):
         # aight we might need to draw two different graphs, lets find out.
 
-        print("here are the bot typews we have been given", bot_types)
-
         pop_graph = avg_pop_per_round is not None and len(avg_pop_per_round) > 0
         util_graph = avg_utility_per_round is not None and len(avg_utility_per_round) > 0
         num_graphs = int(pop_graph) + int(util_graph)

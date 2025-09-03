@@ -78,7 +78,7 @@ class JHG_simulator():
                     configured_players.append(SocialWelfare())
 
 
-        popSize = 60  # ??? I think? based on the command line arguemnts
+        popSize = 10  # ??? I think? based on the command line arguemnts
         player_idxs = list(np.arange(0, numAgents-len(configured_players)))  # where numAgents is the number of actual agents, not players.
 
         for _ in range(num_human_players):
@@ -354,8 +354,8 @@ def loadPopulationFromFile(popSize, generationFolder, startIndex, num_gene_pools
         # file_name = os.path.join(file_name, "sc_jhg_gen_299.csv") # the smartest vanilla agents
         # file_name = os.path.join(file_name, "w_kitties_gen_256.csv") # attempting to overcome cats
         # file_name = os.path.join(file_name, "jhg_sc_w_one_cat.csv") # another not great attmept
-        file_name = os.path.join(file_name, "earlyAttempt2.csv") # maybe better?
-
+        # file_name = os.path.join(file_name, "earlyAttempt2.csv") # maybe better?
+        file_name = os.path.join(file_name, "maybe_cat_fu.csv")
 
         my_path = os.path.dirname(os.path.abspath(__file__))
         file_path = os.path.join(my_path, file_name)
