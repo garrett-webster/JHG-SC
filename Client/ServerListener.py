@@ -15,7 +15,7 @@ class ServerListener(QObject):
     enable_jhg_buttons_signal = pyqtSignal()
     jhg_over_signal = pyqtSignal(bool, float)
     update_sc_votes_signal = pyqtSignal(dict, int, bool)
-    update_sc_utilities_labels_signal = pyqtSignal(int, dict, int, dict, list)
+    update_sc_utilities_labels_signal = pyqtSignal(int, list, int, dict, list)
     update_tornado_graph_signal = pyqtSignal(Axes, list, list)
     switch_to_jhg_signal = pyqtSignal()
     update_sc_nodes_graph_signal = pyqtSignal(int, int)
@@ -72,6 +72,7 @@ class ServerListener(QObject):
         self.round_state.sc_round_num = message["ROUND_NUM"]
         self.round_state.options = message["OPTIONS"]
         self.round_state.nodes[self.round_state.sc_round_num] = message["NODES"]
+        print("this si the utilities we are pasisng through ", message["UTILITIES"])
         self.round_state.utilities_mat = message["UTILITIES"]
 
         self.round_state.captain = message["CAPTAIN"]
@@ -94,14 +95,15 @@ class ServerListener(QObject):
         # if self.round_state.jhg_round_num == 1:
         winning_vote = message["WINNING_VOTE"]
         winning_vote += 1
-        new_utilities = message["UTILITIES"][winning_vote]
-
-        self.main_window.sc_history_grid.update_sc_grid(message["VOTES"], new_utilities, self.round_state.sc_round_num, winning_vote)
+        new_utilities = message["NEW_UTILITIES"]
+        self.main_window.sc_history_grid.update_sc_grid(message["VOTES"], message["UTILITIES"], self.round_state.sc_round_num, winning_vote)
 
         self.disable_sc_buttons_signal.emit()
         # new_utilities = message["NEW_UTILITIES"]
 
-        self.update_sc_utilities_labels_signal.emit(message["ROUND_NUM"], new_utilities, winning_vote, message["VOTES"], new_utilities)
+        # ok so what is new utilties and what we are expecting it to be
+        self.update_sc_utilities_labels_signal.emit(message["ROUND_NUM"], new_utilities, winning_vote, message["VOTES"], message["UTILITIES"])
+        #                                           int,                  dict,          int,          dict,              list
 
         # self.update_tornado_graph_signal.emit(self.main_window.tornado_ax, message["POSITIVE_VOTE_EFFECTS"], message["NEGATIVE_VOTE_EFFECTS"])
 

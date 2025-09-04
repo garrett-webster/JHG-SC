@@ -33,19 +33,17 @@ def create_sc_ui_elements(main_window):
 
 # Triggered by SC_INIT
 def SC_round_init(main_window):
-    print("this is the utilities mat ", main_window.round_state.utilities_mat)
-    # this is where we are going to need to work with the captain stuff.
     if main_window.round_state.captain != -1 and main_window.round_state.captain != main_window.round_state.client_id:
+        # There is a captain, but we aren't the captain
         main_window.add_captain_label(main_window.round_state.captain)
         main_window.SC_panel.setTabEnabled(0, False)
         # also create an auto submitted vote here.
-        time.sleep(0.5) # just go ahead and rattle something off for us.
+        time.sleep(0.1) # just go ahead and rattle something off for us.
+        # this sends a vote back just so we don't have to worry about it
         main_window.connection_manager.send_message("SUBMIT_SC", main_window.round_state.client_id, -1)
 
-
-
-
     else:
+        main_window.add_captain_label(main_window.round_state.captain)
         main_window.SC_panel.setTabEnabled(0, True)
 
     # Update sc ui elements
@@ -58,8 +56,9 @@ def SC_round_init(main_window):
     if main_window.round_state.captain != -1:
         if main_window.round_state.captain != main_window.round_state.client_id:
             pass # if we are NOT the captain
-            main_window.SC_voting_grid.update_utilities([[0] for _ in range(6)]) # hardcoded, fix that
+            main_window.SC_voting_grid.update_utilities([[0,0,0] for _ in range(main_window.round_state.num_players)]) # hardcoded, fix that
         else: # captain model enabled, and we are the captain. we need to see everything.
+            print("this is the utilities mat ", main_window.round_state.utilities_mat)
             main_window.SC_voting_grid.update_utilities(main_window.round_state.utilities_mat)
     main_window.SC_panel.setCurrentIndex(0) # should forcefully move them over if they aren't there already.
    # print("This si the main_window_round staet round num thingy ", main_window.round_state.sc_round_num)
