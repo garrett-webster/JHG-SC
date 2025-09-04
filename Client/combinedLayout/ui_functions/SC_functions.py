@@ -33,6 +33,7 @@ def create_sc_ui_elements(main_window):
 
 # Triggered by SC_INIT
 def SC_round_init(main_window):
+    print("this is the utilities mat ", main_window.round_state.utilities_mat)
     # this is where we are going to need to work with the captain stuff.
     if main_window.round_state.captain != -1 and main_window.round_state.captain != main_window.round_state.client_id:
         main_window.add_captain_label(main_window.round_state.captain)
@@ -57,7 +58,7 @@ def SC_round_init(main_window):
     if main_window.round_state.captain != -1:
         if main_window.round_state.captain != main_window.round_state.client_id:
             pass # if we are NOT the captain
-            main_window.SC_voting_grid.update_utilities([0 for _ in range(6)]) # hardcoded, fix that
+            main_window.SC_voting_grid.update_utilities([[0] for _ in range(6)]) # hardcoded, fix that
         else: # captain model enabled, and we are the captain. we need to see everything.
             main_window.SC_voting_grid.update_utilities(main_window.round_state.utilities_mat)
     main_window.SC_panel.setCurrentIndex(0) # should forcefully move them over if they aren't there already.

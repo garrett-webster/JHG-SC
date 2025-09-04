@@ -69,14 +69,12 @@ class SCGrid(QTabWidget):
         for i, label in enumerate(self.col_2_labels):
             label.setText(str(col_2_vals[i]))
 
-
     def update_utilities(self, utility_mat):
         for row, row_labels in enumerate(self.cause_utility_labels):
             for col, widget in enumerate(row_labels):
-                print("this si the col that is creashing the thing ", col)
                 row_labels[col].setText(str(utility_mat[row][col]))
 
-        utility_col_sums = [0,0,0]
+        utility_col_sums = [0 for _ in range(len(utility_mat[0]))]
         for col_idx in range(3):
             utility_col_sums[col_idx] = sum(row[col_idx] for row in utility_mat)
 
