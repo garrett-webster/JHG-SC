@@ -56,9 +56,9 @@ def SC_round_init(main_window):
     if main_window.round_state.captain != -1:
         if main_window.round_state.captain != main_window.round_state.client_id:
             pass # if we are NOT the captain
-            main_window.SC_voting_grid.update_utilities([[0,0,0] for _ in range(main_window.round_state.num_players)]) # hardcoded, fix that
+            new_utilities = [[0,0,0] for _ in range(main_window.round_state.num_players)]
+            main_window.SC_voting_grid.update_utilities(new_utilities)
         else: # captain model enabled, and we are the captain. we need to see everything.
-            print("this is the utilities mat ", main_window.round_state.utilities_mat)
             main_window.SC_voting_grid.update_utilities(main_window.round_state.utilities_mat)
     main_window.SC_panel.setCurrentIndex(0) # should forcefully move them over if they aren't there already.
    # print("This si the main_window_round staet round num thingy ", main_window.round_state.sc_round_num)
@@ -69,7 +69,8 @@ def SC_round_init(main_window):
 # Triggered by SC_OVER
 def update_sc_utilities_labels(main_window, round_num, new_utilities, winning_vote, last_round_votes, last_round_utilities):
     history_grid = main_window.sc_history_grid
-    history_grid.update_sc_history(round_num, last_round_votes, last_round_utilities, winning_vote)
+    captain = main_window.round_state.captain
+    history_grid.update_sc_history(round_num, last_round_votes, last_round_utilities, winning_vote, captain)
     main_window.SC_panel.setCurrentIndex(1)
     main_window.SC_cause_graph.update_arrows(history_grid.sc_history[str(round_num)]["votes"], True)
     main_window.SC_panel.setTabText(1, "Results")
@@ -89,6 +90,8 @@ def tab_changed(main_window, index):
 
         if main_window.SC_panel.tabText(1) == "Results":
             main_window.SC_panel.setTabText(1, "History")
+
+
     elif current_tab == main_window.sc_history_grid and main_window.sc_history_grid.sc_history:
         sc_history_tab = main_window.sc_history_grid
         selected_round = sc_history_tab.round_drop_down.currentIndex() + 1
@@ -96,6 +99,15 @@ def tab_changed(main_window, index):
         winning_vote = sc_history_tab.sc_history[str(selected_round)]["winning_vote"]
         cause_graph.update_sc_nodes_graph_gritty(selected_round, winning_vote)
         cause_graph.update_arrows(votes)
+
+        # # SO
+        # # this si gonna get werid.
+        # if main_window.round_state.captain != -1 and main_window.round_state.captain != main_window.round_state.client_id:
+        #     sc_history_tab.self.sc_history =
+        # else:
+        #     pass # full history
+        # # this needs to be changed to make sure that only the captian can see the history.
+    print("THIS SHOULD GO FIRST PLEASE")
 
 def sc_vote(main_window, vote):
     main_window.SC_voting_grid.current_vote = vote

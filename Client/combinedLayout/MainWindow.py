@@ -299,7 +299,6 @@ class MainWindow(QMainWindow):
         # self.update_sc_graph()  # go ahead and refresh the origin thing as well.
 
     def add_captain_label(self, captain):
-        print("This is the captain that we are getting ", captain)
         if captain == self.round_state.client_id:
             new_label = "YOU are the captain!"
         else:

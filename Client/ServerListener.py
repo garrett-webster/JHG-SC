@@ -72,7 +72,6 @@ class ServerListener(QObject):
         self.round_state.sc_round_num = message["ROUND_NUM"]
         self.round_state.options = message["OPTIONS"]
         self.round_state.nodes[self.round_state.sc_round_num] = message["NODES"]
-        print("this si the utilities we are pasisng through ", message["UTILITIES"])
         self.round_state.utilities_mat = message["UTILITIES"]
 
         self.round_state.captain = message["CAPTAIN"]
@@ -96,13 +95,28 @@ class ServerListener(QObject):
         winning_vote = message["WINNING_VOTE"]
         winning_vote += 1
         new_utilities = message["NEW_UTILITIES"]
-        self.main_window.sc_history_grid.update_sc_grid(message["VOTES"], message["UTILITIES"], self.round_state.sc_round_num, winning_vote)
+
+        if self.main_window.round_state.captain != -1:
+            current_utilities = message["UTILITIES"]
+            blank_utilities = [[0, 0, 0] for _ in range(self.main_window.round_state.num_players)]
+            for i in range(len(current_utilities)):
+                blank_utilities[i][winning_vote-1] = current_utilities[i][winning_vote-1]
+            self.main_window.sc_history_grid.update_sc_grid(message["VOTES"], blank_utilities, self.round_state.sc_round_num, winning_vote)
+        else:
+            self.main_window.sc_history_grid.update_sc_grid(message["VOTES"], message["UTILITIES"], self.round_state.sc_round_num, winning_vote)
 
         self.disable_sc_buttons_signal.emit()
         # new_utilities = message["NEW_UTILITIES"]
 
         # ok so what is new utilties and what we are expecting it to be
-        self.update_sc_utilities_labels_signal.emit(message["ROUND_NUM"], new_utilities, winning_vote, message["VOTES"], message["UTILITIES"])
+        if self.main_window.round_state.captain != -1:
+            current_utilities = message["UTILITIES"]
+            blank_utilities = [[0, 0, 0] for _ in range(self.main_window.round_state.num_players)]
+            for i in range(len(current_utilities)):
+                blank_utilities[i][winning_vote-1] = current_utilities[i][winning_vote-1]
+            self.update_sc_utilities_labels_signal.emit(message["ROUND_NUM"], new_utilities, winning_vote, message["VOTES"], blank_utilities)
+        else:
+            self.update_sc_utilities_labels_signal.emit(message["ROUND_NUM"], new_utilities, winning_vote, message["VOTES"], message["UTILITIES"])
         #                                           int,                  dict,          int,          dict,              list
 
         # self.update_tornado_graph_signal.emit(self.main_window.tornado_ax, message["POSITIVE_VOTE_EFFECTS"], message["NEGATIVE_VOTE_EFFECTS"])

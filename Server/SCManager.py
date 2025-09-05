@@ -76,6 +76,7 @@ class SCManager:
 
         self.sc_sim.start_round(options_and_peeps) # make sure this actually gets hard set.
         self.current_options_matrix = self.sc_sim.current_options_matrix
+        print("This is the current options matrix ", self.current_options_matrix)
         self.options_history[self.round_num] = self.current_options_matrix
         self.player_nodes = self.sc_sim.get_player_nodes()
         self.causes = self.sc_sim.get_causes()
