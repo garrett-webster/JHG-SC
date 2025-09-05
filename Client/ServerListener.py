@@ -71,7 +71,12 @@ class ServerListener(QObject):
         # self.tabs.setCurrentIndex(1)
         self.round_state.sc_round_num = message["ROUND_NUM"]
         self.round_state.options = message["OPTIONS"]
-        self.round_state.nodes[self.round_state.sc_round_num] = message["NODES"]
+        print("this is what the nodes look like ", message["NODES"])
+        if self.main_window.round_state.captain != -1:
+            print("this is what the nodes look like rn ", message["NODES"])
+            self.round_state.nodes[self.round_state.sc_round_num] = message["NODES"]
+        else:
+            self.round_state.nodes[self.round_state.sc_round_num] = message["NODES"]
         self.round_state.utilities_mat = message["UTILITIES"]
 
         self.round_state.captain = message["CAPTAIN"]
