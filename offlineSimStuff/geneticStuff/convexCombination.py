@@ -28,9 +28,6 @@ class PopularityMetrics:
     avgUtility: float
     endUtility: float
     relUtility: float
-    avgPopularity: float
-    endPopularity: float
-    relPopularity: float
 
 # ok so for our purposes this is almost always going to be 100. there are other things we CAN do but we are most interested in the initial 100 testbed.
 def definteInitialUtility(initPopType, numPlayers, initialPopularities):
@@ -187,10 +184,7 @@ def run_jhg_gen_stuff(jhg_engine, curr_round, agents, numPlayers):
             received[j] = np.array(jhg_engine.T[curr_round][j][i])
         transactions[i] = agents[i].play_round(i, curr_round, received, jhg_engine.P[curr_round], jhg_engine.I[curr_round], extra_data, False)
     jhg_engine.apply_transaction(transactions) # thanks references
-    # ok so now I have to return
-    # the change in popularities,
-    # return sc_sim.current_results, sc_sim.results_sums, new_influence  # so we have the change in utility and overall utility
-    return jhg_engine.get_influence(), jhg_engine.get_popularity().tolist() / num_rounds, jhg_engine.get_popularity().tolist() # return da influence matrix
+    return jhg_engine.get_influence() # return da influence matrix
 
 def playGame(agents, numPlayers, numRounds, gener, gamer, initialPopularities, povertyLine, forcedRandom, rounds_list):
     # for this one, reference defs.h in the C++ code. most of these are hard coded into the engine and this is just tranfering them over.
@@ -225,7 +219,7 @@ def playGame(agents, numPlayers, numRounds, gener, gamer, initialPopularities, p
     #     transactions[i] = [0 for _ in range(numPlayers)]
 
     # they hard lean into initalizing arrays of type class and then filling them later, which is weird to replicate in python
-    pmetrics = [PopularityMetrics(avgUtility=0, endUtility=0, relUtility=0, avgPopularity=0, endPopularity=0, relPopularity=0) for _ in range(numPlayers)]
+    pmetrics = [PopularityMetrics(avgUtility=0, endUtility=0, relUtility=0) for _ in range(numPlayers)]
     # actually I can skip the next step because its just setting it up, yay for python one line loops.
 
 
@@ -245,11 +239,7 @@ def playGame(agents, numPlayers, numRounds, gener, gamer, initialPopularities, p
         curr_round = int(rounds_list[list_index][:-1])  # useful, yes, but not quite the logger round
         #curr_logger_round = gamer + offset  # this way the logger is logging it continously, but the sims don't interpret it that way.
         if jhg_rounds:
-            influence_matrix, changePopularity, overallPopularity = run_jhg_gen_stuff(jhg_engine, curr_round, agents, numPlayers)
-
-            for i in range(numPlayers):
-                pmetrics[i].avgPopularity += changePopularity[i]
-                pmetrics[i].endUtility = overallPopularity[i]
+            influence_matrix = run_jhg_gen_stuff(jhg_engine, curr_round, agents, numPlayers)
 
         if sc_rounds:
             changeUtility, overallUtility, influence_matrix = run_sc_gen_stuff(agents, jhg_engine, sc_sim, total_order, curr_round, num_cycles, numPlayers, influence_matrix)
@@ -296,13 +286,9 @@ def write_generational_results(theGenePools, popSize, gen, agentsPerGame):
         if theGenePools[i].count > 0:
             theGenePools[i].relativeFitness /= theGenePools[i].count
             theGenePools[i].absoluteFitness /= theGenePools[i].count
-            theGenePools[i].relativePopularity /= theGenePools[i].count
-            theGenePools[i].absolutePopularity /= theGenePools[i].count
         else:
             theGenePools[i].relativeFitness = 0.0
             theGenePools[i].absoluteFitness = 0.0
-            theGenePools[i].relativePopularity = 0.0
-            theGenePools[i].absolutePopularity = 0.0
 
     # Sort agents by fitness
     sorted_agents = sorted(theGenePools, key=lambda agent: agent.absoluteFitness, reverse=True)
@@ -327,9 +313,7 @@ def write_generational_results(theGenePools, popSize, gen, agentsPerGame):
                 agent.getString(),
                 agent.count,
                 round(agent.relativeFitness, 4),
-                round(agent.absoluteFitness, 4),
-                round(agent.relativePopularity, 4),
-                round(agent.absolutePopularity, 4),
+                round(agent.absoluteFitness, 4)
             ])
 
     avg_fitness = sum(agent.absoluteFitness for agent in theGenePools) / popSize
@@ -392,11 +376,8 @@ def selectByFitness(thePopulation, popSize, _rank):
     for i in range(popSize):
         if (_rank):
             mag += thePopulation[i].relativeFitness
-            mag += thePopulation[i].relativePopularity
-
         else:
             mag += thePopulation[i].absoluteFitness
-            mag += thePopulation[i].absolutePopularity
     num = random.random()  # Returns float in [0.0, 1.0)
     if mag == 0: # if there is nothing going on, just uhh return a random number.
         return random.randint(0, popSize-1)
@@ -404,10 +385,8 @@ def selectByFitness(thePopulation, popSize, _rank):
     for i in range(popSize):
         if (_rank):
             sum += thePopulation[i].relativeFitness / mag
-            sum += thePopulation[i].relativePopularity / mag
         else:
             sum += thePopulation[i].absoluteFitness / mag
-            sum += thePopulation[i].absolutePopularity / mag
 
         if num <= sum:
             return i
@@ -522,23 +501,18 @@ if __name__ == "__main__":
             # now we gotta calcualte relative popularity
 
             s = 0.0
-            t = 0.0
             for i in range(numPlayers):
                 s += pmetrics[i].avgUtility
-                t += pmetrics[i].avgPopularity
             if s != 0.0:
                 for i in range(numPlayers):
                     pmetrics[i].relUtility = pmetrics[i].avgUtility / s
-                    pmetrics[i].relPopularity = pmetrics[i].avgPopularity / t
 
             # we gotta update fitness - fitness whole pizza in they mouth
             for i in range(agentsPerGame):
                 if theGenePools[plyrIdxs[i]].played_genes: # THANK GOODNESS I thought I was gonna have to assemble that from scratch.
                     theGenePools[plyrIdxs[i]].count += 1
                     theGenePools[plyrIdxs[i]].absoluteFitness += ((pmetrics[i].avgUtility + pmetrics[i].endUtility) / 2.0) # ok buddy
-                    theGenePools[plyrIdxs[i]].absolutePopularity += ((pmetrics[i].avgPopularity + pmetrics[i].endPopularity) / 2.0)
                     theGenePools[plyrIdxs[i]].relativeFitness += pmetrics[i].relUtility # this at least makes sense
-                    theGenePools[plyrIdxs[i]].relativePopularity += pmetrics[i].relPopularity # this also appears to make sense.
 
         print("this is the gen it thinks it is ", gen)
 

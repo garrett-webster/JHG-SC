@@ -18,6 +18,8 @@ class GeneAgent3(GeneAgentMixin, AbstractAgent):
         self.count = 0
         self.relativeFitness = 0.0
         self.absoluteFitness = 0.0
+        self.relativePopularity = 0.0
+        self.absolutePopularity = 0.0
         self.gameParams = {}
         self.tokens_per_player = tokens_per_player
         self.pop_history = [] # just slap this up here.
