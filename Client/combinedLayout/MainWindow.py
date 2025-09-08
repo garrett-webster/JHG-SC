@@ -299,14 +299,20 @@ class MainWindow(QMainWindow):
         # self.update_sc_graph()  # go ahead and refresh the origin thing as well.
 
     def add_captain_label(self, captain):
+        possible_labels = ["YOU are the captain!", f"Captain is player {captain + 1}"]
         if captain == self.round_state.client_id:
-            new_label = "YOU are the captain!"
+            new_label = possible_labels[0]
+            other_label = possible_labels[1]
         else:
-            new_label = f"Captain is player {captain + 1}"
+            new_label = possible_labels[1]
+            other_label = possible_labels[0]
 
         for index in range(self.SC_panel.count()):
             if self.SC_panel.tabText(index) == new_label:
                 print("This tab already exists.")
+                return
+            if self.SC_panel.tabText(index) == other_label:
+                self.SC_panel.setTabText(index, new_label)
                 return
 
         # initalize the new tab
