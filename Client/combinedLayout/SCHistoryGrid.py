@@ -51,7 +51,7 @@ class SCHistoryGrid(SCGrid):
         self.captain = captain
 
 
-    def update_sc_grid(self, votes, utilities, round_num, winning_vote):
+    def update_sc_grid(self, votes, utilities, round_num, winning_vote=None):
         one_idx_votes = {key: value + 1 for key, value in votes.items()}
         super().update_grid(one_idx_votes, utilities)
         # winning_vote = get_winning_vote(votes)

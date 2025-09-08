@@ -71,15 +71,24 @@ class ServerListener(QObject):
         # self.tabs.setCurrentIndex(1)
         self.round_state.sc_round_num = message["ROUND_NUM"]
         self.round_state.options = message["OPTIONS"]
+        self.round_state.captain = message["CAPTAIN"]
         print("this is what the nodes look like ", message["NODES"])
-        if self.main_window.round_state.captain != -1:
-            print("this is what the nodes look like rn ", message["NODES"])
-            self.round_state.nodes[self.round_state.sc_round_num] = message["NODES"]
+        # if captain mode is enabled
+        if self.round_state.captain != -1:
+            if self.round_state.captain != self.round_state.client_id:
+                new_nodes = message["NODES"]
+                for node in new_nodes:
+                    if node["type"] == "PLAYER":
+                        node["x_pos"] = 0.0
+                        node["y_pos"] = 0.0
+                self.round_state.nodes[self.round_state.sc_round_num] = new_nodes
+            else: # we ARE the captain
+                self.round_state.nodes[self.round_state.sc_round_num] = message["NODES"]
         else:
             self.round_state.nodes[self.round_state.sc_round_num] = message["NODES"]
         self.round_state.utilities_mat = message["UTILITIES"]
 
-        self.round_state.captain = message["CAPTAIN"]
+
 
         self.update_sc_round_signal.emit()  # go ahead and adjust all the SC stuff appropriately as well.
 
@@ -100,6 +109,16 @@ class ServerListener(QObject):
         winning_vote = message["WINNING_VOTE"]
         winning_vote += 1
         new_utilities = message["NEW_UTILITIES"]
+
+        if self.round_state.captain != -1:
+            new_nodes = self.round_state.nodes[self.round_state.sc_round_num]
+            for node in new_nodes:
+                if node["type"] == "PLAYER":
+                    node["x_pos"] = 0.0
+                    node["y_pos"] = 0.0
+            self.round_state.nodes[self.round_state.sc_round_num] = new_nodes
+
+
 
         if self.main_window.round_state.captain != -1:
             current_utilities = message["UTILITIES"]
