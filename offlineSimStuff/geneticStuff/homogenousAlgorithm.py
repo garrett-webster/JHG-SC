@@ -312,7 +312,7 @@ def write_generational_results(theGenePools, popSize, gen, agentsPerGame):
     # Get the absolute path to the directory containing this script
     script_dir = os.path.dirname(os.path.abspath(__file__))
     # Construct the full output directory path
-    output_dir = os.path.join(script_dir, "homoResultsLong", "theGenerations")
+    output_dir = os.path.join(script_dir, "convexResults", "theGenerations")
     # Ensure output directory exists
     os.makedirs(output_dir, exist_ok=True)
     # Construct the filename path
@@ -449,13 +449,13 @@ if __name__ == "__main__":
     # 0 -- executable (doesn't change)
     # 1 -- code directive to evolve population (doesn't change)
     theFolder = "SomeFolder" # folder where trained parameters of cab agents are stored.
-    popSize = 60 # number of agnets in the gene pool (use 100 here)
+    popSize = 40 # number of agnets in the gene pool (use 100 here)
     numGeneGopies = 3 # numbers of sets of genes (3 was the number used in the paper)
     startIndex = 0 # generation to start training (0 to start form scratch)
     num_gens = 300 # generation to end traning trains up to 99
     games_per_gen = popSize # agents from the gene pool are selected at random, 100 times.
     # BIG NOTICE --> THIS NEEDS TO BE EQUAL TO GAMES_PER_GEN.
-    agentsPerGame = 10 # number of agents per game
+    agentsPerGame = 8 # number of agents per game
     roundsPerGame = 30 # number fo rounds per game
     povertyLine = 0 # see SM-1
     configFile = "basicConfig" # trains with just cab agents, no assasains.
@@ -482,8 +482,8 @@ if __name__ == "__main__":
     agents = [AbstractAgent() for _ in range(popSize)]  # the fetchers we will be training
 
     # lets let these guys run for a little longer, A full 30 rounds as seen in the original paper might be a good place to start.
-    jhg_games_per_round = [4,3,3,3,3,3] # just give me an easy place to start.
-    # jhg_games_per_round = [4,3,3,3,3] # just give me an easy place to start.
+    # jhg_games_per_round = [4,3,3,3,3,3] # just give me an easy place to start.
+    jhg_games_per_round = [4,3,3,3,3] # just give me an easy place to start.
     # jhg_games_per_round = [2,2,2]
     rounds_list = determine_rounds(jhg_games_per_round)
     mxPlayers = numPlayers
