@@ -102,8 +102,7 @@ class CompleteGrapher():
         pop_graph = avg_pop_per_round is not None and len(avg_pop_per_round) > 0
         util_graph = avg_utility_per_round is not None and len(avg_utility_per_round) > 0
         num_graphs = int(pop_graph) + int(util_graph)
-        num_graphs += 1 # influence graph always gets done\
-        print('this is the ')
+        num_graphs += 1 # influence graph always gets done
 
         community_colors = {}
         player_to_community = {}

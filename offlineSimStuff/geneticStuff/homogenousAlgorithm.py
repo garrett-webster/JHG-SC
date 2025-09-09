@@ -312,7 +312,7 @@ def write_generational_results(theGenePools, popSize, gen, agentsPerGame):
     # Get the absolute path to the directory containing this script
     script_dir = os.path.dirname(os.path.abspath(__file__))
     # Construct the full output directory path
-    output_dir = os.path.join(script_dir, "convexResults", "theGenerations")
+    output_dir = os.path.join(script_dir, "longerConvexResults", "theGenerations")
     # Ensure output directory exists
     os.makedirs(output_dir, exist_ok=True)
     # Construct the filename path
@@ -395,11 +395,11 @@ def selectByFitness(thePopulation, popSize, _rank):
     for i in range(popSize):
         if (_rank):
             mag += thePopulation[i].relativeFitness
-            mag += thePopulation[i].relativePopularity
+            mag += (thePopulation[i].relativePopularity / 10) # attempt to scale these down to match utilty values
 
         else:
             mag += thePopulation[i].absoluteFitness
-            mag += thePopulation[i].absolutePopularity
+            mag += (thePopulation[i].absolutePopularity / 10) # atempt to scale these down to match utility values.
     num = random.random()  # Returns float in [0.0, 1.0)
     if mag == 0: # if there is nothing going on, just uhh return a random number.
         return random.randint(0, popSize-1)
@@ -449,8 +449,8 @@ if __name__ == "__main__":
     # 0 -- executable (doesn't change)
     # 1 -- code directive to evolve population (doesn't change)
     theFolder = "SomeFolder" # folder where trained parameters of cab agents are stored.
-    popSize = 40 # number of agnets in the gene pool (use 100 here)
-    numGeneGopies = 3 # numbers of sets of genes (3 was the number used in the paper)
+    popSize = 60 # number of agnets in the gene pool (use 100 here)
+    numGeneGopies = 1 # numbers of sets of genes (3 was the number used in the paper)
     startIndex = 0 # generation to start training (0 to start form scratch)
     num_gens = 300 # generation to end traning trains up to 99
     games_per_gen = popSize # agents from the gene pool are selected at random, 100 times.

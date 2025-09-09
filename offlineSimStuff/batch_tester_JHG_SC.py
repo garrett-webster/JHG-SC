@@ -232,7 +232,7 @@ if __name__ == "__main__":
     # jhg_games_per_sc_round = [2,3,3]#,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,2]
     # jhg_games_per_sc_round = ["S", 10]
     # jhg_games_per_sc_round = [1,1,1]
-    #jhg_games_per_sc_round = [2,2,2]
+    # jhg_games_per_sc_round = [2,2,2]
 
 
 
@@ -245,13 +245,11 @@ if __name__ == "__main__":
 
     round_list = determine_rounds(jhg_games_per_sc_round)
     num_cycles = 3
-    num_players = 12
+    num_players = 10
     #addAgents = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\Server\Engine\scenarios\2SmartWelfare"
 
-    file_name = os.path.join("..", "Server", "Engine", "scenarios", "workingDirectory")
-    my_path = os.path.dirname(os.path.abspath(__file__))
-    file_path = os.path.normpath(os.path.join(my_path, file_name))
-    addAgents = file_path
+
+
 
     # addAgents = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\Server\Engine\scenarios\workingDirectory"
 
@@ -273,6 +271,24 @@ if __name__ == "__main__":
     num_attempts = 10 # number of batches to do.
     num_rounds = sum(jhg_games_per_sc_round) if len(jhg_games_per_sc_round) > 2 else jhg_games_per_sc_round[-1] # if its a list, len of list. else, grab the second identifier
 
+    file_name = os.path.join("..", "Server", "Engine", "scenarios", "workingDirectory")
+    my_path = os.path.dirname(os.path.abspath(__file__))
+    file_path = os.path.normpath(os.path.join(my_path, file_name))
+    addAgents = file_path
+    new_list = []
+    fp = open(addAgents, "r")
+    for line in fp:
+        if line.startswith("Kitty"):
+            new_list.append(-1)
+        if line.startswith("SocialWelfare"):
+            new_list.append(-2)
+    num_vanilla_bots = num_players - num_humans - len(new_list)
+    bot_types = [jhg_bot_type for _ in range(num_vanilla_bots)]
+    bot_types += new_list
+
+
+
+
     utility_to_log = []
     popularity_to_log = []
 
@@ -281,7 +297,7 @@ if __name__ == "__main__":
         # stuff that we used to od outside that we now have to do inside.
         total_order = create_total_order(num_players, num_humans) # unfortunately we have to make that in here now just bc we are changing the num players
         round_logger = RoundLogger()
-        game_logger = GameLogger(num_players, 199)  # might be the wrong place to ahve this, as I don't actually have the gen number yet.
+        game_logger = GameLogger(num_players, bot_types)  # might be the wrong place to ahve this, as I don't actually have the gen number yet.
         complete_grapher = CompleteGrapher()
 
 
