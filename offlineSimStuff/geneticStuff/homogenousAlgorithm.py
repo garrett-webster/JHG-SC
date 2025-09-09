@@ -190,7 +190,8 @@ def run_jhg_gen_stuff(jhg_engine, curr_round, agents, numPlayers):
     # ok so now I have to return
     # the change in popularities,
     # return sc_sim.current_results, sc_sim.results_sums, new_influence  # so we have the change in utility and overall utility
-    return jhg_engine.get_influence(), jhg_engine.get_popularity().tolist() / num_rounds, jhg_engine.get_popularity().tolist() # return da influence matrix
+
+    return jhg_engine.get_influence()# return da influence matrix, the change in popularitry, and the new popularities.
 
 def playGame(agents, numPlayers, numRounds, gener, gamer, initialPopularities, povertyLine, forcedRandom, rounds_list):
     # for this one, reference defs.h in the C++ code. most of these are hard coded into the engine and this is just tranfering them over.
@@ -245,11 +246,12 @@ def playGame(agents, numPlayers, numRounds, gener, gamer, initialPopularities, p
         curr_round = int(rounds_list[list_index][:-1])  # useful, yes, but not quite the logger round
         #curr_logger_round = gamer + offset  # this way the logger is logging it continously, but the sims don't interpret it that way.
         if jhg_rounds:
-            influence_matrix, changePopularity, overallPopularity = run_jhg_gen_stuff(jhg_engine, curr_round, agents, numPlayers)
+            # influence_matrix, changePopularity, overallPopularity = run_jhg_gen_stuff(jhg_engine, curr_round, agents, numPlayers)
+            influence_matrix = run_jhg_gen_stuff(jhg_engine, curr_round, agents, numPlayers)
 
             for i in range(numPlayers):
-                pmetrics[i].avgPopularity += changePopularity[i]
-                pmetrics[i].endUtility = overallPopularity[i]
+                pmetrics[i].avgPopularity += float(jhg_engine.P[jhg_engine.t][i] / numRounds)
+                pmetrics[i].endPopularity = float(jhg_engine.P[jhg_engine.t][i])
 
         if sc_rounds:
             changeUtility, overallUtility, influence_matrix = run_sc_gen_stuff(agents, jhg_engine, sc_sim, total_order, curr_round, num_cycles, numPlayers, influence_matrix)
@@ -333,7 +335,8 @@ def write_generational_results(theGenePools, popSize, gen, agentsPerGame):
             ])
 
     avg_fitness = sum(agent.absoluteFitness for agent in theGenePools) / popSize
-    print(f"Average utility in generation {gen}: {avg_fitness:.4f}")
+    avg_popularity = sum(agent.absolutePopularity for agent in theGenePools) / popSize
+    print(f"Average utility in generation {gen}: {avg_fitness:.4f} Average Popularity: {avg_popularity:.4f}")
 
 
 def mutateIt(gene):
