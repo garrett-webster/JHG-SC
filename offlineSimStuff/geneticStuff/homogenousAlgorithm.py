@@ -483,7 +483,7 @@ if __name__ == "__main__":
     # 0 -- executable (doesn't change)
     # 1 -- code directive to evolve population (doesn't change)
     theFolder = "SomeFolder" # folder where trained parameters of cab agents are stored.
-    popSize = 10 # number of agnets in the gene pool (use 100 here)
+    popSize = 60 # number of agnets in the gene pool (use 100 here)
     numGeneGopies = 1 # numbers of sets of genes (3 was the number used in the paper)
     startIndex = 0 # generation to start training (0 to start form scratch)
     num_gens = 300 # generation to end traning trains up to 99
@@ -516,8 +516,8 @@ if __name__ == "__main__":
 
     # lets let these guys run for a little longer, A full 30 rounds as seen in the original paper might be a good place to start.
     # jhg_games_per_round = [4,3,3,3,3,3] # just give me an easy place to start.
-    # jhg_games_per_round = [4,3,3,3,3] # just give me an easy place to start.
-    jhg_games_per_round = [2,2,2]
+    jhg_games_per_round = [4,3,3,3,3] # just give me an easy place to start.
+    # jhg_games_per_round = [2,2,2]
     rounds_list = determine_rounds(jhg_games_per_round)
     mxPlayers = numPlayers
 
