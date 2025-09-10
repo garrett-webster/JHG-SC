@@ -358,7 +358,7 @@ def mutateIt(gene):
 def evolvePopulationPairs(theGenePool_prev, popSize, numGeneCopies):
     genes_dict = theGenePool_prev[0].genes_long[0]  # assume [dict]
     gene_keys = list(genes_dict.keys()) # just easier this way
-    num_genes = len(gene_keys) * 3 # cycle through it 3 times, one for each one
+    num_genes = len(gene_keys) # * 3 # cycle through it 3 times, one for each one
     # represents the amount we will have to iterate through or something.
     # problem - you need to generate a list 3 times the length so we can put it all in there. trhat way you can have 3 copies. give it another whirl on monday.
 
@@ -370,16 +370,24 @@ def evolvePopulationPairs(theGenePool_prev, popSize, numGeneCopies):
 
         # the following was a fetching pain to translate over. it works but if it breaks I will have 0 idea of how to fix it. 5 stars.
         gene_values = [] # holds the new genes
+        # for g in range(num_genes):
+        #     cycle = g // len(gene_keys)
+        #     # we have 3 genes that have the same 33 repeating values. we iterate through all of them.
+        #     # would probably be easier to just go through the list three times and adjust the keys as we go. however, if this works, I won't complain.
+        #     new_g = g - (len(gene_keys) * cycle) # this should allow it to be new and not have any carry over issues.
+        #     key = gene_keys[new_g]
+        #     selected_gene = (
+        #         mutateIt(theGenePool_prev[ind1].genes_long[cycle][key])
+        #         if random.randint(0, 1) == 0
+        #         else mutateIt(theGenePool_prev[ind2].genes_long[cycle][key])
+        #     )
+        #     gene_values.append(str(selected_gene))
         for g in range(num_genes):
-            cycle = g // len(gene_keys)
-            # we have 3 genes that have the same 33 repeating values. we iterate through all of them.
-            # would probably be easier to just go through the list three times and adjust the keys as we go. however, if this works, I won't complain.
-            new_g = g - (len(gene_keys) * cycle) # this should allow it to be new and not have any carry over issues.
-            key = gene_keys[new_g]
+            key = gene_keys[g]
             selected_gene = (
-                mutateIt(theGenePool_prev[ind1].genes_long[cycle][key])
+                mutateIt(theGenePool_prev[ind1].genes_long[0][key]) # long story.
                 if random.randint(0, 1) == 0
-                else mutateIt(theGenePool_prev[ind2].genes_long[cycle][key])
+                else mutateIt(theGenePool_prev[ind2].genes_long[0][key])
             )
             gene_values.append(str(selected_gene))
 
@@ -456,10 +464,9 @@ if __name__ == "__main__":
     games_per_gen = popSize # agents from the gene pool are selected at random, 100 times.
     # BIG NOTICE --> THIS NEEDS TO BE EQUAL TO GAMES_PER_GEN.
     agentsPerGame = 8 # number of agents per game
-    roundsPerGame = 30 # number fo rounds per game
+    # roundsPerGame = 30 # number fo rounds per game
     povertyLine = 0 # see SM-1
-    configFile = "basicConfig" # trains with just cab agents, no assasains.
-    initPops = "varied" # starts eveyrone at different initial popularities when training.
+    initPops = "equal" # starts eveyrone at different initial popularities when training.
     tokens_per_player = 2 # probably best if I just reduce this back to whatever. (Added by me just in case we wanted to be silly)
     num_humans = 0 # we discriminate in this fetcher
     num_kitties = 2

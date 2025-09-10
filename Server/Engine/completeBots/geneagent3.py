@@ -841,6 +841,11 @@ class GeneAgent3(GeneAgentMixin, AbstractAgent):
 
     # decide how many tokens to keep
     def cuanto_guardo(self, round_num, player_idx, num_players, num_tokens, popularities, received, selected_community, extra_flag):
+        self_pop = popularities[player_idx]
+
+        if extra_flag:
+            self_pop *= 10
+
         # Change on July 12
         self_pop = popularities[player_idx]
         if extra_flag:
@@ -849,13 +854,8 @@ class GeneAgent3(GeneAgentMixin, AbstractAgent):
         if popularities[player_idx] <= self.gameParams["poverty_line"]:
             return 0
 
-        if round_num == 0: # is it worth like, upping the popularities * 10 or something? just so the numbers play out nicely?
-            # at the same time, keeping doesn't really work the same between the two testbeds, so like
-            # its not really worth keeping here the same way that it is under JHG.
-            if extra_flag:
-                self.underAttack = (self.genes["initialDefense"] / 100.0) * (self_pop)
-            else:
-                self.underAttack = (self.genes["initialDefense"] / 100.0) * (self_pop)
+        if round_num == 0:
+            self.underAttack = (self.genes["initialDefense"] / 100.0) * self_pop
         else:
             totalAttack = np.dot(np.negative(received[0:num_players]).clip(0), popularities[0:num_players])
             dUpdate = self.genes["defenseUpdate"] / 100.0

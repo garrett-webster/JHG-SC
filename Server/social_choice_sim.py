@@ -642,12 +642,11 @@ class Social_Choice_Sim:
     def get_game_deets(self):
         actual_round_num = self.num_rounds + 1 # off by one error
         cooperation_score = self.cooperation_score / (actual_round_num) if self.num_rounds > 0 else 0  # as a percent, how often we cooperated. (had a non negative cause pass)
-        sc_bot_type = 0 # don't return anything here rn.
         results = self.results # do I actually need this?
         results_sums = self.results_sums
         cv, sums_per_round = self.get_sums_per_round_and_cv()
         influence = (self.most_recent_influence).tolist()
-        #utility_per_round = list(zip(*self.get_results_per_round()))
+       #  bot_types = self.bots
         utility_per_round = self.get_results_per_round()
         avg_utility_per_round = self.get_average_utility_per_round()
 

@@ -143,6 +143,8 @@ class JHG_simulator():
         self.sim = GameSimulator(
             game_params)  # sets up our sim object - might need to make this global so we can grab it wherever we need it.
 
+
+
     def reorder_agents(self, plyrs):
         bots = [a for a in plyrs if a.whoami != "Human"]
         players = [a for a in plyrs if a.whoami == "Human"]

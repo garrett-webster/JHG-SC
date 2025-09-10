@@ -1,3 +1,5 @@
+import os
+
 from Server.JHGManager import JHGManager
 from Server.OptionGenerators.generators import generator_factory
 from Server.SCManager import SCManager
@@ -62,7 +64,9 @@ class Server():
 
     def start_server(self, host='0.0.0.0', port=12345):
         jhg_bot_type = 0
-        addAgents = r".\Server\Engine\scenarios\workingDirectory"
+        # addAgents = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\Server\Engine\scenarios\workingDirectory"
+        my_path = os.path.dirname(os.path.abspath(__file__))
+        addAgents = os.path.join(my_path, "Server", "Engine", "scenarios", "workingDirectory")
 
         self.connection_manager = ServerConnectionManager(host, port, OPTIONS["TOTAL_PLAYERS"], OPTIONS["NUM_BOTS"])
 
