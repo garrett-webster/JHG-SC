@@ -261,8 +261,35 @@ def playGame(agents, numPlayers, numRounds, gener, gamer, initialPopularities, p
                 pmetrics[i].avgUtility += changeUtility[i]
                 pmetrics[i].endUtility = overallUtility[i]
 
+
     # print("These are the final utilities ", sc_sim.results_sums, " and these are the final popularities ", (jhg_engine.get_popularity()).tolist())
-    return pmetrics # returns out data type
+    avg_non_cat_pop, avg_non_cat_util = calculate_average_stats(jhg_engine, sc_sim)
+
+    return pmetrics, avg_non_cat_pop, avg_non_cat_util
+
+def calculate_average_stats(jhg_engine, sc_sim):
+
+    popularities = (jhg_engine.get_popularity()).tolist()
+    num_kitties = 2 # just trust me
+    non_cats = 8
+    cumulative_cat_score = sum(popularities[non_cats:])
+    cumulative_non_cat_score = sum(popularities)- cumulative_cat_score
+    avg_cat_pop = cumulative_cat_score / num_kitties
+    avg_non_cat_pop = cumulative_non_cat_score / non_cats
+    # print('here is the average cat / added agent ', avg_cat_pop, " and here is the average non cat utility ", avg_non_cat_pop)
+
+
+
+
+    utilities = sc_sim.results_sums
+    cumulative_cat_score = sum(utilities[non_cats:])
+    cumulative_non_cat_score = sum(utilities)   - cumulative_cat_score
+    avg_cat_util = cumulative_cat_score / num_kitties
+    avg_non_cat_util = cumulative_non_cat_score / non_cats
+    # print('here is the average cat / added agent popualrity ', avg_cat_util, " and here is the average non cat popularity ", avg_non_cat_util)
+
+    return avg_cat_pop, avg_cat_util
+
 
 # this might POOP poop the bed, pretty sure it was written with managers in mind rather than the sims, so we shall see.
 def generate_peeps(total_order, jhg_pops, sc_sim):
@@ -317,7 +344,6 @@ def write_generational_results(theGenePools, popSize, gen, agentsPerGame):
     os.makedirs(output_dir, exist_ok=True)
     # Construct the filename path
     filename = os.path.join(output_dir, f"gen_{gen}.csv")
-    print("this is where it is supposedly writing ", filename)
 
     # Write CSV
     with open(filename, mode='w', newline='') as file:
@@ -457,7 +483,7 @@ if __name__ == "__main__":
     # 0 -- executable (doesn't change)
     # 1 -- code directive to evolve population (doesn't change)
     theFolder = "SomeFolder" # folder where trained parameters of cab agents are stored.
-    popSize = 60 # number of agnets in the gene pool (use 100 here)
+    popSize = 10 # number of agnets in the gene pool (use 100 here)
     numGeneGopies = 1 # numbers of sets of genes (3 was the number used in the paper)
     startIndex = 0 # generation to start training (0 to start form scratch)
     num_gens = 300 # generation to end traning trains up to 99
@@ -490,12 +516,14 @@ if __name__ == "__main__":
 
     # lets let these guys run for a little longer, A full 30 rounds as seen in the original paper might be a good place to start.
     # jhg_games_per_round = [4,3,3,3,3,3] # just give me an easy place to start.
-    jhg_games_per_round = [4,3,3,3,3] # just give me an easy place to start.
-    # jhg_games_per_round = [2,2,2]
+    # jhg_games_per_round = [4,3,3,3,3] # just give me an easy place to start.
+    jhg_games_per_round = [2,2,2]
     rounds_list = determine_rounds(jhg_games_per_round)
     mxPlayers = numPlayers
 
     for gen in range(num_gens): # however many generations we want
+        list_non_cat_pops = []
+        list_non_cat_util = []
         for game in range(games_per_gen): # however many games we want per generation
 
             for i in range(agentsPerGame): # wait is that it???
@@ -526,8 +554,9 @@ if __name__ == "__main__":
 
             num_rounds = sum(jhg_games_per_round)
 
-            pmetrics = playGame(agents, numPlayers, num_rounds, gen, game, initUtilities, povertyLine, False, rounds_list)
-
+            pmetrics, non_cat_pops, non_cat_util = playGame(agents, numPlayers, num_rounds, gen, game, initUtilities, povertyLine, False, rounds_list)
+            list_non_cat_pops.append(non_cat_pops)
+            list_non_cat_util.append(non_cat_util)
 
             # now we gotta calcualte relative popularity
 
@@ -551,6 +580,9 @@ if __name__ == "__main__":
                     theGenePools[plyrIdxs[i]].relativePopularity += pmetrics[i].relPopularity # this also appears to make sense.
 
         print("this is the gen it thinks it is ", gen)
+        average_pops = sum(list_non_cat_pops) / len(list_non_cat_pops)
+        average_util = sum(list_non_cat_util) / len(list_non_cat_util)
+        print("Average Utility: ", average_util, " Average Pops: ", average_pops, " of the CATS")
 
         write_generational_results(theGenePools, popSize, gen, agentsPerGame)
 
