@@ -227,11 +227,11 @@ def determine_rounds(jhg_rounds_per_sc_game_list):
 if __name__ == "__main__":
 
     #jhg_games_per_sc_round = [1,1,1,1,1,1,1,1]#,1,1,1,1,1,1,1,1,1,1,1,1]
-    jhg_games_per_sc_round = [4,3,3,3,3,3,3,3] # what we trained the og assasain agents on.
+    # jhg_games_per_sc_round = [4,3,3,3,3,3,3,3] # what we trained the og assasain agents on.
     # jhg_games_per_sc_round = [4, 3, 3, 3, 3]
     # jhg_games_per_sc_round = [4,3,3,3,3]  # what we trained the sleepy assasain bots on.
     # jhg_games_per_sc_round = [2,3,3]#,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,2]
-    # jhg_games_per_sc_round = ["S", 10]
+    jhg_games_per_sc_round = ["J", 30]
     # jhg_games_per_sc_round = [1,1,1]
     # jhg_games_per_sc_round = [2,2,2]
 
@@ -258,7 +258,7 @@ if __name__ == "__main__":
     num_humans = 0
     tokens_per_player = 2
     utility_per_player = 3
-    create_round_graphs_bool = True
+    create_round_graphs_bool = False
     create_game_graphs_bool = True
     create_influence = False
     chromosomes_directory = "testChromosome"
