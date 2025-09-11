@@ -64,7 +64,7 @@ def run_trial(sc_sim: "Social_Choice_Sim", jhg_sim, round_list, num_cycles, grou
         round_logger.save_round(curr_round, sc_rounds, jhg_rounds)
 
 
-        if create_round_graphs_bool and sc_rounds:
+        if create_round_graphs_bool:
             create_round_graphs(round_logger, curr_round, sc_rounds, jhg_rounds)
 
     if create_game_graphs_bool:
@@ -228,6 +228,7 @@ if __name__ == "__main__":
 
     #jhg_games_per_sc_round = [1,1,1,1,1,1,1,1]#,1,1,1,1,1,1,1,1,1,1,1,1]
     jhg_games_per_sc_round = [4,3,3,3,3,3,3,3] # what we trained the og assasain agents on.
+    # jhg_games_per_sc_round = [4, 3, 3, 3, 3]
     # jhg_games_per_sc_round = [4,3,3,3,3]  # what we trained the sleepy assasain bots on.
     # jhg_games_per_sc_round = [2,3,3]#,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,2]
     # jhg_games_per_sc_round = ["S", 10]
@@ -257,7 +258,7 @@ if __name__ == "__main__":
     num_humans = 0
     tokens_per_player = 2
     utility_per_player = 3
-    create_round_graphs_bool = False
+    create_round_graphs_bool = True
     create_game_graphs_bool = True
     create_influence = False
     chromosomes_directory = "testChromosome"
@@ -268,7 +269,7 @@ if __name__ == "__main__":
     allocation_bot_type = "allocations_scenarios/random"
     jhg_bot_type = 0 # 0 is gene bots, 2 is social welfare and 3 is random. 4 is the new social welfare that I am developing that is just a hair smarter.
 
-    num_attempts = 10 # number of batches to do.
+    num_attempts = 1 # number of batches to do.
     num_rounds = sum(jhg_games_per_sc_round) if len(jhg_games_per_sc_round) > 2 else jhg_games_per_sc_round[-1] # if its a list, len of list. else, grab the second identifier
 
     file_name = os.path.join("..", "Server", "Engine", "scenarios", "workingDirectory")
