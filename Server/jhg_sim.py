@@ -4,6 +4,7 @@ import sys
 
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 from Server.Engine.completeBots.geneagent3 import GeneAgent3
+# from Server.Engine.completeBots.basicGeneAgent3 import BasicGeneAgent3
 from Server.Engine.completeBots.humanagent import HumanAgent
 from Server.Engine.completeBots.socialwelfaragent import SocialWelfareAgent
 from Server.Engine.completeBots.randomagent import RandomAgent
@@ -14,6 +15,7 @@ from Server.Engine.completeBots.antiCat import AntiCat
 
 import numpy as np
 import random
+
 
 np.set_printoptions(precision=2, suppress=True)
 
@@ -145,6 +147,9 @@ class JHG_simulator():
 
 
 
+
+
+
     def reorder_agents(self, plyrs):
         bots = [a for a in plyrs if a.whoami != "Human"]
         players = [a for a in plyrs if a.whoami == "Human"]
@@ -165,11 +170,18 @@ class JHG_simulator():
         T = np.eye(self.num_players) * tkns
         T_prev = self.sim.get_transaction()
         # print("these are the allocations ", allocations)
+
+
         # use this under the sim.get_player inputs to populate T. The problem! is that I have to distinguish between human and non human players.
         for i, plyr in enumerate(self.players):  # DON'T RUN THIS UNITL YOU KNOW THAT YOU HAVE EVERYONE
             if plyr.getType() == "Human":
                 T[i] = client_input[i]["ALLOCATIONS"] # ok so that will have to be adjusted, depends on how we are managing client ids. i'll cook up something better later.
             else:
+
+                print("This is what we are passing in \n ", i, " r ", round, " T_prev ", T_prev[:, i], " sim_pop ",
+                      self.sim.get_popularity(), "\n influence ", self.sim.get_influence(), " and extra data ",
+                      self.sim.get_extra_data(i))
+
                 T[i] = plyr.play_round(
                     i,  # player index
                     round,  # round
@@ -350,13 +362,13 @@ def loadPopulationFromFile(popSize, generationFolder, startIndex, num_gene_pools
         file_name = os.path.join("Engine", "botGenerations") # creates standard file path. we then append to this.
 
         # file_name = os.path.join(file_name, "assassins_gen_175")  # trying to be better and mroe aggressive on group forming
-        # file_name = os.path.join(file_name, "gen_199.csv") # JHG cab agents as used in the study
+        file_name = os.path.join(file_name, "gen_199.csv") # JHG cab agents as used in the study
         # file_name = os.path.join(file_name, "sc_jhg_gen_299.csv") # the smartest vanilla agents
-        file_name = os.path.join(file_name, "w_kitties_gen_256.csv") # attempting to overcome cats
+        # file_name = os.path.join(file_name, "w_kitties_gen_256.csv") # attempting to overcome cats
         # file_name = os.path.join(file_name, "jhg_sc_w_one_cat.csv") # another attempt
         # file_name = os.path.join(file_name, "convex2.csv") # this one should do well against the cats in both settings.
         # file_name = os.path.join(file_name, "bestOfWorstConvex.csv")
-
+        # file_name = os.path.join(file_name, "backToBasics299.csv")
 
         my_path = os.path.dirname(os.path.abspath(__file__))
         file_path = os.path.join(my_path, file_name)
@@ -378,6 +390,7 @@ def loadPopulationFromFile(popSize, generationFolder, startIndex, num_gene_pools
         words = line.split(",")
 
         thePopulation.append(GeneAgent3(words[0], num_gene_pools, tokens_per_player))
+        # thePopulation.append(GeneAgent3(words[0], num_gene_pools))
         thePopulation[i].count = float(words[1])
         thePopulation[i].relativeFitness = float(words[2])
         thePopulation[i].absoluteFitness = float(words[3])

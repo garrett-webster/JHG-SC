@@ -15,6 +15,9 @@ from Server.social_choice_sim import Social_Choice_Sim
 from offlineSimStuff.batch_tester_JHG_SC import determine_rounds
 from offlineSimStuff.geneticStuff.geneticLogger import geneticLogger
 
+# I wanna try something. something is off and IDK where.
+from offlineSimStuff.variousGraphingTools.individualLoggers.gameLogger import GameLogger
+
 
 
 """
@@ -479,15 +482,13 @@ if __name__ == "__main__":
     # using the default arguments from the ijacai documentation.
     # 0 -- executable (doesn't change)
     # 1 -- code directive to evolve population (doesn't change)
-    theFolder = "SomeFolder" # folder where trained parameters of cab agents are stored.
     popSize = 40 # number of agnets in the gene pool (use 100 here)
     numGeneGopies = 1 # numbers of sets of genes (3 was the number used in the paper)
     startIndex = 0 # generation to start training (0 to start form scratch)
     num_gens = 300 # generation to end traning trains up to 99
-    games_per_gen = popSize # agents from the gene pool are selected at random, 100 times.
     # BIG NOTICE --> THIS NEEDS TO BE EQUAL TO GAMES_PER_GEN.
+    games_per_gen = popSize # agents from the gene pool are selected at random, 100 times.
     agentsPerGame = 8 # number of agents per game
-    # roundsPerGame = 30 # number fo rounds per game
     povertyLine = 0 # see SM-1
     initPops = "equal" # starts eveyrone at different initial popularities when training.
     tokens_per_player = 2 # probably best if I just reduce this back to whatever. (Added by me just in case we wanted to be silly)
@@ -520,8 +521,6 @@ if __name__ == "__main__":
     mxPlayers = numPlayers
 
     for gen in range(num_gens): # however many generations we want
-        # list_non_cat_pops = []
-        # list_non_cat_util = []
         for game in range(games_per_gen): # however many games we want per generation
 
             for i in range(agentsPerGame): # wait is that it???

@@ -23,6 +23,10 @@ from offlineSimStuff.variousGraphingTools.groupStuff.groupLogger import GroupLog
 from offlineSimStuff.variousGraphingTools.completeVersions.completeGrapher import CompleteGrapher
 from offlineSimStuff.variousGraphingTools.groupStuff.groupGrapher import GroupGrapher
 
+import random
+
+seed_value = 42
+random.seed(seed_value)
 
 
 # starts the sim, could make this take command line arguments
@@ -53,6 +57,7 @@ def run_trial(sc_sim: "Social_Choice_Sim", jhg_sim, round_list, num_cycles, grou
             jhg_round = True
 
         if sc_rounds:
+            print("IF this goes off I'm ending up on the news")
             old_influence_matrix = copy.copy(influence_matrix)
             influence_matrix, winning_vote = run_sc_stuff(sc_sim, jhg_sim, total_order, influence_matrix, curr_round, num_cycles)
             sc_sim.set_rounds(curr_sc_round) # ???
@@ -124,8 +129,10 @@ def reconcile_influence(jhg_influence, sc_influence):
 
 
 def run_jhg_stuff(jhg_sim, curr_round):
+    # print("influence_matrix coming in \n", jhg_sim.get_influence())
     jhg_sim.execute_round(None, curr_round)  # no client input, thats crazy talk here. run a JHG round.
     influence_matrix = jhg_sim.get_influence()  # need this for friend recognition and whatnot.
+    # print("influence matrix going out \n", jhg_sim.get_influence())
     return influence_matrix
 
 
