@@ -27,7 +27,6 @@ class SCHistoryGrid(SCGrid):
 
     def change_round(self, index):
         round_key = str(index + 1)
-        print("This is the round key we are attempting. on standby ", round_key)
 
         if round_key in self.sc_history:
             self.update_sc_grid(self.sc_history[round_key]["votes"], self.sc_history[round_key]["utilities"], round_key)
@@ -42,7 +41,6 @@ class SCHistoryGrid(SCGrid):
             for i in range(len(new_utilities)):
                 new_utilities[i][winning_vote-1] = utilities[i][winning_vote-1]
             self.sc_history[str(round)] = {"votes": votes, "utilities": new_utilities, "winning_vote": winning_vote, "captain": captain}
-            print("this is the thing we are saving ", new_utilities)
         else:
             self.sc_history[str(round)] = {"votes": votes, "utilities": utilities, "winning_vote": winning_vote, "captain": captain}
 

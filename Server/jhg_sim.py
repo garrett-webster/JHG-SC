@@ -178,9 +178,9 @@ class JHG_simulator():
                 T[i] = client_input[i]["ALLOCATIONS"] # ok so that will have to be adjusted, depends on how we are managing client ids. i'll cook up something better later.
             else:
 
-                print("This is what we are passing in \n ", i, " r ", round, " T_prev ", T_prev[:, i], " sim_pop ",
-                      self.sim.get_popularity(), "\n influence ", self.sim.get_influence(), " and extra data ",
-                      self.sim.get_extra_data(i))
+                # print("This is what we are passing in \n ", i, " r ", round, " T_prev ", T_prev[:, i], " sim_pop ",
+                #       self.sim.get_popularity(), "\n influence ", self.sim.get_influence(), " and extra data ",
+                #       self.sim.get_extra_data(i))
 
                 T[i] = plyr.play_round(
                     i,  # player index

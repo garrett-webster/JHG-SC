@@ -76,7 +76,6 @@ class SCCausesGraph(QWidget):
 
             # Update node data
             for node in self.round_state.nodes[round_num]:
-                print("here is the node we are dealing with ", node)
                 mini_dict = {"x_pos": float(node["x_pos"]), "y_pos": float(node["y_pos"])}
                 self.nodes_dict[node["text"]] = mini_dict
                 self.nodes_x.append(float(node["x_pos"]))

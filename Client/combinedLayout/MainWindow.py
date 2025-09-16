@@ -6,6 +6,8 @@ import numpy as np
 from PyQt6.QtCore import QThread
 from PyQt6.QtGui import QFont, QColor
 from PyQt6.QtWidgets import QMainWindow, QHBoxLayout, QLabel, QWidget, QPushButton
+from pygments.lexers import q
+
 from Client.RoundState import RoundState
 from Client.ServerListener import ServerListener
 from matplotlib.figure import Figure
@@ -299,21 +301,39 @@ class MainWindow(QMainWindow):
         # self.update_sc_graph()  # go ahead and refresh the origin thing as well.
 
     def add_captain_label(self, captain):
-        possible_labels = ["YOU are the captain!", f"Captain is player {captain + 1}"]
-        if captain == self.round_state.client_id:
-            new_label = possible_labels[0]
-            other_label = possible_labels[1]
-        else:
-            new_label = possible_labels[1]
-            other_label = possible_labels[0]
+        # lets try something just a lil different
+
+        # so this code needs to check what label we need to put down
+        # if we ARE the captain we put in a certain label
+        # if we are NOT the captain, make sure to update the number
+
+
+        ## edge case - we are no longer the captain, but we were the captian.
+
+
+        if captain == self.round_state.client_id: # WE ARE THE CAPTAIN
+            new_label = "YOU are the captain!"
+            is_captain = True
+            other_label = "the captain is player "
+
+        else:  # so it falls under here
+            new_label = "The captain is player "
+            is_captain = False
+            other_label = "YOU are the captain "
+
 
         for index in range(self.SC_panel.count()):
-            if self.SC_panel.tabText(index) == new_label:
-                print("This tab already exists.")
-                return
-            if self.SC_panel.tabText(index) == other_label:
+            if (self.SC_panel.tabText(index).startswith(new_label) and is_captain) or (self.SC_panel.tabText(index).startswith(other_label) and is_captain):
+                print('this is the label we are checking ', new_label)
                 self.SC_panel.setTabText(index, new_label)
                 return
+            if (self.SC_panel.tabText(index).startswith(new_label) and not is_captain) or (self.SC_panel.tabText(index).startswith(other_label) and not is_captain):
+                new_label += (str(self.round_state.captain+1))
+                print('this is the label we are checking ', new_label)
+                self.SC_panel.setTabText(index, new_label)
+                return
+
+
 
         # initalize the new tab
         new_tab_widget = QWidget()
@@ -322,6 +342,9 @@ class MainWindow(QMainWindow):
         new_layout = QVBoxLayout()
         new_layout.addWidget(new_tab_label)
         new_tab_widget.setLayout(new_layout)
+
+        if not is_captain: # lil on the fly adjustment for the label
+            new_label += (str(self.round_state.captain + 1))
 
         new_tab_index = self.SC_panel.addTab(new_tab_widget, new_label)
 

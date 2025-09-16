@@ -72,7 +72,6 @@ class ServerListener(QObject):
         self.round_state.sc_round_num = message["ROUND_NUM"]
         self.round_state.options = message["OPTIONS"]
         self.round_state.captain = message["CAPTAIN"]
-        print("this is what the nodes look like ", message["NODES"])
         # if captain mode is enabled
         if self.round_state.captain != -1:
             if self.round_state.captain != self.round_state.client_id:

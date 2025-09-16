@@ -107,7 +107,6 @@ def tab_changed(main_window, index):
         # else:
         #     pass # full history
         # # this needs to be changed to make sure that only the captian can see the history.
-    print("THIS SHOULD GO FIRST PLEASE")
 
 def sc_vote(main_window, vote):
     main_window.SC_voting_grid.current_vote = vote
