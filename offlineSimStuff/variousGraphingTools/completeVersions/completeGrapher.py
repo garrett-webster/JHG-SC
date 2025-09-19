@@ -136,8 +136,9 @@ class CompleteGrapher():
         current_axis = 0
 
         color_library = {
-            -1: "red",
-            0: "blue",
+            -1: "red", # cat agents
+            0: "blue", # Gene3agnets and variants
+            1: "green", # humans
         }
 
         if pop_graph:

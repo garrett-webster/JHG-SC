@@ -1,6 +1,6 @@
 from Server.jhg_sim import JHG_simulator
 from offlineSimStuff.variousGraphingTools.outDated.jhg_tools.jhgLogger import JHGLogger
-
+import time
 
 class JHGManager:
     def __init__(self, connection_manager, num_humans, num_players, num_bots, total_order, tokens_per_player, jhg_bot_types, addAgents):
@@ -15,7 +15,7 @@ class JHGManager:
         self.num_humans = num_humans
 
     def play_jhg_round(self, round_num, is_last_jhg_round):
-
+        time.sleep(5)
         # this section of code (next 11 lines or so) exist only to grab any and all instances of player input for JHG engine.
         client_input = None
         if self.num_humans > 0:
@@ -30,6 +30,7 @@ class JHGManager:
                     print("Error processinging client_input: ", client_input)
 
         # only thing that actually matters for offline play. just run the new round. (don't use round num - 1 ig)
+        time.sleep(3) ## WARNING: PUT THIS BACK IN BEFORE PLAY TESTS
         current_popularity = self.jhg_sim.execute_round(client_input, round_num)
 
         # go ahead and grab everything we need and send it out ot the relavent clients.

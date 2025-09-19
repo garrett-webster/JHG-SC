@@ -1,6 +1,7 @@
 # refer to "main.py" in ../ for more information
 import os
 import sys
+import time
 
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 from Server.Engine.completeBots.geneagent3 import GeneAgent3
@@ -175,12 +176,15 @@ class JHG_simulator():
         # use this under the sim.get_player inputs to populate T. The problem! is that I have to distinguish between human and non human players.
         for i, plyr in enumerate(self.players):  # DON'T RUN THIS UNITL YOU KNOW THAT YOU HAVE EVERYONE
             if plyr.getType() == "Human":
-                T[i] = client_input[i]["ALLOCATIONS"] # ok so that will have to be adjusted, depends on how we are managing client ids. i'll cook up something better later.
+                try:
+                    T[i] = client_input[i]["ALLOCATIONS"] # ok so that will have to be adjusted, depends on how we are managing client ids. i'll cook up something better later.
+                except KeyError:
+                    print("here is the key that was causing the error ", client_input[i])
             else:
 
-                # print("This is what we are passing in \n ", i, " r ", round, " T_prev ", T_prev[:, i], " sim_pop ",
-                #       self.sim.get_popularity(), "\n influence ", self.sim.get_influence(), " and extra data ",
-                #       self.sim.get_extra_data(i))
+                print("This is what we are passing in \n ", i, " r ", round, " T_prev ", T_prev[:, i], " sim_pop ",
+                      self.sim.get_popularity(), "\n influence ", self.sim.get_influence(), " and extra data ",
+                      self.sim.get_extra_data(i))
 
                 T[i] = plyr.play_round(
                     i,  # player index

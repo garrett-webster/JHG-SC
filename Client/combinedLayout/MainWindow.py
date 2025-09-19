@@ -6,7 +6,6 @@ import numpy as np
 from PyQt6.QtCore import QThread
 from PyQt6.QtGui import QFont, QColor
 from PyQt6.QtWidgets import QMainWindow, QHBoxLayout, QLabel, QWidget, QPushButton
-from pygments.lexers import q
 
 from Client.RoundState import RoundState
 from Client.ServerListener import ServerListener
@@ -319,17 +318,14 @@ class MainWindow(QMainWindow):
         else:  # so it falls under here
             new_label = "The captain is player "
             is_captain = False
-            other_label = "YOU are the captain "
+            other_label = "YOU are the captain!"
 
 
         for index in range(self.SC_panel.count()):
-            if (self.SC_panel.tabText(index).startswith(new_label) and is_captain) or (self.SC_panel.tabText(index).startswith(other_label) and is_captain):
-                print('this is the label we are checking ', new_label)
-                self.SC_panel.setTabText(index, new_label)
-                return
-            if (self.SC_panel.tabText(index).startswith(new_label) and not is_captain) or (self.SC_panel.tabText(index).startswith(other_label) and not is_captain):
-                new_label += (str(self.round_state.captain+1))
-                print('this is the label we are checking ', new_label)
+            if (self.SC_panel.tabText(index).startswith(new_label)) or (self.SC_panel.tabText(index).startswith(other_label)):
+                if new_label.startswith("The captain"):
+                    new_label += str(captain+1)
+
                 self.SC_panel.setTabText(index, new_label)
                 return
 

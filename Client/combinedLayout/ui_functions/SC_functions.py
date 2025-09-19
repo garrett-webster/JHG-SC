@@ -34,12 +34,14 @@ def create_sc_ui_elements(main_window):
 # Triggered by SC_INIT
 def SC_round_init(main_window):
     if main_window.round_state.captain != -1 and main_window.round_state.captain != main_window.round_state.client_id:
+        print("or is it this causing it ")
         # There is a captain, but we aren't the captain
         main_window.add_captain_label(main_window.round_state.captain)
         main_window.SC_panel.setTabEnabled(0, False)
         # also create an auto submitted vote here.
-        time.sleep(0.1) # just go ahead and rattle something off for us.
+        time.sleep(0.5) # just go ahead and rattle something off for us.
         # this sends a vote back just so we don't have to worry about it
+        # get rid of this and hope for the best
         main_window.connection_manager.send_message("SUBMIT_SC", main_window.round_state.client_id, -1)
 
     else:

@@ -12,9 +12,10 @@ import numpy as np
 
 OPTIONS = {
     #General settings
-    "NUM_HUMANS": 1, # utterly fetched but can I run this headless
-    "TOTAL_PLAYERS": 3,
+    "NUM_HUMANS": 7, # utterly fetched but can I run this headless
+    "TOTAL_PLAYERS": 7,
     "JHG_ROUNDS_PER_SC_ROUND" : [2,2,2], # Number of JHG rounds to play between each social choice round
+    # "JHG_ROUNDS_PER_SC_ROUND" : [4,2,2,2,2], # Number of JHG rounds to play between each social choice round
     # "JHG_ROUNDS_PER_SC_ROUND" : [4,3,3,3,3] , # Number of JHG rounds to play between each social choice round
     "SC_GROUP_OPTION": 0, # See options_creation.py -> group_size_options to understand what this means
     "SC_VOTE_CYCLES": 3, # Number of cycles to play each social choice round. Players will vote this many times, with the nth vote being final.
@@ -84,7 +85,8 @@ class Server():
                                     self.sc_group_option, self.sc_vote_cycles, self.total_order, self.utility_per_player, self.JHG_manager.jhg_sim.players)
 
         self.round_logger = RoundLogger()
-        self.game_logger = GameLogger(self.num_players, 199)
+        bot_types = self.JHG_manager.jhg_sim.get_bot_types()
+        self.game_logger = GameLogger(self.num_players, bot_types)
         self.round_logger.reset_up(self.JHG_manager.jhg_sim, self.SC_manager.sc_sim)
         self.game_logger.resetup(self.JHG_manager.jhg_sim, self.SC_manager.sc_sim)
 
@@ -128,8 +130,8 @@ class Server():
 
         self.game_logger.save_game(played_sc, played_jhg)
         create_game_graphs(self.game_logger)
-        self.round_logger.actually_close_the_thing("YAHOOO")
-        self.game_logger.actually_close_the_thing("YAHOOO")
+        self.round_logger.actually_close_the_thing("UTTERLYFETCHED")
+        self.game_logger.actually_close_the_thing("UTTERLYFETCHED")
         print("GAME OVER")
 
 

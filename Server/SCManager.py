@@ -127,25 +127,47 @@ class SCManager:
         one_idx_votes = {}
         captain = -1
         is_last_cycle = False
-        print('do we even get this far ')
+
+        # just go ahead and run this always.
+        highest_pop_index = self.total_order.index(highest_pop_player)
+        captain = -1 if not captain_model else highest_pop_index  # if there is no captain, -1. else, captain time.
+
         # so if the captain model is not acgive
         # just do everything normally. simple as.
 
         # ok here me out
         #
+        captain_vote = False
 
-        for cycle in range(self.vote_cycles):
+        for cycle in range(1): # ONLY DO ONE VOTE CYCLE!! VERY IMPORTANT!!!
             player_votes.clear()
             while len(player_votes) < self.connection_manager.num_clients:
                 responses = self.connection_manager.get_responses()
                 # print("these are hte responses I am getting ", responses)
                 for response in responses.values():
                     try:
+                        # print("this is the len of respones ", len(player_votes))
                         player_votes[response["CLIENT_ID"]] = response["FINAL_VOTE"]
+                        print("this is what the highest pop index looks like ", highest_pop_index)
+                        print("this is what the client ID looks like ", response["CLIENT_ID"])
+
+                        if str(highest_pop_index) in player_votes: # if we have the captains vote
+                            print("CAPTAINS VOTE ACCEPTED")
+                            captain_vote = True
+                            break # we can break early and go from there. # prolly need to make sure it gets padded correctly
+                            # but it SHOULD be fine.
+
+
                     except KeyError:
-                        print("SOMEONE SHOULDN't BE ALLOWED TO TOUCH THIS YET. FIX THAT")
+                        pass
+                        print("here are all keys being processed:  client_id", response["CLIENT_ID"], "vote ",  response["FINAL_VOTE"], "and the id ", player_votes[str(highest_pop_index)])
+                        # print("SOMEONE SHOULDN't BE ALLOWED TO TOUCH THIS YET. FIX THAT")
+                if captain_vote:
+                    print("we have dribbled down. breaking .... ")
 
             # combines bots and player votes and saves the appropraite votes to all they spots
+            print("we have escaped this darn place.... how quaint...")
+
             zero_idx_votes, one_idx_votes = self.compile_sc_votes(player_votes,
                                                                   curr_sc_round, cycle, previous_votes, influence_matrix, captain_model)
 
