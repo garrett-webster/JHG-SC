@@ -426,7 +426,7 @@ if __name__ == "__main__":
 
         sc_sim, jhg_engine = run_trial(agents, current_sc_sim, current_jhg_engine, round_list, num_cycles, group, total_order, pops) # This is really whats getting run round times
         utility_to_log.append(sc_sim.results_sums)
-        popularity_to_log.append(jhg_engine.get_popularities())
+        popularity_to_log.append(jhg_engine.get_popularity())
 
 
 

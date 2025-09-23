@@ -285,3 +285,5 @@ class SCManager:
             total_columns = (np.array(total_columns).transpose()).tolist()
             return total_columns, peeps  # this should be the new current options matix. maybe.
 
+
+

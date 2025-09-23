@@ -1,10 +1,17 @@
 import time
 
 from PyQt6.QtWidgets import QVBoxLayout, QTabWidget, QHBoxLayout, QLabel
+import pyqtgraph as pg
 
 from Client.combinedLayout.sc_tornado_graph import sc_create_tornado_graph
 from Client.combinedLayout.SCVotingGrid import SCVotingGrid
 from Client.combinedLayout.ScCreationPanel import ScCreationPanel
+
+from Client.combinedLayout.colors import COLORS
+from Client.combinedLayout.hoverScatter import HoverScatter
+
+
+from PyQt6.QtCore import QTimer
 
 
 def create_sc_ui_elements(main_window):
@@ -138,3 +145,63 @@ def get_winning_vote(votes):
         winning_vote = -1
 
     return winning_vote + 1
+
+def update_sc_ui_elements(main_window):
+    player_utilities = main_window.round_state.new_utilities
+    print("here are the player_utilities ", player_utilities)
+    for i in range(main_window.round_state.num_players):
+        main_window.round_state.players[i].utility_over_time.append(player_utilities[str(i)])
+        print("here is the len of main_windows.round_state.players[i].utilities_over_time ", len(main_window.round_state.players[i].utility_over_time))
+        QTimer.singleShot(0, lambda: update_sc_util_graph(main_window.round_state, main_window.sc_utility_graph))
+
+
+def update_sc_util_graph(round_state, sc_util_graph):
+    sc_util_graph.clear()
+    try:
+        sc_util_graph.useOpenGL(False)
+    except:
+        pass
+
+    max_utility = 0
+    all_spots = []
+
+    for i, player in enumerate(round_state.players):
+        color = COLORS[i]
+        pen = pg.mkPen(color, width=2)
+
+        x = list(range(len(player.utility_over_time)))
+        y = player.utility_over_time
+
+        line = pg.PlotDataItem(x, y, pen=pen)
+        sc_util_graph.addItem(line)
+
+        player_spots = [
+            {
+                'pos': (x[j], y[j]),
+                'data': f"Player {player.id + 1} (Round {j}): {y[j]}",
+                'brush': pg.mkBrush(color),
+                'size': 8,
+                'pen': None
+            }
+            for j in range(len(x))
+        ]
+        all_spots.extend(player_spots)
+        max_utility = max(max_utility, max(y))
+
+    scatter = HoverScatter(spots=all_spots)
+    sc_util_graph.addItem(scatter)
+
+    view_box = sc_util_graph.getViewBox()
+    view_box.setLimits(
+        xMin=0,
+        xMax=len(round_state.players[0].utility_over_time)-1+0.1,
+        yMin=0,
+        yMax=max_utility + 10,
+    )
+
+    max_rounds = max(len(p.utility_over_time) for p in round_state.players)
+    sc_util_graph.setXRange(0, max_rounds-1, padding=2)
+
+    sc_util_graph.setYRange(0, max_utility + 10, padding=0)
+    #view_box.autoRange()
+    sc_util_graph.repaint()

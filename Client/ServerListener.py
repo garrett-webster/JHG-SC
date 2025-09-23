@@ -9,6 +9,7 @@ from pyexpat.errors import messages
 
 class ServerListener(QObject):
     update_jhg_round_signal = pyqtSignal()
+    update_sc_utillity_graph = pyqtSignal()
     update_sc_round_signal = pyqtSignal()
     enable_allocations_interface = pyqtSignal()
     disable_sc_buttons_signal = pyqtSignal()
@@ -103,6 +104,7 @@ class ServerListener(QObject):
 
 
     def SC_OVER(self, message):
+        print("SC OVER, GOING OFF")
         # This is the only time that the user won't switch the tab to see a round it the history tab, so it needs a little manual help.
         # if self.round_state.jhg_round_num == 1:
         winning_vote = message["WINNING_VOTE"]
@@ -145,6 +147,10 @@ class ServerListener(QObject):
         # self.update_tornado_graph_signal.emit(self.main_window.tornado_ax, message["POSITIVE_VOTE_EFFECTS"], message["NEGATIVE_VOTE_EFFECTS"])
 
         self.update_sc_nodes_graph_signal.emit(winning_vote, message["ROUND_NUM"])
+
+        self.round_state.new_utilities = new_utilities
+
+        self.update_sc_utillity_graph.emit() # PLEASE work
 
         # self.update_sc_influence.emit(message["INFLUENCE_MATRIX"], message["NEW_UTILITIES"])
 

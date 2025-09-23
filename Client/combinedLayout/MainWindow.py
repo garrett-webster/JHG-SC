@@ -137,6 +137,15 @@ class MainWindow(QMainWindow):
         create_sc_ui_elements(self)
         self.SC_cause_graph.init_sc_nodes_graph(self.round_state)
 
+        self.sc_utility_graph = pg.PlotWidget()
+
+        self.sc_utility_graph.setXRange(0, 2)
+        self.sc_utility_graph.setYRange(0, 120)
+        self.sc_utility_graph.getAxis('bottom').setTicks(
+            [[(i, str(i)) for i in range(10)]])
+        self.sc_utility_graph.setBackground("#282828ff")
+        view_box = self.sc_utility_graph.getViewBox()
+        view_box.setLimits(xMin=0, xMax=2, yMin=0, yMax=12)
 
         graphs_layout = QVBoxLayout()
 
@@ -144,6 +153,7 @@ class MainWindow(QMainWindow):
         sc_graph_tabs.addTab(self.SC_cause_graph, "Causes Graph")
         sc_graph_tabs.addTab(self.tornado_canvas, "Effect of past votes")
         sc_graph_tabs.addTab(self.sc_influence, "Influence Graph") # not running yet but should! appear.
+        sc_graph_tabs.addTab(self.sc_utility_graph, "Util Graph")
 
         graphs_layout.addWidget(sc_graph_tabs)
 
@@ -174,6 +184,7 @@ class MainWindow(QMainWindow):
     def set_up_signals(self):
         # pyqt signal hook-ups
         self.ServerListener.update_jhg_round_signal.connect(partial(update_jhg_ui_elements, self))
+        self.ServerListener.update_sc_utillity_graph.connect(partial(update_sc_ui_elements, self))
         self.ServerListener.update_sc_round_signal.connect(partial(SC_round_init, self))
         self.ServerListener.enable_allocations_interface.connect(partial(self.enable_allocations_interface))
         self.ServerListener.disable_sc_buttons_signal.connect(partial(disable_sc_buttons, self))
@@ -223,7 +234,10 @@ class MainWindow(QMainWindow):
         self.sc_history_grid.winning_vote = winning_vote
 
     def SC_tab_changed(self, index):
-        tab_changed(self, index)
+        try:
+            tab_changed(self, index)
+        except AttributeError:
+            pass # just tired of the red text that happens sometimes.
 
     def start_jhg_round(self):
         self.enable_jhg_buttons(self.JHG_panel)

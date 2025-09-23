@@ -16,6 +16,9 @@ class RoundState:
     received = [] # Each position in the list represents the number of tokens received from the player with id _
     sent = []
     popularity_over_time = []
+    utility_over_time = []
+
+    new_utilities = []
 
 
     # Stuff for sc
@@ -37,6 +40,7 @@ class RoundState:
         self.received = [0 for _ in range(num_players)] # Each position in the list represents the number of tokens received from the player with id _
         self.sent = [0 for _ in range(num_players)]
         self.popularity_over_time = [100 for _ in range(num_players)]
+        self.utility_over_time = [10 for _ in range(num_players)]
         self.influence_mat = np.array([[0 for _ in range(num_players)] for _ in range(num_players)])
         self.relationships_mat = np.array([[0 for _ in range(num_players)] for _ in range(num_players)])
         self.current_votes = [-1 for _ in range(num_players)]

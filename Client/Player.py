@@ -9,6 +9,7 @@ class PlayerState:
     received_from_player = 0
     sent_to_player = 0
     popularity = 100
+    utility = 10
 
     # For SC
     displayed_vote = None
@@ -69,6 +70,7 @@ class PlayerState:
     def __init__(self, id):
         self.id = id
         self.popularity_over_time = [self.popularity]
+        self.utility_over_time = [self.utility]
 
         # PyQt elements that make up the rows of the JHG_panel. Contained in the Player class for ease of access/tying them to the player
         # self.id_label = QLabel(str(self.id + 1))
