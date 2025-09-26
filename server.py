@@ -12,10 +12,10 @@ import numpy as np
 
 OPTIONS = {
     #General settings
-    "NUM_HUMANS": 1, # utterly fetched but can I run this headless
-    "TOTAL_PLAYERS": 4,
-    "JHG_ROUNDS_PER_SC_ROUND" : [2,2,2], # Number of JHG rounds to play between each social choice round
-    # "JHG_ROUNDS_PER_SC_ROUND" : [4,2,2,2,2], # Number of JHG rounds to play between each social choice round
+    "NUM_HUMANS": 6, # utterly fetched but can I run this headless
+    "TOTAL_PLAYERS": 6,
+    # "JHG_ROUNDS_PER_SC_ROUND" : [2,2,2], # Number of JHG rounds to play between each social choice round
+    "JHG_ROUNDS_PER_SC_ROUND" : [4,2,2,2,2], # Number of JHG rounds to play between each social choice round
     # "JHG_ROUNDS_PER_SC_ROUND" : [4,3,3,3,3] , # Number of JHG rounds to play between each social choice round
     "SC_GROUP_OPTION": 0, # See options_creation.py -> group_size_options to understand what this means
     "SC_VOTE_CYCLES": 3, # Number of cycles to play each social choice round. Players will vote this many times, with the nth vote being final.
@@ -130,10 +130,10 @@ class Server():
 
         self.game_logger.save_game(played_sc, played_jhg)
         create_game_graphs(self.game_logger)
-        self.round_logger.actually_close_the_thing("UTTERLYFETCHED")
-        self.game_logger.actually_close_the_thing("UTTERLYFETCHED")
+        self.round_logger.actually_close_the_thing("noLongerFetched")
+        self.game_logger.actually_close_the_thing("noLongerFetched")
         print("GAME OVER")
-        time.sleep(5) # just give it a little while before it closes the connection so the client can update
+        # time.sleep(5) # just give it a little while before it closes the connection so the client can update
 
 
     def generate_peeps(self, total_order, jhg_sim, sc_sim):

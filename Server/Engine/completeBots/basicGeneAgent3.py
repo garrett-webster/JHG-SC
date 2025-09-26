@@ -260,6 +260,8 @@ class BasicGeneAgent3(AbstractAgent):
 
 
     def play_round(self, player_idx, round_num, received, popularities, influence, extra_data):
+        print("bot params: plyr_idx ", player_idx, " round_num ", round_num, " received \n", received, "popularities \n", popularities, " influence \n", influence, " extra data \n", extra_data)
+
         self.printT(player_idx, str(received))
 
         # set up some variables
@@ -296,6 +298,7 @@ class BasicGeneAgent3(AbstractAgent):
 
         # group analysis and choice
         communities, selected_community = self.group_analysis(round_num, num_players, player_idx, popularities, influence)
+        print("here was the selected group ", selected_community.s)
 
         # figure out how many tokens to keep
         self.estimate_keeping(player_idx, num_players, num_tokens, communities)
@@ -305,7 +308,6 @@ class BasicGeneAgent3(AbstractAgent):
             safety_first = False
         else:
             safety_first = True
-
         guardo_toks = self.cuanto_guardo(round_num, player_idx, num_players, num_tokens, popularities, received, selected_community.s)
         self.printT(player_idx, "   guardo_toks: " + str(guardo_toks))
 
@@ -1540,6 +1542,8 @@ class BasicGeneAgent3(AbstractAgent):
             elijo = self.random_selections(num_players, player_idx, popularities)
 
             self.printT(player_idx, "chosen community: " + str(elijo.s))
+            print("Here is A_pos ", A_pos, " A_neg ", A_neg, " coalition target ", self.coalition_target, " and elijo ", elijo)
+
         else:
             A_pos = self.compute_adjacency(num_players)
             A_neg = self.compute_neg_adjacency(num_players)

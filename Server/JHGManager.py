@@ -15,11 +15,15 @@ class JHGManager:
         self.num_humans = num_humans
 
     def play_jhg_round(self, round_num, is_last_jhg_round):
-        # time.sleep(5) this only goes in when we are tesing with a lot of people I think
+        # time.sleep(5) # this only goes in when we are tesing with a lot of people I think
         # this section of code (next 11 lines or so) exist only to grab any and all instances of player input for JHG engine.
+        print("We are now expecting client input. This might be done in a different thread")
         client_input = None
+        time.sleep(1) # IDK just see if this helps
+
         if self.num_humans > 0:
             while True:
+                self.connection_manager.flush_all_client_sockets()  # lets give this a whirl.
                 client_input = self.connection_manager.get_responses()  # Gets responses of type "JHG"
 
                 try:

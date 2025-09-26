@@ -91,6 +91,7 @@ class ServerConnectionManager(ConnectionManager):
 
     ''' Functions to accept input from clients '''
     def get_responses(self, continuous_distribution_type = None):
+        print("when does this go off")
         responses = {}
         num_received = 0
 
@@ -212,3 +213,22 @@ class ServerConnectionManager(ConnectionManager):
             self.num_clients += 1
             self.send_message(client_socket, "SETUP", player_specific_id, num_clients + num_bots, num_cycles, num_tkns_plyr, util_plyr, util_start, all_allocations)
 
+
+    def flush_all_client_sockets(self):
+        for client in self.clients.values():
+            try:
+                client.setblocking(False)
+                while True:
+                    try:
+                        data = client.recv(4096)
+                        if not data:
+                            break
+
+                    except BlockingIOError:
+                        break # no more data to read
+
+            except Exception as e:
+                pass # Might be worth logging this
+
+            finally:
+                client.setblocking(True)

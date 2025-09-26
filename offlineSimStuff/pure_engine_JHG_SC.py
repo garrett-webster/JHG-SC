@@ -4,15 +4,17 @@ import random
 
 from Server.social_choice_sim import Social_Choice_Sim
 # from Server.JHGManager import JHG_simulator
-from Server.Engine.engine import JHGEngine # lets try doing it all pure engine.
+from Server.Engine.simulator import GameSimulator
 
 from tqdm import tqdm
 import numpy as np
 import os
+import matplotlib.pyplot as plt
 
 from Server.OptionGenerators.generators import generator_factory
 
-from Server.Engine.completeBots.geneagent3 import GeneAgent3
+# from Server.Engine.completeBots.geneagent3 import GeneAgent3
+from Server.Engine.completeBots.basicGeneAgent3 import BasicGeneAgent3
 
 # from offlineSimStuff.variousGraphingTools.individualLoggers.roundLogger import RoundLogger
 # from offlineSimStuff.variousGraphingTools.individualLoggers.gameLogger import GameLogger
@@ -52,15 +54,16 @@ def run_trial(agents, sc_sim: "Social_Choice_Sim", jhg_sim, round_list, num_cycl
             influence_matrix = run_jhg_stuff(jhg_sim, curr_round, agents, len(agents))
             played_jhg = True
             jhg_round = True
+            pops.append(jhg_sim.get_popularity())
 
-        if sc_rounds:
-            print("IF this goes off I'm ending up on the news")
-            old_influence_matrix = copy.copy(influence_matrix)
-            influence_matrix, winning_vote = run_sc_stuff(sc_sim, jhg_sim, total_order, influence_matrix, curr_round, num_cycles)
-            sc_sim.set_rounds(curr_sc_round) # ???
-            curr_sc_round += 1
-            played_sc = True
-            sc_round = True
+        # if sc_rounds:
+        #     print("IF this goes off I'm ending up on the news")
+        #     old_influence_matrix = copy.copy(influence_matrix)
+        #     influence_matrix, winning_vote = run_sc_stuff(sc_sim, jhg_sim, total_order, influence_matrix, curr_round, num_cycles)
+        #     sc_sim.set_rounds(curr_sc_round) # ???
+        #     curr_sc_round += 1
+        #     played_sc = True
+        #     sc_round = True
 
 
         # round_logger.save_round(curr_round, sc_rounds, jhg_rounds)
@@ -73,61 +76,62 @@ def run_trial(agents, sc_sim: "Social_Choice_Sim", jhg_sim, round_list, num_cycl
     #     game_logger.save_game(played_sc, played_jhg)
     #     create_game_graphs(game_logger)
 
-    return sc_sim, jhg_sim
+    return sc_sim, jhg_sim, pops
 
 
-def run_sc_stuff(sc_sim, jhg_sim, total_order, influence_matrix, curr_round, num_cycles):
-    # sc_sim.set_rounds(curr_round) # don't set that here methinks, let it ride.
-    possible_peeps, indexes = generate_peeps(total_order, jhg_sim, sc_sim)  # people who are needed to create the matrix
-    if influence_matrix is not None:
-        new_influence = influence_matrix
-    else:
-        new_influence = sc_sim.get_influence_matrix() # if there is no JHG influence, we are flying solo, leach off of own influence
-    # should I make this, you know, an entirely different bot? having them in the same file feels wrong beuase they are doing differen things.
-    current_options_matrix, peeps = sc_sim.let_others_create_options_matrix(possible_peeps.tolist(), curr_round, new_influence)  # actually creates the matrix
-    # print("these are the peeps" , peeps)
-    sc_sim.start_round((current_options_matrix, indexes))
+# def run_sc_stuff(sc_sim, jhg_sim, total_order, influence_matrix, curr_round, num_cycles):
+#     # sc_sim.set_rounds(curr_round) # don't set that here methinks, let it ride.
+#     possible_peeps, indexes = generate_peeps(total_order, jhg_sim, sc_sim)  # people who are needed to create the matrix
+#     if influence_matrix is not None:
+#         new_influence = influence_matrix
+#     else:
+#         new_influence = sc_sim.get_influence_matrix() # if there is no JHG influence, we are flying solo, leach off of own influence
+#     # should I make this, you know, an entirely different bot? having them in the same file feels wrong beuase they are doing differen things.
+#     current_options_matrix, peeps = sc_sim.let_others_create_options_matrix(possible_peeps.tolist(), curr_round, new_influence)  # actually creates the matrix
+#     # print("these are the peeps" , peeps)
+#     sc_sim.start_round((current_options_matrix, indexes))
+#
+#     bot_votes = {}
+#     for cycle in range(num_cycles):
+#         bot_votes[cycle] = sc_sim.get_votes(bot_votes, curr_round, cycle, num_cycles, influence_matrix)
+#         sc_sim.record_votes(bot_votes[cycle], cycle)
+#
+#     # make sure that this happens IMMEDIATELY afterward.
+#     winning_vote, round_results = sc_sim.return_win(bot_votes[num_cycles - 1])
+#     new_influence = np.array(sc_sim.get_influence_matrix()) # ACTUALLY UPDATE THE FETCHER
+#     sc_sim.save_results()
+#     return new_influence, winning_vote # takes our modified influence and makes sure to feed it back into the jhg sim so we get a cyclical affect.
+#
 
-    bot_votes = {}
-    for cycle in range(num_cycles):
-        bot_votes[cycle] = sc_sim.get_votes(bot_votes, curr_round, cycle, num_cycles, influence_matrix)
-        sc_sim.record_votes(bot_votes[cycle], cycle)
-
-    # make sure that this happens IMMEDIATELY afterward.
-    winning_vote, round_results = sc_sim.return_win(bot_votes[num_cycles - 1])
-    new_influence = np.array(sc_sim.get_influence_matrix()) # ACTUALLY UPDATE THE FETCHER
-    sc_sim.save_results()
-    return new_influence, winning_vote # takes our modified influence and makes sure to feed it back into the jhg sim so we get a cyclical affect.
-
-
-def reconcile_influence(jhg_influence, sc_influence):
-    # ok this fetcher uses convex recombination to put the two together and then uses the frobenius norm to decide on the magnitude to adjust back too. bars!
-    # alpha = 0.5 # THIS iS JUST A STARTER VALUE, WILL LIKELY BE MADE INTO A GENE OR WHATEVER.
-    alpha = 0.5 # THIS iS JUST A STARTER VALUE, WILL LIKELY BE MADE INTO A GENE OR WHATEVER.
-    # Alpha of 0 is entirely JHG, alpha of 1 is entirely SC. I started with 0.5 but worry that that might have been too flattening.
-
-    if sc_influence is None:
-        print("something wrong :(")
-        return jhg_influence
-
-    sc_influence = np.array(sc_influence)
-    jhg_influence = np.array(jhg_influence) # This shbould never get used but it couldn't hurt
-
-    jhg_norm = np.linalg.norm(jhg_influence, 'fro')
-
-    combined = (1 - alpha) * jhg_influence + alpha * sc_influence
-
-    combined_norm = np.linalg.norm(combined, 'fro')
-    if combined_norm == 0:
-        return np.zeros_like(jhg_influence)
-
-    rescaled = combined * (jhg_norm / combined_norm)
-    return rescaled
+# def reconcile_influence(jhg_influence, sc_influence):
+#     # ok this fetcher uses convex recombination to put the two together and then uses the frobenius norm to decide on the magnitude to adjust back too. bars!
+#     # alpha = 0.5 # THIS iS JUST A STARTER VALUE, WILL LIKELY BE MADE INTO A GENE OR WHATEVER.
+#     alpha = 0.5 # THIS iS JUST A STARTER VALUE, WILL LIKELY BE MADE INTO A GENE OR WHATEVER.
+#     # Alpha of 0 is entirely JHG, alpha of 1 is entirely SC. I started with 0.5 but worry that that might have been too flattening.
+#
+#     if sc_influence is None:
+#         print("something wrong :(")
+#         return jhg_influence
+#
+#     sc_influence = np.array(sc_influence)
+#     jhg_influence = np.array(jhg_influence) # This shbould never get used but it couldn't hurt
+#
+#     jhg_norm = np.linalg.norm(jhg_influence, 'fro')
+#
+#     combined = (1 - alpha) * jhg_influence + alpha * sc_influence
+#
+#     combined_norm = np.linalg.norm(combined, 'fro')
+#     if combined_norm == 0:
+#         return np.zeros_like(jhg_influence)
+#
+#     rescaled = combined * (jhg_norm / combined_norm)
+#     return rescaled
 
 
 def run_jhg_stuff(jhg_engine, curr_round, agents, num_players):
     received = [0.0 for _ in range(num_players)]  # C++ really needs to allocate memeory before hadn
     transactions = [0 for _ in range(num_players)]  # so this is how I replilcate it in python.
+    T_prev = jhg_engine.get_transaction()
     extra_data = {
         i: {
             j: None for j in range(num_players)
@@ -135,11 +139,17 @@ def run_jhg_stuff(jhg_engine, curr_round, agents, num_players):
     }
 
     for i in range(num_players):
-        for j in range(num_players):
-            received[j] = np.array(jhg_engine.T[curr_round][j][i])
-        transactions[i] = agents[i].play_round(i, curr_round, received, jhg_engine.P[curr_round],
-                                               jhg_engine.I[curr_round], extra_data, False)
-    jhg_engine.apply_transaction(transactions)  # thanks references
+
+        transactions[i] = agents[i].play_round(
+            i,
+            curr_round,
+            T_prev[:,i],
+            jhg_engine.get_popularity(),
+            jhg_engine.get_influence(),
+            jhg_engine.get_extra_data(i),
+            # False
+        )
+    jhg_engine.play_round(transactions)  # thanks references
     # ok so now I have to return
     # the change in popularities,
     # return sc_sim.current_results, sc_sim.results_sums, new_influence  # so we have the change in utility and overall utility
@@ -147,49 +157,49 @@ def run_jhg_stuff(jhg_engine, curr_round, agents, num_players):
     return jhg_engine.get_influence()  # return da influence matrix, the change in popularitry, and the new popularities.
 
 
-def generate_peeps(total_order, jhg_sim, sc_sim):
-    popularity_array = (jhg_sim.get_popularities()) # huh
-    total = sum(popularity_array)
-    # this is easy bc this will always be positive
-    normalized_popularity_array = [val / total for val in popularity_array]
-    # THIS IS WORSE.
-    utilities_array = sc_sim.results_sums
-    global_shift = min(0, min(utilities_array))
-    # shift everything over. subtract bc its either 0 or a negative number.
-    utilities_array = [val - global_shift for val in utilities_array]
-    total = sum(utilities_array) # yeah override this why not.
-    normalized_utility_array = [val / total if total != 0 else 1 / len(total_order) for val in utilities_array]
-    # new goal -- figure out how zip works
-    overall_probability_array = [(p + u) / 2 for p, u in zip(normalized_popularity_array, normalized_utility_array)]
-    probabilities = np.array(overall_probability_array)
-    new_world_order = np.array(total_order)
-    # shoudl pull without replacement from total order using the overall probability array, gives 3 choies without replacement.
-    new_peeps = np.random.choice(new_world_order, p=probabilities, size=3, replace=False)
-    indexes = peeps_to_total_order(new_peeps, total_order)
-    return new_peeps, indexes
+# def generate_peeps(total_order, jhg_sim, sc_sim):
+#     popularity_array = (jhg_sim.get_popularities()) # huh
+#     total = sum(popularity_array)
+#     # this is easy bc this will always be positive
+#     normalized_popularity_array = [val / total for val in popularity_array]
+#     # THIS IS WORSE.
+#     utilities_array = sc_sim.results_sums
+#     global_shift = min(0, min(utilities_array))
+#     # shift everything over. subtract bc its either 0 or a negative number.
+#     utilities_array = [val - global_shift for val in utilities_array]
+#     total = sum(utilities_array) # yeah override this why not.
+#     normalized_utility_array = [val / total if total != 0 else 1 / len(total_order) for val in utilities_array]
+#     # new goal -- figure out how zip works
+#     overall_probability_array = [(p + u) / 2 for p, u in zip(normalized_popularity_array, normalized_utility_array)]
+#     probabilities = np.array(overall_probability_array)
+#     new_world_order = np.array(total_order)
+#     # shoudl pull without replacement from total order using the overall probability array, gives 3 choies without replacement.
+#     new_peeps = np.random.choice(new_world_order, p=probabilities, size=3, replace=False)
+#     indexes = peeps_to_total_order(new_peeps, total_order)
+#     return new_peeps, indexes
 
 
-def create_round_graphs(round_logger, curr_round, played_jhg, played_sc):
-    pass
-    # complete_grapher = CompleteGrapher()
-    # complete_grapher.create_round_graphs_with_round_logger(round_logger, curr_round, played_jhg, played_sc)
+# def create_round_graphs(round_logger, curr_round, played_jhg, played_sc):
+#     pass
+#     # complete_grapher = CompleteGrapher()
+#     # complete_grapher.create_round_graphs_with_round_logger(round_logger, curr_round, played_jhg, played_sc)
+#
+# def create_game_graphs(game_logger):
+#     pass
+#     # complete_grapher = CompleteGrapher()
+#     # complete_grapher.create_game_graphs_with_logger(game_logger)
+#
+# def create_group_graphs(group_logger):
+#     pass
+#     # group_grapher = GroupGrapher()
+#     # group_grapher.create_graph(group_logger.get_group_data())
 
-def create_game_graphs(game_logger):
-    pass
-    # complete_grapher = CompleteGrapher()
-    # complete_grapher.create_game_graphs_with_logger(game_logger)
-
-def create_group_graphs(group_logger):
-    pass
-    # group_grapher = GroupGrapher()
-    # group_grapher.create_graph(group_logger.get_group_data())
-
-# takes in a list of peeps (player or bot or both) and returns their player indexes as per total order
-def peeps_to_total_order(peeps, total_order):
-    indexes = []
-    for peep in peeps:
-        indexes.append(total_order.index(peep)+1)
-    return indexes
+# # takes in a list of peeps (player or bot or both) and returns their player indexes as per total order
+# def peeps_to_total_order(peeps, total_order):
+#     indexes = []
+#     for peep in peeps:
+#         indexes.append(total_order.index(peep)+1)
+#     return indexes
 
 
 def create_sim(total_players, scenario=None, chromosomes=None, group="", total_order=None, allocation_scenario=None, utility_per_player=3):
@@ -203,14 +213,33 @@ def create_sim(total_players, scenario=None, chromosomes=None, group="", total_o
 
 def create_jhg_sim(num_humans, num_players, total_order, tokens_per_player, jhg_bot_type, addAgents):
     poverty_line = 0
-
+    forcedRandom = True # lets try this for fun
     alpha = 0.2  # double check these magical fetchers when you get the chance actually.
     beta = 0.5
     give = 1.3
     keep = 0.95
     steal = 1.6
     base_pop = 100
-    jhg_engine = JHGEngine(alpha, beta, give, keep, steal, num_players, base_pop, poverty_line)
+
+    game_params = {
+        "num_players": num_players,
+        "alpha": alpha_min,  # np.random.uniform(alpha_min, alpha_max),
+        "beta": beta_min,  # np.random.uniform(beta_min, beta_max),
+        "keep": keep_min,  # np.random.uniform(keep_min, keep_max),
+        "give": give_min,  # np.random.uniform(give_min, give_max),
+        "steal": steal_min,  # np.random.uniform(steal_min, steal_max),
+        "poverty_line": poverty_line,
+        "base_popularity": np.array(initial_pops)
+        # "base_popularity": np.array([*[base_pop]*(num_players)])
+        # "base_popularity": np.array(random.sample(range(1, 200), num_players))
+
+    }
+
+    for a in agents:
+        a.setGameParams(game_params, forcedRandom)
+
+
+    jhg_engine = GameSimulator(game_params)
     return jhg_engine
 
 
@@ -284,8 +313,8 @@ def loadPopulationFromFile(popSize, num_gene_pools, tokens_per_player):
         line = fp.readline()
         words = line.split(",")
 
-        thePopulation.append(GeneAgent3(words[0], num_gene_pools, tokens_per_player))
-        # thePopulation.append(GeneAgent3(words[0], num_gene_pools))
+        # thePopulation.append(GeneAgent3(words[0], num_gene_pools, tokens_per_player))
+        thePopulation.append(BasicGeneAgent3(words[0], num_gene_pools))
         thePopulation[i].count = float(words[1])
         thePopulation[i].relativeFitness = float(words[2])
         thePopulation[i].absoluteFitness = float(words[3])
@@ -297,6 +326,15 @@ def loadPopulationFromFile(popSize, num_gene_pools, tokens_per_player):
 
 
 if __name__ == "__main__":
+
+    import random
+    import numpy as np
+
+    SEED = 42  # pick any constant
+
+    random.seed(SEED)  # Python’s stdlib RNG
+    np.random.seed(SEED)  # NumPy’s RNG
+
     # various batch scenarios I keep on hand for reference.
     #jhg_games_per_sc_round = [1,1,1,1,1,1,1,1]#,1,1,1,1,1,1,1,1,1,1,1,1]
     # jhg_games_per_sc_round = [4,3,3,3,3,3,3,3] # what we trained the og assasain agents on.
@@ -424,10 +462,42 @@ if __name__ == "__main__":
         # round_logger.reset_up(current_jhg_engine, current_sc_sim)
         # game_logger.resetup(current_jhg_engine, current_sc_sim)
 
-        sc_sim, jhg_engine = run_trial(agents, current_sc_sim, current_jhg_engine, round_list, num_cycles, group, total_order, pops) # This is really whats getting run round times
+        sc_sim, jhg_engine, pops = run_trial(agents, current_sc_sim, current_jhg_engine, round_list, num_cycles, group, total_order, pops) # This is really whats getting run round times
         utility_to_log.append(sc_sim.results_sums)
         popularity_to_log.append(jhg_engine.get_popularity())
 
+    pops_by_player = np.array(pops).T
+
+    # Compute average popularity per round
+    avg_pop_per_round = np.mean(np.array(pops), axis=1)
+
+    # Set up the plot
+    fig, ax = plt.subplots(figsize=(12, 6))
+
+    num_players = pops_by_player.shape[0]
+    rounds = np.arange(len(pops))
+
+    color_library = ['blue', 'orange', 'green', 'red', 'purple', 'brown', 'pink', 'gray', 'olive', 'cyan']
+    bot_types = list(range(num_players))  # just indices 0–9 here
+
+    for i in range(num_players):
+        player_scores = pops_by_player[i]
+        color = color_library[bot_types[i] % len(color_library)]
+        label = f'P{i + 1}'
+        ax.plot(rounds, player_scores, label=label, color=color)
+
+    # Plot average line
+    ax.plot(rounds, avg_pop_per_round, color='black', linewidth=3, label='Avg')
+
+    # Labeling
+    ax.set_title('Average Popularity Over Time', loc="left")
+    ax.set_xlabel('Round')
+    ax.set_ylabel('Popularity')
+    ax.legend()
+    ax.grid(True)
+
+    plt.tight_layout()
+    plt.show()
 
 
         #print("here are the final utilities ", sc_sim.results_sums)
@@ -440,29 +510,29 @@ if __name__ == "__main__":
 
 
 
-    num_kitties = 2
-    non_cats = (num_players - num_kitties)
-    cumulative_cat_score = sum(new_results[non_cats:])
-    cumulative_non_cat_score = sum(new_results)- cumulative_cat_score
-    avg_cat_score = cumulative_cat_score / num_kitties
-    avg_non_cat_score = cumulative_non_cat_score / non_cats
-    print('here is the average cat / added agent ', avg_cat_score, " and here is the average non cat utility ", avg_non_cat_score)
-    # print("here is the average Gene3agent score ", avg_non_cat_score)
-    inverted_results.clear()
-
-
-    # man this sucks
-    popularity_to_log = np.round(np.array(popularity_to_log).astype(float), 2).tolist()
-
-    inverted_results = list(zip(*popularity_to_log))
-    new_results = []
-    for i in range(len(inverted_results)):
-        new_sum = sum(inverted_results[i]) / len(inverted_results[i])
-        new_results.append(new_sum)
-
-    non_cats = (num_players - num_kitties)
-    cumulative_cat_score = sum(new_results[non_cats:])
-    cumulative_non_cat_score = sum(new_results)   - cumulative_cat_score
-    avg_cat_score = cumulative_cat_score / num_kitties
-    avg_non_cat_score = cumulative_non_cat_score / non_cats
-    print('here is the average cat / added agent popualrity ', avg_cat_score, " and here is the average non cat popularity ", avg_non_cat_score)
+    # num_kitties = 2
+    # non_cats = (num_players - num_kitties)
+    # cumulative_cat_score = sum(new_results[non_cats:])
+    # cumulative_non_cat_score = sum(new_results)- cumulative_cat_score
+    # avg_cat_score = cumulative_cat_score / num_kitties
+    # avg_non_cat_score = cumulative_non_cat_score / non_cats
+    # print('here is the average cat / added agent ', avg_cat_score, " and here is the average non cat utility ", avg_non_cat_score)
+    # # print("here is the average Gene3agent score ", avg_non_cat_score)
+    # inverted_results.clear()
+    #
+    #
+    # # man this sucks
+    # popularity_to_log = np.round(np.array(popularity_to_log).astype(float), 2).tolist()
+    #
+    # inverted_results = list(zip(*popularity_to_log))
+    # new_results = []
+    # for i in range(len(inverted_results)):
+    #     new_sum = sum(inverted_results[i]) / len(inverted_results[i])
+    #     new_results.append(new_sum)
+    #
+    # non_cats = (num_players - num_kitties)
+    # cumulative_cat_score = sum(new_results[non_cats:])
+    # cumulative_non_cat_score = sum(new_results)   - cumulative_cat_score
+    # avg_cat_score = cumulative_cat_score / num_kitties
+    # avg_non_cat_score = cumulative_non_cat_score / non_cats
+    # print('here is the average cat / added agent popualrity ', avg_cat_score, " and here is the average non cat popularity ", avg_non_cat_score)

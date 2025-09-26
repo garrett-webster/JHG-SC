@@ -62,6 +62,7 @@ class SCManager:
         # not a refactor per se, but made the code much more readable.
         current_options_matrix = self.init_next_round(possible_peeps, curr_round, new_influence, captain_model, highest_pop_player) # gets the current options matrix and starts SC_init
         self.play_social_choice_round(curr_round, new_influence, current_options_matrix, curr_sc_round, captain_model, highest_pop_player) # actually does the voting and whatnot.
+        print("SC ROUND FINISHED")
 
     # starts the next round, prepares the packet and gets the new options matrix. gets all ducks in a row.
     def init_next_round(self, possible_peeps, curr_round, new_influence, captain_model, highest_pop_player):
@@ -141,6 +142,9 @@ class SCManager:
 
         for cycle in range(1): # ONLY DO ONE VOTE CYCLE!! VERY IMPORTANT!!!
             player_votes.clear()
+            self.connection_manager.flush_all_client_sockets()  # lets give this a whirl.
+
+
             while len(player_votes) < self.connection_manager.num_clients:
                 responses = self.connection_manager.get_responses()
                 # print("these are hte responses I am getting ", responses)
@@ -160,8 +164,8 @@ class SCManager:
 
                     except KeyError:
                         pass
-                        print("here are all keys being processed:  client_id", response["CLIENT_ID"], "vote ",  response["FINAL_VOTE"], "and the id ", player_votes[str(highest_pop_index)])
-                        # print("SOMEONE SHOULDN't BE ALLOWED TO TOUCH THIS YET. FIX THAT")
+                        # print("here are all keys being processed:  client_id", response["CLIENT_ID"], "vote ",  response["FINAL_VOTE"], "and the id ", player_votes[str(highest_pop_index)])
+                        print("SOMEONE SHOULDN't BE ALLOWED TO TOUCH THIS YET. FIX THAT")
                 if captain_vote:
                     print("we have dribbled down. breaking .... ")
 
