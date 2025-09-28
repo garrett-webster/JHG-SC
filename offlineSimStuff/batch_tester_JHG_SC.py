@@ -233,33 +233,21 @@ def determine_rounds(jhg_rounds_per_sc_game_list):
 
 if __name__ == "__main__":
 
-    #jhg_games_per_sc_round = [1,1,1,1,1,1,1,1]#,1,1,1,1,1,1,1,1,1,1,1,1]
-    # jhg_games_per_sc_round = [4,3,3,3,3,3,3,3] # what we trained the og assasain agents on.
-    # jhg_games_per_sc_round = [4, 3, 3, 3, 3]
+    import random
+    import numpy as np
+
+    SEED = 42  # pick any constant
+
+    random.seed(SEED)  # Python’s stdlib RNG
+    np.random.seed(SEED)  # NumPy’s RNG
+
     # jhg_games_per_sc_round = [4,3,3,3,3]  # what we trained the sleepy assasain bots on.
-    # jhg_games_per_sc_round = [2,3,3]#,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,2]
     jhg_games_per_sc_round = ["J", 30]
-    # jhg_games_per_sc_round = [1,1,1]
-    # jhg_games_per_sc_round = [2,2,2]
-
-
-
-    # so what we need to do
-    # we need to pass the ROUND logger into the funciton if we need it
-    # we can keep the game logger outside
-    # and keep the batch logger outside as well
-    # so just pass the round logger in and call it good.
 
 
     round_list = determine_rounds(jhg_games_per_sc_round)
     num_cycles = 3
     num_players = 10
-    #addAgents = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\Server\Engine\scenarios\2SmartWelfare"
-
-
-
-
-    # addAgents = r"C:\Users\Sean\Documents\GitHub\OtherGarrettStuff\JHG-SC\Server\Engine\scenarios\workingDirectory"
 
 
     num_humans = 0
@@ -268,12 +256,8 @@ if __name__ == "__main__":
     create_round_graphs_bool = False
     create_game_graphs_bool = True
     create_influence = False
-    chromosomes_directory = "testChromosome"
     group = ""
     # these paths are relative to the file location, so as long as you don't move the file it can and will run from anywhere.
-    scenario = "scenarioIndicator/allRandom"
-    chromosome = "chromosomes/experiment"
-    allocation_bot_type = "allocations_scenarios/random"
     jhg_bot_type = 0 # 0 is gene bots, 2 is social welfare and 3 is random. 4 is the new social welfare that I am developing that is just a hair smarter.
 
     num_attempts = 1 # number of batches to do.
@@ -294,8 +278,10 @@ if __name__ == "__main__":
     bot_types = [jhg_bot_type for _ in range(num_vanilla_bots)]
     bot_types += new_list
 
-
-
+    # these are legacy but they don't actually get used anywhere and I am too lazy to change it so here we are.
+    scenario = "scenarioIndicator/allRandom"
+    chromosome = "chromosomes/experiment"
+    allocation_bot_type = "allocations_scenarios/random"
 
     utility_to_log = []
     popularity_to_log = []

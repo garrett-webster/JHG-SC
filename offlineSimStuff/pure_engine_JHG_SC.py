@@ -394,7 +394,7 @@ if __name__ == "__main__":
     popularity_to_log = []
 
     popSize = 60
-    num_gene_pools = 1
+    num_gene_pools = 3
 
     pops = []
 
