@@ -13,8 +13,8 @@ import matplotlib.pyplot as plt
 
 from Server.OptionGenerators.generators import generator_factory
 
-# from Server.Engine.completeBots.geneagent3 import GeneAgent3
-from Server.Engine.completeBots.basicGeneAgent3 import BasicGeneAgent3
+from Server.Engine.completeBots.geneagent3 import GeneAgent3
+# from Server.Engine.completeBots.basicGeneAgent3 import BasicGeneAgent3
 
 # from offlineSimStuff.variousGraphingTools.individualLoggers.roundLogger import RoundLogger
 # from offlineSimStuff.variousGraphingTools.individualLoggers.gameLogger import GameLogger
@@ -129,14 +129,8 @@ def run_trial(agents, sc_sim: "Social_Choice_Sim", jhg_sim, round_list, num_cycl
 
 
 def run_jhg_stuff(jhg_engine, curr_round, agents, num_players):
-    received = [0.0 for _ in range(num_players)]  # C++ really needs to allocate memeory before hadn
     transactions = [0 for _ in range(num_players)]  # so this is how I replilcate it in python.
     T_prev = jhg_engine.get_transaction()
-    extra_data = {
-        i: {
-            j: None for j in range(num_players)
-        } for i in range(num_players)
-    }
 
     for i in range(num_players):
 
@@ -313,8 +307,8 @@ def loadPopulationFromFile(popSize, num_gene_pools, tokens_per_player):
         line = fp.readline()
         words = line.split(",")
 
-        # thePopulation.append(GeneAgent3(words[0], num_gene_pools, tokens_per_player))
-        thePopulation.append(BasicGeneAgent3(words[0], num_gene_pools))
+        thePopulation.append(GeneAgent3(words[0], num_gene_pools, tokens_per_player))
+        # thePopulation.append(BasicGeneAgent3(words[0], num_gene_pools))
         thePopulation[i].count = float(words[1])
         thePopulation[i].relativeFitness = float(words[2])
         thePopulation[i].absoluteFitness = float(words[3])

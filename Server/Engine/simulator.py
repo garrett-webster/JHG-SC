@@ -37,7 +37,6 @@ class GameSimulator:
 
 
     def play_round(self, T):
-        print("For fun how often is this going off 1")
         self.engine.apply_transaction(T)
 
     def return_bot_type(self):

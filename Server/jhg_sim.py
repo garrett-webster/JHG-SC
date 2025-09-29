@@ -4,8 +4,8 @@ import sys
 import time
 
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
-from Server.Engine.completeBots.geneagent3 import GeneAgent3
-# from Server.Engine.completeBots.basicGeneAgent3 import BasicGeneAgent3
+# from Server.Engine.completeBots.geneagent3 import GeneAgent3
+from Server.Engine.completeBots.basicGeneAgent3 import BasicGeneAgent3
 from Server.Engine.completeBots.humanagent import HumanAgent
 from Server.Engine.completeBots.socialwelfaragent import SocialWelfareAgent
 from Server.Engine.completeBots.randomagent import RandomAgent
@@ -94,7 +94,7 @@ class JHG_simulator():
 
         theFolder = "Server/Engine"
         theGen = 199
-        num_gene_copies = 1 # lets just try this super quick.
+        num_gene_copies = 3 # lets just try this super quick.
 
 
         # should be formatted appropraitely?
@@ -181,10 +181,10 @@ class JHG_simulator():
                 except KeyError:
                     print("here is the key that was causing the error ", client_input[i])
             else:
-
-                print("This is what we are passing in \n ", i, " r ", round, " T_prev ", T_prev[:, i], " sim_pop ",
-                      self.sim.get_popularity(), "\n influence ", self.sim.get_influence(), " and extra data ",
-                      self.sim.get_extra_data(i))
+                # if round == 1:
+                #     print("This is what we are passing in \n ", i, " r ", round, " T_prev ", T_prev[:, i], " sim_pop ",
+                #           self.sim.get_popularity(), "\n influence ", self.sim.get_influence(), " and extra data ",
+                #           self.sim.get_extra_data(i))
 
                 T[i] = plyr.play_round(
                     i,  # player index
@@ -192,7 +192,8 @@ class JHG_simulator():
                     T_prev[:, i],  # received
                     self.sim.get_popularity(),  # popularity
                     self.sim.get_influence(),  # influence
-                    self.sim.get_extra_data(i)  # could NOT tell you what this is.
+                    self.sim.get_extra_data(i),  # could NOT tell you what this is.
+                    # False,
                 )
                 #print(T[i])
 
@@ -366,13 +367,13 @@ def loadPopulationFromFile(popSize, generationFolder, startIndex, num_gene_pools
         file_name = os.path.join("Engine", "botGenerations") # creates standard file path. we then append to this.
 
         # file_name = os.path.join(file_name, "assassins_gen_175")  # trying to be better and mroe aggressive on group forming
-        # file_name = os.path.join(file_name, "gen_199.csv") # JHG cab agents as used in the study
+        file_name = os.path.join(file_name, "gen_199.csv") # JHG cab agents as used in the study
         # file_name = os.path.join(file_name, "sc_jhg_gen_299.csv") # the smartest vanilla agents
         # file_name = os.path.join(file_name, "w_kitties_gen_256.csv") # attempting to overcome cats
         # file_name = os.path.join(file_name, "jhg_sc_w_one_cat.csv") # another attempt
         # file_name = os.path.join(file_name, "convex2.csv") # this one should do well against the cats in both settings.
         # file_name = os.path.join(file_name, "bestOfWorstConvex.csv")
-        file_name = os.path.join(file_name, "backToBasics299.csv")
+        # file_name = os.path.join(file_name, "backToBasics299.csv")
 
         my_path = os.path.dirname(os.path.abspath(__file__))
         file_path = os.path.join(my_path, file_name)
@@ -393,8 +394,8 @@ def loadPopulationFromFile(popSize, generationFolder, startIndex, num_gene_pools
         line = fp.readline()
         words = line.split(",")
 
-        thePopulation.append(GeneAgent3(words[0], num_gene_pools, tokens_per_player))
-        # thePopulation.append(GeneAgent3(words[0], num_gene_pools))
+        # thePopulation.append(GeneAgent3(words[0], num_gene_pools, tokens_per_player))
+        thePopulation.append(BasicGeneAgent3(words[0], num_gene_pools))
         thePopulation[i].count = float(words[1])
         thePopulation[i].relativeFitness = float(words[2])
         thePopulation[i].absoluteFitness = float(words[3])

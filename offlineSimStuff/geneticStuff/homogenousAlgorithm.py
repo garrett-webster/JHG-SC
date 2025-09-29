@@ -173,23 +173,28 @@ def reconcile_received(self, agent, previous_votes):
     return new_v
 
 
-def run_jhg_gen_stuff(jhg_engine, curr_round, agents, numPlayers):
-    received = [0.0 for _ in range(numPlayers)]  # C++ really needs to allocate memeory before hadn
-    transactions = [0 for _ in range(numPlayers)]  # so this is how I replilcate it in python.
-    extra_data = {
-        i: {
-            j: None for j in range(numPlayers)
-        } for i in range(numPlayers)
-    }
+def run_jhg_gen_stuff(jhg_engine, curr_round, agents, num_players):
+    transactions = [0 for _ in range(num_players)]  # so this is how I replilcate it in python.
+    T_prev = jhg_engine.get_transaction()
 
-    for i in range(numPlayers):
-        for j in range(numPlayers):
-            received[j] = np.array(jhg_engine.T[curr_round][j][i])
-        transactions[i] = agents[i].play_round(i, curr_round, received, jhg_engine.P[curr_round], jhg_engine.I[curr_round], extra_data, False)
-    jhg_engine.apply_transaction(transactions) # thanks references
+
+    for i in range(num_players):
+
+        transactions[i] = agents[i].play_round(
+            i,
+            curr_round,
+            T_prev[:,i],
+            jhg_engine.get_popularity(),
+            jhg_engine.get_influence(),
+            jhg_engine.get_extra_data(i),
+            False
+        )
+    jhg_engine.play_round(transactions)  # thanks references
     # ok so now I have to return
     # the change in popularities,
     # return sc_sim.current_results, sc_sim.results_sums, new_influence  # so we have the change in utility and overall utility
+
+    return jhg_engine.get_influence()  # return da influence matrix, the change in popularitry, and the new popularities.
 
     return jhg_engine.get_influence()# return da influence matrix, the change in popularitry, and the new popularities.
 

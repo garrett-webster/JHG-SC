@@ -256,25 +256,34 @@ class GeneAgent3(GeneAgentMixin, AbstractAgent):
 
     def play_round(self, player_idx, round_num, received, popularities, influence, extra_data, extra_flag=False):
 
+        # if round_num == 1:
+        #     print("bot params: plyr_idx ", player_idx, " round_num ", round_num, " received \n", received, "popularities \n", popularities, " influence \n", influence, " extra data \n", extra_data)
+
+        self.printT(player_idx, str(received))
+
         if self.theTracked != 99999:
             self.theTracked = self.getTracked()
 
+        if round_num == 0:
+            self.pop_history = []
         self.pop_history.append(popularities)
 
         num_players = len(popularities)
         num_tokens = num_players * self.tokens_per_player
 
-        # if player_idx == self.theTracked:
-        #     print()
-        #     print("\n\nRound " + str(round_num) + " (Player " + str(self.theTracked) + ")")
+        if player_idx == self.theTracked:
+            print()
+            print("\n\nRound " + str(round_num) + " (Player " + str(self.theTracked) + ")")
 
         if round_num == 0:
             self.initVars(player_idx, extra_data, num_players, popularities)
             self.alpha = self.genes["alpha"] / 100.0
-            #self.printT(player_idx, self.getString())
+            self.printT(player_idx, self.getString())
         else:
             self.alpha = self.genes["alpha"] / 100.0
             self.updateVars(received, popularities, num_tokens, num_players, player_idx)
+
+
 
         # none of this seems to have the bad assumption plugged into it.
         self.computeUsefulQuantities(round_num, num_players, influence, player_idx, num_tokens)
@@ -286,7 +295,8 @@ class GeneAgent3(GeneAgentMixin, AbstractAgent):
 
         # analyzes all the communities. no reason to touch it. (yes I double checked it)
         communities, selected_community = self.group_analysis(round_num, num_players, player_idx, popularities, influence)
-        if not extra_flag:
+
+        if not extra_flag: # first notable difference between the bots
             self.selected_community = selected_community.s
         else: # we don't consider ourselves to be part of our community within the SC thing. I think.
             selected_community.s.remove(player_idx)
@@ -302,6 +312,7 @@ class GeneAgent3(GeneAgentMixin, AbstractAgent):
         else:
             safety_first = True
 
+        # second noticable difference
         guardo_toks = self.cuanto_guardo(round_num, player_idx, num_players, num_tokens, popularities, received, selected_community.s, extra_flag)
         if extra_flag: # in the sc test bed, we can give a max of 10 tokens to any person, including ourselves.
             if guardo_toks > 10: # positive cap
@@ -392,9 +403,9 @@ class GeneAgent3(GeneAgentMixin, AbstractAgent):
         self.genes = copy.deepcopy(self.genes_long[the_pool]) 
 
         self.played_genes = True
-        # if player_idx == -1:# and (np.random.randint(0,2) == 1):
-        #     self.assassinGenes()
-        self.govPlayer = -1 # im literally just guessing here man.
+        if player_idx == -1:# and (np.random.randint(0,2) == 1):
+            self.assassinGenes()
+        self.govPlayer = self.determineGovment(num_players, extra_data)
         self.tally = np.zeros(num_players, dtype=float)
         self.unpaid_debt = np.zeros(num_players)
         self.punishable_debt = np.zeros(num_players, dtype=float)
@@ -405,13 +416,11 @@ class GeneAgent3(GeneAgentMixin, AbstractAgent):
         self.invested_value = 0.0
         self.ROI = self.gameParams["keep"]
 
-    
     def updateVars(self, received, popularities, num_tokens, num_players, player_idx):
         # Change on Sep 21
         the_pool = self.determine_gene_pool(player_idx, popularities)
         self.printT(player_idx, "gene pool: " + str(the_pool))
-        self.genes = copy.deepcopy(self.genes_long[the_pool]) 
-        received = np.array(received) # just turn this into an ndrarray
+        self.genes = copy.deepcopy(self.genes_long[the_pool])
 
         self.printT(player_idx, "\nupdateVars:")
         self.tally += (received * num_tokens) * self.prev_popularities
@@ -425,13 +434,13 @@ class GeneAgent3(GeneAgentMixin, AbstractAgent):
         for i in range(num_players):
             if (self.tally[i] < 0.0) and (self.unpaid_debt[i] < 0.0):
                 self.punishable_debt[i] = -max(self.unpaid_debt[i], self.tally[i])
-                
+
         self.unpaid_debt = self.tally.copy()
 
         for i in range(num_players):
             if i != player_idx:
                 self.scaled_back_nums[i] = self.scale_back(player_idx, i)
-                 
+
         self.printT(player_idx, " scale_back: " + str(self.scaled_back_nums))
 
         self.received_value *= 1.0 - self.gameParams["alpha"]
@@ -451,8 +460,8 @@ class GeneAgent3(GeneAgentMixin, AbstractAgent):
         if self.ROI < self.gameParams["keep"]:
             self.ROI = self.gameParams["keep"]
         self.printT(player_idx, " invested " + str(self.invested_value) + "; got " + str(self.received_value))
-        self.printT(player_idx, " received: " + str(received * num_tokens))           
-        self.printT(player_idx, " ROI: " + str(self.ROI))            
+        self.printT(player_idx, " received: " + str(received * num_tokens))
+        self.printT(player_idx, " ROI: " + str(self.ROI))
         self.printT(player_idx, "")
 
 
@@ -468,14 +477,9 @@ class GeneAgent3(GeneAgentMixin, AbstractAgent):
         # compute the mean
         m = sum(popularities) / len(popularities)
 
-        if m == 0:
-            m += 1
-        if popularities[player_idx] == 0:
-            popularities[player_idx] += 1
-
         ratio = popularities[player_idx] / m
 
-        #self.printT(player_idx, "ratio: " + str(ratio))
+        self.printT(player_idx, "ratio: " + str(ratio))
 
         if ratio > 1.25:
             return 2
@@ -483,8 +487,16 @@ class GeneAgent3(GeneAgentMixin, AbstractAgent):
             return 0
         else:
             return 1
-        
 
+
+    def determineGovment(self, num_players, extra_data):
+        is_govment = np.zeros(num_players, dtype=int)
+        taxes = {}
+        for p_id, data in extra_data.items():
+            if data is not None and data.get('is_government', False):
+                is_govment[int(p_id)] = 1
+
+        return is_govment
 
 
     def estimate_keeping(self, player_idx, num_players, num_tokens, communities):
@@ -619,7 +631,8 @@ class GeneAgent3(GeneAgentMixin, AbstractAgent):
 
 
     # literally 0 clue on how to correctly cap this to 10 tokens tops.
-    def group_givings(self, round_num, num_players, num_tokens, num_giving_tokens, player_idx, influence, popularities, selected_community, attack_alloc, extra_flag):
+    def group_givings(self, round_num, num_players, num_tokens, num_giving_tokens, player_idx, influence, popularities,
+                      selected_community, attack_alloc, extra_flag):
         # Change on 6/16
         if (num_giving_tokens <= 0):
             self.printT(player_idx, "              nothing left to give")
@@ -628,9 +641,23 @@ class GeneAgent3(GeneAgentMixin, AbstractAgent):
 
         self.printT(player_idx, "\n Group Givings (" + str(num_tokens) + ", " + str(num_giving_tokens) + ")")
 
+        # allocate tokens based on homophily
+        # homophily_vec = self.get_homophily_vec(num_players, player_idx)
+        # homophily_alloc, num_tokens_h = self.homophily_allocate_tokens(round_num, num_players, num_giving_tokens, player_idx, homophily_vec, popularities, attack_alloc)
+        # self.printT(player_idx, "homophily_tokens: " + str(num_tokens_h))
+
+
+
+
+
         homophily_alloc = np.zeros(num_players, dtype=float)
         num_tokens_h = 0
-        # as near as I can tell, all the logic in group allocate tokens is solid and doesn't really take into account the weird inversions. Doesn't try to steal here.
+
+        # group_alloc, num_tokens_g = self.group_allocate_tokens(player_idx, num_players,
+        #                                                        num_giving_tokens - num_tokens_h, round_num, influence,
+        #                                                        popularities, selected_community, attack_alloc)
+
+
         group_alloc, num_tokens_g = self.group_allocate_tokens(player_idx, num_players, num_giving_tokens - num_tokens_h, round_num, influence, popularities, selected_community, attack_alloc, extra_flag)
 
         if not extra_flag: # standard JHG behavior, play it safe.
@@ -644,10 +671,22 @@ class GeneAgent3(GeneAgentMixin, AbstractAgent):
                 for friend in selected_community.s:
                     group_alloc[friend] += giving_tokens
 
+
+
+
+        # for now, just keep tokens that you don't know what to do with
+        self.printT(player_idx,
+                    "  tokens initially kept in give: " + str((num_giving_tokens - (num_tokens_h + num_tokens_g))))
+        # group_alloc[player_idx] += (num_giving_tokens - (num_tokens_h + num_tokens_g))
+        # self.printT(player_idx, "   homophily allocations: " + str(homophily_alloc) + " (" + str(num_tokens_h) + ")")
+        self.printT(player_idx, "   initial group_alloc: " + str(group_alloc))
+
         # Change on June 21 and July 12
-        if popularities[player_idx] > 0.01: # we might need to elevate this
-            group_alloc, shave = self.dial_back(num_players, num_tokens, player_idx, homophily_alloc + group_alloc, popularities)
+        if popularities[player_idx] > 0.0001:
+            group_alloc, shave = self.dial_back(num_players, num_tokens, player_idx, homophily_alloc + group_alloc,
+                                                popularities)
             # self.printT(player_idx, "     shave " + str(shave) + " tokens")
+            self.printT(player_idx, "   group_alloc: " + str(group_alloc))
         self.printT(player_idx, "")
 
         # return homophily_alloc + group_alloc, num_tokens_h + num_tokens_g
@@ -714,30 +753,42 @@ class GeneAgent3(GeneAgentMixin, AbstractAgent):
 
         return A
 
-
-    def group_allocate_tokens(self, player_idx, num_players, num_tokens, round_num, influence, popularities, the_community, attack_alloc, extra_flag):
+    def group_allocate_tokens(self, player_idx, num_players, num_tokens, round_num, influence, popularities,
+                              the_community, attack_alloc, extra_flag):
+        # if player_idx == self.theTracked:
+        #     print()
+        #     print("This is my community:")
+        #     the_community.print()
+        # s_modified = the_community.s.copy()
         s_modified = sorted(the_community.s)
         for i in range(num_players):
-            if attack_alloc[i] != 0: # so if WE are attacking them, remove them from our group. thats odd but yeah makes sense.
+            if attack_alloc[i] != 0:
                 if i in s_modified:
+                    # print("remove " + str(i) + " from " + str(s_modified))
                     s_modified.remove(i)
+
+        # self.printT(player_idx, str(s_modified))
 
         toks = np.zeros(num_players, dtype=float)
 
         num_allocated = num_tokens
-
         if round_num == 0:
             if len(s_modified) == 1:
                 toks[player_idx] = num_tokens
             else:
-                for i in range(num_tokens): # for how many tokens we have left.
+                for i in range(num_tokens):
+                    # REMOVING RANDOM
+                    # sel = random.sample(s_modified, 1)[0]
+                    # while sel == player_idx:
+                    #     sel = random.sample(s_modified, 1)[0]
+                    # toks[sel] += 1
 
-                    if self.forced_random: # forced random is always false in this fork, at least as far as I can tell.
+                    if self.forced_random:
                         v = self.getRand()
-                        num = (v + (player_idx+1)) % (len(s_modified)-1)
+                        num = (v + (player_idx + 1)) % (len(s_modified) - 1)
                         # self.printT(player_idx, "num: " + str(v))
                     else:
-                        num = np.random.randint(0,1001) % (len(s_modified)-1) # literally no clue what this does.
+                        num = np.random.randint(0, 1001) % (len(s_modified) - 1)
 
                     # self.printT(player_idx, str(num))
                     c = 0
@@ -754,69 +805,68 @@ class GeneAgent3(GeneAgentMixin, AbstractAgent):
                         sys.exit()
 
                     # self.printT(player_idx, "sel: " + str(sel))
-                    
+
                     toks[sel] += 1
         else:
-            # print("this is the size of s_modified ", len(s_modified))
             comm_size = len(s_modified)
-            if comm_size <= 1: # OOH ok this makes sense. so if we have no community we just save all of our tokens. Good to know.
+            if comm_size <= 1:
                 toks[player_idx] = num_tokens
             else:
                 profile = []
                 mag = 0.0
                 for i in s_modified:
-                    if (i != player_idx):# and (self.punishable_debt[i] < limite):
-                        sb = self.scaled_back_nums[i] #self.scale_back(player_idx, i)
+                    if (i != player_idx):  # and (self.punishable_debt[i] < limite):
+                        sb = self.scaled_back_nums[i]  # self.scale_back(player_idx, i)
                         if sb > 0.0:
-                            val = (self.infl_pos[i][player_idx]+0.01) * sb
+                            val = (self.infl_pos[i][player_idx] + 0.01) * sb
+                            # if self.punishable_debt[i] > 0:
+                            #     val *= 1.0 - (self.punishable_debt[i] / limite)
                             profile.append((i, val))
                             mag += val
-                ...
+                    # elif i != player_idx:
+                    #     self.printT(player_idx, "player " + str(i) + " excluded")
+
                 if mag > 0.0:
                     profile.sort(key=lambda a: a[1], reverse=True)
+
+                    # print("profile " + str(player_idx) + ": " + str(profile))
 
                     remaining_toks = num_tokens
                     comm_size = len(profile)
                     fixed_usage = ((self.genes["fixedUsage"] / 100.0) * num_tokens) / comm_size
+                    # self.printT(player_idx, "fixed_usage = " + str(fixed_usage))
                     flex_tokens = num_tokens - (fixed_usage * comm_size)
-
-                    # I don't think I added that min and max give_em, 0-10. Also don't really knwo what it does.
+                    # flex_tokens = num_tokens - comm_size
                     for i in range(comm_size):
-                        target_idx = profile[i][0]
+                        # give_em = int(1 + flex_tokens * (profile[i][1] / mag) + 0.5)
                         give_em = int(fixed_usage + flex_tokens * (profile[i][1] / mag) + 0.5)
-                        # Cap to 10 max per player
-                        give_em = min(give_em, 10 - toks[target_idx])
-                        give_em = max(give_em, 0)
-
                         if remaining_toks >= give_em:
-                            toks[target_idx] += give_em
+                            toks[profile[i][0]] += give_em
                             remaining_toks -= give_em
                         else:
-                            give_em = min(remaining_toks, 10 - toks[target_idx])
-                            toks[target_idx] += give_em
-                            remaining_toks -= give_em
-                    while remaining_toks > 0:
-                        all_full = True
-                        for i in range(comm_size):
-                            target_idx = profile[i][0]
-                            if toks[target_idx] < 10:
-                                toks[target_idx] += 1
-                                remaining_toks -= 1
-                                all_full = False
-                                if remaining_toks == 0:
-                                    break
-                        if all_full:
-                            break  # No one can take more tokens, stop
-                    num_allocated = int(np.sum(toks))
+                            toks[profile[i][0]] += remaining_toks
+                            remaining_toks = 0
 
+                    while remaining_toks > 0:
+                        for i in range(comm_size):
+                            toks[profile[i][0]] += 1
+                            remaining_toks -= 1
+                            if remaining_toks == 0:
+                                break
+
+                else:
+                    # need to make a new friend
+                    self.printT(player_idx, "    can't figure out who to give my tokens to")
+
+                    num_allocated = 0
+                #     for i in range(num_players):
+                #         toks[np.random.randint(0,num_players)] += 1
 
         return toks, num_allocated
 
-
     def scale_back(self, player_idx, quien):
-        # we aren't using government code in this version, just let it ride.
-        # if self.govPlayer[quien] == 1:  # for now, don't scale back payments to the gov'ment
-        #     return 1
+        if self.govPlayer[quien] == 1:  # for now, don't scale back payments to the gov'ment
+            return 1
 
         # consider scaling back if the other person is in debt to me
         if self.punishable_debt[quien] > 0:
@@ -828,7 +878,7 @@ class GeneAgent3(GeneAgentMixin, AbstractAgent):
                 if denom == 0:
                     return 0.0
                 else:
-                    perc = 1.0 - (self.punishable_debt[quien] / denom) #(self.expectedReturn[quien] * debtLimit))
+                    perc = 1.0 - (self.punishable_debt[quien] / denom)  # (self.expectedReturn[quien] * debtLimit))
                     if perc > 0.0:
                         # self.printT(player_idx, "backoff " + str(quien) + " by " + str(perc) + "(debtLimit = " + str(debtLimit) + ")")
                         return perc
@@ -848,8 +898,8 @@ class GeneAgent3(GeneAgentMixin, AbstractAgent):
 
         # Change on July 12
         self_pop = popularities[player_idx]
-        if extra_flag:
-            self_pop *= 10
+        # if extra_flag:
+        #     self_pop *= 10
 
         if popularities[player_idx] <= self.gameParams["poverty_line"]:
             return 0
@@ -862,11 +912,11 @@ class GeneAgent3(GeneAgentMixin, AbstractAgent):
             self.underAttack = (self.underAttack * (1.0 - dUpdate)) + (totalAttack * dUpdate)
 
         caution = self.genes["defensePropensity"] / 50.0
-        try:
-            self_defense_tokens = min(num_tokens, int(((self.underAttack * caution) / self_pop) * num_tokens + 0.5))
-        except ValueError:
-            print("Here is the value of everything ", num_tokens, " and ", self.underAttack, " and ", caution, " and ", self_pop, " and ", num_tokens)
-            self_defense_tokens = num_tokens # just so it does SOMETHING.
+        # try:
+        self_defense_tokens = min(num_tokens, int(((self.underAttack * caution) / self_pop) * num_tokens + 0.5))
+        # except ValueError:
+        #     print("Here is the value of everything ", num_tokens, " and ", self.underAttack, " and ", caution, " and ", self_pop, " and ", num_tokens)
+        #     self_defense_tokens = num_tokens # just so it does SOMETHING.
 
         # are there attacks on my friends by outsiders?  if so, consider keeping more tokens
         # this can be compared to the self.fear_keeping function
