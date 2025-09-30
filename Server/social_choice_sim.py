@@ -222,7 +222,7 @@ class Social_Choice_Sim:
             new_v.append((solid_received[i] + new_received[i]) / 2) # make this part of the agent chromosome at some point, for right now its just there.
         # print("this is the new v ", new_v)
         # print("This is what the solid received looks like ", solid_received, " and here is the new_v")
-        return new_v
+        return np.array(new_v)
 
     # this exists of necessity of needing to add player votes to this fetcher. Bot votes only are easy, but we need player votes as well.
     def record_votes(self, current_votes, cycle_number):

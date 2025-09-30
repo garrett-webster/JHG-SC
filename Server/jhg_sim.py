@@ -4,8 +4,8 @@ import sys
 import time
 
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
-# from Server.Engine.completeBots.geneagent3 import GeneAgent3
-from Server.Engine.completeBots.basicGeneAgent3 import BasicGeneAgent3
+from Server.Engine.completeBots.geneagent3 import GeneAgent3
+# from Server.Engine.completeBots.basicGeneAgent3 import BasicGeneAgent3
 from Server.Engine.completeBots.humanagent import HumanAgent
 from Server.Engine.completeBots.socialwelfaragent import SocialWelfareAgent
 from Server.Engine.completeBots.randomagent import RandomAgent
@@ -66,6 +66,10 @@ class JHG_simulator():
             game_params)  # sets up our sim object - might need to make this global so we can grab it wherever we need it.
         self.T = np.array([[0.0 for _ in range(num_players)] for _ in range(num_players)])
 
+
+    def override_everything(self, new_engine, new_agnets):
+        self.sim = new_engine
+        self.players = new_agnets
 
     def start_game(self, num_human_players, num_players, tokens_per_player, bot_type, agent_config):
         init_pop = "equal"
@@ -394,8 +398,8 @@ def loadPopulationFromFile(popSize, generationFolder, startIndex, num_gene_pools
         line = fp.readline()
         words = line.split(",")
 
-        # thePopulation.append(GeneAgent3(words[0], num_gene_pools, tokens_per_player))
-        thePopulation.append(BasicGeneAgent3(words[0], num_gene_pools))
+        thePopulation.append(GeneAgent3(words[0], num_gene_pools, tokens_per_player))
+        # thePopulation.append(GeneAgent3(words[0], num_gene_pools))
         thePopulation[i].count = float(words[1])
         thePopulation[i].relativeFitness = float(words[2])
         thePopulation[i].absoluteFitness = float(words[3])

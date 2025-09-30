@@ -176,7 +176,11 @@ def reconcile_received(self, agent, previous_votes):
 def run_jhg_gen_stuff(jhg_engine, curr_round, agents, num_players):
     transactions = [0 for _ in range(num_players)]  # so this is how I replilcate it in python.
     T_prev = jhg_engine.get_transaction()
-
+    extra_data = {
+        i: {
+            j: None for j in range(numPlayers)
+        } for i in range(numPlayers)
+    }
 
     for i in range(num_players):
 
@@ -186,23 +190,21 @@ def run_jhg_gen_stuff(jhg_engine, curr_round, agents, num_players):
             T_prev[:,i],
             jhg_engine.get_popularity(),
             jhg_engine.get_influence(),
-            jhg_engine.get_extra_data(i),
+            extra_data,
             False
         )
-    jhg_engine.play_round(transactions)  # thanks references
+    jhg_engine.apply_transaction(transactions)  # thanks references
     # ok so now I have to return
     # the change in popularities,
     # return sc_sim.current_results, sc_sim.results_sums, new_influence  # so we have the change in utility and overall utility
 
     return jhg_engine.get_influence()  # return da influence matrix, the change in popularitry, and the new popularities.
 
-    return jhg_engine.get_influence()# return da influence matrix, the change in popularitry, and the new popularities.
 
 def playGame(agents, numPlayers, numRounds, gener, gamer, initialPopularities, povertyLine, forcedRandom, rounds_list):
     # for this one, reference defs.h in the C++ code. most of these are hard coded into the engine and this is just tranfering them over.
     # they might get set to different values in the engine, but i wan this engine to be consistent with other engines.
     # so for now just accept the magic numbers and we will move on with our day
-    offset = gener * numRounds
     num_cycles = 3
     alpha = 0.2 # double check these magical fetchers when you get the chance actually.
     beta = 0.5
@@ -389,7 +391,7 @@ def mutateIt(gene):
 def evolvePopulationPairs(theGenePool_prev, popSize, numGeneCopies):
     genes_dict = theGenePool_prev[0].genes_long[0]  # assume [dict]
     gene_keys = list(genes_dict.keys()) # just easier this way
-    num_genes = len(gene_keys) # * 3 # cycle through it 3 times, one for each one
+    num_genes = len(gene_keys) * 3 # cycle through it 3 times, one for each one
     # represents the amount we will have to iterate through or something.
     # problem - you need to generate a list 3 times the length so we can put it all in there. trhat way you can have 3 copies. give it another whirl on monday.
 
@@ -401,24 +403,16 @@ def evolvePopulationPairs(theGenePool_prev, popSize, numGeneCopies):
 
         # the following was a fetching pain to translate over. it works but if it breaks I will have 0 idea of how to fix it. 5 stars.
         gene_values = [] # holds the new genes
-        # for g in range(num_genes):
-        #     cycle = g // len(gene_keys)
-        #     # we have 3 genes that have the same 33 repeating values. we iterate through all of them.
-        #     # would probably be easier to just go through the list three times and adjust the keys as we go. however, if this works, I won't complain.
-        #     new_g = g - (len(gene_keys) * cycle) # this should allow it to be new and not have any carry over issues.
-        #     key = gene_keys[new_g]
-        #     selected_gene = (
-        #         mutateIt(theGenePool_prev[ind1].genes_long[cycle][key])
-        #         if random.randint(0, 1) == 0
-        #         else mutateIt(theGenePool_prev[ind2].genes_long[cycle][key])
-        #     )
-        #     gene_values.append(str(selected_gene))
         for g in range(num_genes):
-            key = gene_keys[g]
+            cycle = g // len(gene_keys)
+            # we have 3 genes that have the same 33 repeating values. we iterate through all of them.
+            # would probably be easier to just go through the list three times and adjust the keys as we go. however, if this works, I won't complain.
+            new_g = g - (len(gene_keys) * cycle) # this should allow it to be new and not have any carry over issues.
+            key = gene_keys[new_g]
             selected_gene = (
-                mutateIt(theGenePool_prev[ind1].genes_long[0][key]) # long story.
+                mutateIt(theGenePool_prev[ind1].genes_long[cycle][key])
                 if random.randint(0, 1) == 0
-                else mutateIt(theGenePool_prev[ind2].genes_long[0][key])
+                else mutateIt(theGenePool_prev[ind2].genes_long[cycle][key])
             )
             gene_values.append(str(selected_gene))
 
@@ -480,6 +474,8 @@ def create_total_order(total_players, num_humans):
 # however, it is still doing 100 games per gen
 # I hope this gives me a better prototype and a means to try and reason through this
 # if we see progress here, we will up it back up and run it for longer.
+
+
 if __name__ == "__main__":
     ## -- INIT STUFF , didn't feel like using the command line everytime, thats on me. heres' the init and all explanation -- ##
     #// - run the code: ./jhgsim(0) evolve(1) ../Results/theGenerations(2) 100(3) 3(4) 0(5) 100(6) 100(7) 10(8) 30(9) 0(10) basicConfig(11) varied(12)
@@ -489,7 +485,7 @@ if __name__ == "__main__":
     # 1 -- code directive to evolve population (doesn't change)
     theFolder = "SomeFolder" # folder where trained parameters of cab agents are stored.
     popSize = 60 # number of agnets in the gene pool (use 100 here)
-    numGeneGopies = 1 # numbers of sets of genes (3 was the number used in the paper)
+    numGeneGopies = 3 # numbers of sets of genes (3 was the number used in the paper)
     startIndex = 0 # generation to start training (0 to start form scratch)
     num_gens = 300 # generation to end traning trains up to 99
     games_per_gen = popSize # agents from the gene pool are selected at random, 100 times.

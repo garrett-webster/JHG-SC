@@ -423,6 +423,7 @@ class GeneAgent3(GeneAgentMixin, AbstractAgent):
         self.genes = copy.deepcopy(self.genes_long[the_pool])
 
         self.printT(player_idx, "\nupdateVars:")
+                    # nd array * int *             ndarray
         self.tally += (received * num_tokens) * self.prev_popularities
         self.tally[player_idx] = 0
 
@@ -477,7 +478,11 @@ class GeneAgent3(GeneAgentMixin, AbstractAgent):
         # compute the mean
         m = sum(popularities) / len(popularities)
 
-        ratio = popularities[player_idx] / m
+        if m > 0.0:
+            ratio = popularities[player_idx] / m
+        else:
+            print("SOMETHING IS VERY WRONG")
+            ratio = 1
 
         self.printT(player_idx, "ratio: " + str(ratio))
 
@@ -912,11 +917,11 @@ class GeneAgent3(GeneAgentMixin, AbstractAgent):
             self.underAttack = (self.underAttack * (1.0 - dUpdate)) + (totalAttack * dUpdate)
 
         caution = self.genes["defensePropensity"] / 50.0
-        # try:
-        self_defense_tokens = min(num_tokens, int(((self.underAttack * caution) / self_pop) * num_tokens + 0.5))
-        # except ValueError:
-        #     print("Here is the value of everything ", num_tokens, " and ", self.underAttack, " and ", caution, " and ", self_pop, " and ", num_tokens)
-        #     self_defense_tokens = num_tokens # just so it does SOMETHING.
+        try:
+            self_defense_tokens = min(num_tokens, int(((self.underAttack * caution) / self_pop) * num_tokens + 0.5))
+        except ValueError:
+            print("Here is the value of everything ", num_tokens, " and ", self.underAttack, " and ", caution, " and ", self_pop, " and ", num_tokens)
+            self_defense_tokens = num_tokens # just so it does SOMETHING.
 
         # are there attacks on my friends by outsiders?  if so, consider keeping more tokens
         # this can be compared to the self.fear_keeping function

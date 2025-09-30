@@ -4,18 +4,17 @@ import random
 
 from Server.social_choice_sim import Social_Choice_Sim
 from Server.JHGManager import JHG_simulator
+from Server.Engine.simulator import GameSimulator
+
 from tqdm import tqdm
 import numpy as np
 import os
+import matplotlib.pyplot as plt
 
-
-
-# from offlineSimStuff.variousGraphingTools.sc_tools.causeNodeGraphVisualizer import causeNodeGraphVisualizer
-# from offlineSimStuff.variousGraphingTools.sc_tools.graph_influence_matrix import influenceGrapher
 from Server.OptionGenerators.generators import generator_factory
 
-# from offlineSimStuff.variousGraphingTools.completeVersions.completeLogger import CompleteLogger
-# from offlineSimStuff.variousGraphingTools.completeVersions.completeGrapher import CompleteGrapher
+from Server.Engine.completeBots.geneagent3 import GeneAgent3
+# from Server.Engine.completeBots.basicGeneAgent3 import BasicGeneAgent3
 
 from offlineSimStuff.variousGraphingTools.individualLoggers.roundLogger import RoundLogger
 from offlineSimStuff.variousGraphingTools.individualLoggers.gameLogger import GameLogger
@@ -31,7 +30,7 @@ random.seed(seed_value)
 
 # starts the sim, could make this take command line arguments
 # takes in a bot type, a number of rounds, and then runs it and plots the results. plans for expansion coming soon.
-def run_trial(sc_sim: "Social_Choice_Sim", jhg_sim, round_list, num_cycles, group, total_order, round_logger, create_round_graphs_bool, game_logger, create_game_graphs_bool):
+def run_trial(agents, sc_sim: "Social_Choice_Sim", jhg_sim, round_list, num_cycles, group, total_order, pops, round_logger, create_round_graphs_bool, game_logger, create_game_graphs_bool, current_jhg_sim):
 
     sc_sim.set_group(group)
     played_sc = False
@@ -52,9 +51,10 @@ def run_trial(sc_sim: "Social_Choice_Sim", jhg_sim, round_list, num_cycles, grou
         # print("*****************************ROUND ", curr_round, "********************************")
 
         if jhg_rounds:
-            influence_matrix = run_jhg_stuff(jhg_sim, curr_round)
+            influence_matrix = run_jhg_stuff(jhg_sim, curr_round, agents, len(agents), current_jhg_sim)
             played_jhg = True
             jhg_round = True
+            pops.append(jhg_sim.get_popularity())
 
         if sc_rounds:
             print("IF this goes off I'm ending up on the news")
@@ -76,7 +76,7 @@ def run_trial(sc_sim: "Social_Choice_Sim", jhg_sim, round_list, num_cycles, grou
         game_logger.save_game(played_sc, played_jhg)
         create_game_graphs(game_logger)
 
-    return sc_sim, jhg_sim
+    return sc_sim, jhg_sim, pops
 
 
 def run_sc_stuff(sc_sim, jhg_sim, total_order, influence_matrix, curr_round, num_cycles):
@@ -128,11 +128,8 @@ def reconcile_influence(jhg_influence, sc_influence):
     return rescaled
 
 
-def run_jhg_stuff(jhg_sim, curr_round):
-    jhg_engine = jhg_sim.sim
-    agents = jhg_sim.players
+def run_jhg_stuff(jhg_engine, curr_round, agents, num_players, current_jhg_sim):
     transactions = [0 for _ in range(num_players)]  # so this is how I replilcate it in python.
-
     T_prev = jhg_engine.get_transaction()
 
     for i in range(num_players):
@@ -141,18 +138,18 @@ def run_jhg_stuff(jhg_sim, curr_round):
             i,
             curr_round,
             T_prev[:,i],
-            jhg_engine.get_popularity(),
+            jhg_engine.get_popularity().tolist(),
             jhg_engine.get_influence(),
             jhg_engine.get_extra_data(i),
             # False
         )
     jhg_engine.play_round(transactions)  # thanks references
 
-    jhg_sim.T = transactions
-    new_popularity = jhg_sim.sim.get_popularity()
-    avg_pop = sum(new_popularity) / jhg_sim.num_players
-    jhg_sim.avg_pop_per_round.append(avg_pop)
-    jhg_sim.game_popularities.append(new_popularity)
+    current_jhg_sim.T = transactions
+    new_popularity = current_jhg_sim.sim.get_popularity()
+    avg_pop = sum(new_popularity) / current_jhg_sim.num_players
+    current_jhg_sim.avg_pop_per_round.append(avg_pop)
+    current_jhg_sim.game_popularities.append(new_popularity)
 
     # ok so now I have to return
     # the change in popularities,
@@ -161,9 +158,8 @@ def run_jhg_stuff(jhg_sim, curr_round):
     return jhg_engine.get_influence()  # return da influence matrix, the change in popularitry, and the new popularities.
 
 
-
 def generate_peeps(total_order, jhg_sim, sc_sim):
-    popularity_array = (jhg_sim.get_popularities()) # huh
+    popularity_array = (jhg_sim.get_popularity()) # huh
     total = sum(popularity_array)
     # this is easy bc this will always be positive
     normalized_popularity_array = [val / total for val in popularity_array]
@@ -193,8 +189,9 @@ def create_game_graphs(game_logger):
     complete_grapher.create_game_graphs_with_logger(game_logger)
 
 def create_group_graphs(group_logger):
-    group_grapher = GroupGrapher()
-    group_grapher.create_graph(group_logger.get_group_data())
+    pass
+    # group_grapher = GroupGrapher()
+    # group_grapher.create_graph(group_logger.get_group_data())
 
 # takes in a list of peeps (player or bot or both) and returns their player indexes as per total order
 def peeps_to_total_order(peeps, total_order):
@@ -212,10 +209,49 @@ def create_sim(total_players, scenario=None, chromosomes=None, group="", total_o
     sc_sim = Social_Choice_Sim(total_players, num_causes, num_humans, generator, cycle, curr_round, chromosomes, scenario, group, total_order, allocation_scenario, utility_per_player)
     return sc_sim
 
-
-def create_jhg_sim(num_humans, num_players, total_order, tokens_per_player, jhg_bot_type, addAgents):
+def create_jhg_sim(num_humans, num_players, total_order, tokens_per_player, jhg_bot_type, addAgents, new_agents, new_engine):
     jhg_sim = JHG_simulator(num_humans, num_players, total_order, tokens_per_player, jhg_bot_type, agent_config=addAgents)
+    jhg_sim.override_everything(new_engine, new_agents)
     return jhg_sim
+
+def create_jhg_engine(num_humans, num_players, total_order, tokens_per_player, jhg_bot_type, addAgents):
+    poverty_line = 0
+    forcedRandom = True # lets try this for fun
+    alpha = 0.2  # double check these magical fetchers when you get the chance actually.
+    beta = 0.5
+    give = 1.3
+    keep = 0.95
+    steal = 1.6
+    base_pop = 100
+
+    alpha_min, alpha_max = 0.20, 0.20
+    beta_min, beta_max = 0.5, 1.0
+    keep_min, keep_max = 0.95, 0.95
+    give_min, give_max = 1.30, 1.30
+    steal_min, steal_max = 1.6, 1.60
+
+    initial_pops = [100 for _ in range(num_players)]
+
+    game_params = {
+        "num_players": num_players,
+        "alpha": alpha_min,  # np.random.uniform(alpha_min, alpha_max),
+        "beta": beta_min,  # np.random.uniform(beta_min, beta_max),
+        "keep": keep_min,  # np.random.uniform(keep_min, keep_max),
+        "give": give_min,  # np.random.uniform(give_min, give_max),
+        "steal": steal_min,  # np.random.uniform(steal_min, steal_max),
+        "poverty_line": poverty_line,
+        "base_popularity": np.array(initial_pops)
+        # "base_popularity": np.array([*[base_pop]*(num_players)])
+        # "base_popularity": np.array(random.sample(range(1, 200), num_players))
+
+    }
+
+    for a in agents:
+        a.setGameParams(game_params, forcedRandom)
+
+
+    jhg_engine = GameSimulator(game_params)
+    return jhg_engine
 
 
 def create_total_order(total_players, num_humans):
@@ -255,6 +291,95 @@ def determine_rounds(jhg_rounds_per_sc_game_list):
 
     return new_list
 
+def loadPopulationFromFile(popSize, num_gene_pools, tokens_per_player):
+    fnombre = "Kill me"
+    try:
+        file_name = os.path.join("Server", "Engine", "botGenerations") # creates standard file path. we then append to this.
+
+        # file_name = os.path.join(file_name, "assassins_gen_175")  # trying to be better and mroe aggressive on group forming
+        # file_name = os.path.join(file_name, "gen_199.csv") # JHG cab agents as used in the study
+        # file_name = os.path.join(file_name, "sc_jhg_gen_299.csv") # the smartest vanilla agents
+        # file_name = os.path.join(file_name, "w_kitties_gen_256.csv") # attempting to overcome cats
+        # file_name = os.path.join(file_name, "jhg_sc_w_one_cat.csv") # another attempt
+        # file_name = os.path.join(file_name, "convex2.csv") # this one should do well against the cats in both settings.
+        file_name = os.path.join(file_name, "bestOfWorstConvex.csv")
+        # file_name = os.path.join(file_name, "backToBasics299.csv")
+
+        my_path = os.path.dirname(os.path.abspath(__file__))
+        my_path = os.path.abspath(os.path.join(my_path, "../.."))  # go up 2 levels and resolve path
+        file_path = os.path.join(my_path, file_name)
+        fnombre = file_path
+
+        fp = open(fnombre, "r")
+    except FileNotFoundError:
+        try:
+            fnombre = "../Server/Engine/gen_199.csv"
+            fp = open(fnombre, "r")
+        except FileNotFoundError:
+            print(fnombre + " not found")
+            quit()
+
+    thePopulation = []
+
+    for i in range(0,popSize):
+        line = fp.readline()
+        words = line.split(",")
+
+        thePopulation.append(GeneAgent3(words[0], num_gene_pools, tokens_per_player))
+        # thePopulation.append(BasicGeneAgent3(words[0], num_gene_pools))
+        thePopulation[i].count = float(words[1])
+        thePopulation[i].relativeFitness = float(words[2])
+        thePopulation[i].absoluteFitness = float(words[3])
+
+    fp.close()
+
+    return thePopulation
+
+
+def create_agents(num_players):
+    popSize = 60
+    num_gene_pools = 3
+    tokens_per_player = 2
+
+    theGenePools = loadPopulationFromFile(popSize, num_gene_pools, tokens_per_player)  # this gets us our fetcher
+
+    initial_pops = [100 for _ in range(num_players)]
+
+    plyrs = []
+    for i in range(0, num_players):
+        plyrs.append(theGenePools[i])  # just add the first guys and go form there
+
+    agents = np.array(plyrs)
+    players = [*agents]
+
+    alpha_min, alpha_max = 0.20, 0.20
+    beta_min, beta_max = 0.5, 1.0
+    keep_min, keep_max = 0.95, 0.95
+    give_min, give_max = 1.30, 1.30
+    steal_min, steal_max = 1.6, 1.60
+
+    num_players = len(players)
+
+    poverty_line = 0
+
+    game_params = {
+        "num_players": num_players,
+        "alpha": alpha_min,  # np.random.uniform(alpha_min, alpha_max),
+        "beta": beta_min,  # np.random.uniform(beta_min, beta_max),
+        "keep": keep_min,  # np.random.uniform(keep_min, keep_max),
+        "give": give_min,  # np.random.uniform(give_min, give_max),
+        "steal": steal_min,  # np.random.uniform(steal_min, steal_max),
+        "poverty_line": poverty_line,
+        "base_popularity": np.array(initial_pops)
+
+    }
+
+    forcedRandom = False
+
+    for a in agents:
+        a.setGameParams(game_params, forcedRandom)
+
+    return agents
 
 
 if __name__ == "__main__":
@@ -267,8 +392,9 @@ if __name__ == "__main__":
     random.seed(SEED)  # Python’s stdlib RNG
     np.random.seed(SEED)  # NumPy’s RNG
 
-    # jhg_games_per_sc_round = [4,3,3,3,3]  # what we trained the sleepy assasain bots on.
-    jhg_games_per_sc_round = ["J", 30]
+    # various batch scenarios I keep on hand for reference.
+    jhg_games_per_sc_round = [4, 3, 3, 3, 3, 3, 3, 3, 3]
+    # jhg_games_per_sc_round = ["J", 30]
 
 
     round_list = determine_rounds(jhg_games_per_sc_round)
@@ -282,35 +408,46 @@ if __name__ == "__main__":
     create_round_graphs_bool = False
     create_game_graphs_bool = True
     create_influence = False
+    chromosomes_directory = "testChromosome"
     group = ""
     # these paths are relative to the file location, so as long as you don't move the file it can and will run from anywhere.
+    scenario = "scenarioIndicator/allRandom"
+    chromosome = "chromosomes/experiment"
+    allocation_bot_type = "allocations_scenarios/random"
     jhg_bot_type = 0 # 0 is gene bots, 2 is social welfare and 3 is random. 4 is the new social welfare that I am developing that is just a hair smarter.
 
     num_attempts = 1 # number of batches to do.
     num_rounds = sum(jhg_games_per_sc_round) if len(jhg_games_per_sc_round) > 2 else jhg_games_per_sc_round[-1] # if its a list, len of list. else, grab the second identifier
 
-    file_name = os.path.join("..", "Server", "Engine", "scenarios", "workingDirectory")
+    file_name = os.path.join("../..", "Server", "Engine", "scenarios", "workingDirectory")
     my_path = os.path.dirname(os.path.abspath(__file__))
     file_path = os.path.normpath(os.path.join(my_path, file_name))
     addAgents = file_path
     new_list = []
     fp = open(addAgents, "r")
+
     for line in fp:
         if line.startswith("Kitty"):
             new_list.append(-1)
         if line.startswith("SocialWelfare"):
             new_list.append(-2)
     num_vanilla_bots = num_players - num_humans - len(new_list)
+
+
     bot_types = [jhg_bot_type for _ in range(num_vanilla_bots)]
     bot_types += new_list
 
-    # these are legacy but they don't actually get used anywhere and I am too lazy to change it so here we are.
-    scenario = "scenarioIndicator/allRandom"
-    chromosome = "chromosomes/experiment"
-    allocation_bot_type = "allocations_scenarios/random"
+
 
     utility_to_log = []
     popularity_to_log = []
+
+    agents = create_agents(num_players)
+    pops = []
+
+
+    bot_types = [0 for _ in range(len(agents))]  # they are all cab doesn't REALLY matter here.
+
 
     for attempt in tqdm(range(num_attempts)): # create a new sim for each attempt to prevent bleeding over.
     # for attempt in (range(num_attempts)): # create a new sim for each attempt to prevent bleeding over.
@@ -322,51 +459,46 @@ if __name__ == "__main__":
 
 
         offset = num_rounds * attempt # for logging purposes, lets us know the relationship between the logger round and current round
-        current_jhg_sim = create_jhg_sim(num_humans, num_players, total_order, tokens_per_player, jhg_bot_type, addAgents)
+        current_jhg_engine = create_jhg_engine(num_humans, num_players, total_order, tokens_per_player, jhg_bot_type, addAgents)
+        current_jhg_sim = create_jhg_sim(num_humans, num_players, total_order, tokens_per_player, jhg_bot_type, addAgents, agents, current_jhg_engine)
         current_sc_sim = create_sim(num_players, scenario, chromosome, group, total_order, allocation_bot_type, utility_per_player)
-        current_sc_sim.bot_ovveride(current_jhg_sim.players) # tells the SC sim to make sure that it is using the same bots as the JHG by passing htem as a reference to both voting and allocation slots.
+        current_sc_sim.bot_ovveride(agents) # tells the SC sim to make sure that it is using the same bots as the JHG by passing htem as a reference to both voting and allocation slots.
         round_logger.reset_up(current_jhg_sim, current_sc_sim)
         game_logger.resetup(current_jhg_sim, current_sc_sim)
 
-        sc_sim, jhg_sim = run_trial(current_sc_sim, current_jhg_sim, round_list, num_cycles, group, total_order, round_logger, create_round_graphs_bool, game_logger, create_game_graphs_bool) # This is really whats getting run round times
+        sc_sim, jhg_engine, pops = run_trial(agents, current_sc_sim, current_jhg_engine, round_list, num_cycles, group, total_order, pops, round_logger, create_round_graphs_bool, game_logger, create_game_graphs_bool, current_jhg_sim) # This is really whats getting run round times
         utility_to_log.append(sc_sim.results_sums)
-        popularity_to_log.append(jhg_sim.get_popularities())
+        popularity_to_log.append(jhg_engine.get_popularity())
 
-
-
-        #print("here are the final utilities ", sc_sim.results_sums)
-    inverted_results = list(zip(*utility_to_log))
-    new_results = []
-    for i in range(len(inverted_results)):
-        new_sum = sum(inverted_results[i]) / len(inverted_results[i])
-        new_results.append(new_sum)
+    pops_by_player = np.array(pops).T
 
 
 
 
-    num_kitties = 2
-    non_cats = (num_players - num_kitties)
-    cumulative_cat_score = sum(new_results[non_cats:])
-    cumulative_non_cat_score = sum(new_results)- cumulative_cat_score
-    avg_cat_score = cumulative_cat_score / num_kitties
-    avg_non_cat_score = cumulative_non_cat_score / non_cats
-    print('here is the average cat / added agent ', avg_cat_score, " and here is the average non cat utility ", avg_non_cat_score)
-    # print("here is the average Gene3agent score ", avg_non_cat_score)
-    inverted_results.clear()
 
-
-    # man this sucks
-    popularity_to_log = np.round(np.array(popularity_to_log).astype(float), 2).tolist()
-
-    inverted_results = list(zip(*popularity_to_log))
-    new_results = []
-    for i in range(len(inverted_results)):
-        new_sum = sum(inverted_results[i]) / len(inverted_results[i])
-        new_results.append(new_sum)
-
-    non_cats = (num_players - num_kitties)
-    cumulative_cat_score = sum(new_results[non_cats:])
-    cumulative_non_cat_score = sum(new_results)   - cumulative_cat_score
-    avg_cat_score = cumulative_cat_score / num_kitties
-    avg_non_cat_score = cumulative_non_cat_score / non_cats
-    print('here is the average cat / added agent popualrity ', avg_cat_score, " and here is the average non cat popularity ", avg_non_cat_score)
+    # num_kitties = 2
+    # non_cats = (num_players - num_kitties)
+    # cumulative_cat_score = sum(new_results[non_cats:])
+    # cumulative_non_cat_score = sum(new_results)- cumulative_cat_score
+    # avg_cat_score = cumulative_cat_score / num_kitties
+    # avg_non_cat_score = cumulative_non_cat_score / non_cats
+    # print('here is the average cat / added agent ', avg_cat_score, " and here is the average non cat utility ", avg_non_cat_score)
+    # # print("here is the average Gene3agent score ", avg_non_cat_score)
+    # inverted_results.clear()
+    #
+    #
+    # # man this sucks
+    # popularity_to_log = np.round(np.array(popularity_to_log).astype(float), 2).tolist()
+    #
+    # inverted_results = list(zip(*popularity_to_log))
+    # new_results = []
+    # for i in range(len(inverted_results)):
+    #     new_sum = sum(inverted_results[i]) / len(inverted_results[i])
+    #     new_results.append(new_sum)
+    #
+    # non_cats = (num_players - num_kitties)
+    # cumulative_cat_score = sum(new_results[non_cats:])
+    # cumulative_non_cat_score = sum(new_results)   - cumulative_cat_score
+    # avg_cat_score = cumulative_cat_score / num_kitties
+    # avg_non_cat_score = cumulative_non_cat_score / non_cats
+    # print('here is the average cat / added agent popualrity ', avg_cat_score, " and here is the average non cat popularity ", avg_non_cat_score)
