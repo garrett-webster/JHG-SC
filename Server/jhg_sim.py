@@ -246,7 +246,7 @@ class JHG_simulator():
                 initial_pops[i] += 150
             random.shuffle(initial_pops)
         else:
-            print("don't understand init_pop " + str(init_pop) + " so just going with equal")
+            # print("don't understand init_pop " + str(init_pop) + " so just going with equal")
             initial_pops = [*[base_pop] * (num_players)]
 
         # normalize initial_pops so average popularity across all agents is 100
@@ -371,13 +371,16 @@ def loadPopulationFromFile(popSize, generationFolder, startIndex, num_gene_pools
         file_name = os.path.join("Engine", "botGenerations") # creates standard file path. we then append to this.
 
         # file_name = os.path.join(file_name, "assassins_gen_175")  # trying to be better and mroe aggressive on group forming
-        file_name = os.path.join(file_name, "gen_199.csv") # JHG cab agents as used in the study
+        # file_name = os.path.join(file_name, "gen_199.csv") # JHG cab agents as used in the study
+        # file_name = os.path.join(file_name, "longerConvex2.csv")
         # file_name = os.path.join(file_name, "sc_jhg_gen_299.csv") # the smartest vanilla agents
         # file_name = os.path.join(file_name, "w_kitties_gen_256.csv") # attempting to overcome cats
         # file_name = os.path.join(file_name, "jhg_sc_w_one_cat.csv") # another attempt
         # file_name = os.path.join(file_name, "convex2.csv") # this one should do well against the cats in both settings.
         # file_name = os.path.join(file_name, "bestOfWorstConvex.csv")
         # file_name = os.path.join(file_name, "backToBasics299.csv")
+        file_name = os.path.join(file_name, "PureJHGAntiCat.csv")
+        # file_name = os.path.join(file_name, "fullyDevelopedPureJHG.csv")
 
         my_path = os.path.dirname(os.path.abspath(__file__))
         file_path = os.path.join(my_path, file_name)

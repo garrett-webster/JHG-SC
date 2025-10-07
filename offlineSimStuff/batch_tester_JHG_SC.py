@@ -23,10 +23,10 @@ from offlineSimStuff.variousGraphingTools.groupStuff.groupLogger import GroupLog
 from offlineSimStuff.variousGraphingTools.completeVersions.completeGrapher import CompleteGrapher
 from offlineSimStuff.variousGraphingTools.groupStuff.groupGrapher import GroupGrapher
 
-import random
-
-seed_value = 42
-random.seed(seed_value)
+# import random
+#
+# seed_value = 42
+# random.seed(seed_value)
 
 
 # starts the sim, could make this take command line arguments

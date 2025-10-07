@@ -15,8 +15,6 @@ from Server.social_choice_sim import Social_Choice_Sim
 from offlineSimStuff.batch_tester_JHG_SC import determine_rounds
 from offlineSimStuff.geneticStuff.geneticLogger import geneticLogger
 
-
-
 """
 based on the genetic algorihtm as given within the IJCAII repo. However, it tries to implement some of the chagnes as seen within the flutter algorithm for
 homogenity, trying to be better about having the CAB agents defend against outside bad actors (READ: CATS). 
@@ -186,7 +184,7 @@ def run_jhg_gen_stuff(jhg_engine, curr_round, agents, numPlayers):
     jhg_engine.apply_transaction(transactions) # thanks references
     return jhg_engine.get_influence() # return da influence matrix
 
-def playGame(agents, numPlayers, numRounds, gener, gamer, initialPopularities, povertyLine, forcedRandom, rounds_list):
+def playGame(agents, numPlayers, numRounds, gener, gamer, initialPopularities, povertyLine, forcedRandom, rounds_list, print_game):
     # for this one, reference defs.h in the C++ code. most of these are hard coded into the engine and this is just tranfering them over.
     # they might get set to different values in the engine, but i wan this engine to be consistent with other engines.
     # so for now just accept the magic numbers and we will move on with our day
@@ -465,7 +463,12 @@ if __name__ == "__main__":
     mxPlayers = numPlayers
 
     for gen in range(num_gens): # however many generations we want
+        game_to_print = random.randint(0, games_per_gen)
         for game in range(games_per_gen): # however many games we want per generation
+            print_game = False
+            if game == game_to_print:
+                print_game = True
+
 
             for i in range(agentsPerGame): # wait is that it???
                 plyrIdxs[i] = game % popSize # trying with modulo pop size to make sure that we dont' get any out of bounds errors
@@ -495,7 +498,7 @@ if __name__ == "__main__":
 
             num_rounds = sum(jhg_games_per_round)
 
-            pmetrics = playGame(agents, numPlayers, num_rounds, gen, game, initUtilities, povertyLine, False, rounds_list)
+            pmetrics = playGame(agents, numPlayers, num_rounds, gen, game, initUtilities, povertyLine, False, rounds_list, print_game)
 
 
             # now we gotta calcualte relative popularity

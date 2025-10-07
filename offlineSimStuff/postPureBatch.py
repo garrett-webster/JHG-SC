@@ -21,11 +21,13 @@ from offlineSimStuff.variousGraphingTools.individualLoggers.gameLogger import Ga
 from offlineSimStuff.variousGraphingTools.groupStuff.groupLogger import GroupLogger
 from offlineSimStuff.variousGraphingTools.completeVersions.completeGrapher import CompleteGrapher
 from offlineSimStuff.variousGraphingTools.groupStuff.groupGrapher import GroupGrapher
+from Server.Engine.completeBots.projectCat import ProjectCat
 
-import random
 
-seed_value = 42
-random.seed(seed_value)
+# import random
+#
+# seed_value = 42
+# random.seed(seed_value)
 
 
 # starts the sim, could make this take command line arguments
@@ -216,7 +218,7 @@ def create_jhg_sim(num_humans, num_players, total_order, tokens_per_player, jhg_
 
 def create_jhg_engine(num_humans, num_players, total_order, tokens_per_player, jhg_bot_type, addAgents):
     poverty_line = 0
-    forcedRandom = True # lets try this for fun
+    forcedRandom = False # lets try this for fun
     alpha = 0.2  # double check these magical fetchers when you get the chance actually.
     beta = 0.5
     give = 1.3
@@ -302,11 +304,13 @@ def loadPopulationFromFile(popSize, num_gene_pools, tokens_per_player):
         # file_name = os.path.join(file_name, "w_kitties_gen_256.csv") # attempting to overcome cats
         # file_name = os.path.join(file_name, "jhg_sc_w_one_cat.csv") # another attempt
         # file_name = os.path.join(file_name, "convex2.csv") # this one should do well against the cats in both settings.
-        file_name = os.path.join(file_name, "bestOfWorstConvex.csv")
+        # file_name = os.path.join(file_name, "bestOfWorstConvex.csv")
         # file_name = os.path.join(file_name, "backToBasics299.csv")
+        # file_name = os.path.join(file_name, "fullyDevelopedPureJHG.csv")
+        file_name =  os.path.join(file_name, "MelissasGenes.csv.csv")
 
         my_path = os.path.dirname(os.path.abspath(__file__))
-        my_path = os.path.abspath(os.path.join(my_path, "../.."))  # go up 2 levels and resolve path
+        my_path = os.path.abspath(os.path.join(my_path, "../"))  # go up 2 levels and resolve path
         file_path = os.path.join(my_path, file_name)
         fnombre = file_path
 
@@ -336,7 +340,7 @@ def loadPopulationFromFile(popSize, num_gene_pools, tokens_per_player):
     return thePopulation
 
 
-def create_agents(num_players):
+def create_agents(num_players, new_list):
     popSize = 60
     num_gene_pools = 3
     tokens_per_player = 2
@@ -346,8 +350,11 @@ def create_agents(num_players):
     initial_pops = [100 for _ in range(num_players)]
 
     plyrs = []
-    for i in range(0, num_players):
+    for i in range(0, num_players-len(new_list)):
         plyrs.append(theGenePools[i])  # just add the first guys and go form there
+
+    for i in range(0, len(new_list)):
+        plyrs.append(ProjectCat())
 
     agents = np.array(plyrs)
     players = [*agents]
@@ -384,17 +391,17 @@ def create_agents(num_players):
 
 if __name__ == "__main__":
 
-    import random
-    import numpy as np
-
-    SEED = 42  # pick any constant
-
-    random.seed(SEED)  # Python’s stdlib RNG
-    np.random.seed(SEED)  # NumPy’s RNG
+    # import random
+    # import numpy as np
+    #
+    # SEED = 42  # pick any constant
+    #
+    # random.seed(SEED)  # Python’s stdlib RNG
+    # np.random.seed(SEED)  # NumPy’s RNG
 
     # various batch scenarios I keep on hand for reference.
-    jhg_games_per_sc_round = [4, 3, 3, 3, 3, 3, 3, 3, 3]
-    # jhg_games_per_sc_round = ["J", 30]
+    # jhg_games_per_sc_round = [4, 3, 3, 3, 3, 3, 3, 3, 3]
+    jhg_games_per_sc_round = ["J", 30]
 
 
     round_list = determine_rounds(jhg_games_per_sc_round)
@@ -419,7 +426,7 @@ if __name__ == "__main__":
     num_attempts = 1 # number of batches to do.
     num_rounds = sum(jhg_games_per_sc_round) if len(jhg_games_per_sc_round) > 2 else jhg_games_per_sc_round[-1] # if its a list, len of list. else, grab the second identifier
 
-    file_name = os.path.join("../..", "Server", "Engine", "scenarios", "workingDirectory")
+    file_name = os.path.join("..", "Server", "Engine", "scenarios", "workingDirectory")
     my_path = os.path.dirname(os.path.abspath(__file__))
     file_path = os.path.normpath(os.path.join(my_path, file_name))
     addAgents = file_path
@@ -442,11 +449,11 @@ if __name__ == "__main__":
     utility_to_log = []
     popularity_to_log = []
 
-    agents = create_agents(num_players)
+    agents = create_agents(num_players, new_list)
     pops = []
 
 
-    bot_types = [0 for _ in range(len(agents))]  # they are all cab doesn't REALLY matter here.
+    # bot_types = [0 for _ in range(len(agents))]  # they are all cab doesn't REALLY matter here.
 
 
     for attempt in tqdm(range(num_attempts)): # create a new sim for each attempt to prevent bleeding over.

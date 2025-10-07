@@ -187,7 +187,11 @@ class Social_Choice_Sim:
 
         bot_votes = {}
         final_votes = None
-        extra_data = {""}
+        extra_data = {
+            i: {
+                j: None for j in range(len(self.total_types))
+            } for i in range(len(self.total_types))
+        }
         # print("here is the len of self.bots (should be 8, not 9 )", len(self.bots))
         for i, bot in enumerate(self.bots):
             # print("this is the bot id ", bot.self_id, " an dthis is the i index ", i)

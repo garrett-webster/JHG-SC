@@ -5,7 +5,7 @@ import glob
 from collections import defaultdict
 
 
-data_dir = "roughResults1/theGenerations"
+data_dir = "longerConvexResults/theGenerations"
 
 generation_stats = {}
 
@@ -28,8 +28,9 @@ if __name__ == "__main__":
                 if len(row) < 4:
                     continue  # Skip short/bad rows
                 try:
-                    rel_util = float(row[2])  # Relative Utility
-                    abs_util = float(row[3])  # Absolute Utility
+                    # to have it parse POPS instead of UTIL, use 4 and 5
+                    rel_util = float(row[4])  # Relative Utility
+                    abs_util = float(row[5])  # Absolute Utility
                     rel_utilities.append(rel_util)
                     abs_utilities.append(abs_util)
                 except ValueError:

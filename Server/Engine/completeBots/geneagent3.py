@@ -255,7 +255,8 @@ class GeneAgent3(GeneAgentMixin, AbstractAgent):
 
 
     def play_round(self, player_idx, round_num, received, popularities, influence, extra_data, extra_flag=False):
-
+        if np.isnan(popularities).all():
+            print("STack trace this fetcher please and thank you!")
         # if round_num == 1:
         #     print("bot params: plyr_idx ", player_idx, " round_num ", round_num, " received \n", received, "popularities \n", popularities, " influence \n", influence, " extra data \n", extra_data)
 
@@ -281,7 +282,7 @@ class GeneAgent3(GeneAgentMixin, AbstractAgent):
             self.printT(player_idx, self.getString())
         else:
             self.alpha = self.genes["alpha"] / 100.0
-            self.updateVars(received, popularities, num_tokens, num_players, player_idx)
+            self.updateVars(received, popularities, num_tokens, num_players, player_idx, extra_flag)
 
 
 
@@ -296,11 +297,11 @@ class GeneAgent3(GeneAgentMixin, AbstractAgent):
         # analyzes all the communities. no reason to touch it. (yes I double checked it)
         communities, selected_community = self.group_analysis(round_num, num_players, player_idx, popularities, influence)
 
-        if not extra_flag: # first notable difference between the bots
-            self.selected_community = selected_community.s
-        else: # we don't consider ourselves to be part of our community within the SC thing. I think.
-            selected_community.s.remove(player_idx)
-            self.selected_community = selected_community.s
+        # if not extra_flag: # first notable difference between the bots
+        self.selected_community = selected_community.s
+        # else: # we don't consider ourselves to be part of our community within the SC thing. I think.
+        #     selected_community.s.remove(player_idx)
+        #     self.selected_community = selected_community.s
 
         # figure out how many tokens to keep
         # this estimates how much we think eveyrone else will keep. currently checking for negatives.
@@ -312,7 +313,6 @@ class GeneAgent3(GeneAgentMixin, AbstractAgent):
         else:
             safety_first = True
 
-        # second noticable difference
         guardo_toks = self.cuanto_guardo(round_num, player_idx, num_players, num_tokens, popularities, received, selected_community.s, extra_flag)
         if extra_flag: # in the sc test bed, we can give a max of 10 tokens to any person, including ourselves.
             if guardo_toks > 10: # positive cap
@@ -385,8 +385,8 @@ class GeneAgent3(GeneAgentMixin, AbstractAgent):
                     transaction_vec[i] = 10
                     # num_allocated -= excess
 
-        if extra_flag: # Not entirelyt sure whats going on here but I have broked it broked it
-            self.selected_community.add(player_idx) # just go ahead and stick that back in there.
+        # if extra_flag: # Not entirelyt sure whats going on here but I have broked it broked it
+        #     self.selected_community.add(player_idx) # just go ahead and stick that back in there.
 
         if sum(transaction_vec) < -50:
             print("hey something si wrong ", player_idx, " has an allocatino of ", transaction_vec, " . and here is the flag ", extra_flag)
@@ -399,7 +399,7 @@ class GeneAgent3(GeneAgentMixin, AbstractAgent):
 
     def initVars(self, player_idx, extra_data, num_players, popularities):
         # Change on Sep 21
-        the_pool = self.determine_gene_pool(player_idx, popularities)
+        the_pool = self.determine_gene_pool(player_idx, popularities, False)
         self.genes = copy.deepcopy(self.genes_long[the_pool]) 
 
         self.played_genes = True
@@ -416,9 +416,9 @@ class GeneAgent3(GeneAgentMixin, AbstractAgent):
         self.invested_value = 0.0
         self.ROI = self.gameParams["keep"]
 
-    def updateVars(self, received, popularities, num_tokens, num_players, player_idx):
+    def updateVars(self, received, popularities, num_tokens, num_players, player_idx, extra_flag):
         # Change on Sep 21
-        the_pool = self.determine_gene_pool(player_idx, popularities)
+        the_pool = self.determine_gene_pool(player_idx, popularities, extra_flag)
         self.printT(player_idx, "gene pool: " + str(the_pool))
         self.genes = copy.deepcopy(self.genes_long[the_pool])
 
@@ -467,7 +467,7 @@ class GeneAgent3(GeneAgentMixin, AbstractAgent):
 
 
     # Change on Sep 21
-    def determine_gene_pool(self, player_idx, popularities):
+    def determine_gene_pool(self, player_idx, popularities, extra_flag):
         if self.num_gene_copies == 1:
             return 0
 
@@ -475,14 +475,17 @@ class GeneAgent3(GeneAgentMixin, AbstractAgent):
             print('geneagent not configured for ' + str(self.num_gene_copies) + ' gene copies')
             os.exit()
 
-        # compute the mean
-        m = sum(popularities) / len(popularities)
 
-        if m > 0.0:
+        if not extra_flag:
+        # compute the mean
+            m = sum(popularities) / len(popularities)
             ratio = popularities[player_idx] / m
+
         else:
-            print("SOMETHING IS VERY WRONG")
-            ratio = 1
+            min = np.min(popularities)
+            new_popularities = [pop + min for pop in popularities]
+            m = sum(new_popularities) / len(popularities)
+            ratio = popularities[player_idx] / m
 
         self.printT(player_idx, "ratio: " + str(ratio))
 
@@ -514,6 +517,9 @@ class GeneAgent3(GeneAgentMixin, AbstractAgent):
 
 
     def computeUsefulQuantities(self, round_num, num_players, influence, player_idx, num_tokens):
+        if influence.all() == None:
+            print("Stop here")
+
         if round_num > 0:
             self.infl_neg_prev = np.copy(self.infl_neg)
         else:
@@ -897,6 +903,8 @@ class GeneAgent3(GeneAgentMixin, AbstractAgent):
     # decide how many tokens to keep
     def cuanto_guardo(self, round_num, player_idx, num_players, num_tokens, popularities, received, selected_community, extra_flag):
         self_pop = popularities[player_idx]
+        if np.isnan(self_pop):
+            print("Here is our pop ", self_pop)
 
         if extra_flag:
             self_pop *= 10
@@ -915,11 +923,13 @@ class GeneAgent3(GeneAgentMixin, AbstractAgent):
             totalAttack = np.dot(np.negative(received[0:num_players]).clip(0), popularities[0:num_players])
             dUpdate = self.genes["defenseUpdate"] / 100.0
             self.underAttack = (self.underAttack * (1.0 - dUpdate)) + (totalAttack * dUpdate)
+            if np.isnan(self.underAttack):
+                print("here ar ethe values ", self.underAttack, " and ", dUpdate, " and ", totalAttack, " and ", totalAttack * dUpdate, ".")
 
         caution = self.genes["defensePropensity"] / 50.0
         try:
             self_defense_tokens = min(num_tokens, int(((self.underAttack * caution) / self_pop) * num_tokens + 0.5))
-        except ValueError:
+        except ValueError:                                                  # getting a nan here                        # and here
             print("Here is the value of everything ", num_tokens, " and ", self.underAttack, " and ", caution, " and ", self_pop, " and ", num_tokens)
             self_defense_tokens = num_tokens # just so it does SOMETHING.
 
