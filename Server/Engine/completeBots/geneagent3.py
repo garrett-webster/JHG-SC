@@ -11,7 +11,7 @@ from Server.Engine.completeBots.geneAgent3Supplement import GeneAgentMixin
 # make sure to put the GeneAgentMixin first, then the abstractAgent. Base class goes last, mixin classes go on top.
 class GeneAgent3(GeneAgentMixin, AbstractAgent):
 
-    def __init__(self, geneStr, _num_gene_copies, tokens_per_player):  # Change on Sep 21
+    def __init__(self, geneStr, _num_gene_copies):  # Change on Sep 21
         super().__init__()
         self.num_gene_copies = _num_gene_copies     # Change on Sep 21
         self.whoami = "gene"
@@ -21,7 +21,7 @@ class GeneAgent3(GeneAgentMixin, AbstractAgent):
         self.relativePopularity = 0.0
         self.absolutePopularity = 0.0
         self.gameParams = {}
-        self.tokens_per_player = tokens_per_player
+        self.tokens_per_player = 2
         self.pop_history = [] # just slap this up here.
         self.selected_community = {-1} # sign that nothing has changed
 

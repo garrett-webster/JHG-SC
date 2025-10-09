@@ -401,7 +401,7 @@ def loadPopulationFromFile(popSize, generationFolder, startIndex, num_gene_pools
         line = fp.readline()
         words = line.split(",")
 
-        thePopulation.append(GeneAgent3(words[0], num_gene_pools, tokens_per_player))
+        thePopulation.append(GeneAgent3(words[0], num_gene_pools))
         # thePopulation.append(GeneAgent3(words[0], num_gene_pools))
         thePopulation[i].count = float(words[1])
         thePopulation[i].relativeFitness = float(words[2])

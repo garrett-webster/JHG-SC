@@ -306,8 +306,8 @@ def loadPopulationFromFile(popSize, num_gene_pools, tokens_per_player):
         # file_name = os.path.join(file_name, "convex2.csv") # this one should do well against the cats in both settings.
         # file_name = os.path.join(file_name, "bestOfWorstConvex.csv")
         # file_name = os.path.join(file_name, "backToBasics299.csv")
-        # file_name = os.path.join(file_name, "fullyDevelopedPureJHG.csv")
-        file_name =  os.path.join(file_name, "MelissasGenes.csv.csv")
+        file_name = os.path.join(file_name, "fullyDevelopedPureJHG.csv")
+        # file_name =  os.path.join(file_name, "MelissasGenes.csv.csv")
 
         my_path = os.path.dirname(os.path.abspath(__file__))
         my_path = os.path.abspath(os.path.join(my_path, "../"))  # go up 2 levels and resolve path
@@ -329,7 +329,7 @@ def loadPopulationFromFile(popSize, num_gene_pools, tokens_per_player):
         line = fp.readline()
         words = line.split(",")
 
-        thePopulation.append(GeneAgent3(words[0], num_gene_pools, tokens_per_player))
+        thePopulation.append(GeneAgent3(words[0], num_gene_pools))
         # thePopulation.append(BasicGeneAgent3(words[0], num_gene_pools))
         thePopulation[i].count = float(words[1])
         thePopulation[i].relativeFitness = float(words[2])
@@ -402,7 +402,7 @@ if __name__ == "__main__":
     # various batch scenarios I keep on hand for reference.
     # jhg_games_per_sc_round = [4, 3, 3, 3, 3, 3, 3, 3, 3]
     jhg_games_per_sc_round = ["J", 30]
-
+    ForcedRandom = True
 
     round_list = determine_rounds(jhg_games_per_sc_round)
     num_cycles = 3

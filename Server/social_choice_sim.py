@@ -524,7 +524,7 @@ class Social_Choice_Sim:
             line = fp.readline()
             words = line.split(",")
 
-            thePopulation.append(GeneAgent3(words[0], num_gene_copies, self.utility_per_player))
+            thePopulation.append(GeneAgent3(words[0], num_gene_copies))
             thePopulation[i].count = float(words[1])
             thePopulation[i].relativeFitness = float(words[2])
 

@@ -522,8 +522,10 @@ if __name__ == "__main__":
     # 0 -- executable (doesn't change)
     # 1 -- code directive to evolve population (doesn't change)
     theFolder = "SomeFolder" # folder where trained parameters of cab agents are stored.
-    popSize = 60 # number of agnets in the gene pool (use 100 here)
-    numGeneGopies = 3 # numbers of sets of genes (3 was the number used in the paper)
+    popSize = 100 # number of agnets in the gene pool (use 100 here)
+    numGeneGopies = 1 # numbers of sets of genes (3 was the number used in the paper)
+    # 1 should ALSO work fine, I should stress.
+
     startIndex = 0 # generation to start training (0 to start form scratch)
     num_gens = 300 # generation to end traning trains up to 99
     games_per_gen = popSize # agents from the gene pool are selected at random, 100 times.
@@ -532,7 +534,6 @@ if __name__ == "__main__":
     # roundsPerGame = 30 # number fo rounds per game
     povertyLine = 0 # see SM-1
     initPops = "equal" # starts eveyrone at different initial popularities when training.
-    tokens_per_player = 2 # probably best if I just reduce this back to whatever. (Added by me just in case we wanted to be silly)
     num_humans = 0 # we discriminate in this fetcher
     num_kitties = 2
     current_logger = geneticLogger()
@@ -542,7 +543,7 @@ if __name__ == "__main__":
         configured_players.append(ProjectCat())
 
     # should initialize this fetcher
-    theGenePools = [GeneAgent3("", numGeneGopies, tokens_per_player) for _ in range(popSize)] # don't let this be empty
+    theGenePools = [GeneAgent3("", numGeneGopies) for _ in range(popSize)] # don't let this be empty
 
     numPlayers = agentsPerGame + len(configured_players) # could put gocnifutred players.size but that si currently empty and I couldn't care less.
     # maxPlayers = numPlayers + len(configured_players)
@@ -558,7 +559,7 @@ if __name__ == "__main__":
     # jhg_games_per_round = [4,3,3,3,3] # just give me an easy place to start.
     # jhg_games_per_round = [2,2,2]
     # jhg_games_per_round = ["S", 10]
-    jhg_games_per_round = ["J", 20]
+    jhg_games_per_round = ["J", 30]
     rounds_list = determine_rounds(jhg_games_per_round)
     mxPlayers = numPlayers
 
@@ -590,6 +591,8 @@ if __name__ == "__main__":
             else:
                 sel = 0
             # this should be all 10's after the first run
+            # should also point out that it never gets used -- wanted for models with different starting points.
+            # not currently implemented and its not SUPER interesting to me.
             initUtilities = definteInitialUtility(possible_init_pops[sel], numPlayers, initUtilities)
 
             s = 0
