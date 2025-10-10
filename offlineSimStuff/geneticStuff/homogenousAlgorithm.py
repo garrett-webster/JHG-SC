@@ -429,11 +429,11 @@ def mutateIt(gene):
 def evolvePopulationPairs(theGenePool_prev, popSize, numGeneCopies):
     genes_dict = theGenePool_prev[0].genes_long[0]  # assume [dict]
     gene_keys = list(genes_dict.keys()) # just easier this way
-    num_genes = len(gene_keys) * 3 # cycle through it 3 times, one for each one
+    num_genes = len(gene_keys) * 1 # cycle through it 3 times, one for each one  # one only this time
     # represents the amount we will have to iterate through or something.
     # problem - you need to generate a list 3 times the length so we can put it all in there. trhat way you can have 3 copies. give it another whirl on monday.
 
-    theGenePool = [GeneAgent3("", numGeneCopies, 2) for _ in range(popSize)] #initalize empty gene pool.
+    theGenePool = [GeneAgent3("", numGeneCopies) for _ in range(popSize)] #initalize empty gene pool.
 
     for i in range(popSize): # for EVERY fetcher
         ind1 = selectByFitness(theGenePool_prev, popSize, True) if i < (popSize / 5) else selectByFitness(theGenePool_prev, popSize, False)
@@ -455,7 +455,7 @@ def evolvePopulationPairs(theGenePool_prev, popSize, numGeneCopies):
             gene_values.append(str(selected_gene))
 
         geneStr = "gene_" + "_".join(gene_values) # reassembles the genes
-        theGenePool[i] = GeneAgent3(geneStr, numGeneCopies, 2) # creates a new agent at that index and puts it back in the gene pool.
+        theGenePool[i] = GeneAgent3(geneStr, numGeneCopies) # creates a new agent at that index and puts it back in the gene pool.
 
     return theGenePool # puts back the new gene pool to be played with again.
 
