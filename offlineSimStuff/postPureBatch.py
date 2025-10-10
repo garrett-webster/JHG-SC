@@ -306,8 +306,9 @@ def loadPopulationFromFile(popSize, num_gene_pools, tokens_per_player):
         # file_name = os.path.join(file_name, "convex2.csv") # this one should do well against the cats in both settings.
         # file_name = os.path.join(file_name, "bestOfWorstConvex.csv")
         # file_name = os.path.join(file_name, "backToBasics299.csv")
-        file_name = os.path.join(file_name, "fullyDevelopedPureJHG.csv")
+        # file_name = os.path.join(file_name, "fullyDevelopedPureJHG.csv")
         # file_name =  os.path.join(file_name, "MelissasGenes.csv.csv")
+        file_name = os.path.join(file_name, "oneMoreTimeNowYall.csv")
 
         my_path = os.path.dirname(os.path.abspath(__file__))
         my_path = os.path.abspath(os.path.join(my_path, "../"))  # go up 2 levels and resolve path
@@ -341,8 +342,8 @@ def loadPopulationFromFile(popSize, num_gene_pools, tokens_per_player):
 
 
 def create_agents(num_players, new_list):
-    popSize = 60
-    num_gene_pools = 3
+    popSize = 100
+    num_gene_pools = 1
     tokens_per_player = 2
 
     theGenePools = loadPopulationFromFile(popSize, num_gene_pools, tokens_per_player)  # this gets us our fetcher
@@ -402,7 +403,7 @@ if __name__ == "__main__":
     # various batch scenarios I keep on hand for reference.
     # jhg_games_per_sc_round = [4, 3, 3, 3, 3, 3, 3, 3, 3]
     jhg_games_per_sc_round = ["J", 30]
-    ForcedRandom = True
+    ForcedRandom = False
 
     round_list = determine_rounds(jhg_games_per_sc_round)
     num_cycles = 3
@@ -423,7 +424,7 @@ if __name__ == "__main__":
     allocation_bot_type = "allocations_scenarios/random"
     jhg_bot_type = 0 # 0 is gene bots, 2 is social welfare and 3 is random. 4 is the new social welfare that I am developing that is just a hair smarter.
 
-    num_attempts = 1 # number of batches to do.
+    num_attempts = 5 # number of batches to do.
     num_rounds = sum(jhg_games_per_sc_round) if len(jhg_games_per_sc_round) > 2 else jhg_games_per_sc_round[-1] # if its a list, len of list. else, grab the second identifier
 
     file_name = os.path.join("..", "Server", "Engine", "scenarios", "workingDirectory")

@@ -220,6 +220,7 @@ class GeneAgent3(GeneAgentMixin, AbstractAgent):
 
     def setGameParams(self, gameParams, _forcedRandom):
         self.gameParams = gameParams
+        print("this is the forced random value ", _forcedRandom)
         self.forced_random = _forcedRandom
 
     def getType(self):

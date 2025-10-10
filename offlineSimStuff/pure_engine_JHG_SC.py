@@ -207,7 +207,7 @@ def create_sim(total_players, scenario=None, chromosomes=None, group="", total_o
 
 def create_jhg_sim(num_humans, num_players, total_order, tokens_per_player, jhg_bot_type, addAgents):
     poverty_line = 0
-    forcedRandom = True # lets try this for fun
+    forcedRandom = False # lets try this for fun
     alpha = 0.2  # double check these magical fetchers when you get the chance actually.
     beta = 0.5
     give = 1.3
