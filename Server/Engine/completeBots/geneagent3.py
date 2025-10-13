@@ -220,7 +220,6 @@ class GeneAgent3(GeneAgentMixin, AbstractAgent):
 
     def setGameParams(self, gameParams, _forcedRandom):
         self.gameParams = gameParams
-        print("this is the forced random value ", _forcedRandom)
         self.forced_random = _forcedRandom
 
     def getType(self):
@@ -782,7 +781,6 @@ class GeneAgent3(GeneAgentMixin, AbstractAgent):
         # self.printT(player_idx, str(s_modified))
 
         toks = np.zeros(num_players, dtype=float)
-
         num_allocated = num_tokens
         if round_num == 0:
             if len(s_modified) == 1:
@@ -794,7 +792,6 @@ class GeneAgent3(GeneAgentMixin, AbstractAgent):
                     # while sel == player_idx:
                     #     sel = random.sample(s_modified, 1)[0]
                     # toks[sel] += 1
-
                     if self.forced_random:
                         v = self.getRand()
                         num = (v + (player_idx + 1)) % (len(s_modified) - 1)

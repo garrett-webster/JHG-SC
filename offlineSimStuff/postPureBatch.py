@@ -298,16 +298,7 @@ def loadPopulationFromFile(popSize, num_gene_pools, tokens_per_player):
     try:
         file_name = os.path.join("Server", "Engine", "botGenerations") # creates standard file path. we then append to this.
 
-        # file_name = os.path.join(file_name, "assassins_gen_175")  # trying to be better and mroe aggressive on group forming
         # file_name = os.path.join(file_name, "gen_199.csv") # JHG cab agents as used in the study
-        # file_name = os.path.join(file_name, "sc_jhg_gen_299.csv") # the smartest vanilla agents
-        # file_name = os.path.join(file_name, "w_kitties_gen_256.csv") # attempting to overcome cats
-        # file_name = os.path.join(file_name, "jhg_sc_w_one_cat.csv") # another attempt
-        # file_name = os.path.join(file_name, "convex2.csv") # this one should do well against the cats in both settings.
-        # file_name = os.path.join(file_name, "bestOfWorstConvex.csv")
-        # file_name = os.path.join(file_name, "backToBasics299.csv")
-        # file_name = os.path.join(file_name, "fullyDevelopedPureJHG.csv")
-        # file_name =  os.path.join(file_name, "MelissasGenes.csv.csv")
         file_name = os.path.join(file_name, "oneMoreTimeNowYall.csv")
 
         my_path = os.path.dirname(os.path.abspath(__file__))
@@ -342,7 +333,7 @@ def loadPopulationFromFile(popSize, num_gene_pools, tokens_per_player):
 
 
 def create_agents(num_players, new_list):
-    popSize = 100
+    popSize = 60
     num_gene_pools = 1
     tokens_per_player = 2
 

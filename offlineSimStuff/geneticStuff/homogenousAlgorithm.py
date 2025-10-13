@@ -465,22 +465,25 @@ def selectByFitness(thePopulation, popSize, _rank):
     mag = 0.0
     for i in range(popSize):
         if (_rank):
-            mag += thePopulation[i].relativeFitness
-            mag += (thePopulation[i].relativePopularity / 10) # attempt to scale these down to match utilty values
+            # mag += thePopulation[i].relativeFitness
+            # mag += (thePopulation[i].relativePopularity / 10) # attempt to scale these down to match utilty values
+            mag += (thePopulation[i].relativePopularity) # attempt to scale these down to match utilty values
 
         else:
-            mag += thePopulation[i].absoluteFitness
-            mag += (thePopulation[i].absolutePopularity / 10) # atempt to scale these down to match utility values.
+            # mag += thePopulation[i].absoluteFitness
+            # mag += (thePopulation[i].absolutePopularity / 10) # atempt to scale these down to match utility values.
+            mag += (thePopulation[i].absolutePopularity) # atempt to scale these down to match utility values.
+
     num = random.random()  # Returns float in [0.0, 1.0)
     if mag == 0: # if there is nothing going on, just uhh return a random number.
         return random.randint(0, popSize-1)
     sum = 0.0
     for i in range(popSize):
         if (_rank):
-            sum += thePopulation[i].relativeFitness / mag
+            # sum += thePopulation[i].relativeFitness / mag
             sum += thePopulation[i].relativePopularity / mag
         else:
-            sum += thePopulation[i].absoluteFitness / mag
+            # sum += thePopulation[i].absoluteFitness / mag
             sum += thePopulation[i].absolutePopularity / mag
 
         if num <= sum:
@@ -488,7 +491,7 @@ def selectByFitness(thePopulation, popSize, _rank):
 
     #print("uh no select, whatever happened ", num, " ", sum)
     # exit(1)
-
+    print("Uh somethign pooped the bed, this is wrong")
     return popSize - 1
 
 # once again, garbage collection in python is really nice.
