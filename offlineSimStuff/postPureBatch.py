@@ -59,7 +59,6 @@ def run_trial(agents, sc_sim: "Social_Choice_Sim", jhg_sim, round_list, num_cycl
             pops.append(jhg_sim.get_popularity())
 
         if sc_rounds:
-            print("IF this goes off I'm ending up on the news")
             old_influence_matrix = copy.copy(influence_matrix)
             influence_matrix, winning_vote = run_sc_stuff(sc_sim, jhg_sim, total_order, influence_matrix, curr_round, num_cycles)
             sc_sim.set_rounds(curr_sc_round) # ???
@@ -146,6 +145,8 @@ def run_jhg_stuff(jhg_engine, curr_round, agents, num_players, current_jhg_sim):
             # False
         )
     jhg_engine.play_round(transactions)  # thanks references
+
+    print("here are the treansactions \n", transactions)
 
     current_jhg_sim.T = transactions
     new_popularity = current_jhg_sim.sim.get_popularity()
@@ -299,7 +300,7 @@ def loadPopulationFromFile(popSize, num_gene_pools, tokens_per_player):
         file_name = os.path.join("Server", "Engine", "botGenerations") # creates standard file path. we then append to this.
 
         # file_name = os.path.join(file_name, "gen_199.csv") # JHG cab agents as used in the study
-        file_name = os.path.join(file_name, "oneMoreTimeNowYall.csv")
+        file_name = os.path.join(file_name, "justPulled.csv")
 
         my_path = os.path.dirname(os.path.abspath(__file__))
         my_path = os.path.abspath(os.path.join(my_path, "../"))  # go up 2 levels and resolve path
@@ -373,7 +374,7 @@ def create_agents(num_players, new_list):
 
     }
 
-    forcedRandom = False
+    forcedRandom = True
 
     for a in agents:
         a.setGameParams(game_params, forcedRandom)
@@ -393,7 +394,7 @@ if __name__ == "__main__":
 
     # various batch scenarios I keep on hand for reference.
     # jhg_games_per_sc_round = [4, 3, 3, 3, 3, 3, 3, 3, 3]
-    jhg_games_per_sc_round = ["J", 30]
+    jhg_games_per_sc_round = ["S", 30]
     ForcedRandom = False
 
     round_list = determine_rounds(jhg_games_per_sc_round)

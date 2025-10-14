@@ -199,6 +199,11 @@ class CompleteGrapher():
             ax = axes[current_axis]
             sc_rounds = range(0, len(utility_per_round[0])) # get the number of SC rounds, not players
 
+            transposed_matrix = [list(row) for row in zip(*utility_per_round)]
+            print("sum ", sum(transposed_matrix[-1]))
+            print("num players ", len(transposed_matrix[-1]))
+
+            print("this si the utiliyt per round ", transposed_matrix[-1])
             for i, player_scores in enumerate(utility_per_round):
                 # bot_type_name = "GENE BOT"
                 # alloc_type_name = "GEEN BOT"
