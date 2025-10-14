@@ -384,7 +384,7 @@ def write_generational_results(theGenePools, popSize, gen, agentsPerGame):
     # Get the absolute path to the directory containing this script
     script_dir = os.path.dirname(os.path.abspath(__file__))
     # Construct the full output directory path
-    output_dir = os.path.join(script_dir, "longerConvexResults", "theGenerations")
+    output_dir = os.path.join(script_dir, "oneMoreTimeNowY'all", "theGenerations")
     # Ensure output directory exists
     os.makedirs(output_dir, exist_ok=True)
     # Construct the filename path
