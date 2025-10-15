@@ -3,7 +3,8 @@ from Server.Engine.engine import JHGEngine
 from Server.JHGManager import JHG_simulator
 from Server.Engine.completeBots.geneagent3 import GeneAgent3
 from Server.Engine.completeBots.baseagent import AbstractAgent
-from Server.Engine.completeBots.projectCat import ProjectCat
+# from Server.Engine.completeBots.projectCat import ProjectCat
+from Server.Engine.completeBots.jakecat import JakeCAT
 from Server.OptionGenerators.generators import generator_factory # i don't like him
 from dataclasses import dataclass
 import random
@@ -384,7 +385,7 @@ def write_generational_results(theGenePools, popSize, gen, agentsPerGame):
     # Get the absolute path to the directory containing this script
     script_dir = os.path.dirname(os.path.abspath(__file__))
     # Construct the full output directory path
-    output_dir = os.path.join(script_dir, "oneMoreTimeNowY'all", "theGenerations")
+    output_dir = os.path.join(script_dir, "normalCatTime", "theGenerations")
     # Ensure output directory exists
     os.makedirs(output_dir, exist_ok=True)
     # Construct the filename path
@@ -543,7 +544,7 @@ if __name__ == "__main__":
 
     configured_players = []
     for i in range(num_kitties):
-        configured_players.append(ProjectCat())
+        configured_players.append(JakeCAT())
 
     # should initialize this fetcher
     theGenePools = [GeneAgent3("", numGeneGopies) for _ in range(popSize)] # don't let this be empty

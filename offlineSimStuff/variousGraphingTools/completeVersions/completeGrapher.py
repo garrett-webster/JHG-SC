@@ -200,10 +200,6 @@ class CompleteGrapher():
             sc_rounds = range(0, len(utility_per_round[0])) # get the number of SC rounds, not players
 
             transposed_matrix = [list(row) for row in zip(*utility_per_round)]
-            print("sum ", sum(transposed_matrix[-1]))
-            print("num players ", len(transposed_matrix[-1]))
-
-            print("this si the utiliyt per round ", transposed_matrix[-1])
             for i, player_scores in enumerate(utility_per_round):
                 # bot_type_name = "GENE BOT"
                 # alloc_type_name = "GEEN BOT"
@@ -216,20 +212,6 @@ class CompleteGrapher():
                 # community_idx = player_to_community.get(i, -1)
                 # dot_color = community_colors.get(community_idx, 'gray')
                 # ax.scatter(dot_x, dot_y, color=dot_color, s=40, edgecolors='black', zorder=5)
-
-            # x_fit = np.arange(1, len(avg_utility_per_round) + 1)
-            # y_vals = np.array(avg_utility_per_round)
-            #
-            # # Compute slope (m) assuming intercept is fixed at 10
-            # numerator = np.sum(x_fit * (y_vals - 10))
-            # denominator = np.sum(x_fit ** 2)
-            # m = numerator / denominator
-            #
-            # # Build fitted line
-            # y_fit = m * x_fit + 10
-            #
-            # # Plot it
-            # ax.plot(x_fit, y_fit, linestyle='--', color='red', linewidth=2, label=f'Line of Best Fit: y={m:.2f}x + 10')
 
             ax.plot(sc_rounds, avg_utility_per_round, color='black', linewidth=3, label='Avg')
             ax.set_title('Average Utility Over Time', loc="left")
