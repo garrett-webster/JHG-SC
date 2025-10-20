@@ -146,7 +146,6 @@ def run_jhg_stuff(jhg_engine, curr_round, agents, num_players, current_jhg_sim):
         )
     jhg_engine.play_round(transactions)  # thanks references
 
-    print("here are the treansactions \n", transactions)
 
     current_jhg_sim.T = transactions
     new_popularity = current_jhg_sim.sim.get_popularity()
@@ -300,7 +299,8 @@ def loadPopulationFromFile(popSize, num_gene_pools, tokens_per_player):
         file_name = os.path.join("Server", "Engine", "botGenerations") # creates standard file path. we then append to this.
 
         # file_name = os.path.join(file_name, "gen_199.csv") # JHG cab agents as used in the study
-        file_name = os.path.join(file_name, "justPulled.csv")
+        # file_name = os.path.join(file_name, "justPulled.csv")
+        file_name = os.path.join(file_name, "normalCatKiller.csv")
 
         my_path = os.path.dirname(os.path.abspath(__file__))
         my_path = os.path.abspath(os.path.join(my_path, "../"))  # go up 2 levels and resolve path
@@ -394,7 +394,7 @@ if __name__ == "__main__":
 
     # various batch scenarios I keep on hand for reference.
     # jhg_games_per_sc_round = [4, 3, 3, 3, 3, 3, 3, 3, 3]
-    jhg_games_per_sc_round = ["S", 30]
+    jhg_games_per_sc_round = ["J", 30]
     ForcedRandom = False
     enformce_majority = False
 

@@ -385,7 +385,7 @@ def write_generational_results(theGenePools, popSize, gen, agentsPerGame):
     # Get the absolute path to the directory containing this script
     script_dir = os.path.dirname(os.path.abspath(__file__))
     # Construct the full output directory path
-    output_dir = os.path.join(script_dir, "normalCatTime", "theGenerations")
+    output_dir = os.path.join(script_dir, "normalCats2", "theGenerations")
     # Ensure output directory exists
     os.makedirs(output_dir, exist_ok=True)
     # Construct the filename path
@@ -441,8 +441,12 @@ def evolvePopulationPairs(theGenePool_prev, popSize, numGeneCopies):
         ind2 = selectByFitness(theGenePool_prev, popSize, False)
 
         # the following was a fetching pain to translate over. it works but if it breaks I will have 0 idea of how to fix it. 5 stars.
+        minKeepIndex = 12
         gene_values = [] # holds the new genes
         for g in range(num_genes):
+            if g % minKeepIndex == 0: # if g is the min keep index
+                gene_values.append("0") # turns out this gene is better represented by other genes so we cut it out.
+                continue
             cycle = g // len(gene_keys)
             # we have 3 genes that have the same 33 repeating values. we iterate through all of them.
             # would probably be easier to just go through the list three times and adjust the keys as we go. however, if this works, I won't complain.
@@ -463,36 +467,33 @@ def evolvePopulationPairs(theGenePool_prev, popSize, numGeneCopies):
 # take in our population and put the best fetchers at the very top and the worst fetchers at the very bottom.
 # only problem is, what is
 def selectByFitness(thePopulation, popSize, _rank):
-    mag = 0.0
-    for i in range(popSize):
-        if (_rank):
-            # mag += thePopulation[i].relativeFitness
-            # mag += (thePopulation[i].relativePopularity / 10) # attempt to scale these down to match utilty values
-            mag += (thePopulation[i].relativePopularity) # attempt to scale these down to match utilty values
+    """
+    Roulette-wheel selection matching the Flutter (Dart) engine.
+    Chooses an index based on weighted probability proportional to
+    relativePopularity (if ranked) or absolutePopularity (otherwise).
+    """
 
-        else:
-            # mag += thePopulation[i].absoluteFitness
-            # mag += (thePopulation[i].absolutePopularity / 10) # atempt to scale these down to match utility values.
-            mag += (thePopulation[i].absolutePopularity) # atempt to scale these down to match utility values.
+    # get the magnitude in one go
+    total_weight = sum(
+        (p.relativePopularity if _rank else p.absolutePopularity)
+        for p in thePopulation
+    )
 
-    num = random.random()  # Returns float in [0.0, 1.0)
-    if mag == 0: # if there is nothing going on, just uhh return a random number.
-        return random.randint(0, popSize-1)
-    sum = 0.0
-    for i in range(popSize):
-        if (_rank):
-            # sum += thePopulation[i].relativeFitness / mag
-            sum += thePopulation[i].relativePopularity / mag
-        else:
-            # sum += thePopulation[i].absoluteFitness / mag
-            sum += thePopulation[i].absolutePopularity / mag
+    # Fallback: if all weights are zero, pick random agent
+    if total_weight <= 0.0:
+        return random.randint(0, popSize - 1)
 
-        if num <= sum:
+    # generate a random threshold
+    pick = random.random() * total_weight
+
+    cumulative = 0.0
+    for i, p in enumerate(thePopulation):
+        weight = p.relativePopularity if _rank else p.absolutePopularity
+        cumulative += weight
+        if pick <= cumulative: # how to decide where to return
             return i
 
-    #print("uh no select, whatever happened ", num, " ", sum)
-    # exit(1)
-    print("Uh somethign pooped the bed, this is wrong")
+    # Fallback for rounding edge cases
     return popSize - 1
 
 # once again, garbage collection in python is really nice.
@@ -634,9 +635,9 @@ if __name__ == "__main__":
             for i in range(agentsPerGame):
                 if theGenePools[plyrIdxs[i]].played_genes: # THANK GOODNESS I thought I was gonna have to assemble that from scratch.
                     theGenePools[plyrIdxs[i]].count += 1
-                    theGenePools[plyrIdxs[i]].absoluteFitness += ((pmetrics[i].avgUtility + pmetrics[i].endUtility) / 2.0) # ok buddy
+                    # theGenePools[plyrIdxs[i]].absoluteFitness += ((pmetrics[i].avgUtility + pmetrics[i].endUtility) / 2.0) # ok buddy
                     theGenePools[plyrIdxs[i]].absolutePopularity += ((pmetrics[i].avgPopularity + pmetrics[i].endPopularity) / 2.0)
-                    theGenePools[plyrIdxs[i]].relativeFitness += pmetrics[i].relUtility # this at least makes sense
+                    # theGenePools[plyrIdxs[i]].relativeFitness += pmetrics[i].relUtility # this at least makes sense
                     theGenePools[plyrIdxs[i]].relativePopularity += pmetrics[i].relPopularity # this also appears to make sense.
 
         print("this is the gen it thinks it is ", gen)

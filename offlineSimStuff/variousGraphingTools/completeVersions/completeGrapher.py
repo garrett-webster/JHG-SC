@@ -103,7 +103,6 @@ class CompleteGrapher():
         util_graph = avg_utility_per_round is not None and len(avg_utility_per_round) > 0
         num_graphs = int(pop_graph) + int(util_graph)
         num_graphs += 2 # param graph, num_graphs, influence graph
-        print('this is the ')
 
         community_colors = {}
         player_to_community = {}
@@ -159,11 +158,11 @@ class CompleteGrapher():
 
 
 
-        # color_library = {
-        #     -1: "red", # cat agents
-        #     0: "blue", # Gene3agnets and variants
-        #     1: "green", # humans
-        # }
+        color_library = {
+            -1: "red", # cat agents
+            0: "blue", # Gene3agnets and variants
+            1: "green", # humans
+        }
 
         if pop_graph:
             jhg_rounds = range(0, len(avg_pop_per_round))
@@ -174,8 +173,8 @@ class CompleteGrapher():
                 # label = f'P{i + 1} ({bot_type_name})'
                 # color = color_library[bot_types[i]]
                 label = f'P{i + 1}'
-                # ax.plot(jhg_rounds, player_scores, label=label, color=color)
-                ax.plot(jhg_rounds, player_scores, label=label)
+                # ax.plot(jhg_rounds, player_scores, label=label) # may
+                ax.plot(jhg_rounds, player_scores, label=label, color=color_library[bot_types[i]]) # may
                 # dot_y = player_scores[-1]
                 # dot_x = jhg_rounds[-1]
                 # community_idx = player_to_community.get(i, -1)
