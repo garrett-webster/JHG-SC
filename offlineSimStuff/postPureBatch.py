@@ -204,12 +204,12 @@ def peeps_to_total_order(peeps, total_order):
     return indexes
 
 
-def create_sim(total_players, scenario=None, chromosomes=None, group="", total_order=None, allocation_scenario=None, utility_per_player=3):
+def create_sim(total_players, scenario=None, chromosomes=None, group="", total_order=None, allocation_scenario=None, utility_per_player=3, enforce_majority=False):
     cycle = -1 # a negative cycle indicates to me that this is a test - that, or something is really really wrong.
     curr_round = -1
     num_causes = 3
     generator = generator_factory(2, total_players, 5, 10, -10, 3, None, None)
-    sc_sim = Social_Choice_Sim(total_players, num_causes, num_humans, generator, cycle, curr_round, chromosomes, scenario, group, total_order, allocation_scenario, utility_per_player)
+    sc_sim = Social_Choice_Sim(total_players, num_causes, num_humans, generator, cycle, curr_round, chromosomes, scenario, group, total_order, allocation_scenario, utility_per_player, enforce_majority)
     return sc_sim
 
 def create_jhg_sim(num_humans, num_players, total_order, tokens_per_player, jhg_bot_type, addAgents, new_agents, new_engine):
@@ -396,6 +396,7 @@ if __name__ == "__main__":
     # jhg_games_per_sc_round = [4, 3, 3, 3, 3, 3, 3, 3, 3]
     jhg_games_per_sc_round = ["S", 30]
     ForcedRandom = False
+    enformce_majority = False
 
     round_list = determine_rounds(jhg_games_per_sc_round)
     num_cycles = 3
@@ -461,7 +462,7 @@ if __name__ == "__main__":
         offset = num_rounds * attempt # for logging purposes, lets us know the relationship between the logger round and current round
         current_jhg_engine = create_jhg_engine(num_humans, num_players, total_order, tokens_per_player, jhg_bot_type, addAgents)
         current_jhg_sim = create_jhg_sim(num_humans, num_players, total_order, tokens_per_player, jhg_bot_type, addAgents, agents, current_jhg_engine)
-        current_sc_sim = create_sim(num_players, scenario, chromosome, group, total_order, allocation_bot_type, utility_per_player)
+        current_sc_sim = create_sim(num_players, scenario, chromosome, group, total_order, allocation_bot_type, utility_per_player, enformce_majority)
         current_sc_sim.bot_ovveride(agents) # tells the SC sim to make sure that it is using the same bots as the JHG by passing htem as a reference to both voting and allocation slots.
         round_logger.reset_up(current_jhg_sim, current_sc_sim)
         game_logger.resetup(current_jhg_sim, current_sc_sim)

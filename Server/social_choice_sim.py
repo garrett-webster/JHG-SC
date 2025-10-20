@@ -18,14 +18,14 @@ NUM_CAUSES = 3 # if its ever not this a LOT of math breaks, so just leave it be.
 
 class Social_Choice_Sim:
     def __init__(self, total_players, num_causes, num_humans, options_generator, cycle=0, round=0, chromosomes="",
-                 scenario="", group="", total_order=None, allocation_scenario="", utility_per_player=3):
+                 scenario="", group="", total_order=None, allocation_scenario="", utility_per_player=3, enforce_majority=False):
         self.options_generator = options_generator
         if total_order == None:  # generating it non server side
             self.total_order = self.create_total_order(total_players, num_humans)
         else:  # if created with server, spoon feed it.
             self.total_order = total_order
 
-        self.enforce_majority = False
+        self.enforce_majority = enforce_majority
         # just a bunch of base setters.
         self.utility_per_player = utility_per_player
         self.bot_index_dict = {}
@@ -657,6 +657,8 @@ class Social_Choice_Sim:
         avg_rise = (avg_utility_per_round[-1]-10) / actual_round_num
         num_rounds = actual_round_num
 
+        enforce_majority = self.enforce_majority
+
         total_data = {
             "cooperation_score": cooperation_score,
             "avg_rise": avg_rise,
@@ -668,6 +670,7 @@ class Social_Choice_Sim:
             "influence": influence,
             "utility_per_round": utility_per_round,
             "avg_utility_per_round": avg_utility_per_round,
+            "enforce_majority": enforce_majority,
         }
 
         #return cooperation_score, avg_rise, results, results_sums, num_rounds, sums_per_round, cv, influence, utility_per_round, avg_utility_per_round

@@ -37,10 +37,10 @@ class GameLogger():
         if sc_request:
             sc = self.game_data.get("SC_STUFF")
             (cooperation_score, avg_rise, results, results_sums, num_rounds, sums_per_round, cv, influence, utility_per_round,
-             avg_utility_per_round) = (self.extract_keys(sc, ["cooperation_score", "avg_rise", "results", "results_sums",
+             avg_utility_per_round, enforce_majority) = (self.extract_keys(sc, ["cooperation_score", "avg_rise", "results", "results_sums",
                                                               "num_rounds", "sums_per_round", "cv", "influence", "utility_per_round",
-                                                              "avg_utility_per_round"]))
-            return cooperation_score, avg_rise, results, results_sums, num_rounds, sums_per_round, cv, influence, utility_per_round, avg_utility_per_round
+                                                              "avg_utility_per_round", "enforce_majority"]))
+            return cooperation_score, avg_rise, results, results_sums, num_rounds, sums_per_round, cv, influence, utility_per_round, avg_utility_per_round, enforce_majority
 
         if jhg_request:
             jhg = self.game_data.get("JHG_STUFF")

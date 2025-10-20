@@ -39,10 +39,10 @@ class CompleteGrapher():
 
     def create_game_graphs_with_logger(self, game_logger):
         num_players, bot_types = game_logger.get_header()
-        cooperation_score, avg_rise, results, results_sums, num_rounds, sums_per_round, cv, influence, utility_per_round, average_utility_per_round = game_logger.get_game_data(True, False)
+        cooperation_score, avg_rise, results, results_sums, num_rounds, sums_per_round, cv, influence, utility_per_round, average_utility_per_round, enforce_majority = game_logger.get_game_data(True, False)
         b, pops, jhg_cv, jhg_influence, pop_per_round = game_logger.get_game_data(False, True)
         self.draw_two_long_graphs_simplified(num_players, cooperation_score, avg_rise, results, results_sums, num_rounds,
-                                             sums_per_round, cv, influence, utility_per_round, average_utility_per_round, b, pops, jhg_cv, jhg_influence, pop_per_round, bot_types)
+                                             sums_per_round, cv, influence, utility_per_round, average_utility_per_round, b, pops, jhg_cv, jhg_influence, pop_per_round, bot_types, enforce_majority)
 
     def create_sc_graphs(self, all_nodes, all_votes, winning_vote_list, current_options_matrix, types_list,
                          group, curr_round, influence_matrix, results_sums, results, peeps):
@@ -96,13 +96,13 @@ class CompleteGrapher():
 
 
     def draw_two_long_graphs_simplified(self, num_players, cooperation_score, avg_rise, results, results_sums, num_rounds,
-                                        sums_per_round, cv, influence, utility_per_round, avg_utility_per_round, b, pops, jhg_cv, jhg_influence, avg_pop_per_round, bot_types):
+                                        sums_per_round, cv, influence, utility_per_round, avg_utility_per_round, b, pops, jhg_cv, jhg_influence, avg_pop_per_round, bot_types, enforce_majority):
         # aight we might need to draw two different graphs, lets find out.
 
         pop_graph = avg_pop_per_round is not None and len(avg_pop_per_round) > 0
         util_graph = avg_utility_per_round is not None and len(avg_utility_per_round) > 0
         num_graphs = int(pop_graph) + int(util_graph)
-        num_graphs += 1 # influence graph always gets done\
+        num_graphs += 2 # param graph, num_graphs, influence graph
         print('this is the ')
 
         community_colors = {}
@@ -130,16 +130,40 @@ class CompleteGrapher():
 
 
         # Set up figure and axes
-        fig, axes = plt.subplots(1, num_graphs, figsize=(7 * num_graphs, 6))
-        if num_graphs == 1:
-            axes = [axes]  # Make it iterable
+        import matplotlib.gridspec as gridspec
+
+        fig = plt.figure(figsize=(7 * num_graphs, 6))
+        gs = gridspec.GridSpec(1, num_graphs, width_ratios=[0.3] + [1] * (num_graphs - 1))  # First one narrower
+
+        axes = [fig.add_subplot(gs[i]) for i in range(num_graphs)]
         current_axis = 0
 
-        color_library = {
-            -1: "red", # cat agents
-            0: "blue", # Gene3agnets and variants
-            1: "green", # humans
+        # SET UP PARAM GRAPH
+
+        params = {
+            "Enforce_Majority:": enforce_majority,
+            "bot_types \n": self.wrap_list(bot_types, items_per_line=4),
+            "Peep_constant:": 1,  # TODO: IMPLEMENT THE PEEP CONSTANT
+            "JGH_GAME:": pop_graph,
+            "SC_GAME:": util_graph,
+            "num_rounds:": num_rounds,
+            "num_players:": num_players,
         }
+
+        ax = axes[current_axis]
+        ax.axis('off')  # Hide the frame for a clean text panel
+        ax.text(0, 1.05, "Parameters", fontsize=14, fontweight='bold', va='bottom')
+        text_lines = [f"{k} {v}" for k, v in params.items()]
+        ax.text(0, 1, "\n".join(text_lines), va='top', ha='left', fontsize=12, family='monospace')
+        current_axis += 1
+
+
+
+        # color_library = {
+        #     -1: "red", # cat agents
+        #     0: "blue", # Gene3agnets and variants
+        #     1: "green", # humans
+        # }
 
         if pop_graph:
             jhg_rounds = range(0, len(avg_pop_per_round))
@@ -148,9 +172,10 @@ class CompleteGrapher():
             for i, player_scores in enumerate(pops):
                 # bot_type_name = "GENE BOT"
                 # label = f'P{i + 1} ({bot_type_name})'
-                color = color_library[bot_types[i]]
+                # color = color_library[bot_types[i]]
                 label = f'P{i + 1}'
-                ax.plot(jhg_rounds, player_scores, label=label, color=color)
+                # ax.plot(jhg_rounds, player_scores, label=label, color=color)
+                ax.plot(jhg_rounds, player_scores, label=label)
                 # dot_y = player_scores[-1]
                 # dot_x = jhg_rounds[-1]
                 # community_idx = player_to_community.get(i, -1)
@@ -204,9 +229,10 @@ class CompleteGrapher():
                 # bot_type_name = "GENE BOT"
                 # alloc_type_name = "GEEN BOT"
                 # label = f'P{i + 1} ({bot_type_name} {alloc_type_name})'
-                color = color_library[bot_types[i]]
+                # color = color_library[bot_types[i]]
                 label = f'P{i + 1}'
-                ax.plot(sc_rounds, player_scores, label=label, color=color)
+                # ax.plot(sc_rounds, player_scores, label=label, color=color)
+                ax.plot(sc_rounds, player_scores, label=label)
                 # dot_y = player_scores[-1]
                 # dot_x = sc_rounds[-1]
                 # community_idx = player_to_community.get(i, -1)
@@ -250,6 +276,17 @@ class CompleteGrapher():
             ax.text(
                 0.1, -0.15,  # Left bottom of axis
                 f"CoV: {cv:.2f}",
+                transform=ax.transAxes,
+                ha="center",
+                va="top",
+                fontsize=12,
+                color="black",
+                weight="bold",
+            )
+
+            ax.text(
+                0.4, -0.15,  # Left bottom of axis
+                f"force maj?: {enforce_majority}",
                 transform=ax.transAxes,
                 ha="center",
                 va="top",
@@ -631,6 +668,11 @@ class CompleteGrapher():
         #     weight="bold",
         # )
 
+    def wrap_list(self, lst, items_per_line=5):
+        return '\n'.join(
+            ', '.join(str(x) for x in lst[i:i + items_per_line])
+            for i in range(0, len(lst), items_per_line)
+        )
 
 
 
