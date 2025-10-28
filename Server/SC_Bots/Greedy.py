@@ -25,3 +25,5 @@ class GreedyBot(AbstractVotingBot):
         # actually just being able to abstain is a good idea. that way it doesn't muck with anything else.
 
 
+
+

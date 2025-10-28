@@ -5,7 +5,7 @@ import glob
 from collections import defaultdict
 
 
-data_dir = "MelissasGenes.csv"
+data_dir = "../../../legacy/old_bot_generations/MelissasGenes.csv"
 
 generation_stats = {}
 
@@ -14,7 +14,7 @@ if __name__ == "__main__":
     num_genes_new = 33
     num_genes_old = 40
     num_pools = 3
-    file_path = r"C:\Users\Sean Smith\Documents\GitHub\JHG-SC\Server\Engine\botGenerations\MelissasGenes.csv"
+    file_path = r"/legacy/old_bot_generations/MelissasGenes.csv"
     all_new_genes = []
     with open(file_path, newline='') as csvfile:
         reader = csv.reader(csvfile)

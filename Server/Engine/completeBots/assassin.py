@@ -29,6 +29,9 @@ class AssassinAgent(AbstractAgent):
                 taxes[p_id] = data.get('taxes', 0.)
         return taxes
 
+    def setGameParams(self, gameParams, _forcedRandom):
+        pass # doesn't actually do anything, I just need it to do nothing.
+
     def play_round(self, player_idx, round_num, recieved, popularities, influence, extra_data):
         self.blackboard.scribe(f'recieved_{round_num}', recieved)
         self.blackboard.scribe(f'popularities_{round_num}', popularities)

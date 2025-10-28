@@ -115,10 +115,13 @@ def playGame(agents, numPlayers, numRounds, gener, gamer, initialPopularities, p
     pmetrics = [PopularityMetrics(avePop=0, endPop=0, relPop=0) for _ in range(numPlayers)]
     # actually I can skip the next step because its just setting it up, yay for python one line loops.
 
-    extra_data = {} # literally no clue as to why this is useful, but filling it with None seems to do the trick.
-    for player in range(numPlayers): # could help maybe.
-        extra_data[player] = None
+    extra_data = {
+        i: {
+            j: None for j in range(numPlayers)
+        } for i in range(numPlayers)
+    }
 
+    print("here is the extra data ", extra_data)
     # create a new JHG sim, so everything happens within the same sim
     jhg_sim = JHGEngine(alpha, beta, give, keep, steal, numPlayers, base_pop, povertyLine)
     for r in range(numRounds):
@@ -126,7 +129,9 @@ def playGame(agents, numPlayers, numRounds, gener, gamer, initialPopularities, p
             for j in range(numPlayers):
                 received[j] = np.array(jhg_sim.T[r][j][i]) # ???
             #agents[i].play_round(numPlayers, numToknes, i, r, received, jhg_sim.P[r], jhg_sim.I[r], transactions[i])
-            transactions[i] = agents[i].play_round(i, r, received, jhg_sim.P[r], jhg_sim.I[r], transactions[i]) # ?? still don't know what the "extra data" is. might be transcations?
+
+            # player_idx, round_num, received, popularities, influence, extra_data, extra_flag=False
+            transactions[i] = agents[i].play_round(i, r, received, jhg_sim.P[r], jhg_sim.I[r], extra_data) # ?? still don't know what the "extra data" is. might be transcations?
         jhg_sim.apply_transaction(transactions) # applies the round, this is where we learn
 
         for i in range(numPlayers): # how much have we increased overall and in this round
@@ -158,7 +163,7 @@ def write_generational_results(theGenePools, popSize, gen, agentsPerGame):
     sorted_agents = sorted(theGenePools, key=lambda agent: agent.absoluteFitness, reverse=True)
 
     # Ensure output directory exists
-    output_dir = "../Results/theGenerations"
+    output_dir = "../PureStuff/theGenerations"
     os.makedirs(output_dir, exist_ok=True)
     filename = os.path.join(output_dir, f"gen_{gen}.csv")
 
@@ -280,7 +285,7 @@ if __name__ == "__main__":
 
 
     # should initialize this fetcher
-    theGenePools = [GeneAgent3("", numGeneGopies, tokens_per_player) for _ in range(popSize)] # don't let this be empty
+    theGenePools = [GeneAgent3("", numGeneGopies) for _ in range(popSize)] # don't let this be empty
 
     numPlayers = agentsPerGame + 0 # could put gocnifutred players.size but that si currently empty and I couldn't care less.
     maxPlayers = numPlayers

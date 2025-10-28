@@ -69,6 +69,7 @@ class GeneAgent3(GeneAgentMixin, AbstractAgent):
                 self.genes_long.append(gene_set)
         else:
             # read geneStr to set up the genotype
+            # print("this is the geneStr we are passing in ", geneStr)
             words = geneStr.split("_")
             # Change on May 12
             # Change on Sep 21

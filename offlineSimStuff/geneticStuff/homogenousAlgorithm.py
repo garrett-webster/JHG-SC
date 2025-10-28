@@ -428,51 +428,31 @@ def mutateIt(gene):
 
 # takes in a gene pool, our popsize and the number of copies and proceeds to evolve all of the pairs.
 def evolvePopulationPairs(theGenePool_prev, popSize, numGeneCopies):
-    genes_dict = theGenePool_prev[0].genes_long[0]  # assume [dict]
-    gene_keys = list(genes_dict.keys()) # just easier this way
-    num_genes = len(gene_keys) * 1 # cycle through it 3 times, one for each one  # one only this time
-    # represents the amount we will have to iterate through or something.
-    # problem - you need to generate a list 3 times the length so we can put it all in there. trhat way you can have 3 copies. give it another whirl on monday.
+    theGenePool = [None] * popSize
+    gene_keys = list(theGenePool_prev[0].genes_long[0].keys())
+    minKeepIndex = 12
 
-    theGenePool = [GeneAgent3("", numGeneCopies) for _ in range(popSize)] #initalize empty gene pool.
-
-    for i in range(popSize): # for EVERY fetcher
+    for i in range(popSize):
         ind1 = selectByFitness(theGenePool_prev, popSize, True) if i < (popSize / 5) else selectByFitness(theGenePool_prev, popSize, False)
         ind2 = selectByFitness(theGenePool_prev, popSize, False)
 
-        # the following was a fetching pain to translate over. it works but if it breaks I will have 0 idea of how to fix it. 5 stars.
-        minKeepIndex = 12
-        gene_values = [] # holds the new genes
-        for g in range(num_genes):
-            if g % minKeepIndex == 0: # if g is the min keep index
-                gene_values.append("0") # turns out this gene is better represented by other genes so we cut it out.
-                continue
-            cycle = g // len(gene_keys)
-            # we have 3 genes that have the same 33 repeating values. we iterate through all of them.
-            # would probably be easier to just go through the list three times and adjust the keys as we go. however, if this works, I won't complain.
-            new_g = g - (len(gene_keys) * cycle) # this should allow it to be new and not have any carry over issues.
-            key = gene_keys[new_g]
-            selected_gene = (
-                mutateIt(theGenePool_prev[ind1].genes_long[cycle][key])
-                if random.randint(0, 1) == 0
-                else mutateIt(theGenePool_prev[ind2].genes_long[cycle][key])
-            )
-            gene_values.append(str(selected_gene))
+        gene_values = []
+        for gene, key in enumerate(gene_keys):
+            if gene % minKeepIndex == 0:
+                gene_values.append("0")
+            else:
+                gene1 = theGenePool_prev[ind1].genes_long[0][key]
+                gene2 = theGenePool_prev[ind2].genes_long[0][key]
+                selected_gene = mutateIt(gene1) if random.randint(0,1) == 0 else mutateIt(gene2)
+                gene_values.append(str(selected_gene))
+            geneStr = "gene_" + "_".join(gene_values)
+            theGenePool[i] = GeneAgent3(geneStr, 1)
 
-        geneStr = "gene_" + "_".join(gene_values) # reassembles the genes
-        theGenePool[i] = GeneAgent3(geneStr, numGeneCopies) # creates a new agent at that index and puts it back in the gene pool.
-
-    return theGenePool # puts back the new gene pool to be played with again.
+    return theGenePool
 
 # take in our population and put the best fetchers at the very top and the worst fetchers at the very bottom.
 # only problem is, what is
 def selectByFitness(thePopulation, popSize, _rank):
-    """
-    Roulette-wheel selection matching the Flutter (Dart) engine.
-    Chooses an index based on weighted probability proportional to
-    relativePopularity (if ranked) or absolutePopularity (otherwise).
-    """
-
     # get the magnitude in one go
     total_weight = sum(
         (p.relativePopularity if _rank else p.absolutePopularity)
@@ -549,21 +529,18 @@ if __name__ == "__main__":
 
     # should initialize this fetcher
     theGenePools = [GeneAgent3("", numGeneGopies) for _ in range(popSize)] # don't let this be empty
+    # when the agents are handed an empty string, they go ahead and randomize it for me. don't know why thats changed between the two.
+
 
     numPlayers = agentsPerGame + len(configured_players) # could put gocnifutred players.size but that si currently empty and I couldn't care less.
     # maxPlayers = numPlayers + len(configured_players)
 
     plyrIdxs = [0 for _ in range(numPlayers)]
     possible_init_pops = ["equal", "random", "step", "power", "highlow"]
-    initUtilities = [0.0 for _ in range(numPlayers)]
-    initRelativeUtilities = [0.0 for _ in range(numPlayers)]
+    # initUtilities = [0.0 for _ in range(numPlayers)]
+    # initRelativeUtilities = [0.0 for _ in range(numPlayers)]
     agents = [AbstractAgent() for _ in range(popSize)]  # the fetchers we will be training
 
-    # lets let these guys run for a little longer, A full 30 rounds as seen in the original paper might be a good place to start.
-    # jhg_games_per_round = [4,3,3,3,3,3] # just give me an easy place to start.
-    # jhg_games_per_round = [4,3,3,3,3] # just give me an easy place to start.
-    # jhg_games_per_round = [2,2,2]
-    # jhg_games_per_round = ["S", 10]
     jhg_games_per_round = ["J", 30]
     rounds_list = determine_rounds(jhg_games_per_round)
     mxPlayers = numPlayers
@@ -580,8 +557,9 @@ if __name__ == "__main__":
                 print_game = True
             # print_game = True
 
-            for i in range(agentsPerGame): # wait is that it???
-                plyrIdxs[i] = game % popSize # trying with modulo pop size to make sure that we dont' get any out of bounds errors
+            # time to pick an individual frfom the gene poosl
+            for i in range(agentsPerGame):
+                plyrIdxs[i] = game # hope for the best IG.
                 agents[i] = theGenePools[plyrIdxs[i]] # YIPEEE
 
             # not adding in the configured players yet, leave that alone for now.
@@ -598,7 +576,9 @@ if __name__ == "__main__":
             # this should be all 10's after the first run
             # should also point out that it never gets used -- wanted for models with different starting points.
             # not currently implemented and its not SUPER interesting to me.
-            initUtilities = definteInitialUtility(possible_init_pops[sel], numPlayers, initUtilities)
+            # initUtilities = definteInitialUtility(possible_init_pops[sel], numPlayers, initUtilities)
+            initUtilities = [10 for _ in range(numPlayers)]
+            initRelativeUtilities = [0 for _ in range(numPlayers)] # just to get something down.
 
             s = 0
             for i in range(numPlayers):
@@ -635,10 +615,10 @@ if __name__ == "__main__":
             for i in range(agentsPerGame):
                 if theGenePools[plyrIdxs[i]].played_genes: # THANK GOODNESS I thought I was gonna have to assemble that from scratch.
                     theGenePools[plyrIdxs[i]].count += 1
-                    # theGenePools[plyrIdxs[i]].absoluteFitness += ((pmetrics[i].avgUtility + pmetrics[i].endUtility) / 2.0) # ok buddy
                     theGenePools[plyrIdxs[i]].absolutePopularity += ((pmetrics[i].avgPopularity + pmetrics[i].endPopularity) / 2.0)
-                    # theGenePools[plyrIdxs[i]].relativeFitness += pmetrics[i].relUtility # this at least makes sense
                     theGenePools[plyrIdxs[i]].relativePopularity += pmetrics[i].relPopularity # this also appears to make sense.
+                    # theGenePools[plyrIdxs[i]].absoluteFitness += ((pmetrics[i].avgUtility + pmetrics[i].endUtility) / 2.0) # ok buddy
+                    # theGenePools[plyrIdxs[i]].relativeFitness += pmetrics[i].relUtility # this at least makes sense
 
         print("this is the gen it thinks it is ", gen)
         average_pops = sum(list_non_cat_pops) / len(list_non_cat_pops)

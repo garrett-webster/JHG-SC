@@ -6,12 +6,14 @@ import numpy as np
 import os
 
 from Server.Engine.completeBots.geneagent3 import GeneAgent3
+from Server.Engine.completeBots.basicGeneAgent3 import BasicGeneAgent3 # this one can't play SC games.
 from Server.Engine.completeBots.completeSocialWelfare import SocialWelfare
 from Server.Engine.completeBots.humanagent import HumanAgent
 from Server.Engine.completeBots.jakecat import JakeCAT
 from Server.Engine.completeBots.improvedJakeCate import ImprovedJakeCat
 from Server.Engine.completeBots.projectCat import ProjectCat
 from Server.Engine.completeBots.antiCat import AntiCat
+
 from Server.Node import Node
 from Server.OptionGenerators.options_creation import generate_two_plus_one_groups
 NUM_CAUSES = 3 # if its ever not this a LOT of math breaks, so just leave it be.
@@ -505,7 +507,7 @@ class Social_Choice_Sim:
         popSize = 60
         player_idxs = list(np.arange(0, num_agents))
         # file_name = r"Engine\botGenerations\assassins_gen_175.csv"
-        file_name = os.path.join("Engine", "botGenerations", "assassins_gen_175.csv")
+        file_name = os.path.join("Engine", "botGenerations", "gen_199.csv")
 
 
         # file_name = r"Engine\botGenerations\sc_jhg_gen_299.csv"  # # JHG_SC agnets I trained.

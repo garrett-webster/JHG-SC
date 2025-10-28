@@ -231,7 +231,8 @@ class CompleteGrapher():
                 # color = color_library[bot_types[i]]
                 label = f'P{i + 1}'
                 # ax.plot(sc_rounds, player_scores, label=label, color=color)
-                ax.plot(sc_rounds, player_scores, label=label)
+                # ax.plot(jhg_rounds, player_scores, label=label, color=color_library[bot_types[i]])  # may
+                ax.plot(sc_rounds, player_scores, label=label, color=color_library[bot_types[i]])
                 # dot_y = player_scores[-1]
                 # dot_x = sc_rounds[-1]
                 # community_idx = player_to_community.get(i, -1)

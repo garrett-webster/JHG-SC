@@ -144,6 +144,7 @@ def run_jhg_stuff(jhg_engine, curr_round, agents, num_players, current_jhg_sim):
             jhg_engine.get_extra_data(i),
             # False
         )
+    print("here are the transactinos \n", transactions)
     jhg_engine.play_round(transactions)  # thanks references
 
 
@@ -248,10 +249,6 @@ def create_jhg_engine(num_humans, num_players, total_order, tokens_per_player, j
 
     }
 
-    for a in agents:
-        a.setGameParams(game_params, forcedRandom)
-
-
     jhg_engine = GameSimulator(game_params)
     return jhg_engine
 
@@ -300,7 +297,8 @@ def loadPopulationFromFile(popSize, num_gene_pools, tokens_per_player):
 
         # file_name = os.path.join(file_name, "gen_199.csv") # JHG cab agents as used in the study
         # file_name = os.path.join(file_name, "justPulled.csv")
-        file_name = os.path.join(file_name, "normalCatKiller.csv")
+        # file_name = os.path.join(file_name, "modifiedAlgorithm3.csv")
+        file_name = os.path.join(file_name, "homogenousCatKillers.csv")
 
         my_path = os.path.dirname(os.path.abspath(__file__))
         my_path = os.path.abspath(os.path.join(my_path, "../"))  # go up 2 levels and resolve path
@@ -325,8 +323,8 @@ def loadPopulationFromFile(popSize, num_gene_pools, tokens_per_player):
         thePopulation.append(GeneAgent3(words[0], num_gene_pools))
         # thePopulation.append(BasicGeneAgent3(words[0], num_gene_pools))
         thePopulation[i].count = float(words[1])
-        thePopulation[i].relativeFitness = float(words[2])
-        thePopulation[i].absoluteFitness = float(words[3])
+        # thePopulation[i].relativeFitness = float(words[2])
+        # thePopulation[i].absoluteFitness = float(words[3][0])
 
     fp.close()
 
@@ -334,7 +332,7 @@ def loadPopulationFromFile(popSize, num_gene_pools, tokens_per_player):
 
 
 def create_agents(num_players, new_list):
-    popSize = 60
+    popSize = 100
     num_gene_pools = 1
     tokens_per_player = 2
 
@@ -394,9 +392,9 @@ if __name__ == "__main__":
 
     # various batch scenarios I keep on hand for reference.
     # jhg_games_per_sc_round = [4, 3, 3, 3, 3, 3, 3, 3, 3]
-    jhg_games_per_sc_round = ["J", 30]
+    jhg_games_per_sc_round = ["S", 30]
     ForcedRandom = False
-    enformce_majority = False
+    enformce_majority = True
 
     round_list = determine_rounds(jhg_games_per_sc_round)
     num_cycles = 3
@@ -417,7 +415,7 @@ if __name__ == "__main__":
     allocation_bot_type = "allocations_scenarios/random"
     jhg_bot_type = 0 # 0 is gene bots, 2 is social welfare and 3 is random. 4 is the new social welfare that I am developing that is just a hair smarter.
 
-    num_attempts = 5 # number of batches to do.
+    num_attempts = 1 # number of batches to do.
     num_rounds = sum(jhg_games_per_sc_round) if len(jhg_games_per_sc_round) > 2 else jhg_games_per_sc_round[-1] # if its a list, len of list. else, grab the second identifier
 
     file_name = os.path.join("..", "Server", "Engine", "scenarios", "workingDirectory")
