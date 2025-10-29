@@ -38,11 +38,11 @@ class CompleteGrapher():
 
 
     def create_game_graphs_with_logger(self, game_logger):
-        num_players, bot_types = game_logger.get_header()
+        num_players, bot_types, peep_constant = game_logger.get_header()
         cooperation_score, avg_rise, results, results_sums, num_rounds, sums_per_round, cv, influence, utility_per_round, average_utility_per_round, enforce_majority = game_logger.get_game_data(True, False)
         b, pops, jhg_cv, jhg_influence, pop_per_round = game_logger.get_game_data(False, True)
         self.draw_two_long_graphs_simplified(num_players, cooperation_score, avg_rise, results, results_sums, num_rounds,
-                                             sums_per_round, cv, influence, utility_per_round, average_utility_per_round, b, pops, jhg_cv, jhg_influence, pop_per_round, bot_types, enforce_majority)
+                                             sums_per_round, cv, influence, utility_per_round, average_utility_per_round, b, pops, jhg_cv, jhg_influence, pop_per_round, bot_types, enforce_majority, peep_constant)
 
     def create_sc_graphs(self, all_nodes, all_votes, winning_vote_list, current_options_matrix, types_list,
                          group, curr_round, influence_matrix, results_sums, results, peeps):
@@ -96,7 +96,7 @@ class CompleteGrapher():
 
 
     def draw_two_long_graphs_simplified(self, num_players, cooperation_score, avg_rise, results, results_sums, num_rounds,
-                                        sums_per_round, cv, influence, utility_per_round, avg_utility_per_round, b, pops, jhg_cv, jhg_influence, avg_pop_per_round, bot_types, enforce_majority):
+                                        sums_per_round, cv, influence, utility_per_round, avg_utility_per_round, b, pops, jhg_cv, jhg_influence, avg_pop_per_round, bot_types, enforce_majority, peep_constant):
         # aight we might need to draw two different graphs, lets find out.
 
         pop_graph = avg_pop_per_round is not None and len(avg_pop_per_round) > 0
@@ -142,7 +142,7 @@ class CompleteGrapher():
         params = {
             "Enforce_Majority:": enforce_majority,
             "bot_types \n": self.wrap_list(bot_types, items_per_line=4),
-            "Peep_constant:": 1,  # TODO: IMPLEMENT THE PEEP CONSTANT
+            "Peep_constant:": peep_constant,
             "JGH_GAME:": pop_graph,
             "SC_GAME:": util_graph,
             "num_rounds:": num_rounds,
