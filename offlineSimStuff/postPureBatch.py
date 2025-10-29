@@ -22,7 +22,7 @@ from offlineSimStuff.variousGraphingTools.groupStuff.groupLogger import GroupLog
 from offlineSimStuff.variousGraphingTools.completeVersions.completeGrapher import CompleteGrapher
 from offlineSimStuff.variousGraphingTools.groupStuff.groupGrapher import GroupGrapher
 from Server.Engine.completeBots.projectCat import ProjectCat
-
+from Server.Engine.completeBots.improvedJakeCate import ImprovedJakeCat
 
 # import random
 #
@@ -295,16 +295,11 @@ def determine_rounds(jhg_rounds_per_sc_game_list):
 
     return new_list
 
-def loadPopulationFromFile(popSize, num_gene_pools, tokens_per_player):
+def loadPopulationFromFile(popSize, num_gene_pools, agent_directory_name):
     fnombre = "Kill me"
     try:
         file_name = os.path.join("Server", "Engine", "botGenerations") # creates standard file path. we then append to this.
-
-        # file_name = os.path.join(file_name, "gen_199.csv") # JHG cab agents as used in the study
-        # file_name = os.path.join(file_name, "justPulled.csv")
-        # file_name = os.path.join(file_name, "modifiedAlgorithm3.csv")
-        # file_name = os.path.join(file_name, "homogenousCatKillers.csv")
-        file_name = os.path.join(file_name, "heterogenousCatKillers.csv")
+        file_name = os.path.join(file_name, agent_directory_name)
 
         my_path = os.path.dirname(os.path.abspath(__file__))
         my_path = os.path.abspath(os.path.join(my_path, "../"))  # go up 2 levels and resolve path
@@ -337,12 +332,12 @@ def loadPopulationFromFile(popSize, num_gene_pools, tokens_per_player):
     return thePopulation
 
 
-def create_agents(num_players, new_list):
+def create_agents(num_players, new_list, agent_directory_name):
     popSize = 100
     num_gene_pools = 1
     tokens_per_player = 2
 
-    theGenePools = loadPopulationFromFile(popSize, num_gene_pools, tokens_per_player)  # this gets us our fetcher
+    theGenePools = loadPopulationFromFile(popSize, num_gene_pools, agent_directory_name)  # this gets us our fetcher
 
     initial_pops = [100 for _ in range(num_players)]
 
@@ -350,8 +345,12 @@ def create_agents(num_players, new_list):
     for i in range(0, num_players-len(new_list)):
         plyrs.append(theGenePools[i])  # just add the first guys and go form there
 
-    for i in range(0, len(new_list)):
-        plyrs.append(ProjectCat())
+    for i in new_list:
+        if i == -1:
+            plyrs.append(ImprovedJakeCat())
+        if i == -2:
+            plyrs.append(ProjectCat())
+
 
     agents = np.array(plyrs)
     players = [*agents]
@@ -433,22 +432,31 @@ if __name__ == "__main__":
     fp = open(addAgents, "r")
 
     for line in fp:
-        if line.startswith("Kitty"):
+        if line.startswith("OldKitty"):
             new_list.append(-1)
-        if line.startswith("SocialWelfare"):
+        if line.startswith("NewKitty"):
             new_list.append(-2)
+        if line.startswith("SocialWelfare"):
+            new_list.append(-3)
     num_vanilla_bots = num_players - num_humans - len(new_list)
 
 
     bot_types = [jhg_bot_type for _ in range(num_vanilla_bots)]
     bot_types += new_list
 
+    # file_name = os.path.join(file_name, "gen_199.csv") # JHG cab agents as used in the study
+    # file_name = os.path.join(file_name, "justPulled.csv")
+    # file_name = os.path.join(file_name, "modifiedAlgorithm3.csv")
+    # file_name = os.path.join(file_name, "homogenousCatKillers.csv")
+    # file_name = os.path.join(file_name, "heterogenousCatKillers.csv")
+    # file_name = os.path.join(file_name, "homoNewCats.csv")
+    agent_directory_name = "newHomoCats.csv"
 
 
     utility_to_log = []
     popularity_to_log = []
 
-    agents = create_agents(num_players, new_list)
+    agents = create_agents(num_players, new_list, agent_directory_name)
     pops = []
 
 

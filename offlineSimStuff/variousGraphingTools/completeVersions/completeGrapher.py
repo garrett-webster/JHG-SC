@@ -159,7 +159,8 @@ class CompleteGrapher():
 
 
         color_library = {
-            -1: "red", # cat agents
+            -2: "purple", # my improved(?) cat agents
+            -1: "red", # standard cat agents
             0: "blue", # Gene3agnets and variants
             1: "green", # humans
         }
