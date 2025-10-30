@@ -66,7 +66,7 @@ def write_generational_results(theGenePools, popSize, gen):
     # Get the absolute path to the directory containing this script
     script_dir = os.path.dirname(os.path.abspath(__file__))
     # Construct the full output directory path
-    output_dir = os.path.join(script_dir, "IDEK", "theGenerations")
+    output_dir = os.path.join(script_dir, "Test2", "theGenerations")
     # Ensure output directory exists
     os.makedirs(output_dir, exist_ok=True)
     # Construct the filename path
@@ -210,7 +210,7 @@ def run_jhg_stuff(jhg_engine, round, agents, numAgents):
 def create_jhg_engine(agents):
     num_players = len(agents)
     poverty_line = 0
-    forcedRandom = True  # replicable.
+    forcedRandom = True  # replicable. # THIS SHOULD BE FALSE UNDER NORMAL TESTING.
 
     alpha_min, alpha_max = 0.20, 0.20
     beta_min, beta_max = 0.5, 1.0
@@ -251,7 +251,16 @@ def extractGene(gene_dict):
 
 # something about pickling, IDK what.
 def run_game_helper(args):
-    return run_game(*args)
+    game_idx, gene, numGeneCopies, agentsPerGame, roundsPerGame, folder, extraAgents, gen_idx = args
+
+    seed = compute_game_seed(GLOBAL_SEED, gen_idx, game_idx)
+    random.seed(seed)
+    np.random.seed(seed)
+
+    return run_game(game_idx, gene, numGeneCopies, agentsPerGame, roundsPerGame, folder, extraAgents)
+
+def compute_game_seed(global_seed, generation_idx, game_idx):
+    return global_seed + generation_idx * 100 + game_idx
 
 # here we just changed the arguments a bit, thats literally it.
 def playGame(theGene, agents, agentsPerGame, numExtraAgents, roundsPerGame, gen, game):
@@ -293,6 +302,10 @@ def getPmetrics(game, theGene, jhg_engine, agents, agentsPerGame, numExtraAgents
 
 # run da game
 def run_game(game_idx, gene, numGeneCopies, agentsPerGame, roundsPerGame, folder, extraAgents):
+    # freeze the seed
+    random.seed(GLOBAL_SEED)
+    np.random.seed(GLOBAL_SEED)
+
     # Generate agents sharing the same gene
     agents = [GeneAgent3(gene, numGeneCopies) for _ in range(agentsPerGame)]
     agents.extend(extraAgents)
@@ -335,7 +348,7 @@ def evolve(popSize, numGeneCopies, startIndex, numGens, gamesPerGen, agentsPerGa
 
 
         args_list = [
-            (i, genes_for_games[i], numGeneCopies, agentsPerGame, roundsPerGame, folder, extraAgents)
+            (i, genes_for_games[i], numGeneCopies, agentsPerGame, roundsPerGame, folder, extraAgents, gen)
             for i in range(gamesPerGen)
         ]
 
@@ -345,7 +358,6 @@ def evolve(popSize, numGeneCopies, startIndex, numGens, gamesPerGen, agentsPerGa
 
         # flatten metrics into something that I can actually use
         all_metrics = list(itertools.chain.from_iterable(all_metrics_nested))
-
         # get everything PER AGENT bc that makes more sense in this context. this includes the absolute fitnesses and counts.
         agg = defaultdict(lambda: {"absoluteFitness": 0.0, "count": 0})
         for m in all_metrics:
@@ -372,7 +384,7 @@ def evolve(popSize, numGeneCopies, startIndex, numGens, gamesPerGen, agentsPerGa
 
         # Sort by absolute fitness
         theGenePools = sorted(theGenePools, key=lambda g: g.absoluteFitness)
-
+        print("here are the gene pools ", theGenePools)
         # Save results
         write_generational_results(theGenePools, popSize, gen)
 
@@ -380,9 +392,17 @@ def evolve(popSize, numGeneCopies, startIndex, numGens, gamesPerGen, agentsPerGa
         theGenePoolsOld = theGenePools
         theGenePools = evolvePopulationPairs(theGenePoolsOld, popSize, numGeneCopies)
 
+GLOBAL_SEED = 42 # global little guy
 
 if __name__ == "__main__":
     print("We start here ")
+
+    # freeze the seed
+    random.seed(GLOBAL_SEED)
+    np.random.seed(GLOBAL_SEED)
+
+
+
 
     cpu_count = os.cpu_count() # gets the the number of logical cores that we possess.
     max_workers = max(1, os.cpu_count() - 2) # save a couple of cores for other processes, don't want to overwhelm.
