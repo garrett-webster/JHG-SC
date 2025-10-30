@@ -19,8 +19,7 @@ from Server.OptionGenerators.options_creation import generate_two_plus_one_group
 NUM_CAUSES = 3 # if its ever not this a LOT of math breaks, so just leave it be.
 
 class Social_Choice_Sim:
-    def __init__(self, total_players, num_causes, num_humans, options_generator, cycle=0, round=0, chromosomes="",
-                 scenario="", group="", total_order=None, allocation_scenario="", utility_per_player=3, enforce_majority=False):
+    def __init__(self, total_players, num_causes, num_humans, options_generator, cycle, curr_round, total_order, enforce_majority):
         self.options_generator = options_generator
         if total_order == None:  # generating it non server side
             self.total_order = self.create_total_order(total_players, num_humans)
@@ -29,14 +28,14 @@ class Social_Choice_Sim:
 
         self.enforce_majority = enforce_majority
         # just a bunch of base setters.
-        self.utility_per_player = utility_per_player
+        self.utility_per_player = 3 # not a fantastic reason to toggle this. might be worth normalizing at some poi8nt back here.
         self.bot_index_dict = {}
         self.total_players = total_players
         self.num_humans = num_humans
         self.num_bots = total_players - num_humans
         self.num_causes = num_causes
         self.cycle = cycle  # set these for graphing and logging purposes, we usually set these round by round and cycle by cycle for logging purposes.
-        self.round = round
+        self.round = curr_round
         self.rad = 5  # used for graphing the dots on the board.
 
         self.players = self.create_players()  # ??? This might be used for multiplayer functionality.
@@ -53,7 +52,7 @@ class Social_Choice_Sim:
         # group stuff - all used under set group, and then there are defualts just in case.
         self.group = -1  # doesn't exist, let me know it hasn't been set.
         self.sc_groups = -1  # no group exists, can ignore.
-        self.group_option = group
+        self.group_option = "" # surprise surprise we don't really use this anymore.
 
         # the bread and butter of the sim. set under start round.
         self.current_options_matrix = {}
