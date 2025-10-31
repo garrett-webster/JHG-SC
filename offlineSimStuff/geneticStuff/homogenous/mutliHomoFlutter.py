@@ -253,14 +253,14 @@ def extractGene(gene_dict):
 def run_game_helper(args):
     game_idx, gene, numGeneCopies, agentsPerGame, roundsPerGame, folder, extraAgents, gen_idx = args
 
-    seed = compute_game_seed(GLOBAL_SEED, gen_idx, game_idx)
-    random.seed(seed)
-    np.random.seed(seed)
+    # seed = compute_game_seed(GLOBAL_SEED, gen_idx, game_idx)
+    # random.seed(seed)
+    # np.random.seed(seed)
 
     return run_game(game_idx, gene, numGeneCopies, agentsPerGame, roundsPerGame, folder, extraAgents)
 
-def compute_game_seed(global_seed, generation_idx, game_idx):
-    return global_seed + generation_idx * 100 + game_idx
+# def compute_game_seed(global_seed, generation_idx, game_idx):
+#     return global_seed + generation_idx * 100 + game_idx
 
 # here we just changed the arguments a bit, thats literally it.
 def playGame(theGene, agents, agentsPerGame, numExtraAgents, roundsPerGame, gen, game):
@@ -302,9 +302,9 @@ def getPmetrics(game, theGene, jhg_engine, agents, agentsPerGame, numExtraAgents
 
 # run da game
 def run_game(game_idx, gene, numGeneCopies, agentsPerGame, roundsPerGame, folder, extraAgents):
-    # freeze the seed
-    random.seed(GLOBAL_SEED)
-    np.random.seed(GLOBAL_SEED)
+    ## freeze the seed
+    # random.seed(GLOBAL_SEED)
+    # np.random.seed(GLOBAL_SEED)
 
     # Generate agents sharing the same gene
     agents = [GeneAgent3(gene, numGeneCopies) for _ in range(agentsPerGame)]
@@ -392,14 +392,14 @@ def evolve(popSize, numGeneCopies, startIndex, numGens, gamesPerGen, agentsPerGa
         theGenePoolsOld = theGenePools
         theGenePools = evolvePopulationPairs(theGenePoolsOld, popSize, numGeneCopies)
 
-GLOBAL_SEED = 42 # global little guy
+# GLOBAL_SEED = 42 # global little guy
 
 if __name__ == "__main__":
     print("We start here ")
 
-    # freeze the seed
-    random.seed(GLOBAL_SEED)
-    np.random.seed(GLOBAL_SEED)
+    # # freeze the seed
+    # random.seed(GLOBAL_SEED)
+    # np.random.seed(GLOBAL_SEED)
 
 
 

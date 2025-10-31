@@ -7,8 +7,13 @@ from Server.Engine.completeBots.geneagent3 import GeneAgent3
 import random
 import numpy as np
 import os
-import csv # used for writing to files
+import csv  # used for writing to files
 from Server.Engine.simulator import GameSimulator
+
+from concurrent.futures import ProcessPoolExecutor, as_completed # where the multiprocessing magic happens
+from collections import defaultdict # him... I remember him from the stag_hare project...
+import itertools
+
 
 
 # class to hold the actual pop stuff for purposes of updating everything.
@@ -17,7 +22,7 @@ class PopularityMetrics:
         self.gene = gene
         self.avePop = avePop
         self.endPop = endPop
-        self.relPop = 0 # just so it has SOME kind fo value.
+        self.relPop = 0  # just so it has SOME kind fo value.
 
     def set_relPop(self, relPop):
         self.relPop = relPop
@@ -25,16 +30,14 @@ class PopularityMetrics:
     def __str__(self):
         return f"PopularityMetrics(avePop: {self.avePop}, endPop: {self.endPop}, relPop: {self.relPop}, gene: {self.gene})"
 
-class GeneMetrics:
-    def __init__(self, gene, count=0, absolute_fitness=0.0, relative_fitness=0.0):
-        self.gene = gene
+# try using this to hold things upstream of pmetrics to cauge agent metrics.
+class AgentMetrics:
+    def __init__(self, idx, absoluteFitness, avePop, endPop, count=1):
+        self.idx = idx
+        self.absoluteFitness = absoluteFitness
+        self.avePop = avePop
+        self.endPop = endPop
         self.count = count
-        self.absolute_fitness = absolute_fitness
-        self.relative_fitness = relative_fitness
-
-    @property # this is to replicate the nunGenes or whatever, I don't get it.
-    def num_genes(self):
-        return self.gene.split('_').__len__() - 1
 
 
 def randomGeneString(numGeneCopies):
@@ -62,7 +65,7 @@ def write_generational_results(theGenePools, popSize, gen):
     # Get the absolute path to the directory containing this script
     script_dir = os.path.dirname(os.path.abspath(__file__))
     # Construct the full output directory path
-    output_dir = os.path.join(script_dir, "burned", "theGenerations")
+    output_dir = os.path.join(script_dir, "Test4", "theGenerations")
     # Ensure output directory exists
     os.makedirs(output_dir, exist_ok=True)
     # Construct the filename path
@@ -81,11 +84,11 @@ def write_generational_results(theGenePools, popSize, gen):
                 np.round(agent.relativePopularity, 4),
                 np.round(agent.absolutePopularity, 4),
             ])
-
-    # so under the mixed version, the lists were causing issues. the squeezing seems to fix it?
+    # force it to squeeze the scalar value out. not sure what the problem was.
     avg_fitness = np.sum([float(np.squeeze(agent.absoluteFitness)) for agent in theGenePools]) / popSize
     avg_popularity = np.sum([float(np.squeeze(agent.absolutePopularity)) for agent in theGenePools]) / popSize
-    print(f"Average utility in generation {gen}: {float(avg_fitness):.4f} Average Popularity: {float(avg_popularity):.4f}")
+    print(
+        f"Average utility in generation {gen}: {float(avg_fitness):.4f} Average Popularity: {float(avg_popularity):.4f}")
 
 
 def selectByFitness(thePopulation, popSize, _rank):
@@ -103,25 +106,26 @@ def selectByFitness(thePopulation, popSize, _rank):
         else:
             sum += thePopulation[i].absoluteFitness / mag
         if num < sum:
-            return i # no clue what this does to be so honest with you
+            return i  # no clue what this does to be so honest with you
 
     print("uh oh, somethign went wrong, there was so selection, bricking")
-    return popSize - 1 # return the last index.
+    return popSize - 1  # return the last index.
 
 
-def mutateIt(gene): # expect gene to be an int. if its not there is going to be a problem.
+def mutateIt(gene):  # expect gene to be an int. if its not there is going to be a problem.
     v = random.randrange(100)
     if v > 15:
-        return gene # no mutation
+        return gene  # no mutation
     elif v < 3:
         return random.randrange(101)
     else:
         g = gene + random.randrange(11) - 5
-        if g < 0: # need to cap values from 0, 100
+        if g < 0:  # need to cap values from 0, 100
             g = 0
         if g > 100:
             g = 100
     return g
+
 
 def writeGenerationalResults(theGenePools, popSize, gen, agentsPerGame, folder):
     # create a file here
@@ -137,10 +141,10 @@ def evolvePopulationPairs(theGenePoolsOld, popSize, numGeneCopies):
     ind2 = -1
 
     for i in range(popSize):
-        if i < popSize / 5.0: # this is making the assumption that popSize is 100 people large.
+        if i < popSize / 5.0:  # this is making the assumption that popSize is 100 people large.
             ind1 = selectByFitness(theGenePoolsOld, popSize, True)
             ind2 = selectByFitness(theGenePoolsOld, popSize, False)
-            while ind2 == ind1: # prevent themselves from self breeding
+            while ind2 == ind1:  # prevent themselves from self breeding
                 ind2 = selectByFitness(theGenePoolsOld, popSize, False)
 
         else:
@@ -157,17 +161,18 @@ def evolvePopulationPairs(theGenePoolsOld, popSize, numGeneCopies):
 
         # ind1Genes = extractGene(theGenePoolsOld[ind1].genes_long[0]).split("_")[1:]
 
-        ind1Genes = extractGene(theGenePoolsOld[ind1].genes_long[0]).split("_")[1:] # the "gene_" at the beginning for both.
+        ind1Genes = extractGene(theGenePoolsOld[ind1].genes_long[0]).split("_")[
+                    1:]  # the "gene_" at the beginning for both.
         ind2Genes = extractGene(theGenePoolsOld[ind2].genes_long[0]).split("_")[1:]
 
         for g in range(num_genes):
             minKeepIndex = 12
             if g == minKeepIndex:
-                geneStr += "0_" # maybe??
-                continue # we don't want to update this or anything, go back to the beginning.
-            if bool(random.getrandbits(1)): # just a 50/50 shot
+                geneStr += "0_"  # maybe??
+                continue  # we don't want to update this or anything, go back to the beginning.
+            if bool(random.getrandbits(1)):  # just a 50/50 shot
                 geneStr += str(mutateIt(int(ind1Genes[g])))
-                if g < num_genes-1:
+                if g < num_genes - 1:
                     geneStr += "_"
 
             else:
@@ -175,59 +180,89 @@ def evolvePopulationPairs(theGenePoolsOld, popSize, numGeneCopies):
                 if g < num_genes - 1:
                     geneStr += "_"
 
-        theNewGenePools.append(GeneAgent3(geneStr, numGeneCopies)) # create a new agent
+        theNewGenePools.append(GeneAgent3(geneStr, numGeneCopies))  # create a new agent
 
     return theNewGenePools
 
-def runGame(theGene, numGeneCopies, agentsPerGame, roundsPerGame, gen, game, folder, extraAgents):
-    agents = [GeneAgent3(theGene, numGeneCopies) for _ in range(agentsPerGame)] # THATS SO SMART
+
+def compute_game_seed(global_seed, generation_idx, game_idx):
+    return global_seed + generation_idx * 100 + game_idx
+
+def runGame(agent_genes, numGeneCopies, agentsPerGame, roundsPerGame, gen, game_idx, folder, extraAgents):
+
+
+    # seed = compute_game_seed(GLOBAL_SEED, gen, game_idx)
+    # random.seed(seed)
+    # np.random.seed(seed)
+
+    agents = [GeneAgent3(gene, numGeneCopies) for gene in agent_genes]
+
     # bc we are only using a single gene every time, we can JUST pass that gene around and generate agents as needed.
     # should save us a lot of copying and passing aroudn overhead.
-    for extraAgent in extraAgents: # add in the kitties. Same every time.
-        agents.append(extraAgent)
+    agents.extend(extraAgents) # add them to it more gracefully
 
     numExtraAgents = len(extraAgents)
 
-    pmetrics = playGame(theGene, agents, agentsPerGame, numExtraAgents, roundsPerGame, gen, game)
-    return pmetrics
+    pmetrics = playGame(agent_genes, agents, agentsPerGame, numExtraAgents, roundsPerGame, gen, game_idx)
 
-def playGame(theGene, agents, agentsPerGame, numExtraAgents, roundsPerGame, gen, game):
+
+    metrics = []
+    for i in range(agentsPerGame):
+        ave_pop = pmetrics[i]["avePop"]
+        end_pop = pmetrics[i]["endPop"]
+        abs_fit = (ave_pop + end_pop) / 2
+
+        metrics.append(AgentMetrics(
+            idx=game_idx,
+            absoluteFitness=abs_fit,
+            avePop=ave_pop,
+            endPop=end_pop,
+        ))
+    return metrics
+
+# this is exactly the same actually. nice.
+def playGame(theGenes, agents, agentsPerGame, numExtraAgents, roundsPerGame, gen, game):
+
+    # seed = compute_game_seed(GLOBAL_SEED, gen, game)
+    # random.seed(seed)
+    # np.random.seed(seed)
+
+
     # so this is the part I was kinda worried about, and there isn't a godo way to replicate it bc the flutter thing just works so differently
     # so we are going to addlib this portion.
-    jhg_engine, players = create_jhg_engine(agents) # create a JHG engine and update the player parameters.
+    jhg_engine, players = create_jhg_engine(agents)  # create a JHG engine and update the player parameters.
     total_agents = agentsPerGame + numExtraAgents
     # influence_matrix = np.array([[0 for _ in range(total_agents)] for _ in range(total_agents)])  # initalization for pure sc purposes
 
     for round in range(roundsPerGame):
         # ironically enough everything is already updated and held in there, so don't worry about it. maybe.
-        run_jhg_stuff(jhg_engine, round, agents, total_agents) # don't pass in a sim, not worth
+        run_jhg_stuff(jhg_engine, round, agents, total_agents)  # don't pass in a sim, not worth
 
     # we can use the gen adn the game to write the results to a file if we really want to.
 
-    pmetrics = getPmetrics(theGene, jhg_engine, agents, agentsPerGame, numExtraAgents, roundsPerGame)
-    return pmetrics # this is the only thing we actually care about from this game.
-
-def getPmetrics(theGene, jhg_engine, agents, agentsPerGame, numExtraAgents, roundsPerGame):
-
-    pmetrics = [] # initalize the object here.
-
-    pops = np.array(jhg_engine.engine.P) # gets all the pops as a list
-    ave_pop = pops.mean(axis=0, keepdims=True)[0] # get column averages
-    end_pop = pops[-1].reshape(-1, 1) #?????
-
-    # gene = agents[i].genes_long
-    # pmetrics.append(PopularityMetrics(gene, avePop=ave_pop, endPop=end_pop))
+    pmetrics = getPmetrics(game, theGenes, jhg_engine, agents, agentsPerGame, numExtraAgents, roundsPerGame)
+    return pmetrics  # this is the only thing we actually care about from this game.
 
 
-    for i in range(agentsPerGame): # just take in the ones we care about
-        pmetrics.append(PopularityMetrics(theGene, avePop=ave_pop[i], endPop=end_pop[i]))
+def getPmetrics(game, theGene, jhg_engine, agents, agentsPerGame, numExtraAgents, roundsPerGame):
+    pmetrics = []
 
+    pops = np.array(jhg_engine.engine.P)  # all da pops
+    ave_pop = pops.mean(axis=0) # get teh average per column
+    end_pop = pops[-1] # and the last row
 
-    sum_pops = sum(ave_pop) # just get everyones pops
     for i in range(agentsPerGame):
-        pmetrics[i].relPop = pmetrics[i].avePop / sum_pops
+        metric = {
+            "idx": game,  # genetic algorithm silly
+            "absoluteFitness": (ave_pop[i] + end_pop[i]) / 2.0,
+            "avePop": ave_pop[i],
+            "endPop": end_pop[i],
+            "count": 1
+        }
+        pmetrics.append(metric)
 
     return pmetrics
+
 
 def run_jhg_stuff(jhg_engine, round, agents, numAgents):
     # num agents is just everyone -- there is no need to discriminate between the two at this level.
@@ -235,11 +270,10 @@ def run_jhg_stuff(jhg_engine, round, agents, numAgents):
     T_prev = jhg_engine.get_transaction()
 
     for i in range(numAgents):
-
         transactions[i] = agents[i].play_round(
             i,
             round,
-            T_prev[:,i],
+            T_prev[:, i],
             jhg_engine.get_popularity().tolist(),
             jhg_engine.get_influence(),
             jhg_engine.get_extra_data(i)
@@ -250,12 +284,10 @@ def run_jhg_stuff(jhg_engine, round, agents, numAgents):
     return jhg_engine.get_influence()
 
 
-
-
 def create_jhg_engine(agents):
     num_players = len(agents)
     poverty_line = 0
-    forcedRandom = True # replicable.
+    forcedRandom = True  # replicable.
 
     alpha_min, alpha_max = 0.20, 0.20
     beta_min, beta_max = 0.5, 1.0
@@ -282,9 +314,9 @@ def create_jhg_engine(agents):
     for a in agents:
         a.setGameParams(game_params, forcedRandom)
 
-
     jhg_engine = GameSimulator(game_params)
     return jhg_engine, agents
+
 
 def extractGene(gene_dict):
     gene_str = "gene_"
@@ -293,7 +325,20 @@ def extractGene(gene_dict):
     gene_str += result
     return gene_str
 
-def evolve(popSize, numGeneCopies, startIndex, numGens, gamesPerGen, agentsPerGame, roundsPerGame, povertyLine, folder, extraAgents):
+
+def run_game_helper(args):
+    (game_idx, agent_indices, agent_genes, numGeneCopies, agentsPerGame, roundsPerGame, folder, extraAgents, gen) = args
+
+    metrics = runGame(agent_genes, numGeneCopies, agentsPerGame, roundsPerGame,
+                      gen, game_idx, folder, extraAgents)
+
+    for i, m in enumerate(metrics):
+        m.idx = agent_indices[i]
+    return metrics
+
+
+def evolve(popSize, numGeneCopies, startIndex, numGens, gamesPerGen, agentsPerGame, roundsPerGame, povertyLine, folder,
+           extraAgents, max_workers):
     theGenePools = []
     theGenePoolsOld = []
 
@@ -301,7 +346,7 @@ def evolve(popSize, numGeneCopies, startIndex, numGens, gamesPerGen, agentsPerGa
     # can further modify this for tests, we can have a random folder (rnums.text) and make sure results are consistent between bots or whatever.
     if startIndex == 0:
         for j in range(popSize):
-            theGenePools.append(GeneAgent3("", numGeneCopies)) # hot take I think I am going to keep it this way.
+            theGenePools.append(GeneAgent3("", numGeneCopies))  # hot take I think I am going to keep it this way.
             # maybe the overhead is bigger? but they are clearly doing something else to get it be an agent.
 
     # we could open the CSV here, I am going to opt not to yet. create a functino called write genrational results and go from there.
@@ -311,74 +356,79 @@ def evolve(popSize, numGeneCopies, startIndex, numGens, gamesPerGen, agentsPerGa
 
     for gen in range(numGens):
         print("starting gen", gen)
-        for game in range(gamesPerGen):
-            agents = []
-            plyrIdxs = []
 
-            for i in range(agentsPerGame):
-                plyrIdxs.append(game)
-                agents.append(theGenePools[plyrIdxs[i]])
+        args_list = []
 
-            # will this work with the new system that I have cooked up?
-            current_gene =  extractGene(theGenePools[game].genes_long[0]) # helper function to pull gene list out
-            new_pmetrics = runGame(current_gene, numGeneCopies, agentsPerGame, roundsPerGame, gen, game, folder, extraAgents)
-            # this is just stuff that we then add ot the gene pool
-            for i in range(agentsPerGame): # once we have finished the game, we then have to update all of the information present within the gene pool.
-                # gene = theGenePools[plyrIdxs[i]].genes_long # ??? I think????
-                pmgGene = new_pmetrics[i].gene
-                if pmgGene != current_gene: # make sure there was no silly business. probably an artifact from the mixed training environment.
-                    print("gene mismatch! BRICK")
+        for game_idx in range(gamesPerGen):
+            # rng = random.Random(compute_game_seed(GLOBAL_SEED, gen, game_idx)) # use this for deterministic worker seeding.
+            agent_indices = [random.randrange(popSize) for _ in range(agentsPerGame)]
+            agent_genes = [
+                extractGene(theGenePools[idx].genes_long[0])
+                for idx in agent_indices
+            ]
+
+            args_list.append((
+                game_idx, agent_indices, agent_genes, numGeneCopies, agentsPerGame, roundsPerGame,
+                folder, extraAgents, gen
+            ))
+
+        with ProcessPoolExecutor(max_workers=max_workers) as executor:
+            all_metrics_nested = executor.map(run_game_helper, args_list)
+
+            all_metrics = list(itertools.chain.from_iterable(all_metrics_nested))
+
+            agg = defaultdict(lambda: {"absoluteFitness": 0.0, "count": 0})
+            for m in all_metrics:
+                idx = m.idx
+                agg[idx]["absoluteFitness"] += m.absoluteFitness
+                agg[idx]["count"] += m.count
+
+            for idx, vals in agg.items():
+                theGenePools[idx].absoluteFitness += vals["absoluteFitness"]
+                theGenePools[idx].count += vals["count"]
+
+            for g in theGenePools:
+                if g.count > 0:
+                    g.absoluteFitness /= g.count
                 else:
-                    theGenePools[plyrIdxs[i]].count += 1
-                    theGenePools[plyrIdxs[i]].absoluteFitness += (new_pmetrics[i].avePop + new_pmetrics[i].endPop) / 2.0
-                    theGenePools[plyrIdxs[i]].relativeFitness = new_pmetrics[i].relPop
-        # now that all teh gens are finished, we can now update it all as a batch
-        for i in range(popSize):
-            if theGenePools[i].count > 0:
-                theGenePools[i].relativeFitness /= theGenePools[i].count
-                theGenePools[i].absoluteFitness /= theGenePools[i].count
-            else:
-                theGenePools[i].absoluteFitness = 0
-                theGenePools[i].relativeFitness = 0
+                    g.absoluteFitness = 0
 
-        # this sorts the fetcher, must easier in python.
-        theGenePools = sorted(theGenePools, key=lambda g: g.absoluteFitness)
-        write_generational_results(theGenePools, popSize, gen)
+            total_abs = sum(g.absoluteFitness for g in theGenePools)
+            for g in theGenePools:
+                g.relativeFitness = g.absoluteFitness / total_abs if total_abs > 0 else 0
 
-        theGenePoolsOld = theGenePools
-        theGenePools = evolvePopulationPairs(theGenePoolsOld, popSize, numGeneCopies)
+            theGenePools = sorted(theGenePools, key=lambda g: g.absoluteFitness)
+            write_generational_results(theGenePools, popSize, gen)
 
-
-
-                
+            theGenePoolsOld = theGenePools
+            theGenePools = evolvePopulationPairs(theGenePoolsOld, popSize, numGeneCopies)
 
 
 
 
-
-
-
-
-
-
-
-
-
-
-
+# GLOBAL_SEED = 42
 
 if __name__ == "__main__":
     print("We start here ")
-    popSize = 10
+
+    # random.seed(GLOBAL_SEED)
+    # np.random.seed(GLOBAL_SEED)
+
+    cpu_count = os.cpu_count()
+    max_workers = max(1, os.cpu_count() - 2) # save some cores for the rest of us!
+
+
+    popSize = 100
     numGeneCopies = 1
     startIndex = 0
-    numGens = 200
-    gamesPerGen = popSize # this is in part what makes it homogenous. for mixed, use a discrete number
+    numGens = 1
+    gamesPerGen = 100
     agentsPerGame = 8
-    roundsPerGame = 3
+    roundsPerGame = 30
     numCats = 2
     povertyLine = 0
     folder = ""
     extraAgents = [ImprovedJakeCat() for _ in range(numCats)]
-    evolve(popSize, numGeneCopies, startIndex, numGens, gamesPerGen, agentsPerGame, roundsPerGame, povertyLine, folder, extraAgents)
+    evolve(popSize, numGeneCopies, startIndex, numGens, gamesPerGen, agentsPerGame, roundsPerGame, povertyLine, folder,
+           extraAgents, max_workers)
     # we are running no fear, no chat

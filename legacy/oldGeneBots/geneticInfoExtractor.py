@@ -5,7 +5,7 @@ import glob
 from collections import defaultdict
 
 
-data_dir = "longerConvexResults/theGenerations"
+data_dir = "../oldGeneTraining/longerConvexResults/theGenerations"
 
 generation_stats = {}
 

@@ -63,7 +63,7 @@ def write_generational_results(theGenePools, popSize, gen):
     # Get the absolute path to the directory containing this script
     script_dir = os.path.dirname(os.path.abspath(__file__))
     # Construct the full output directory path
-    output_dir = os.path.join(script_dir, "burned", "theGenerations")
+    output_dir = os.path.join(script_dir, "Test3", "theGenerations")
     # Ensure output directory exists
     os.makedirs(output_dir, exist_ok=True)
     # Construct the filename path
@@ -182,6 +182,8 @@ def evolvePopulationPairs(theGenePoolsOld, popSize, numGeneCopies):
 
     return theNewGenePools
 
+# def compute_game_seed(global_seed, generation_idx, game_idx):
+#     return global_seed + generation_idx * 100 + game_idx
 
 def runGame(theGenes, numGeneCopies, agentsPerGame, roundsPerGame, gen, game, folder, extraAgents):
 
@@ -200,6 +202,11 @@ def runGame(theGenes, numGeneCopies, agentsPerGame, roundsPerGame, gen, game, fo
 
 
 def playGame(theGenes, agents, agentsPerGame, numExtraAgents, roundsPerGame, gen, game):
+
+    # seed = compute_game_seed(GLOBAL_SEED, gen, game)
+    # random.seed(seed)
+    # np.random.seed(seed)
+
     # so this is the part I was kinda worried about, and there isn't a godo way to replicate it bc the flutter thing just works so differently
     # so we are going to addlib this portion.
     jhg_engine, players = create_jhg_engine(agents)  # create a JHG engine and update the player parameters.
@@ -344,6 +351,7 @@ def evolve(popSize, numGeneCopies, startIndex, numGens, gamesPerGen, agentsPerGa
                     theGenePools[plyrIdxs[i]].count += 1
                     theGenePools[plyrIdxs[i]].absoluteFitness += (new_pmetrics[i].avePop + new_pmetrics[i].endPop) / 2.0
                     theGenePools[plyrIdxs[i]].relativeFitness = new_pmetrics[i].relPop
+
         # now that all teh gens are finished, we can now update it all as a batch
         for i in range(popSize):
             if theGenePools[i].count > 0:
@@ -361,12 +369,21 @@ def evolve(popSize, numGeneCopies, startIndex, numGens, gamesPerGen, agentsPerGa
         theGenePools = evolvePopulationPairs(theGenePoolsOld, popSize, numGeneCopies)
 
 
+# GLOBAL_SEED = 42
+
 if __name__ == "__main__":
     print("We start here ")
+
+
+    # random.seed(GLOBAL_SEED)
+    # np.random.seed(GLOBAL_SEED)
+
+
+
     popSize = 100
     numGeneCopies = 1
     startIndex = 0
-    numGens = 200
+    numGens = 1
     gamesPerGen = 100
     agentsPerGame = 8
     roundsPerGame = 30

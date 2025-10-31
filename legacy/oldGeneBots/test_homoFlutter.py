@@ -1,4 +1,4 @@
-from .homoFlutter import *
+from offlineSimStuff.geneticStuff.homogenous.homoFlutter import *
 
 def test_randomGeneString():
     numGeneCopies = 1

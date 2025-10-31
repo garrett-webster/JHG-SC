@@ -2,7 +2,6 @@
 from Server.Engine.engine import JHGEngine
 from Server.Engine.completeBots.geneagent3 import GeneAgent3
 from Server.Engine.completeBots.baseagent import AbstractAgent
-from Server.Engine.completeBots.projectCat import ProjectCat
 from Server.OptionGenerators.generators import generator_factory # i don't like him
 from dataclasses import dataclass
 import random
@@ -12,14 +11,19 @@ import math
 import numpy as np
 
 from Server.social_choice_sim import Social_Choice_Sim
-from offlineSimStuff.batch_tester_JHG_SC import determine_rounds
-from offlineSimStuff.geneticStuff.geneticLogger import geneticLogger
+from offlineSimStuff.batch_tester_JHG_SC import determine_rounds, reconcile_influence
+from legacy.oldGeneBots.geneticLogger import geneticLogger
+
+
 
 """
-based on the genetic algorihtm as given within the IJCAII repo. However, it tries to implement some of the chagnes as seen within the flutter algorithm for
-homogenity, trying to be better about having the CAB agents defend against outside bad actors (READ: CATS). 
+Genetic algorithm from C++ ijacai paper for training Gene3 agents in the Junior high test bed. this is the Python reference 
+that I am using as a springboard for developing my own version for the SC + JHG version. evaluating fitness and whatnot is going to be 
+difficult, but I am going to create a new file especially for my own format. today is my second tackle into this one to try and better
+understand how this functinos before I use it myself. 
 """
-
+## TODO: make sure that the results actually get written to a directory so we cna save them for later.
+## TODO: add in the configured players functionality so we can train with other bots. (might need to adjust those bots to also work in the new testbed)
 
 @dataclass # because python doesn't support dedicated new stucts the way C++ does. I could have built a custom class, but this seemed lighterweight and better addapted.
 class PopularityMetrics:
@@ -118,12 +122,7 @@ def make_sims():
 
 def run_sc_gen_stuff(agents, jhg_engine, sc_sim, total_order, curr_sc_round, num_cycles, numPlayers, influence_matrix):
     possible_peeps, indexes = generate_peeps(total_order, jhg_engine.get_popularity(), sc_sim)
-
-    if influence_matrix is not None:
-        new_influence = influence_matrix
-    else:
-        new_influence = sc_sim.get_influence_matrix()  # if there is no JHG influence, we are flying solo, leach off of own influence
-
+    new_influence = reconcile_influence(influence_matrix, sc_sim.get_influence_matrix())
     current_options_matrix, peeps = sc_sim.let_others_create_options_matrix(possible_peeps.tolist(),
                                                                             curr_sc_round, new_influence)  # actually creates the matrix
     sc_sim.start_round((current_options_matrix, indexes))
@@ -133,8 +132,6 @@ def run_sc_gen_stuff(agents, jhg_engine, sc_sim, total_order, curr_sc_round, num
             j: None for j in range(len(total_order))
         } for i in range(len(total_order))
     }
-    index = len(sc_sim.I)
-
     for cycle in range(num_cycles):
         bot_votes[cycle] = {}
         if cycle == 0:
@@ -144,15 +141,16 @@ def run_sc_gen_stuff(agents, jhg_engine, sc_sim, total_order, curr_sc_round, num
         for agent in range(numPlayers):
             recieved = sc_sim.reconcile_received(agent, votes_put_in)
             # the influence array is doing all sorts of silly things lately, and I am not sure why. I think we have lost track of SC round in here somewhere.
-            bot_votes[cycle][agent] = (agents[agent].get_vote(agent, curr_sc_round, recieved, sc_sim.results_sums, np.array(influence_matrix), extra_data, current_options_matrix, False))
+            bot_votes[cycle][agent] = (agents[agent].get_vote(agent, curr_sc_round, recieved, sc_sim.results_sums, np.array(sc_sim.I[curr_sc_round]), extra_data, current_options_matrix))
         sc_sim.record_votes(bot_votes[cycle], cycle) # important for logging individual games, can likely be disregarded here
 
-    winning_vote, round_results = sc_sim.return_win(bot_votes[num_cycles - 1])  # we need this to run, even if we don't need the results HERE per se
-    new_influence = np.array(sc_sim.get_influence_matrix())  # ACTUALLY UPDATE THE FETCHER
+    new_influence = reconcile_influence(influence_matrix, sc_sim.get_influence_matrix())
 
     # make sure that this happens IMMEDIATELY afterward.
-
+    winning_vote, round_results = sc_sim.return_win(bot_votes[num_cycles - 1])  # we need this to run, even if we don't need the results HERE per se
     sc_sim.save_results()
+    # ok so what do I actually
+    # what doe I need to
     return sc_sim.current_results, sc_sim.results_sums, new_influence # so we have the change in utility and overall utility
 
 def reconcile_received(self, agent, previous_votes):
@@ -171,20 +169,15 @@ def reconcile_received(self, agent, previous_votes):
 def run_jhg_gen_stuff(jhg_engine, curr_round, agents, numPlayers):
     received = [0.0 for _ in range(numPlayers)]  # C++ really needs to allocate memeory before hadn
     transactions = [0 for _ in range(numPlayers)]  # so this is how I replilcate it in python.
-    extra_data = {
-        i: {
-            j: None for j in range(numPlayers)
-        } for i in range(numPlayers)
-    }
 
     for i in range(numPlayers):
         for j in range(numPlayers):
             received[j] = np.array(jhg_engine.T[curr_round][j][i])
-        transactions[i] = agents[i].play_round(i, curr_round, received, jhg_engine.P[curr_round], jhg_engine.I[curr_round], extra_data, False)
+        transactions[i] = agents[i].play_round(i, curr_round, received, jhg_engine.P[curr_round], jhg_engine.I[curr_round], transactions[i])
     jhg_engine.apply_transaction(transactions) # thanks references
     return jhg_engine.get_influence() # return da influence matrix
 
-def playGame(agents, numPlayers, numRounds, gener, gamer, initialPopularities, povertyLine, forcedRandom, rounds_list, print_game):
+def playGame(agents, numPlayers, numRounds, gener, gamer, initialPopularities, povertyLine, forcedRandom, rounds_list):
     # for this one, reference defs.h in the C++ code. most of these are hard coded into the engine and this is just tranfering them over.
     # they might get set to different values in the engine, but i wan this engine to be consistent with other engines.
     # so for now just accept the magic numbers and we will move on with our day
@@ -240,14 +233,13 @@ def playGame(agents, numPlayers, numRounds, gener, gamer, initialPopularities, p
             influence_matrix = run_jhg_gen_stuff(jhg_engine, curr_round, agents, numPlayers)
 
         if sc_rounds:
-            changeUtility, overallUtility, influence_matrix = run_sc_gen_stuff(agents, jhg_engine, sc_sim, total_order, curr_round, num_cycles, numPlayers, influence_matrix)
+            changeUtility, overallUtility, influence_matrix = run_sc_gen_stuff(agents, jhg_engine, sc_sim, total_order, curr_sc_round, num_cycles, numPlayers, influence_matrix)
             curr_sc_round += 1
 
             for i in range(numPlayers):
                 pmetrics[i].avgUtility += changeUtility[i]
                 pmetrics[i].endUtility = overallUtility[i]
 
-    # print("These are the final utilities ", sc_sim.results_sums, " and these are the final popularities ", (jhg_engine.get_popularity()).tolist())
     return pmetrics # returns out data type
 
 # this might POOP poop the bed, pretty sure it was written with managers in mind rather than the sims, so we shall see.
@@ -294,7 +286,7 @@ def write_generational_results(theGenePools, popSize, gen, agentsPerGame):
     # Get the absolute path to the directory containing this script
     script_dir = os.path.dirname(os.path.abspath(__file__))
     # Construct the full output directory path
-    output_dir = os.path.join(script_dir, "homoResultsLong", "theGenerations")
+    output_dir = os.path.join(script_dir, "Results", "theGenerations")
     # Ensure output directory exists
     os.makedirs(output_dir, exist_ok=True)
     # Construct the filename path
@@ -410,11 +402,7 @@ def create_total_order(total_players, num_humans):
         total_order.append("P" + str(human))
     return total_order
 
-# this one has some modifications to it, namely
-# less players, and shorter rounds.
-# however, it is still doing 100 games per gen
-# I hope this gives me a better prototype and a means to try and reason through this
-# if we see progress here, we will up it back up and run it for longer.
+
 if __name__ == "__main__":
     ## -- INIT STUFF , didn't feel like using the command line everytime, thats on me. heres' the init and all explanation -- ##
     #// - run the code: ./jhgsim(0) evolve(1) ../Results/theGenerations(2) 100(3) 3(4) 0(5) 100(6) 100(7) 10(8) 30(9) 0(10) basicConfig(11) varied(12)
@@ -423,12 +411,11 @@ if __name__ == "__main__":
     # 0 -- executable (doesn't change)
     # 1 -- code directive to evolve population (doesn't change)
     theFolder = "SomeFolder" # folder where trained parameters of cab agents are stored.
-    popSize = 60 # number of agnets in the gene pool (use 100 here)
+    popSize = 100 # number of agnets in the gene pool (use 100 here)
     numGeneGopies = 3 # numbers of sets of genes (3 was the number used in the paper)
     startIndex = 0 # generation to start training (0 to start form scratch)
     num_gens = 300 # generation to end traning trains up to 99
-    games_per_gen = popSize # agents from the gene pool are selected at random, 100 times.
-    # BIG NOTICE --> THIS NEEDS TO BE EQUAL TO GAMES_PER_GEN.
+    games_per_gen = 10 # agents from the gene pool are selected at random, 100 times.
     agentsPerGame = 10 # number of agents per game
     roundsPerGame = 30 # number fo rounds per game
     povertyLine = 0 # see SM-1
@@ -436,18 +423,13 @@ if __name__ == "__main__":
     initPops = "varied" # starts eveyrone at different initial popularities when training.
     tokens_per_player = 2 # probably best if I just reduce this back to whatever. (Added by me just in case we wanted to be silly)
     num_humans = 0 # we discriminate in this fetcher
-    num_kitties = 2
     current_logger = geneticLogger()
-
-    configured_players = []
-    for i in range(num_kitties):
-        configured_players.append(ProjectCat())
 
     # should initialize this fetcher
     theGenePools = [GeneAgent3("", numGeneGopies, tokens_per_player) for _ in range(popSize)] # don't let this be empty
 
-    numPlayers = agentsPerGame + len(configured_players) # could put gocnifutred players.size but that si currently empty and I couldn't care less.
-    # maxPlayers = numPlayers + len(configured_players)
+    numPlayers = agentsPerGame + 0 # could put gocnifutred players.size but that si currently empty and I couldn't care less.
+    maxPlayers = numPlayers
 
     plyrIdxs = [0 for _ in range(numPlayers)]
     possible_init_pops = ["equal", "random", "step", "power", "highlow"]
@@ -455,31 +437,19 @@ if __name__ == "__main__":
     initRelativeUtilities = [0.0 for _ in range(numPlayers)]
     agents = [AbstractAgent() for _ in range(popSize)]  # the fetchers we will be training
 
-    # lets let these guys run for a little longer, A full 30 rounds as seen in the original paper might be a good place to start.
-    jhg_games_per_round = [4,3,3,3,3,3] # just give me an easy place to start.
-    # jhg_games_per_round = [4,3,3,3,3] # just give me an easy place to start.
-    # jhg_games_per_round = [2,2,2]
+    # jhg_games_per_round = [4,3,3,3,3,3,3,3] # just give me an easy place to start.
+    jhg_games_per_round = [4,3,3,3,3] # just give me an easy place to start.
     rounds_list = determine_rounds(jhg_games_per_round)
-    mxPlayers = numPlayers
 
     for gen in range(num_gens): # however many generations we want
-        game_to_print = random.randint(0, games_per_gen)
         for game in range(games_per_gen): # however many games we want per generation
-            print_game = False
-            if game == game_to_print:
-                print_game = True
 
-
-            for i in range(agentsPerGame): # wait is that it???
-                plyrIdxs[i] = game % popSize # trying with modulo pop size to make sure that we dont' get any out of bounds errors
-                agents[i] = theGenePools[plyrIdxs[i]] # YIPEEE
+            # pick individuals to put into the gene pools.
+            for i in range(agentsPerGame):
+                plyrIdxs[i] = random.randint(0, popSize - 1)
+                agents[i] = theGenePools[plyrIdxs[i]]
 
             # not adding in the configured players yet, leave that alone for now.
-            numPlayers = agentsPerGame
-            for i in range(agentsPerGame, mxPlayers, 1):
-                plyrIdxs[numPlayers] = popSize + i
-                agents[numPlayers] = configured_players[i-agentsPerGame]
-                numPlayers += 1
 
             if initPops == "varied":
                 sel = random.randint(0, 4)
@@ -498,8 +468,7 @@ if __name__ == "__main__":
 
             num_rounds = sum(jhg_games_per_round)
 
-            pmetrics = playGame(agents, numPlayers, num_rounds, gen, game, initUtilities, povertyLine, False, rounds_list, print_game)
-
+            pmetrics = playGame(agents, numPlayers, num_rounds, gen, game, initUtilities, povertyLine, False, rounds_list)
 
             # now we gotta calcualte relative popularity
 
@@ -509,6 +478,26 @@ if __name__ == "__main__":
             if s != 0.0:
                 for i in range(numPlayers):
                     pmetrics[i].relUtility = pmetrics[i].avgUtility / s
+
+            # print some stuff to the terminal for the purposes of understanding other stuf.f
+            # print("Indicies: ")
+            # for i in range(numPlayers):
+            #     print("i, ", plyrIdxs[i])
+            #
+            # print("\n")
+            # print("averageUtility :")
+            # for i in range(numPlayers):
+            #     print(f"{pmetrics[i].avgUtility}.2")
+            # print("\n")
+            # print("\n")
+            #
+            # print("relUtility: ")
+            # for i in range(numPlayers):
+            #     print(f"{pmetrics[i].relUtility}.2")
+            #
+            # print("\n")
+            #print("Average Utility ", s / agentsPerGame)
+
 
             # we gotta update fitness - fitness whole pizza in they mouth
             for i in range(agentsPerGame):
@@ -534,8 +523,6 @@ if __name__ == "__main__":
     iniitalRelativePopularities = None
     plyrIdxs = None
     agents = None
-    configured_agents = None # more garbage collection
-
 
     # no extra players within the config file so we can probably just NOT do that
 

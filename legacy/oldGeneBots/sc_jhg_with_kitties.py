@@ -13,7 +13,7 @@ import numpy as np
 
 from Server.social_choice_sim import Social_Choice_Sim
 from offlineSimStuff.batch_tester_JHG_SC import determine_rounds
-from offlineSimStuff.geneticStuff.geneticLogger import geneticLogger
+from legacy.oldGeneBots.geneticLogger import geneticLogger
 
 
 
