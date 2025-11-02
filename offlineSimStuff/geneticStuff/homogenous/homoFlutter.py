@@ -386,7 +386,7 @@ if __name__ == "__main__":
     random.seed(GLOBAL_SEED)
     np.random.seed(GLOBAL_SEED)
 
-    print("We start here ")
+    # print("We start here ")
     popSize = 100
     numGeneCopies = 1
     startIndex = 0

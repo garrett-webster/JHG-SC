@@ -1,5 +1,5 @@
 from Server.jhg_sim import JHG_simulator
-from offlineSimStuff.variousGraphingTools.outDated.jhg_tools.jhgLogger import JHGLogger
+from legacy.outDated.jhg_tools.jhgLogger import JHGLogger
 import time
 
 class JHGManager:

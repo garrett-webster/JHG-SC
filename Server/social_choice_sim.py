@@ -81,6 +81,9 @@ class Social_Choice_Sim:
                 j: None for j in range(len(total_order))
             } for i in range(len(total_order))
         }
+
+        self.num_cats = -1 # used for logging. -1 breaks everything, should get overrriden to 0
+        self.peeps = [] # just an empty list for now. used for logging if the cats got the bag.
         self.most_recent_influence = None # keep this fetcher around somewhere.
 
     def create_total_order(self, total_players, num_humans):
@@ -120,8 +123,9 @@ class Social_Choice_Sim:
 
 
     # ovverides the other bots to make sure that I can use the same bot for both - important for the genetic algorithm.
-    def bot_ovveride(self, bots):
+    def bot_ovveride(self, bots, num_cats=0):
         self.bots = bots
+        self.num_cats = num_cats
         self.allocation_bots = bots
         self.total_types = self.create_total_types() # make this cause we need it now
 
@@ -597,6 +601,7 @@ class Social_Choice_Sim:
     # this functin is used for simulation purposes ONLY. should never be called with live players.
     def let_others_create_options_matrix(self, bot_peeps, curr_round, influence_matrix):
         indexes = [] # this gest used regardless.
+        self.peeps = bot_peeps
         for peep in bot_peeps:
             indexes.append(bot_peeps.index(peep) + 1)
         if isinstance(self.allocation_bots[0], GeneAgent3) or isinstance(self.allocation_bots[0], SocialWelfare) or isinstance(self.allocation_bots[0], AntiCat): # make sure he is in there too
@@ -645,11 +650,18 @@ class Social_Choice_Sim:
     #########################################################################
 
     def get_game_deets(self):
+        ## TODO: apply a cat filter here so a lot of math works for non cats, rather than whole populartion.
+
+        # DON"T DO THIS YET! FOCUS ON PURE BOT SIMULATIONS AT THE MOMENT.
+        # self.results = dict(list(self.results.items())[:-2]) # take a lil off the top.
+
         actual_round_num = self.num_rounds + 1 # off by one error
         cooperation_score = self.cooperation_score / (actual_round_num) if self.num_rounds > 0 else 0  # as a percent, how often we cooperated. (had a non negative cause pass)
         results = self.results # do I actually need this?
         results_sums = self.results_sums
+        results_sums = results_sums[:-self.num_cats] # thhat is a pukeworthy line
         cv, sums_per_round = self.get_sums_per_round_and_cv()
+
         influence = (self.most_recent_influence).tolist()
        #  bot_types = self.bots
         utility_per_round = self.get_results_per_round()

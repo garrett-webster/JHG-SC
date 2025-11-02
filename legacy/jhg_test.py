@@ -1,5 +1,5 @@
 from Server.jhg_sim import JHG_simulator
-from offlineSimStuff.variousGraphingTools.outDated.completeLogger import CompleteLogger
+from legacy.outDated import CompleteLogger
 from offlineSimStuff.variousGraphingTools.completeVersions.completeGrapher import CompleteGrapher
 
 # this doesn't really get used anymore. it was a useful proof of concept but can now be ignored.

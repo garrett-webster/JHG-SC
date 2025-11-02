@@ -13,7 +13,7 @@ from Server.Engine.simulator import GameSimulator
 from concurrent.futures import ProcessPoolExecutor, as_completed # where the multiprocessing magic happens
 from collections import defaultdict # him... I remember him from the stag_hare project...
 import itertools
-
+from tqdm import tqdm
 
 
 # class to hold the actual pop stuff for purposes of updating everything.
@@ -46,7 +46,7 @@ def randomGeneString(numGeneCopies):
 
 
 # worry about this later, just have it here for now.
-def write_generational_results(theGenePools, popSize, gen):
+def write_generational_results(theGenePools, popSize, gen, folder):
     for i in range(popSize):
         if theGenePools[i].count > 0:
             theGenePools[i].relativeFitness /= theGenePools[i].count
@@ -65,7 +65,10 @@ def write_generational_results(theGenePools, popSize, gen):
     # Get the absolute path to the directory containing this script
     script_dir = os.path.dirname(os.path.abspath(__file__))
     # Construct the full output directory path
-    output_dir = os.path.join(script_dir, "Test4", "theGenerations")
+    if folder == "":
+        output_dir = os.path.join(script_dir, "I have utterly pooped the bed", "theGenerations " + str(gen)) # just to give it somewhere to go
+    else:
+        output_dir = os.path.join(script_dir, folder) # just to give it somewhere to go
     # Ensure output directory exists
     os.makedirs(output_dir, exist_ok=True)
     # Construct the filename path
@@ -87,8 +90,7 @@ def write_generational_results(theGenePools, popSize, gen):
     # force it to squeeze the scalar value out. not sure what the problem was.
     avg_fitness = np.sum([float(np.squeeze(agent.absoluteFitness)) for agent in theGenePools]) / popSize
     avg_popularity = np.sum([float(np.squeeze(agent.absolutePopularity)) for agent in theGenePools]) / popSize
-    print(
-        f"Average utility in generation {gen}: {float(avg_fitness):.4f} Average Popularity: {float(avg_popularity):.4f}")
+    # print(f"Average utility in generation {gen}: {float(avg_fitness):.4f} Average Popularity: {float(avg_popularity):.4f}")
 
 
 def selectByFitness(thePopulation, popSize, _rank):
@@ -337,7 +339,7 @@ def run_game_helper(args):
     return metrics
 
 
-def evolve(popSize, numGeneCopies, startIndex, numGens, gamesPerGen, agentsPerGame, roundsPerGame, povertyLine, folder,
+def evolve_mixed(popSize, numGeneCopies, startIndex, numGens, gamesPerGen, agentsPerGame, roundsPerGame, povertyLine, folder,
            extraAgents, max_workers):
     theGenePools = []
     theGenePoolsOld = []
@@ -354,8 +356,8 @@ def evolve(popSize, numGeneCopies, startIndex, numGens, gamesPerGen, agentsPerGa
 
     # theGenePools = evolvePopulationPairs(theGenePoolsOld, popSize, numGeneCopies) # only useful
 
-    for gen in range(numGens):
-        print("starting gen", gen)
+    for gen in tqdm(range(numGens), desc="Mixed", leave=False):
+        # print("starting gen", gen)
 
         args_list = []
 
@@ -398,7 +400,7 @@ def evolve(popSize, numGeneCopies, startIndex, numGens, gamesPerGen, agentsPerGa
                 g.relativeFitness = g.absoluteFitness / total_abs if total_abs > 0 else 0
 
             theGenePools = sorted(theGenePools, key=lambda g: g.absoluteFitness)
-            write_generational_results(theGenePools, popSize, gen)
+            write_generational_results(theGenePools, popSize, gen, folder)
 
             theGenePoolsOld = theGenePools
             theGenePools = evolvePopulationPairs(theGenePoolsOld, popSize, numGeneCopies)
@@ -409,7 +411,7 @@ def evolve(popSize, numGeneCopies, startIndex, numGens, gamesPerGen, agentsPerGa
 # GLOBAL_SEED = 42
 
 if __name__ == "__main__":
-    print("We start here ")
+    # print("We start here ")
 
     # random.seed(GLOBAL_SEED)
     # np.random.seed(GLOBAL_SEED)

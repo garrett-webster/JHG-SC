@@ -1,0 +1,332 @@
+AgentType,RoundType,Scenario,PeepConstant,EnforceMajority,AverageUtilityNonCats,AverageUtilityCats,AveragePopularityNonCats,AveragePopularityCats
+homoNewCats.csv,"['S', 30]",2NewKitties,0.0,True,27.0,27.0,NAN,NAN
+homoNewCats.csv,"['S', 30]",2NewKitties,0.0,False,70.9375,66.25,NAN,NAN
+homoNewCats.csv,"['S', 30]",2NewKitties,0.1,True,33.875,34.5,NAN,NAN
+homoNewCats.csv,"['S', 30]",2NewKitties,0.1,False,69.8125,70.75,NAN,NAN
+homoNewCats.csv,"['S', 30]",2NewKitties,0.2,True,36.9375,32.25,NAN,NAN
+homoNewCats.csv,"['S', 30]",2NewKitties,0.2,False,73.25,57.0,NAN,NAN
+homoNewCats.csv,"['S', 30]",2NewKitties,0.3,True,24.0,24.0,NAN,NAN
+homoNewCats.csv,"['S', 30]",2NewKitties,0.3,False,69.8125,70.75,NAN,NAN
+homoNewCats.csv,"['S', 30]",2NewKitties,0.4,True,28.25,27.0,NAN,NAN
+homoNewCats.csv,"['S', 30]",2NewKitties,0.4,False,71.75,63.0,NAN,NAN
+homoNewCats.csv,"['S', 30]",2NewKitties,0.5,True,36.0,36.0,NAN,NAN
+homoNewCats.csv,"['S', 30]",2NewKitties,0.5,False,73.9375,51.0,NAN,NAN
+homoNewCats.csv,"['S', 30]",2NewKitties,0.6,True,39.125,38.5,NAN,NAN
+homoNewCats.csv,"['S', 30]",2NewKitties,0.6,False,74.625,51.5,NAN,NAN
+homoNewCats.csv,"['S', 30]",2NewKitties,0.7,True,33.0,33.0,NAN,NAN
+homoNewCats.csv,"['S', 30]",2NewKitties,0.7,False,72.0625,56.75,NAN,NAN
+homoNewCats.csv,"['S', 30]",2NewKitties,0.8,True,39.9375,40.25,NAN,NAN
+homoNewCats.csv,"['S', 30]",2NewKitties,0.8,False,73.0,58.0,NAN,NAN
+homoNewCats.csv,"['S', 30]",2NewKitties,0.9,True,45.0,45.0,NAN,NAN
+homoNewCats.csv,"['S', 30]",2NewKitties,0.9,False,69.5625,69.25,NAN,NAN
+homoNewCats.csv,"['S', 30]",2NewKitties,1.0,True,18.0,18.0,NAN,NAN
+homoNewCats.csv,"['S', 30]",2NewKitties,1.0,False,74.6875,50.5,NAN,NAN
+homoNewCats.csv,"['S', 30]",2OldKitties,0.0,True,37.75,39.0,NAN,NAN
+homoNewCats.csv,"['S', 30]",2OldKitties,0.0,False,70.6875,67.25,NAN,NAN
+homoNewCats.csv,"['S', 30]",2OldKitties,0.1,True,25.9375,26.25,NAN,NAN
+homoNewCats.csv,"['S', 30]",2OldKitties,0.1,False,70.6875,67.25,NAN,NAN
+homoNewCats.csv,"['S', 30]",2OldKitties,0.2,True,27.0,27.0,NAN,NAN
+homoNewCats.csv,"['S', 30]",2OldKitties,0.2,False,73.5625,55.75,NAN,NAN
+homoNewCats.csv,"['S', 30]",2OldKitties,0.3,True,36.0,36.0,NAN,NAN
+homoNewCats.csv,"['S', 30]",2OldKitties,0.3,False,70.4375,68.0,NAN,NAN
+homoNewCats.csv,"['S', 30]",2OldKitties,0.4,True,19.0,19.0,NAN,NAN
+homoNewCats.csv,"['S', 30]",2OldKitties,0.4,False,75.625,47.5,NAN,NAN
+homoNewCats.csv,"['S', 30]",2OldKitties,0.5,True,27.0,27.0,NAN,NAN
+homoNewCats.csv,"['S', 30]",2OldKitties,0.5,False,71.5,62.25,NAN,NAN
+homoNewCats.csv,"['S', 30]",2OldKitties,0.6,True,27.75,24.0,NAN,NAN
+homoNewCats.csv,"['S', 30]",2OldKitties,0.6,False,71.625,63.5,NAN,NAN
+homoNewCats.csv,"['S', 30]",2OldKitties,0.7,True,44.6875,36.25,NAN,NAN
+homoNewCats.csv,"['S', 30]",2OldKitties,0.7,False,69.5625,69.25,NAN,NAN
+homoNewCats.csv,"['S', 30]",2OldKitties,0.8,True,23.75,25.0,NAN,NAN
+homoNewCats.csv,"['S', 30]",2OldKitties,0.8,False,72.5625,54.75,NAN,NAN
+homoNewCats.csv,"['S', 30]",2OldKitties,0.9,True,39.75,41.0,NAN,NAN
+homoNewCats.csv,"['S', 30]",2OldKitties,0.9,False,73.5625,55.75,NAN,NAN
+homoNewCats.csv,"['S', 30]",2OldKitties,1.0,True,29.1875,28.25,NAN,NAN
+homoNewCats.csv,"['S', 30]",2OldKitties,1.0,False,71.75,62.75,NAN,NAN
+homoNewCats.csv,"['S', 30]",SelfPlay,0.0,True,23.1875,22.25,NAN,NAN
+homoNewCats.csv,"['S', 30]",SelfPlay,0.0,False,80.125,29.5,NAN,NAN
+homoNewCats.csv,"['S', 30]",SelfPlay,0.1,True,42.1875,41.25,NAN,NAN
+homoNewCats.csv,"['S', 30]",SelfPlay,0.1,False,72.4375,59.75,NAN,NAN
+homoNewCats.csv,"['S', 30]",SelfPlay,0.2,True,25.5,23.0,NAN,NAN
+homoNewCats.csv,"['S', 30]",SelfPlay,0.2,False,73.75,55.0,NAN,NAN
+homoNewCats.csv,"['S', 30]",SelfPlay,0.3,True,27.25,21.0,NAN,NAN
+homoNewCats.csv,"['S', 30]",SelfPlay,0.3,False,70.75,67.0,NAN,NAN
+homoNewCats.csv,"['S', 30]",SelfPlay,0.4,True,26.5,24.0,NAN,NAN
+homoNewCats.csv,"['S', 30]",SelfPlay,0.4,False,72.0,60.75,NAN,NAN
+homoNewCats.csv,"['S', 30]",SelfPlay,0.5,True,14.0,14.0,NAN,NAN
+homoNewCats.csv,"['S', 30]",SelfPlay,0.5,False,75.5,47.5,NAN,NAN
+homoNewCats.csv,"['S', 30]",SelfPlay,0.6,True,26.0,21.0,NAN,NAN
+homoNewCats.csv,"['S', 30]",SelfPlay,0.6,False,71.25,65.0,NAN,NAN
+homoNewCats.csv,"['S', 30]",SelfPlay,0.7,True,23.0,23.0,NAN,NAN
+homoNewCats.csv,"['S', 30]",SelfPlay,0.7,False,74.3125,50.25,NAN,NAN
+homoNewCats.csv,"['S', 30]",SelfPlay,0.8,True,33.0,33.0,NAN,NAN
+homoNewCats.csv,"['S', 30]",SelfPlay,0.8,False,73.6875,52.25,NAN,NAN
+homoNewCats.csv,"['S', 30]",SelfPlay,0.9,True,40.125,39.5,NAN,NAN
+homoNewCats.csv,"['S', 30]",SelfPlay,0.9,False,70.0625,69.75,NAN,NAN
+homoNewCats.csv,"['S', 30]",SelfPlay,1.0,True,26.4375,24.25,NAN,NAN
+homoNewCats.csv,"['S', 30]",SelfPlay,1.0,False,71.625,63.5,NAN,NAN
+homoNewCats.csv,"['J', 30]",2NewKitties,0.0,True,71.625,63.5,79.17258005595917,621.7885602718782
+homoNewCats.csv,"['J', 30]",2NewKitties,0.0,False,71.625,63.5,79.17258005595917,621.7885602718782
+homoNewCats.csv,"['J', 30]",2NewKitties,0.1,True,71.625,63.5,79.17258005595917,621.7885602718782
+homoNewCats.csv,"['J', 30]",2NewKitties,0.1,False,71.625,63.5,79.17258005595917,621.7885602718782
+homoNewCats.csv,"['J', 30]",2NewKitties,0.2,True,71.625,63.5,79.17258005595917,621.7885602718782
+homoNewCats.csv,"['J', 30]",2NewKitties,0.2,False,71.625,63.5,79.17258005595917,621.7885602718782
+homoNewCats.csv,"['J', 30]",2NewKitties,0.3,True,71.625,63.5,79.17258005595917,621.7885602718782
+homoNewCats.csv,"['J', 30]",2NewKitties,0.3,False,71.625,63.5,79.17258005595917,621.7885602718782
+homoNewCats.csv,"['J', 30]",2NewKitties,0.4,True,71.625,63.5,79.17258005595917,621.7885602718782
+homoNewCats.csv,"['J', 30]",2NewKitties,0.4,False,71.625,63.5,79.17258005595917,621.7885602718782
+homoNewCats.csv,"['J', 30]",2NewKitties,0.5,True,71.625,63.5,79.17258005595917,621.7885602718782
+homoNewCats.csv,"['J', 30]",2NewKitties,0.5,False,71.625,63.5,79.17258005595917,621.7885602718782
+homoNewCats.csv,"['J', 30]",2NewKitties,0.6,True,71.625,63.5,79.17258005595917,621.7885602718782
+homoNewCats.csv,"['J', 30]",2NewKitties,0.6,False,71.625,63.5,79.17258005595917,621.7885602718782
+homoNewCats.csv,"['J', 30]",2NewKitties,0.7,True,71.625,63.5,79.17258005595917,621.7885602718782
+homoNewCats.csv,"['J', 30]",2NewKitties,0.7,False,71.625,63.5,79.17258005595917,621.7885602718782
+homoNewCats.csv,"['J', 30]",2NewKitties,0.8,True,71.625,63.5,79.17258005595917,621.7885602718782
+homoNewCats.csv,"['J', 30]",2NewKitties,0.8,False,71.625,63.5,79.17258005595917,621.7885602718782
+homoNewCats.csv,"['J', 30]",2NewKitties,0.9,True,71.625,63.5,79.17258005595917,621.7885602718782
+homoNewCats.csv,"['J', 30]",2NewKitties,0.9,False,71.625,63.5,79.17258005595917,621.7885602718782
+homoNewCats.csv,"['J', 30]",2NewKitties,1.0,True,71.625,63.5,79.17258005595917,621.7885602718782
+homoNewCats.csv,"['J', 30]",2NewKitties,1.0,False,71.625,63.5,79.17258005595917,621.7885602718782
+homoNewCats.csv,"['J', 30]",2OldKitties,0.0,True,71.625,63.5,79.17258005595917,621.7885602718782
+homoNewCats.csv,"['J', 30]",2OldKitties,0.0,False,71.625,63.5,79.17258005595917,621.7885602718782
+homoNewCats.csv,"['J', 30]",2OldKitties,0.1,True,71.625,63.5,79.17258005595917,621.7885602718782
+homoNewCats.csv,"['J', 30]",2OldKitties,0.1,False,71.625,63.5,79.17258005595917,621.7885602718782
+homoNewCats.csv,"['J', 30]",2OldKitties,0.2,True,71.625,63.5,79.17258005595917,621.7885602718782
+homoNewCats.csv,"['J', 30]",2OldKitties,0.2,False,71.625,63.5,79.17258005595917,621.7885602718782
+homoNewCats.csv,"['J', 30]",2OldKitties,0.3,True,71.625,63.5,79.17258005595917,621.7885602718782
+homoNewCats.csv,"['J', 30]",2OldKitties,0.3,False,71.625,63.5,79.17258005595917,621.7885602718782
+homoNewCats.csv,"['J', 30]",2OldKitties,0.4,True,71.625,63.5,79.17258005595917,621.7885602718782
+homoNewCats.csv,"['J', 30]",2OldKitties,0.4,False,71.625,63.5,79.17258005595917,621.7885602718782
+homoNewCats.csv,"['J', 30]",2OldKitties,0.5,True,71.625,63.5,79.17258005595917,621.7885602718782
+homoNewCats.csv,"['J', 30]",2OldKitties,0.5,False,71.625,63.5,79.17258005595917,621.7885602718782
+homoNewCats.csv,"['J', 30]",2OldKitties,0.6,True,71.625,63.5,79.17258005595917,621.7885602718782
+homoNewCats.csv,"['J', 30]",2OldKitties,0.6,False,71.625,63.5,79.17258005595917,621.7885602718782
+homoNewCats.csv,"['J', 30]",2OldKitties,0.7,True,71.625,63.5,79.17258005595917,621.7885602718782
+homoNewCats.csv,"['J', 30]",2OldKitties,0.7,False,71.625,63.5,79.17258005595917,621.7885602718782
+homoNewCats.csv,"['J', 30]",2OldKitties,0.8,True,71.625,63.5,79.17258005595917,621.7885602718782
+homoNewCats.csv,"['J', 30]",2OldKitties,0.8,False,71.625,63.5,79.17258005595917,621.7885602718782
+homoNewCats.csv,"['J', 30]",2OldKitties,0.9,True,71.625,63.5,79.17258005595917,621.7885602718782
+homoNewCats.csv,"['J', 30]",2OldKitties,0.9,False,71.625,63.5,79.17258005595917,621.7885602718782
+homoNewCats.csv,"['J', 30]",2OldKitties,1.0,True,71.625,63.5,79.17258005595917,621.7885602718782
+homoNewCats.csv,"['J', 30]",2OldKitties,1.0,False,71.625,63.5,79.17258005595917,621.7885602718782
+homoNewCats.csv,"['J', 30]",SelfPlay,0.0,True,71.625,63.5,79.17258005595917,621.7885602718782
+homoNewCats.csv,"['J', 30]",SelfPlay,0.0,False,71.625,63.5,79.17258005595917,621.7885602718782
+homoNewCats.csv,"['J', 30]",SelfPlay,0.1,True,71.625,63.5,79.17258005595917,621.7885602718782
+homoNewCats.csv,"['J', 30]",SelfPlay,0.1,False,71.625,63.5,79.17258005595917,621.7885602718782
+homoNewCats.csv,"['J', 30]",SelfPlay,0.2,True,71.625,63.5,79.17258005595917,621.7885602718782
+homoNewCats.csv,"['J', 30]",SelfPlay,0.2,False,71.625,63.5,79.17258005595917,621.7885602718782
+homoNewCats.csv,"['J', 30]",SelfPlay,0.3,True,71.625,63.5,79.17258005595917,621.7885602718782
+homoNewCats.csv,"['J', 30]",SelfPlay,0.3,False,71.625,63.5,79.17258005595917,621.7885602718782
+homoNewCats.csv,"['J', 30]",SelfPlay,0.4,True,71.625,63.5,79.17258005595917,621.7885602718782
+homoNewCats.csv,"['J', 30]",SelfPlay,0.4,False,71.625,63.5,79.17258005595917,621.7885602718782
+homoNewCats.csv,"['J', 30]",SelfPlay,0.5,True,71.625,63.5,79.17258005595917,621.7885602718782
+homoNewCats.csv,"['J', 30]",SelfPlay,0.5,False,71.625,63.5,79.17258005595917,621.7885602718782
+homoNewCats.csv,"['J', 30]",SelfPlay,0.6,True,71.625,63.5,79.17258005595917,621.7885602718782
+homoNewCats.csv,"['J', 30]",SelfPlay,0.6,False,71.625,63.5,79.17258005595917,621.7885602718782
+homoNewCats.csv,"['J', 30]",SelfPlay,0.7,True,71.625,63.5,79.17258005595917,621.7885602718782
+homoNewCats.csv,"['J', 30]",SelfPlay,0.7,False,71.625,63.5,79.17258005595917,621.7885602718782
+homoNewCats.csv,"['J', 30]",SelfPlay,0.8,True,71.625,63.5,79.17258005595917,621.7885602718782
+homoNewCats.csv,"['J', 30]",SelfPlay,0.8,False,71.625,63.5,79.17258005595917,621.7885602718782
+homoNewCats.csv,"['J', 30]",SelfPlay,0.9,True,71.625,63.5,79.17258005595917,621.7885602718782
+homoNewCats.csv,"['J', 30]",SelfPlay,0.9,False,71.625,63.5,79.17258005595917,621.7885602718782
+homoNewCats.csv,"['J', 30]",SelfPlay,1.0,True,71.625,63.5,79.17258005595917,621.7885602718782
+homoNewCats.csv,"['J', 30]",SelfPlay,1.0,False,71.625,63.5,79.17258005595917,621.7885602718782
+homoNewCats.csv,"[4, 3, 3, 3, 3, 3, 3, 3, 3]",2NewKitties,0.0,True,17.0,17.0,45.697053088330634,563.5912714778544
+homoNewCats.csv,"[4, 3, 3, 3, 3, 3, 3, 3, 3]",2NewKitties,0.0,False,29.5,22.0,53.47413620851712,547.1205820954261
+homoNewCats.csv,"[4, 3, 3, 3, 3, 3, 3, 3, 3]",2NewKitties,0.1,True,15.0,15.0,57.78081932790795,553.6632241198085
+homoNewCats.csv,"[4, 3, 3, 3, 3, 3, 3, 3, 3]",2NewKitties,0.1,False,31.5,14.0,37.59171015437878,536.8696810545629
+homoNewCats.csv,"[4, 3, 3, 3, 3, 3, 3, 3, 3]",2NewKitties,0.2,True,16.0,16.0,90.36057720946383,550.2091616051272
+homoNewCats.csv,"[4, 3, 3, 3, 3, 3, 3, 3, 3]",2NewKitties,0.2,False,27.9375,28.25,81.97094092088466,552.3384509169671
+homoNewCats.csv,"[4, 3, 3, 3, 3, 3, 3, 3, 3]",2NewKitties,0.3,True,17.75,19.0,93.97690724260872,523.7352635257964
+homoNewCats.csv,"[4, 3, 3, 3, 3, 3, 3, 3, 3]",2NewKitties,0.3,False,28.375,26.5,95.48167565928935,540.8499342503314
+homoNewCats.csv,"[4, 3, 3, 3, 3, 3, 3, 3, 3]",2NewKitties,0.4,True,16.0,16.0,45.67953751583304,556.3913263033954
+homoNewCats.csv,"[4, 3, 3, 3, 3, 3, 3, 3, 3]",2NewKitties,0.4,False,29.875,20.5,68.8679519472723,543.9230941930136
+homoNewCats.csv,"[4, 3, 3, 3, 3, 3, 3, 3, 3]",2NewKitties,0.5,True,15.0,15.0,39.93370205424887,550.8862124667919
+homoNewCats.csv,"[4, 3, 3, 3, 3, 3, 3, 3, 3]",2NewKitties,0.5,False,30.625,17.5,56.34296473422985,542.6034968858224
+homoNewCats.csv,"[4, 3, 3, 3, 3, 3, 3, 3, 3]",2NewKitties,0.6,True,16.0,16.0,57.8124537357342,551.7330669947603
+homoNewCats.csv,"[4, 3, 3, 3, 3, 3, 3, 3, 3]",2NewKitties,0.6,False,30.625,17.0,46.596276665996555,556.8557921226002
+homoNewCats.csv,"[4, 3, 3, 3, 3, 3, 3, 3, 3]",2NewKitties,0.7,True,18.0,18.0,130.56253208173183,530.6982430375149
+homoNewCats.csv,"[4, 3, 3, 3, 3, 3, 3, 3, 3]",2NewKitties,0.7,False,29.3125,22.25,69.14891312796709,535.7237218189686
+homoNewCats.csv,"[4, 3, 3, 3, 3, 3, 3, 3, 3]",2NewKitties,0.8,True,16.0,16.0,67.59065229002717,545.7048317199176
+homoNewCats.csv,"[4, 3, 3, 3, 3, 3, 3, 3, 3]",2NewKitties,0.8,False,27.6875,29.25,66.14041899508419,553.5446573690673
+homoNewCats.csv,"[4, 3, 3, 3, 3, 3, 3, 3, 3]",2NewKitties,0.9,True,12.0,12.0,45.49100175246949,558.7291253173278
+homoNewCats.csv,"[4, 3, 3, 3, 3, 3, 3, 3, 3]",2NewKitties,0.9,False,28.625,25.5,84.07028695467494,533.8242973980864
+homoNewCats.csv,"[4, 3, 3, 3, 3, 3, 3, 3, 3]",2NewKitties,1.0,True,17.0,17.0,126.73659287327173,517.0490724787074
+homoNewCats.csv,"[4, 3, 3, 3, 3, 3, 3, 3, 3]",2NewKitties,1.0,False,28.1875,27.25,130.49907193783372,524.4788823925797
+homoNewCats.csv,"[4, 3, 3, 3, 3, 3, 3, 3, 3]",2OldKitties,0.0,True,17.0,17.0,82.44149077114992,552.52653667694
+homoNewCats.csv,"[4, 3, 3, 3, 3, 3, 3, 3, 3]",2OldKitties,0.0,False,28.625,25.5,83.9125583377635,552.4713188818754
+homoNewCats.csv,"[4, 3, 3, 3, 3, 3, 3, 3, 3]",2OldKitties,0.1,True,14.0,14.0,88.19638168144502,539.8869858964171
+homoNewCats.csv,"[4, 3, 3, 3, 3, 3, 3, 3, 3]",2OldKitties,0.1,False,27.875,28.5,90.24088602835702,535.3587731026207
+homoNewCats.csv,"[4, 3, 3, 3, 3, 3, 3, 3, 3]",2OldKitties,0.2,True,15.0,15.0,42.463429895062546,555.469912776263
+homoNewCats.csv,"[4, 3, 3, 3, 3, 3, 3, 3, 3]",2OldKitties,0.2,False,28.375,26.5,82.72817585166999,546.6216488968978
+homoNewCats.csv,"[4, 3, 3, 3, 3, 3, 3, 3, 3]",2OldKitties,0.3,True,16.0,16.0,62.081241407768616,545.4683181769499
+homoNewCats.csv,"[4, 3, 3, 3, 3, 3, 3, 3, 3]",2OldKitties,0.3,False,28.5625,25.75,97.680378070894,537.3360326996446
+homoNewCats.csv,"[4, 3, 3, 3, 3, 3, 3, 3, 3]",2OldKitties,0.4,True,16.0,16.0,56.533988426509296,547.7832898148786
+homoNewCats.csv,"[4, 3, 3, 3, 3, 3, 3, 3, 3]",2OldKitties,0.4,False,29.5,22.0,74.356903130566,551.0794709181753
+homoNewCats.csv,"[4, 3, 3, 3, 3, 3, 3, 3, 3]",2OldKitties,0.5,True,19.0,19.0,98.94631734385163,532.7093246957219
+homoNewCats.csv,"[4, 3, 3, 3, 3, 3, 3, 3, 3]",2OldKitties,0.5,False,29.625,21.5,42.3168749985591,557.6138742256144
+homoNewCats.csv,"[4, 3, 3, 3, 3, 3, 3, 3, 3]",2OldKitties,0.6,True,16.875,17.5,118.60835356374356,517.0368572676504
+homoNewCats.csv,"[4, 3, 3, 3, 3, 3, 3, 3, 3]",2OldKitties,0.6,False,28.0625,27.75,92.41264712301182,547.828024942412
+homoNewCats.csv,"[4, 3, 3, 3, 3, 3, 3, 3, 3]",2OldKitties,0.7,True,16.0,16.0,65.20487390900871,524.6266465055198
+homoNewCats.csv,"[4, 3, 3, 3, 3, 3, 3, 3, 3]",2OldKitties,0.7,False,28.375,26.5,87.41583042642112,547.897918648074
+homoNewCats.csv,"[4, 3, 3, 3, 3, 3, 3, 3, 3]",2OldKitties,0.8,True,15.0,15.0,39.75869544262561,547.3149665256428
+homoNewCats.csv,"[4, 3, 3, 3, 3, 3, 3, 3, 3]",2OldKitties,0.8,False,30.25,19.0,72.37861477730937,539.4797068701529
+homoNewCats.csv,"[4, 3, 3, 3, 3, 3, 3, 3, 3]",2OldKitties,0.9,True,14.0,14.0,47.18676611373504,563.942858252972
+homoNewCats.csv,"[4, 3, 3, 3, 3, 3, 3, 3, 3]",2OldKitties,0.9,False,28.625,25.5,71.87031107655352,544.2213123490004
+homoNewCats.csv,"[4, 3, 3, 3, 3, 3, 3, 3, 3]",2OldKitties,1.0,True,20.0,20.0,95.46246151396016,547.0068045868628
+homoNewCats.csv,"[4, 3, 3, 3, 3, 3, 3, 3, 3]",2OldKitties,1.0,False,28.0,28.0,262.88819495990447,486.43899261860895
+homoNewCats.csv,"[4, 3, 3, 3, 3, 3, 3, 3, 3]",SelfPlay,0.0,True,14.0,14.0,67.84023377121792,537.3984794607499
+homoNewCats.csv,"[4, 3, 3, 3, 3, 3, 3, 3, 3]",SelfPlay,0.0,False,28.625,25.5,81.11615659323124,549.9989426787084
+homoNewCats.csv,"[4, 3, 3, 3, 3, 3, 3, 3, 3]",SelfPlay,0.1,True,16.0,16.0,133.95841409665917,528.8674839673979
+homoNewCats.csv,"[4, 3, 3, 3, 3, 3, 3, 3, 3]",SelfPlay,0.1,False,29.4375,21.75,64.04895350067399,547.6999026585725
+homoNewCats.csv,"[4, 3, 3, 3, 3, 3, 3, 3, 3]",SelfPlay,0.2,True,17.0,17.0,27.358417668850365,554.5326838597023
+homoNewCats.csv,"[4, 3, 3, 3, 3, 3, 3, 3, 3]",SelfPlay,0.2,False,28.875,24.5,106.66554169555602,536.7379997555238
+homoNewCats.csv,"[4, 3, 3, 3, 3, 3, 3, 3, 3]",SelfPlay,0.3,True,15.0,15.0,41.138393978599474,563.5916052067901
+homoNewCats.csv,"[4, 3, 3, 3, 3, 3, 3, 3, 3]",SelfPlay,0.3,False,29.5,21.5,84.78970948532401,552.3031846403883
+homoNewCats.csv,"[4, 3, 3, 3, 3, 3, 3, 3, 3]",SelfPlay,0.4,True,15.0,15.0,45.2532545351056,561.0942517537151
+homoNewCats.csv,"[4, 3, 3, 3, 3, 3, 3, 3, 3]",SelfPlay,0.4,False,29.625,21.5,59.1759981064359,538.5854485705536
+homoNewCats.csv,"[4, 3, 3, 3, 3, 3, 3, 3, 3]",SelfPlay,0.5,True,16.0,16.0,43.26939315888742,548.155350851489
+homoNewCats.csv,"[4, 3, 3, 3, 3, 3, 3, 3, 3]",SelfPlay,0.5,False,29.125,23.5,79.58504005937218,545.1555389669073
+homoNewCats.csv,"[4, 3, 3, 3, 3, 3, 3, 3, 3]",SelfPlay,0.6,True,18.0,18.0,38.25927245990948,558.5779882579013
+homoNewCats.csv,"[4, 3, 3, 3, 3, 3, 3, 3, 3]",SelfPlay,0.6,False,29.125,23.5,51.148639295970206,545.0760854943201
+homoNewCats.csv,"[4, 3, 3, 3, 3, 3, 3, 3, 3]",SelfPlay,0.7,True,17.0,17.0,96.43701087691552,541.3411222215269
+homoNewCats.csv,"[4, 3, 3, 3, 3, 3, 3, 3, 3]",SelfPlay,0.7,False,29.6875,20.75,37.748466306377395,565.251727640558
+homoNewCats.csv,"[4, 3, 3, 3, 3, 3, 3, 3, 3]",SelfPlay,0.8,True,14.0,14.0,58.779890018235236,550.5353107806387
+homoNewCats.csv,"[4, 3, 3, 3, 3, 3, 3, 3, 3]",SelfPlay,0.8,False,29.0,23.75,42.85782757193248,564.899617143707
+homoNewCats.csv,"[4, 3, 3, 3, 3, 3, 3, 3, 3]",SelfPlay,0.9,True,13.0,13.0,62.15094408573907,543.6304077422487
+homoNewCats.csv,"[4, 3, 3, 3, 3, 3, 3, 3, 3]",SelfPlay,0.9,False,29.75,17.25,75.33083087670201,557.7895536778271
+homoNewCats.csv,"[4, 3, 3, 3, 3, 3, 3, 3, 3]",SelfPlay,1.0,True,17.0,17.0,177.20853444565606,521.1172911664626
+homoNewCats.csv,"[4, 3, 3, 3, 3, 3, 3, 3, 3]",SelfPlay,1.0,False,29.5,22.0,93.80562537763674,540.4391901050969
+heterogenousCatKillers.csv,"['S', 30]",2NewKitties,0.0,True,15.625,17.5,NAN,NAN
+heterogenousCatKillers.csv,"['S', 30]",2NewKitties,0.0,False,60.9375,82.75,NAN,NAN
+heterogenousCatKillers.csv,"['S', 30]",2NewKitties,0.1,True,18.0,18.0,NAN,NAN
+heterogenousCatKillers.csv,"['S', 30]",2NewKitties,0.1,False,62.4375,78.0,NAN,NAN
+heterogenousCatKillers.csv,"['S', 30]",2NewKitties,0.2,True,17.375,20.5,NAN,NAN
+heterogenousCatKillers.csv,"['S', 30]",2NewKitties,0.2,False,57.4375,63.0,NAN,NAN
+heterogenousCatKillers.csv,"['S', 30]",2NewKitties,0.3,True,16.75,18.0,NAN,NAN
+heterogenousCatKillers.csv,"['S', 30]",2NewKitties,0.3,False,62.625,74.0,NAN,NAN
+heterogenousCatKillers.csv,"['S', 30]",2NewKitties,0.4,True,18.625,20.5,NAN,NAN
+heterogenousCatKillers.csv,"['S', 30]",2NewKitties,0.4,False,58.9375,69.25,NAN,NAN
+heterogenousCatKillers.csv,"['S', 30]",2NewKitties,0.5,True,19.3125,22.75,NAN,NAN
+heterogenousCatKillers.csv,"['S', 30]",2NewKitties,0.5,False,61.625,84.75,NAN,NAN
+heterogenousCatKillers.csv,"['S', 30]",2NewKitties,0.6,True,17.625,19.5,NAN,NAN
+heterogenousCatKillers.csv,"['S', 30]",2NewKitties,0.6,False,61.875,79.0,NAN,NAN
+heterogenousCatKillers.csv,"['S', 30]",2NewKitties,0.7,True,17.625,19.5,NAN,NAN
+heterogenousCatKillers.csv,"['S', 30]",2NewKitties,0.7,False,60.0,82.75,NAN,NAN
+heterogenousCatKillers.csv,"['S', 30]",2NewKitties,0.8,True,13.0,13.0,NAN,NAN
+heterogenousCatKillers.csv,"['S', 30]",2NewKitties,0.8,False,58.375,65.75,NAN,NAN
+heterogenousCatKillers.csv,"['S', 30]",2NewKitties,0.9,True,16.0,16.0,NAN,NAN
+heterogenousCatKillers.csv,"['S', 30]",2NewKitties,0.9,False,60.25,70.0,NAN,NAN
+heterogenousCatKillers.csv,"['S', 30]",2NewKitties,1.0,True,18.0,18.0,NAN,NAN
+heterogenousCatKillers.csv,"['S', 30]",2NewKitties,1.0,False,60.375,72.0,NAN,NAN
+heterogenousCatKillers.csv,"['S', 30]",2OldKitties,0.0,True,19.375,22.5,NAN,NAN
+heterogenousCatKillers.csv,"['S', 30]",2OldKitties,0.0,False,58.6875,52.5,NAN,NAN
+heterogenousCatKillers.csv,"['S', 30]",2OldKitties,0.1,True,18.5,21.0,NAN,NAN
+heterogenousCatKillers.csv,"['S', 30]",2OldKitties,0.1,False,58.8125,61.0,NAN,NAN
+heterogenousCatKillers.csv,"['S', 30]",2OldKitties,0.2,True,17.875,18.5,NAN,NAN
+heterogenousCatKillers.csv,"['S', 30]",2OldKitties,0.2,False,58.0625,66.0,NAN,NAN
+heterogenousCatKillers.csv,"['S', 30]",2OldKitties,0.3,True,19.0,19.0,NAN,NAN
+heterogenousCatKillers.csv,"['S', 30]",2OldKitties,0.3,False,61.5625,72.0,NAN,NAN
+heterogenousCatKillers.csv,"['S', 30]",2OldKitties,0.4,True,22.75,29.0,NAN,NAN
+heterogenousCatKillers.csv,"['S', 30]",2OldKitties,0.4,False,60.9375,77.75,NAN,NAN
+heterogenousCatKillers.csv,"['S', 30]",2OldKitties,0.5,True,20.5,23.0,NAN,NAN
+heterogenousCatKillers.csv,"['S', 30]",2OldKitties,0.5,False,63.75,78.25,NAN,NAN
+heterogenousCatKillers.csv,"['S', 30]",2OldKitties,0.6,True,16.75,18.0,NAN,NAN
+heterogenousCatKillers.csv,"['S', 30]",2OldKitties,0.6,False,62.3125,75.25,NAN,NAN
+heterogenousCatKillers.csv,"['S', 30]",2OldKitties,0.7,True,17.75,19.0,NAN,NAN
+heterogenousCatKillers.csv,"['S', 30]",2OldKitties,0.7,False,61.375,76.25,NAN,NAN
+heterogenousCatKillers.csv,"['S', 30]",2OldKitties,0.8,True,13.0,13.0,NAN,NAN
+heterogenousCatKillers.csv,"['S', 30]",2OldKitties,0.8,False,60.5625,74.75,NAN,NAN
+heterogenousCatKillers.csv,"['S', 30]",2OldKitties,0.9,True,16.0,16.0,NAN,NAN
+heterogenousCatKillers.csv,"['S', 30]",2OldKitties,0.9,False,61.6875,75.75,NAN,NAN
+heterogenousCatKillers.csv,"['S', 30]",2OldKitties,1.0,True,15.0,15.0,NAN,NAN
+heterogenousCatKillers.csv,"['S', 30]",2OldKitties,1.0,False,61.3125,74.5,NAN,NAN
+heterogenousCatKillers.csv,"['S', 30]",SelfPlay,0.0,True,19.0625,23.75,NAN,NAN
+heterogenousCatKillers.csv,"['S', 30]",SelfPlay,0.0,False,60.6875,76.75,NAN,NAN
+heterogenousCatKillers.csv,"['S', 30]",SelfPlay,0.1,True,16.875,17.5,NAN,NAN
+heterogenousCatKillers.csv,"['S', 30]",SelfPlay,0.1,False,57.9375,66.0,NAN,NAN
+heterogenousCatKillers.csv,"['S', 30]",SelfPlay,0.2,True,15.0,15.0,NAN,NAN
+heterogenousCatKillers.csv,"['S', 30]",SelfPlay,0.2,False,60.4375,85.25,NAN,NAN
+heterogenousCatKillers.csv,"['S', 30]",SelfPlay,0.3,True,20.625,22.5,NAN,NAN
+heterogenousCatKillers.csv,"['S', 30]",SelfPlay,0.3,False,62.75,83.0,NAN,NAN
+heterogenousCatKillers.csv,"['S', 30]",SelfPlay,0.4,True,19.75,21.0,NAN,NAN
+heterogenousCatKillers.csv,"['S', 30]",SelfPlay,0.4,False,61.8125,80.25,NAN,NAN
+heterogenousCatKillers.csv,"['S', 30]",SelfPlay,0.5,True,18.0,18.0,NAN,NAN
+heterogenousCatKillers.csv,"['S', 30]",SelfPlay,0.5,False,58.625,71.5,NAN,NAN
+heterogenousCatKillers.csv,"['S', 30]",SelfPlay,0.6,True,14.0,14.0,NAN,NAN
+heterogenousCatKillers.csv,"['S', 30]",SelfPlay,0.6,False,63.6875,78.0,NAN,NAN
+heterogenousCatKillers.csv,"['S', 30]",SelfPlay,0.7,True,13.5625,15.75,NAN,NAN
+heterogenousCatKillers.csv,"['S', 30]",SelfPlay,0.7,False,60.0,81.25,NAN,NAN
+heterogenousCatKillers.csv,"['S', 30]",SelfPlay,0.8,True,20.25,24.0,NAN,NAN
+heterogenousCatKillers.csv,"['S', 30]",SelfPlay,0.8,False,61.625,74.0,NAN,NAN
+heterogenousCatKillers.csv,"['S', 30]",SelfPlay,0.9,True,20.875,26.5,NAN,NAN
+heterogenousCatKillers.csv,"['S', 30]",SelfPlay,0.9,False,63.0,76.25,NAN,NAN
+heterogenousCatKillers.csv,"['S', 30]",SelfPlay,1.0,True,12.0,12.0,NAN,NAN
+heterogenousCatKillers.csv,"['S', 30]",SelfPlay,1.0,False,61.3125,77.0,NAN,NAN
+heterogenousCatKillers.csv,"['J', 30]",2NewKitties,0.0,True,61.3125,77.0,6.725913397192876,87.4224561317425
+heterogenousCatKillers.csv,"['J', 30]",2NewKitties,0.0,False,61.3125,77.0,13.12669142100604,86.36011657194365
+heterogenousCatKillers.csv,"['J', 30]",2NewKitties,0.1,True,61.3125,77.0,13.12669142100604,86.36011657194365
+heterogenousCatKillers.csv,"['J', 30]",2NewKitties,0.1,False,61.3125,77.0,13.30142150916699,86.58633331103897
+heterogenousCatKillers.csv,"['J', 30]",2NewKitties,0.2,True,61.3125,77.0,6.900643485353828,87.64867287083783
+heterogenousCatKillers.csv,"['J', 30]",2NewKitties,0.2,False,61.3125,77.0,13.30142150916699,86.58633331103897
+heterogenousCatKillers.csv,"['J', 30]",2NewKitties,0.3,True,61.3125,77.0,6.900643485353828,87.64867287083783
+heterogenousCatKillers.csv,"['J', 30]",2NewKitties,0.3,False,61.3125,77.0,13.12669142100604,86.36011657194365
+heterogenousCatKillers.csv,"['J', 30]",2NewKitties,0.4,True,61.3125,77.0,6.900643485353828,87.64867287083783
+heterogenousCatKillers.csv,"['J', 30]",2NewKitties,0.4,False,61.3125,77.0,6.900643485353828,87.64867287083783
+heterogenousCatKillers.csv,"['J', 30]",2NewKitties,0.5,True,61.3125,77.0,13.30142150916699,86.58633331103897
+heterogenousCatKillers.csv,"['J', 30]",2NewKitties,0.5,False,61.3125,77.0,13.30142150916699,86.58633331103897
+heterogenousCatKillers.csv,"['J', 30]",2NewKitties,0.6,True,61.3125,77.0,6.900643485353828,87.64867287083783
+heterogenousCatKillers.csv,"['J', 30]",2NewKitties,0.6,False,61.3125,77.0,6.900643485353828,87.64867287083783
+heterogenousCatKillers.csv,"['J', 30]",2NewKitties,0.7,True,61.3125,77.0,13.12669142100604,86.36011657194365
+heterogenousCatKillers.csv,"['J', 30]",2NewKitties,0.7,False,61.3125,77.0,13.30142150916699,86.58633331103897
+heterogenousCatKillers.csv,"['J', 30]",2NewKitties,0.8,True,61.3125,77.0,6.900643485353828,87.64867287083783
+heterogenousCatKillers.csv,"['J', 30]",2NewKitties,0.8,False,61.3125,77.0,13.12669142100604,86.36011657194365
+heterogenousCatKillers.csv,"['J', 30]",2NewKitties,0.9,True,61.3125,77.0,6.900643485353828,87.64867287083783
+heterogenousCatKillers.csv,"['J', 30]",2NewKitties,0.9,False,61.3125,77.0,12.951961332845087,86.13389983284833
+heterogenousCatKillers.csv,"['J', 30]",2NewKitties,1.0,True,61.3125,77.0,6.900643485353828,87.64867287083783
+heterogenousCatKillers.csv,"['J', 30]",2NewKitties,1.0,False,61.3125,77.0,6.725913397192876,87.4224561317425
+heterogenousCatKillers.csv,"['J', 30]",2OldKitties,0.0,True,61.3125,77.0,0.4998654615406656,88.7110124306367
+heterogenousCatKillers.csv,"['J', 30]",2OldKitties,0.0,False,61.3125,77.0,13.30142150916699,86.58633331103897
+heterogenousCatKillers.csv,"['J', 30]",2OldKitties,0.1,True,61.3125,77.0,6.900643485353828,87.64867287083783
+heterogenousCatKillers.csv,"['J', 30]",2OldKitties,0.1,False,61.3125,77.0,13.30142150916699,86.58633331103897
+heterogenousCatKillers.csv,"['J', 30]",2OldKitties,0.2,True,61.3125,77.0,13.12669142100604,86.36011657194365
+heterogenousCatKillers.csv,"['J', 30]",2OldKitties,0.2,False,61.3125,77.0,6.900643485353828,87.64867287083783
+heterogenousCatKillers.csv,"['J', 30]",2OldKitties,0.3,True,61.3125,77.0,6.900643485353828,87.64867287083783
+heterogenousCatKillers.csv,"['J', 30]",2OldKitties,0.3,False,61.3125,77.0,6.725913397192876,87.4224561317425
+heterogenousCatKillers.csv,"['J', 30]",2OldKitties,0.4,True,61.3125,77.0,13.30142150916699,86.58633331103897
+heterogenousCatKillers.csv,"['J', 30]",2OldKitties,0.4,False,61.3125,77.0,13.12669142100604,86.36011657194365
+heterogenousCatKillers.csv,"['J', 30]",2OldKitties,0.5,True,61.3125,77.0,6.900643485353828,87.64867287083783
+heterogenousCatKillers.csv,"['J', 30]",2OldKitties,0.5,False,61.3125,77.0,0.4998654615406656,88.7110124306367
+heterogenousCatKillers.csv,"['J', 30]",2OldKitties,0.6,True,61.3125,77.0,13.12669142100604,86.36011657194365
+heterogenousCatKillers.csv,"['J', 30]",2OldKitties,0.6,False,61.3125,77.0,12.951961332845087,86.13389983284833
+heterogenousCatKillers.csv,"['J', 30]",2OldKitties,0.7,True,61.3125,77.0,13.12669142100604,86.36011657194365
+heterogenousCatKillers.csv,"['J', 30]",2OldKitties,0.7,False,61.3125,77.0,6.900643485353828,87.64867287083783
+heterogenousCatKillers.csv,"['J', 30]",2OldKitties,0.8,True,61.3125,77.0,6.725913397192876,87.4224561317425
+heterogenousCatKillers.csv,"['J', 30]",2OldKitties,0.8,False,61.3125,77.0,13.12669142100604,86.36011657194365
+heterogenousCatKillers.csv,"['J', 30]",2OldKitties,0.9,True,61.3125,77.0,13.30142150916699,86.58633331103897
+heterogenousCatKillers.csv,"['J', 30]",2OldKitties,0.9,False,61.3125,77.0,13.30142150916699,86.58633331103897
+heterogenousCatKillers.csv,"['J', 30]",2OldKitties,1.0,True,61.3125,77.0,6.900643485353828,87.64867287083783
+heterogenousCatKillers.csv,"['J', 30]",2OldKitties,1.0,False,61.3125,77.0,12.951961332845087,86.13389983284833
+heterogenousCatKillers.csv,"['J', 30]",SelfPlay,0.0,True,61.3125,77.0,13.12669142100604,86.36011657194365
+heterogenousCatKillers.csv,"['J', 30]",SelfPlay,0.0,False,61.3125,77.0,13.30142150916699,86.58633331103897
+heterogenousCatKillers.csv,"['J', 30]",SelfPlay,0.1,True,61.3125,77.0,13.30142150916699,86.58633331103897
+heterogenousCatKillers.csv,"['J', 30]",SelfPlay,0.1,False,61.3125,77.0,6.900643485353828,87.64867287083783
+heterogenousCatKillers.csv,"['J', 30]",SelfPlay,0.2,True,61.3125,77.0,6.900643485353828,87.64867287083783
+heterogenousCatKillers.csv,"['J', 30]",SelfPlay,0.2,False,61.3125,77.0,12.951961332845087,86.13389983284833
+heterogenousCatKillers.csv,"['J', 30]",SelfPlay,0.3,True,61.3125,77.0,12.951961332845087,86.13389983284833
+heterogenousCatKillers.csv,"['J', 30]",SelfPlay,0.3,False,61.3125,77.0,6.725913397192876,87.4224561317425
+heterogenousCatKillers.csv,"['J', 30]",SelfPlay,0.4,True,61.3125,77.0,6.725913397192876,87.4224561317425
+heterogenousCatKillers.csv,"['J', 30]",SelfPlay,0.4,False,61.3125,77.0,13.12669142100604,86.36011657194365
+heterogenousCatKillers.csv,"['J', 30]",SelfPlay,0.5,True,61.3125,77.0,6.725913397192876,87.4224561317425
+heterogenousCatKillers.csv,"['J', 30]",SelfPlay,0.5,False,61.3125,77.0,6.900643485353828,87.64867287083783
+heterogenousCatKillers.csv,"['J', 30]",SelfPlay,0.6,True,61.3125,77.0,6.900643485353828,87.64867287083783
+heterogenousCatKillers.csv,"['J', 30]",SelfPlay,0.6,False,61.3125,77.0,6.900643485353828,87.64867287083783
+heterogenousCatKillers.csv,"['J', 30]",SelfPlay,0.7,True,61.3125,77.0,13.30142150916699,86.58633331103897
+heterogenousCatKillers.csv,"['J', 30]",SelfPlay,0.7,False,61.3125,77.0,13.30142150916699,86.58633331103897
+heterogenousCatKillers.csv,"['J', 30]",SelfPlay,0.8,True,61.3125,77.0,13.30142150916699,86.58633331103897
+heterogenousCatKillers.csv,"['J', 30]",SelfPlay,0.8,False,61.3125,77.0,13.30142150916699,86.58633331103897
+heterogenousCatKillers.csv,"['J', 30]",SelfPlay,0.9,True,61.3125,77.0,6.900643485353828,87.64867287083783
+heterogenousCatKillers.csv,"['J', 30]",SelfPlay,0.9,False,61.3125,77.0,13.30142150916699,86.58633331103897
+heterogenousCatKillers.csv,"['J', 30]",SelfPlay,1.0,True,61.3125,77.0,6.900643485353828,87.64867287083783
+heterogenousCatKillers.csv,"['J', 30]",SelfPlay,1.0,False,61.3125,77.0,6.725913397192876,87.4224561317425
+heterogenousCatKillers.csv,"[4, 3, 3, 3, 3, 3, 3, 3, 3]",2NewKitties,0.0,True,10.0,10.0,13.508869412521687,88.30616621313551

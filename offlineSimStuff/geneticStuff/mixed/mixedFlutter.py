@@ -266,7 +266,7 @@ def run_jhg_stuff(jhg_engine, round, agents, numAgents):
 def create_jhg_engine(agents):
     num_players = len(agents)
     poverty_line = 0
-    forcedRandom = True  # replicable.
+    forcedRandom = False  # replicable.
 
     alpha_min, alpha_max = 0.20, 0.20
     beta_min, beta_max = 0.5, 1.0
@@ -372,9 +372,9 @@ def evolve(popSize, numGeneCopies, startIndex, numGens, gamesPerGen, agentsPerGa
 # GLOBAL_SEED = 42
 
 if __name__ == "__main__":
-    print("We start here ")
+    # print("We start here ")
 
-
+    # IF WANT REPLCABAILITY, SET FORCEDRANDOM TO TRUE
     # random.seed(GLOBAL_SEED)
     # np.random.seed(GLOBAL_SEED)
 

@@ -209,12 +209,12 @@ def peeps_to_total_order(peeps, total_order):
     return indexes
 
 
-def create_sim(total_players, scenario=None, chromosomes=None, group="", total_order=None, allocation_scenario=None, utility_per_player=3, enforce_majority=False):
+def create_sim(total_players, num_humans, total_order=None, enforce_majority=False):
     cycle = -1 # a negative cycle indicates to me that this is a test - that, or something is really really wrong.
     curr_round = -1
     num_causes = 3
     generator = generator_factory(2, total_players, 5, 10, -10, 3, None, None)
-    sc_sim = Social_Choice_Sim(total_players, num_causes, num_humans, generator, cycle, curr_round, chromosomes, scenario, group, total_order, allocation_scenario, utility_per_player, enforce_majority)
+    sc_sim = Social_Choice_Sim(total_players, num_causes, num_humans, generator, cycle, curr_round, total_order, enforce_majority)
     return sc_sim
 
 def create_jhg_sim(num_humans, num_players, total_order, tokens_per_player, jhg_bot_type, addAgents, new_agents, new_engine):
@@ -396,8 +396,9 @@ if __name__ == "__main__":
     # np.random.seed(SEED)  # NumPy’s RNG
 
     # various batch scenarios I keep on hand for reference.
-    jhg_games_per_sc_round = [4, 3, 3, 3, 3, 3, 3, 3, 3]
+    # jhg_games_per_sc_round = [4, 3, 3, 3, 3, 3, 3, 3, 3]
     # jhg_games_per_sc_round = ["J", 30]
+    jhg_games_per_sc_round = ["S", 3]
     ForcedRandom = False
     enforce_majority = False
 
@@ -415,16 +416,14 @@ if __name__ == "__main__":
     create_influence = False
     chromosomes_directory = "testChromosome"
     group = ""
+    cat_scenario = "2OldKitties"
     # these paths are relative to the file location, so as long as you don't move the file it can and will run from anywhere.
-    scenario = "scenarioIndicator/allRandom"
-    chromosome = "chromosomes/experiment"
-    allocation_bot_type = "allocations_scenarios/random"
     jhg_bot_type = 0 # 0 is gene bots, 2 is social welfare and 3 is random. 4 is the new social welfare that I am developing that is just a hair smarter.
 
     num_attempts = 1 # number of batches to do.
     num_rounds = sum(jhg_games_per_sc_round) if len(jhg_games_per_sc_round) > 2 else jhg_games_per_sc_round[-1] # if its a list, len of list. else, grab the second identifier
 
-    file_name = os.path.join("..", "Server", "Engine", "scenarios", "workingDirectory")
+    file_name = os.path.join("..", "Server", "Engine", "scenarios", cat_scenario)
     my_path = os.path.dirname(os.path.abspath(__file__))
     file_path = os.path.normpath(os.path.join(my_path, file_name))
     addAgents = file_path
@@ -449,7 +448,7 @@ if __name__ == "__main__":
     # file_name = os.path.join(file_name, "homogenousCatKillers.csv")
     # file_name = os.path.join(file_name, "heterogenousCatKillers.csv")
     # file_name = os.path.join(file_name, "homoNewCats.csv")
-    agent_name = "homoNewCats.csv"
+    agent_name = "mixedSelfPlay.csv"
 
     # bunch of stuff for print statements
     utility_to_log = []
@@ -477,8 +476,8 @@ if __name__ == "__main__":
         offset = num_rounds * attempt # for logging purposes, lets us know the relationship between the logger round and current round
         current_jhg_engine = create_jhg_engine(num_humans, num_players, total_order, tokens_per_player, jhg_bot_type, addAgents)
         current_jhg_sim = create_jhg_sim(num_humans, num_players, total_order, tokens_per_player, jhg_bot_type, addAgents, agents, current_jhg_engine)
-        current_sc_sim = create_sim(num_players, scenario, chromosome, group, total_order, allocation_bot_type, utility_per_player, enforce_majority)
-        current_sc_sim.bot_ovveride(agents) # tells the SC sim to make sure that it is using the same bots as the JHG by passing htem as a reference to both voting and allocation slots.
+        current_sc_sim = create_sim(num_players, num_humans, total_order, enforce_majority)
+        current_sc_sim.bot_ovveride(agents, len(new_list)) # tells the SC sim to make sure that it is using the same bots as the JHG by passing htem as a reference to both voting and allocation slots.
         round_logger.reset_up(current_jhg_sim, current_sc_sim)
         game_logger.resetup(current_jhg_sim, current_sc_sim)
 

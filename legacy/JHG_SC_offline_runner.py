@@ -7,10 +7,10 @@ import numpy as np
 
 
 from offlineSimStuff.variousGraphingTools.completeVersions.completeGrapher import CompleteGrapher
-from offlineSimStuff.variousGraphingTools.outDated.sc_tools import causeNodeGraphVisualizer
-from offlineSimStuff.variousGraphingTools.outDated.sc_tools import influenceGrapher
+from legacy.outDated import causeNodeGraphVisualizer
+from legacy.outDated import influenceGrapher
 from Server.OptionGenerators.generators import generator_factory
-from offlineSimStuff.variousGraphingTools.outDated.completeLogger import CompleteLogger
+from legacy.outDated import CompleteLogger
 
 # starts the sim, could make this take command line arguments
 # takes in a bot type, a number of rounds, and then runs it and plots the results. plans for expansion coming soon.

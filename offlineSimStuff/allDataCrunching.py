@@ -394,7 +394,6 @@ def create_agents(num_players, new_list, agent_name):
     return agents
 
 
-## TODO: NOT GENERATING SCALARS! FIX THAT TOMORROW!
 if __name__ == "__main__":
 
     # this section is just stuff that stays the same from batch to batch. Don't touch it.

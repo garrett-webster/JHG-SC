@@ -441,25 +441,17 @@ if __name__ == "__main__":
     group = ""
     # these paths are relative to the file location, so as long as you don't move the file it can and will run from anywhere.
     jhg_bot_type = 0 # 0 is gene bots, 2 is social welfare and 3 is random. ## Social welfare and random are deprecated, don't look at them.
-    num_attempts = 20 # number of batches to do.
+    num_attempts = 1 # number of batches to do.
 
                 # all consideratiosn about the new cats have been removed. we need to add a self play thing.
-    agent_names = ["heterogenousCatKillers.csv", "homogenousCatKillers.csv"]
+    agent_names = ["homoSelfPlay.csv", "mixedSelfPlay.csv"]
     # round_types = [["S", 30], ["J", 30], [4, 3, 3, 3, 3, 3, 3, 3, 3]]
-    round_types = [["S", 3]]#, # ["J", 30], [4, 3, 3, 3, 3, 3, 3, 3, 3]]
-    scenarios = ["2OldKitties", "SelfPlay"] # exactly what it says on the tin.
-    # round_list = determine_rounds(jhg_games_per_sc_round) ## format for later
+    round_types = [["S", 3], ["J", 3]] # small example to make sure everything is getting written appropriately.
+    scenarios = ["SelfPlay"] # For now, worry only about self play stuff.
     peep_constants = [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0] # not sure the best way to test this
     enforce_majorities = [True, False]
 
-    # use this in a second.
-    # num_rounds = sum(jhg_games_per_sc_round) if len(jhg_games_per_sc_round) > 2 else jhg_games_per_sc_round[-1]  # if its a list, len of list. else, grab the second identifier
-    # bunch of stuff for print statements
-
-    # this is what we want to iterate and print between batches, write it somewhere.
-    pops = []
-
-    create_round_graphs_bool = False
+    create_round_graphs_bool = False # leftovers from earlier iterations, not important.
     create_game_graphs_bool = False
 
     # used for adding cats or whatever.
@@ -468,16 +460,6 @@ if __name__ == "__main__":
     file_path = os.path.normpath(os.path.join(my_path, file_name))
     addAgents = file_path
     new_list = []
-    fp = open(addAgents, "r")
-
-    for line in fp:
-        if line.startswith("OldKitty"):
-            new_list.append(-1)
-        if line.startswith("NewKitty"):
-            new_list.append(-2)
-    num_vanilla_bots = num_players - num_humans - len(new_list)
-    bot_types = [jhg_bot_type for _ in range(num_vanilla_bots)]
-    bot_types += new_list
 
     output_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "burned", "results")
     current_results_saver = ResultsSaver(output_dir)
@@ -496,7 +478,7 @@ if __name__ == "__main__":
 
             for scenario in scenarios:
 
-                file_name = os.path.join("..", "Server", "Engine", "scenarios", "workingDirectory")
+                file_name = os.path.join("..", "Server", "Engine", "scenarios", scenario)
                 my_path = os.path.dirname(os.path.abspath(__file__))
                 file_path = os.path.normpath(os.path.join(my_path, file_name))
                 addAgents = file_path
@@ -563,6 +545,7 @@ if __name__ == "__main__":
                             average_popularity_cats = "NAN"
                             average_popularity_non_cats = "NAN"
 
+
                         print(agent, " ", round_type, " ", scenario, " ", peep_constant, ", ", enforce_majority)
                         print("Results: ")
                         print("Average utility of non cats ", average_utility_non_cats)
@@ -571,17 +554,17 @@ if __name__ == "__main__":
                         print("Average popularity of cats ", average_popularity_cats)
 
                         # go ahead and write anyway just
-                        # current_results_saver.write_result_row(
-                        #     agent,
-                        #     round_type,
-                        #     scenario,
-                        #     peep_constant,
-                        #     enforce_majority,
-                        #     average_utility_non_cats,
-                        #     average_utility_cats,
-                        #     average_popularity_non_cats,
-                        #     average_popularity_cats
-                        # )
+                        current_results_saver.write_result_row(
+                            agent,
+                            round_type,
+                            scenario,
+                            peep_constant,
+                            enforce_majority,
+                            average_utility_non_cats,
+                            average_utility_cats,
+                            average_popularity_non_cats,
+                            average_popularity_cats
+                        )
 
     current_results_saver.close_file()
 
