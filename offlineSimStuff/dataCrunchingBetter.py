@@ -351,7 +351,7 @@ def loadPopulationFromFile(popSize, num_gene_pools, agent_name):
     return thePopulation
 
 
-def create_agents(num_players, new_list, agent_name):
+def create_agents(num_players, new_list, agent_name, forcedRandom):
     popSize = 100
     num_gene_pools = 1
     tokens_per_player = 2
@@ -395,8 +395,6 @@ def create_agents(num_players, new_list, agent_name):
         "base_popularity": np.array(initial_pops)
 
     }
-
-    forcedRandom = True
 
     for a in agents:
         a.setGameParams(game_params, forcedRandom)
@@ -446,7 +444,7 @@ if __name__ == "__main__":
     max_workers = max(1, os.cpu_count() - 2) # save a couple of cores for other processes, don't want to overwhelm.
 
     # this section is just stuff that stays the same from batch to batch. Don't touch it.
-    ForcedRandom = False
+    forcedRandom = False
     num_cycles = 3
     num_players = 10
     peep_constant = 0.5 # relates to the balance of which we us
@@ -491,7 +489,7 @@ if __name__ == "__main__":
     # good HEAVENS this is nested.
     for agent_index in tqdm(range(len(agent_names))):
         agent = agent_names[agent_index] # so we can use the TQDM
-        agents = create_agents(num_players, new_list, agent)
+        agents = create_agents(num_players, new_list, agent, forcedRandom)
 
         for round_type in round_types:
 
