@@ -1,18 +1,18 @@
 import os
 import csv
+import json
 
 class ResultsSaver:
     def __init__(self, output_dir):
-
         os.makedirs(output_dir, exist_ok=True)
-        file_name = os.path.join(output_dir, "simulation_results.csv")
+        self.file_name = os.path.join(output_dir, "simulation_results.csv")
 
-        file_exists = os.path.isfile(file_name)
-        csv_file = open(file_name, "a", newline="")
-        writer = csv.writer(csv_file)
+        file_exists = os.path.isfile(self.file_name)
+        self.csv_file = open(self.file_name, "a", newline="", encoding="utf-8")
+        self.writer = csv.writer(self.csv_file)
 
         if not file_exists:
-            writer.writerow([
+            self.writer.writerow([
                 "AgentType",
                 "RoundType",
                 "Scenario",
@@ -22,36 +22,39 @@ class ResultsSaver:
                 "AverageUtilityCats",
                 "AveragePopularityNonCats",
                 "AveragePopularityCats",
+                "UtilityLog",
+                "PopularityLog"
             ])
 
-        self.writer = writer
-        self.csv_file = csv_file
-
-    def write_result_row(self,
-                         agent,
-                         round_type,
-                         scenario,
-                         peep_constant,
-                         enforce_majority,
-                         average_utility_non_cats,
-                         average_utility_cats,
-                         average_popularity_non_cats,
-                         average_popularity_cats):
-
+    def write_result_row(
+        self,
+        agent,
+        round_type,
+        scenario,
+        peep_constant,
+        enforce_majority,
+        average_utility_non_cats,
+        average_utility_cats,
+        average_popularity_non_cats,
+        average_popularity_cats,
+        utility_to_log,
+        popularity_to_log,
+    ):
         self.writer.writerow([
             agent,
-            str(round_type),
+            json.dumps(round_type),  # safely store list
             scenario,
             peep_constant,
             enforce_majority,
             average_utility_non_cats,
             average_utility_cats,
-            average_popularity_cats,
             average_popularity_non_cats,
+            average_popularity_cats,
+            json.dumps(utility_to_log.tolist()),
+            json.dumps(popularity_to_log.tolist()),
         ])
 
-
-        # flush to disc immediately, should be safer for longer runs.
+        # flush immediately
         self.csv_file.flush()
         os.fsync(self.csv_file.fileno())
 

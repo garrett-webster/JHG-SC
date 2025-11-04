@@ -40,24 +40,24 @@ from concurrent.futures import ProcessPoolExecutor, as_completed # where the mul
 
 class RoundState:
     def __init__(self, round_type):
-        self.pure_sc = False
         self.pure_jhg = False
-        self.mixed = False
+        self.pure_sc = False
+        self.combined = False
         if round_type[0] == "S":
+            self.pure_jhg = False
             self.pure_sc = True
-            self.pure_jhg = False
-            self.mixed = False
+            self.combined = False
         elif round_type[0] == "J":
-            self.pure_sc = False
             self.pure_jhg = True
-            self.mixed = False
-        else:
             self.pure_sc = False
+            self.combined = False
+        else:
             self.pure_jhg = False
-            self.mixed = True
+            self.pure_sc = False
+            self.combined = True
 
     def return_round_state(self):
-        return [self.pure_jhg, self.pure_sc, self.mixed]
+        return [self.pure_jhg, self.pure_sc, self.combined]
 
     def print(self):
         return str(self.return_round_state())
@@ -195,7 +195,6 @@ def generate_peeps(total_order, jhg_sim, sc_sim, peep_constant):
         new_val = alpha * pop + (1 - alpha) * util
         overall_probability_array.append(new_val)
 
-    overall_probability_array = [(p + u) / 2 for p, u in zip(normalized_popularity_array, normalized_utility_array)]
     probabilities = np.array(overall_probability_array)
     new_world_order = np.array(total_order)
     # shoudl pull without replacement from total order using the overall probability array, gives 3 choies without replacement.
@@ -463,27 +462,23 @@ if __name__ == "__main__":
     group = ""
     # these paths are relative to the file location, so as long as you don't move the file it can and will run from anywhere.
     jhg_bot_type = 0 # 0 is gene bots, 2 is social welfare and 3 is random. ## Social welfare and random are deprecated, don't look at them.
-    num_attempts = 1 # number of batches to do.
+    num_attempts = 1000 # number of batches to do.
 
                 # all consideratiosn about the new cats have been removed. we need to add a self play thing.
     agent_names = ["homoSelfPlay.csv", "mixedSelfPlay.csv"]
-    # round_types = [["S", 30], ["J", 30], [4, 3, 3, 3, 3, 3, 3, 3, 3]]
-    round_types = [["S", 3], ["J", 3]] # small example to make sure everything is getting written appropriately.
+    round_types = [["S", 30], ["J", 30], [4, 3, 3, 3, 3, 3, 3, 3, 3]]
+    # round_types = [["S", 3], ["J", 3], [4,3]]  # small example to make sure everything is getting written appropriately.
     scenarios = ["SelfPlay"] # For now, worry only about self play stuff.
-    peep_constants_list = [[1], [1], [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]] # not sure the best way to test this
-    round_state_map = {
-        (True, False, False): 0,  # JHG
-        (False, True, False): 1,  # SC
-        (False, False, True): 2  # Mixed
-    }
-
+                        # 1 pure pops, 1 pure util, third has a bunch of constants that I want to test.
+    peep_constants_list = [[1], [0], [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]] # not sure the best way to test this
+    # ROUND STATE: JHG, SC, COMBINED
     enforce_majorities = [True, False]
 
     create_round_graphs_bool = False # leftovers from earlier iterations, not important.
     create_game_graphs_bool = False
 
     # used for adding cats or whatever.
-    file_name = os.path.join("..", "Server", "Engine", "scenarios", "workingDirectory")
+    file_name = os.path.join("..", "Server", "Engine", "scenarios", "SelfPlay")
     my_path = os.path.dirname(os.path.abspath(__file__))
     file_path = os.path.normpath(os.path.join(my_path, file_name))
     addAgents = file_path
@@ -497,7 +492,6 @@ if __name__ == "__main__":
     for agent_index in tqdm(range(len(agent_names))):
         agent = agent_names[agent_index] # so we can use the TQDM
         agents = create_agents(num_players, new_list, agent)
-
 
         for round_type in round_types:
 
@@ -576,14 +570,6 @@ if __name__ == "__main__":
                             average_popularity_cats = "NAN"
                             average_popularity_non_cats = "NAN"
 
-
-                        print(agent, " ", round_type, " ", scenario, " ", peep_constant, ", ", enforce_majority)
-                        print("Results: ")
-                        print("Average utility of non cats ", average_utility_non_cats)
-                        print("Average utility of cats ", average_utility_cats)
-                        print("Average popularity of non cats ", average_popularity_non_cats)
-                        print("Average popularity of cats ", average_popularity_cats)
-
                         # go ahead and write anyway just
                         current_results_saver.write_result_row(
                             agent,
@@ -594,7 +580,9 @@ if __name__ == "__main__":
                             average_utility_non_cats,
                             average_utility_cats,
                             average_popularity_non_cats,
-                            average_popularity_cats
+                            average_popularity_cats,
+                            utility_to_log,
+                            popularity_to_log,
                         )
 
     current_results_saver.close_file()
