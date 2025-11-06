@@ -191,6 +191,7 @@ def generate_peeps(total_order, jhg_sim, sc_sim, peep_constant):
     # new goal -- figure out how zip works
     overall_probability_array = []
     alpha = peep_constant
+    # this should be better.
     for pop, util in zip(normalized_popularity_array, normalized_utility_array):
         new_val = alpha * pop + (1 - alpha) * util
         overall_probability_array.append(new_val)
@@ -291,7 +292,6 @@ def create_total_order(total_players, num_humans):
 def determine_rounds(jhg_rounds_per_sc_game_list):
     new_list = [] # WHEEE gotta start somewhere
     if jhg_rounds_per_sc_game_list[0] == "J" or jhg_rounds_per_sc_game_list[0] == "S":
-        print("engaging pure opertaiopns, standing by")
         if jhg_rounds_per_sc_game_list[0] == "J":
             num_rounds = int(jhg_rounds_per_sc_game_list[-1]) # possibly one of the jankier lines that I have ever written but here we are
             for i in range(num_rounds):
@@ -439,15 +439,13 @@ def run_attempt(attempt_id, num_players, num_humans, bot_types, peep_constant, a
 
 
 if __name__ == "__main__":
-
-    cpu_count = os.cpu_count() # gets the the number of logical cores that we possess.
-    max_workers = max(1, os.cpu_count() - 2) # save a couple of cores for other processes, don't want to overwhelm.
+     # gets the the number of logical cores that we possess.
+    max_workers = max(1, os.cpu_count()-2) # save a couple of cores for other processes, don't want to overwhelm.
 
     # this section is just stuff that stays the same from batch to batch. Don't touch it.
     forcedRandom = False
     num_cycles = 3
     num_players = 10
-    peep_constant = 0.5 # relates to the balance of which we us
     # lets try a couple fo different peep constants for fun, just to see
 
 
@@ -464,13 +462,13 @@ if __name__ == "__main__":
 
                 # all consideratiosn about the new cats have been removed. we need to add a self play thing.
     agent_names = ["homoSelfPlay.csv", "mixedSelfPlay.csv"]
-    round_types = [["S", 30], ["J", 30], [4, 3, 3, 3, 3, 3, 3, 3, 3]]
-    # round_types = [["S", 3], ["J", 3], [4,3]]  # small example to make sure everything is getting written appropriately.
+    round_types = [["J", 30], ["S", 30], [4, 3, 3, 3, 3, 3, 3, 3, 3]]
+    # round_types = [["J", 3], ["S", 3], [4,3]]  # small example to make sure everything is getting written appropriately.
     scenarios = ["SelfPlay"] # For now, worry only about self play stuff.
                         # 1 pure pops, 1 pure util, third has a bunch of constants that I want to test.
     peep_constants_list = [[1], [0], [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]] # not sure the best way to test this
     # ROUND STATE: JHG, SC, COMBINED
-    enforce_majorities = [True, False]
+    enforce_majorities_list = [[True], [True, False], [True, False]]
 
     create_round_graphs_bool = False # leftovers from earlier iterations, not important.
     create_game_graphs_bool = False
@@ -498,6 +496,7 @@ if __name__ == "__main__":
             round_state = RoundState(round_type)
             index = round_state.return_round_state().index(True) # just find the index where its true and go from there.
             peep_constants = peep_constants_list[index]
+            enforce_majorities = enforce_majorities_list[index]
 
             for scenario in scenarios:
 
@@ -523,10 +522,10 @@ if __name__ == "__main__":
 
                 for enforce_majority in enforce_majorities:
                     # auto plugged in, no reason to change it at all.
-                    results = []
 
                     for peep_constant in peep_constants:
                     # auto plugged in, no reason to change it at all.
+                        results = []
 
                         with ProcessPoolExecutor(max_workers=max_workers) as executor:
                             futures = []
@@ -547,9 +546,8 @@ if __name__ == "__main__":
                         num_normal = num_players - num_cats  # number of normal humans
 
 
-                        if isinstance(utility_to_log, ndarray) and utility_to_log.size > 0:
+                        if isinstance(utility_to_log, np.ndarray) and utility_to_log.size > 0:
                             average_utility = np.sum(utility_to_log, axis=0) / len(utility_to_log)
-                            average_utility_non_cats = average_utility[:num_normal]
                             average_utility_non_cats = average_utility[:num_normal].mean() if num_normal > 0 else "NAN"
                             average_utility_cats = average_utility[num_normal:].mean() if num_cats > 0 else "NAN"
 
@@ -558,9 +556,8 @@ if __name__ == "__main__":
                             average_utility_non_cats = "NAN"
 
 
-                        if isinstance(popularity_to_log, ndarray) and popularity_to_log.size > 0:
+                        if isinstance(popularity_to_log, np.ndarray) and popularity_to_log.size > 0:
                             average_popularity = np.sum(popularity_to_log, axis=0) / len(popularity_to_log)
-                            average_popularity_non_cats = average_popularity[:num_normal]
                             average_popularity_non_cats = average_popularity[:num_normal].mean() if num_normal > 0 else "NAN"
                             average_popularity_cats = average_popularity[num_normal:].mean() if num_cats > 0 else "NAN"
 
@@ -570,17 +567,17 @@ if __name__ == "__main__":
 
                         # go ahead and write anyway just
                         current_results_saver.write_result_row(
-                            agent,
-                            round_type,
-                            scenario,
-                            peep_constant,
-                            enforce_majority,
-                            average_utility_non_cats,
-                            average_utility_cats,
-                            average_popularity_non_cats,
-                            average_popularity_cats,
-                            utility_to_log,
-                            popularity_to_log,
+                            agent=agent,
+                            round_type=round_type,
+                            scenario=scenario,
+                            peep_constant=peep_constant,
+                            enforce_majority=enforce_majority,
+                            average_utility_non_cats=average_utility_non_cats,
+                            average_utility_cats=average_utility_cats,
+                            average_popularity_non_cats=average_popularity_non_cats,
+                            average_popularity_cats=average_popularity_cats,
+                            utility_to_log=utility_to_log,
+                            popularity_to_log=popularity_to_log,
                         )
 
     current_results_saver.close_file()

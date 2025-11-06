@@ -3,28 +3,28 @@ import csv
 import json
 
 class ResultsSaver:
+    HEADER = [ # default lil header guy
+        "AgentType",
+        "RoundType",
+        "Scenario",
+        "PeepConstant",
+        "EnforceMajority",
+        "AverageUtilityNonCats",
+        "AverageUtilityCats",
+        "AveragePopularityNonCats",
+        "AveragePopularityCats",
+        "UtilityLog",
+        "PopularityLog"
+    ]
+
     def __init__(self, output_dir):
         os.makedirs(output_dir, exist_ok=True)
         self.file_name = os.path.join(output_dir, "simulation_results.csv")
 
-        file_exists = os.path.isfile(self.file_name)
-        self.csv_file = open(self.file_name, "a", newline="", encoding="utf-8")
+        # Always overwrite the file and write a fresh header
+        self.csv_file = open(self.file_name, "w", newline="", encoding="utf-8")
         self.writer = csv.writer(self.csv_file)
-
-        if not file_exists:
-            self.writer.writerow([
-                "AgentType",
-                "RoundType",
-                "Scenario",
-                "PeepConstant",
-                "EnforceMajority",
-                "AverageUtilityNonCats",
-                "AverageUtilityCats",
-                "AveragePopularityNonCats",
-                "AveragePopularityCats",
-                "UtilityLog",
-                "PopularityLog"
-            ])
+        self.writer.writerow(self.HEADER)
 
     def write_result_row(
         self,

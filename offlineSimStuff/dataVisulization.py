@@ -4,22 +4,94 @@ import ast  # to safely evaluate the list strings
 import seaborn as sns
 import matplotlib.pyplot as plt
 import numpy as np
+from IPython.core.pylabtools import figsize
 from pytz.reference import first_sunday_on_or_after
 
+def extract_lists(curr_dict):
+    new_utilities_list = []
+    new_popularity_list = []
 
-def extract_lists(df_dict):
-    all_utilities = []
-    all_popularities = []
+    for key, subdf in curr_dict.items():
+        all_utils = []
+        for entry in subdf["UtilityLog"]:
+            if isinstance(entry, list):
+                for data in entry:
+                    all_utils.append(data)
+        all_pops = []
+        for entry in subdf["PopularityLog"]:
+            if isinstance(entry, list):
+                for data in entry:
+                    all_pops.append(data)
 
-    for df in df_dict.values():
-        all_utilities.extend(df["UtilityLog"].tolist())
-        all_popularities.extend(df["PopularityLog"].tolist())
+        new_utilities_list.append(all_utils)
+        new_popularity_list.append(all_pops)
 
-    return all_utilities, all_popularities
+    return new_utilities_list, new_popularity_list
+
+
+def prepare_graphing_data(data_list, peep_constants):
+    """Converts a list of lists into tuples of (peep_constant, associated_list)"""
+    graphing_data = []
+    for i, constant in enumerate(peep_constants):
+        graphing_data.append((constant, data_list[i]))
+    return graphing_data
+
+
+def plot_8_boxplots_separate_ylim(dataset_names, datasets_util, datasets_pop, peep_constants, figsize=(20, 10)):
+    """
+    Plots 8 boxplots in a single figure: 4 columns x 2 rows.
+    Top row: utilities
+    Bottom row: popularities
+    Each row has its own global y-limits.
+    """
+    fig, axes = plt.subplots(2, 4, figsize=figsize)
+    fig.suptitle("Peep Constant per Agent w/ Enforce Majority in Mixed")
+    current_axes = axes.flatten()
+
+    # --- Utilities global min/max ---
+    util_values_flat = [val for dataset in datasets_util for inner_lists in dataset for inner in inner_lists for val in
+                        inner]
+    util_y_min = min(util_values_flat)
+    util_y_max = max(util_values_flat)
+
+    # --- Popularities global min/max ---
+    pop_values_flat = [val for dataset in datasets_pop for inner_lists in dataset for inner in inner_lists for val in
+                       inner]
+    pop_y_min = min(pop_values_flat)
+    pop_y_max = max(pop_values_flat)
+
+    # Plot utilities (top row)
+    for i, (name, dataset) in enumerate(zip(dataset_names, datasets_util)):
+        graphing_data = prepare_graphing_data(dataset, peep_constants)
+        boxplot_data = []
+        labels = []
+        for peep, lists in graphing_data:
+            flat_values = [val for inner_list in lists for val in inner_list]
+            boxplot_data.append(flat_values)
+            labels.append(peep)
+        current_axes[i].boxplot(boxplot_data, tick_labels=labels)
+        current_axes[i].set_title(f"Utilities {name}")
+        current_axes[i].set_ylim(util_y_min, util_y_max)
+
+    # Plot popularities (bottom row)
+    for i, (name, dataset) in enumerate(zip(dataset_names, datasets_pop)):
+        graphing_data = prepare_graphing_data(dataset, peep_constants)
+        boxplot_data = []
+        labels = []
+        for peep, lists in graphing_data:
+            flat_values = [val for inner_list in lists for val in inner_list]
+            boxplot_data.append(flat_values)
+            labels.append(peep)
+        current_axes[i + 4].boxplot(boxplot_data, tick_labels=labels)  # offset by 4 for second row
+        current_axes[i + 4].set_title(f"Popularities {name}")
+        current_axes[i + 4].set_ylim(pop_y_min, pop_y_max)
+
+    plt.tight_layout()
+    plt.show()
 
 
 def create_jhg_stuff(subsets):
-    pure_jhg = subsets[1]
+    pure_jhg = subsets
 
     filtered_pure_jhg = pure_jhg[pure_jhg["EnforceMajority"] == True]
 
@@ -29,6 +101,7 @@ def create_jhg_stuff(subsets):
     mixed = filtered_pure_jhg[filtered_pure_jhg["AgentType"] == "mixedSelfPlay.csv"]["PopularityLog"]
 
     fig, axes = plt.subplots(1, 2)
+    fig.suptitle("Agent Performance in Pure JHG")
     current_axes = axes.flatten()
 
     current_axes[0].boxplot(homo)
@@ -42,7 +115,7 @@ def create_jhg_stuff(subsets):
     plt.show()
 
 def create_sc_stuff(subsets):
-    pure_sc = subsets[0]
+    pure_sc = subsets
 
 
     pure_sc_true = pure_sc[pure_sc["EnforceMajority"] == True]
@@ -57,6 +130,7 @@ def create_sc_stuff(subsets):
     mixed_false = pure_sc_false[pure_sc_false["AgentType"] == "mixedSelfPlay.csv"]["UtilityLog"]
 
     fig, axes = plt.subplots(1, 4, figsize=(15, 5))
+    fig.suptitle("Agents and Enforce Majority in Pure SC")
     current_axes = axes.flatten()
 
     current_axes[0].boxplot(homo_true)
@@ -77,17 +151,64 @@ def create_sc_stuff(subsets):
 
     plt.show()
 
+def create_mixed_stuff(subsets):
+    mixed = subsets
+
+    mixed_true = mixed[mixed["EnforceMajority"] == True]
+    mixed_false = mixed[mixed["EnforceMajority"] == False]
+
+
+    homo_true = mixed_true[mixed_true["AgentType"] == "homoSelfPlay.csv"]
+    homo_false = mixed_false[mixed_false["AgentType"] == "homoSelfPlay.csv"]
+
+    mixed_true = mixed_true[mixed_true["AgentType"] == "mixedSelfPlay.csv"]
+    mixed_false = mixed_false[mixed_false["AgentType"] == "mixedSelfPlay.csv"]
+
+    peep_values = mixed_true["PeepConstant"].unique()  # get all unique peep values
+
+    homo_true_dict = {}
+    for p in peep_values:
+        homo_true_dict[p] = homo_true[homo_true["PeepConstant"] == p].copy()
+
+    homo_false_dict = {}
+    for p in peep_values:
+        homo_false_dict[p] = homo_false[homo_false["PeepConstant"] == p].copy()
+
+    mixed_true_dict = {}
+    for p in peep_values:
+        mixed_true_dict[p] = mixed_true[mixed_true["PeepConstant"] == p].copy()
+
+    mixed_false_dict = {}
+    for p in peep_values:
+        mixed_false_dict[p] = mixed_false[mixed_false["PeepConstant"] == p].copy()
+
+    peep_constants = [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
+
+    homo_true_utilities, homo_true_popularities = extract_lists(homo_true_dict)
+    homo_false_utilities, homo_false_popularities = extract_lists(homo_false_dict)
+
+    mixed_true_utilities, mixed_true_popularities = extract_lists(mixed_true_dict)
+    mixed_false_utilities, mixed_false_popularities = extract_lists(mixed_false_dict)
+
+    dataset_names = ["Homo True", "Homo False", "Mixed True", "Mixed False"]
+    plot_8_boxplots_separate_ylim(
+        dataset_names,
+        datasets_util=[homo_true_utilities, homo_false_utilities, mixed_true_utilities, mixed_false_utilities],
+        datasets_pop=[homo_true_popularities, homo_false_popularities, mixed_true_popularities,
+                      mixed_false_popularities],
+        peep_constants=peep_constants
+    )
+
 
 if __name__ == "__main__":
 
     # just trust the system on the file pathD
-    df = pd.read_csv("subsetForFormatting/simulation_results.csv")
+    df = pd.read_csv("simulationResults/smallerSampleRun/simulation_results.csv", converters={
+        "UtilityLog": json.loads, # this should making loading the list of lists better.
+        "PopularityLog": json.loads,
+        "RoundType": json.loads,
+    })
 
-    df.to_excel("my_data.xlsx", index=False)  # index=False to skip row numbers
-
-    json_columns = ["RoundType", "UtilityLog", "PopularityLog"]
-    for col in json_columns:
-        df[col] = df[col].apply(lambda x: json.loads(x) if pd.notna(x) else None)
     numeric_cols = [
         "PeepConstant",
         "AverageUtilityNonCats",
@@ -111,70 +232,8 @@ if __name__ == "__main__":
     for round_variant in df["RoundType"].unique():
         subsets.append(df[df["RoundType"] == round_variant])
 
-    # create_jhg_stuff(subsets)
-    # create_sc_stuff(subsets)
-
-    mixed = subsets[2]
-
-
-    mixed_true = mixed[mixed["EnforceMajority"] == True]
-    mixed_false = mixed[mixed["EnforceMajority"] == False]
-
-
-    homo_true = mixed_true[mixed_true["AgentType"] == "homoSelfPlay.csv"]
-    homo_false = mixed_false[mixed_false["AgentType"] == "homoSelfPlay.csv"]
-
-    mixed_true = mixed_true[mixed_true["AgentType"] == "mixedSelfPlay.csv"]
-    mixed_false = mixed_false[mixed_false["AgentType"] == "mixedSelfPlay.csv"]
-
-    peep_values = mixed_true["PeepConstant"].unique()  # get all unique peep values
-
-    homo_true_dict = {}
-    for p in peep_values:
-        homo_true_dict[p] = homo_true[homo_true["PeepConstant"] == p]
-
-    homo_false_dict = {}
-    for p in peep_values:
-        homo_false_dict[p] = homo_false[homo_false["PeepConstant"] == p]
-
-    mixed_true_dict = {}
-    for p in peep_values:
-        mixed_true_dict[p] = mixed_true[mixed_true["PeepConstant"] == p]
-
-    mixed_false_dict = {}
-    for p in peep_values:
-        mixed_false_dict[p] = mixed_false[mixed_false["PeepConstant"] == p]
-
-    homo_true_utilities, homo_true_popularities = extract_lists(homo_true_dict)
-    homo_false_utilities, homo_false_popularities = extract_lists(homo_false_dict)
-    mixed_true_utilities, mixed_true_popularities = extract_lists(mixed_true_dict)
-    mixed_false_utilities, mixed_false_popularities = extract_lists(mixed_false_dict)
-
-
-
-
-
-
-
-    fig, axes = plt.subplots(1, 4, figsize=(15, 5))
-    current_axes = axes.flatten()
-
-    current_axes[0].boxplot(homo_true)
-    current_axes[0].set_title("homo_true")
-    current_axes[0].set_ylim(8, 24)
-
-    current_axes[1].boxplot(homo_false)
-    current_axes[1].set_title("homo_false")
-    current_axes[1].set_ylim(8, 24)
-
-    current_axes[2].boxplot(mixed_true)
-    current_axes[2].set_title("mixed_true")
-    current_axes[2].set_ylim(8, 24)
-
-    current_axes[3].boxplot(mixed_false)
-    current_axes[3].set_title("mixed_false")
-    current_axes[3].set_ylim(8, 24)
-
-    plt.show()
+    create_jhg_stuff(subsets[0])
+    create_sc_stuff(subsets[1])
+    create_mixed_stuff(subsets[2])
 
 
