@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from IPython.core.pylabtools import figsize
 from pytz.reference import first_sunday_on_or_after
+import os
 
 def extract_lists(curr_dict):
     new_utilities_list = []
@@ -90,7 +91,14 @@ def plot_8_boxplots_separate_ylim(dataset_names, datasets_util, datasets_pop, pe
     plt.show()
 
 
-def create_jhg_stuff(subsets):
+def flatten(nested):
+    for item in nested:
+        if isinstance(item, list):
+            yield from flatten(item)
+        else:
+            yield item
+
+def create_jhg_stuff(subsets, directory):
     pure_jhg = subsets
 
     filtered_pure_jhg = pure_jhg[pure_jhg["EnforceMajority"] == True]
@@ -100,21 +108,32 @@ def create_jhg_stuff(subsets):
     homo = filtered_pure_jhg[filtered_pure_jhg["AgentType"] == "homoSelfPlay.csv"]["PopularityLog"]
     mixed = filtered_pure_jhg[filtered_pure_jhg["AgentType"] == "mixedSelfPlay.csv"]["PopularityLog"]
 
+    flat_values_homo = list(flatten(homo))
+    flat_values_mixed = list(flatten(mixed))
+
+    max_value = max(max(flat_values_homo), max(flat_values_mixed))
+    min_value = min(min(flat_values_homo), min(flat_values_mixed))
+
+
+
     fig, axes = plt.subplots(1, 2)
     fig.suptitle("Agent Performance in Pure JHG")
     current_axes = axes.flatten()
 
-    current_axes[0].boxplot(homo)
+    current_axes[0].scatter(flat_values_homo)
     current_axes[0].set_title("HomoSelfPlay")
-    current_axes[0].set_ylim(105,135)
+    current_axes[0].set_ylim(min_value,max_value)
 
-    current_axes[1].boxplot(mixed)
+    current_axes[1].scatter(flat_values_mixed)
     current_axes[1].set_title("MixedSelfPlay")
-    current_axes[1].set_ylim(105,135)
+    current_axes[1].set_ylim(min_value,max_value)
+
+    filepath = os.path.join(directory, "JHGPureReults.png")
+    plt.savefig(str(filepath), dpi=300, bbox_inches="tight")
 
     plt.show()
 
-def create_sc_stuff(subsets):
+def create_sc_stuff(subsets, directory):
     pure_sc = subsets
 
 
@@ -149,9 +168,11 @@ def create_sc_stuff(subsets):
     current_axes[3].set_title("mixed_false")
     current_axes[3].set_ylim(8, 24)
 
+    filepath = os.path.join(directory, "SCPureReults.png")
+    plt.savefig(str(filepath), dpi=300, bbox_inches="tight")
     plt.show()
 
-def create_mixed_stuff(subsets):
+def create_mixed_stuff(subsets, directory):
     mixed = subsets
 
     mixed_true = mixed[mixed["EnforceMajority"] == True]
@@ -199,11 +220,14 @@ def create_mixed_stuff(subsets):
         peep_constants=peep_constants
     )
 
+    filepath = os.path.join(directory, "MixedResults.png")
+    plt.savefig(str(filepath), dpi=300, bbox_inches="tight")
 
 if __name__ == "__main__":
 
+    file_path = "simulationResults/secondRun/simulation_results.csv"
     # just trust the system on the file pathD
-    df = pd.read_csv("simulationResults/smallerSampleRun/simulation_results.csv", converters={
+    df = pd.read_csv(file_path, converters={
         "UtilityLog": json.loads, # this should making loading the list of lists better.
         "PopularityLog": json.loads,
         "RoundType": json.loads,
@@ -232,8 +256,17 @@ if __name__ == "__main__":
     for round_variant in df["RoundType"].unique():
         subsets.append(df[df["RoundType"] == round_variant])
 
-    create_jhg_stuff(subsets[0])
-    create_sc_stuff(subsets[1])
-    create_mixed_stuff(subsets[2])
+    # Get the absolute path to the directory containing this script
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    filepath = os.path.join(script_dir, file_path)
+    filepath = os.path.join("..", filepath)
+
+    directory = os.path.dirname(filepath)
+
+    os.makedirs(directory, exist_ok=True)
+
+    create_jhg_stuff(subsets[0], directory)
+    create_sc_stuff(subsets[1], directory)
+    create_mixed_stuff(subsets[2], directory)
 
 

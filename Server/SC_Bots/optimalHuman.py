@@ -9,14 +9,14 @@
 
 from Server.SC_Bots.abstractVotingBot import AbstractVotingBot
 
-class optimalHuman(AbstractVotingBot):
+class OptimalHuman(AbstractVotingBot):
     def __init__(self, self_id):
         self.self_id = self_id # the id of ourself in realtion to other bots.
         self.type = "BG" # used for graphing purposes
         self.chromosome = None # used as a default holder, will be assinged later.
         self.risk_adversity = "MAX" # never used, actually.
         self.number_type = 6 # used for logging purposes.
-        super(optimalHuman, self).__init__()
+        super(OptimalHuman, self).__init__()
 
 
     def set_chromosome(self, chromosome): # allows me to set the chromosome at will.
@@ -24,9 +24,6 @@ class optimalHuman(AbstractVotingBot):
 
     def get_number_type(self): # used for logging.
         return self.number_type
-
-
-
 
     # returns the bots vote given the current option matrix and previous votes.
     def get_vote(self, current_options_matrix, previous_votes=None, cycle=0, max_cycle=3):
@@ -36,7 +33,6 @@ class optimalHuman(AbstractVotingBot):
         col_probs = [sum(col) for col in zip(*matrix)] # how likely everything is to pass given what they like.
         total = sum(col_probs)
         col_probs = [val/total for val in col_probs]
-        print("here are the col probs ", col_probs)
         cause_sums = None # used for generating bayseian prior - otherwise alwyas have col sums
 
         our_row = current_options_matrix[self.self_id]
@@ -165,3 +161,15 @@ class optimalHuman(AbstractVotingBot):
             return expected_values.index(max(expected_values)) - 1 # off by one error
         else: # no prior information, just return the greediest solution.
             return new_row.index(max(new_row)) - 1
+
+
+    def create_column(self, total_players):
+        # work on cat detection later.
+
+        num_utility = 2 * total_players # thats hard coded, definitely ways to make that better.
+        new_allocations = [0 for _ in range(total_players)]
+        for i in range(len(new_allocations)):
+            new_allocations[i] = 1
+        self_allocation = num_utility - sum(new_allocations)
+        new_allocations[self.self_id] = self_allocation
+        return new_allocations

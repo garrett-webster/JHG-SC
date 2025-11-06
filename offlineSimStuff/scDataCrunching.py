@@ -1,6 +1,10 @@
 # so this allows me to run the fetcher and create visualizations based off of scenarios and whatnot.
 import copy
 import random
+import csv
+from os import cpu_count
+
+from numpy import ndarray
 
 from Server.social_choice_sim import Social_Choice_Sim
 from Server.JHGManager import JHG_simulator
@@ -24,39 +28,62 @@ from offlineSimStuff.variousGraphingTools.groupStuff.groupGrapher import GroupGr
 from Server.Engine.completeBots.projectCat import ProjectCat
 from Server.Engine.completeBots.improvedJakeCate import ImprovedJakeCat
 
+from resultsSaver import ResultsSaver # logger for long term savings.
+from concurrent.futures import ProcessPoolExecutor, as_completed # where the multiprocessing magic happens
+
+
 # import random
 #
 # seed_value = 42
 # random.seed(seed_value)
 
 
+class RoundState:
+    def __init__(self, round_type):
+        self.pure_jhg = False
+        self.pure_sc = False
+        self.combined = False
+        if round_type[0] == "S":
+            self.pure_jhg = False
+            self.pure_sc = True
+            self.combined = False
+        elif round_type[0] == "J":
+            self.pure_jhg = True
+            self.pure_sc = False
+            self.combined = False
+        else:
+            self.pure_jhg = False
+            self.pure_sc = False
+            self.combined = True
+
+    def return_round_state(self):
+        return [self.pure_jhg, self.pure_sc, self.combined]
+
+    def print(self):
+        return str(self.return_round_state())
+
 # starts the sim, could make this take command line arguments
 # takes in a bot type, a number of rounds, and then runs it and plots the results. plans for expansion coming soon.
-def run_trial(agents, sc_sim: "Social_Choice_Sim", jhg_sim, round_list, num_cycles, group, total_order, pops, round_logger, create_round_graphs_bool, game_logger, create_game_graphs_bool, current_jhg_sim, peep_constant):
+def run_trial(agents, sc_sim, round_list, num_cycles, total_order, peep_constant):
 
+    group = "" # get rid fo this at some point, IKD why its till here.
     sc_sim.set_group(group)
     played_sc = False
     played_jhg = False
     curr_sc_round = 0
     influence_matrix = None # this should get overwritten pretty quick, but its there so there's no error.
     for list_index in (range(0, len(round_list))): # fixed, we start at 0 now.
-        jhg_round = False
-        sc_round = False
-
-
 
         sc_rounds = round_list[list_index][-1] == "*"
         jhg_rounds = round_list[list_index][-1] == "-"
         curr_round = int(round_list[list_index][:-1]) # useful, yes, but not quite the logger round
-        # print("this si the curr round ", curr_round)
 
         # print("*****************************ROUND ", curr_round, "********************************")
 
         if jhg_rounds:
             influence_matrix = run_jhg_stuff(jhg_sim, curr_round, agents, len(agents), current_jhg_sim)
             played_jhg = True
-            jhg_round = True
-            pops.append(jhg_sim.get_popularity())
+
 
         if sc_rounds:
             old_influence_matrix = copy.copy(influence_matrix)
@@ -64,20 +91,9 @@ def run_trial(agents, sc_sim: "Social_Choice_Sim", jhg_sim, round_list, num_cycl
             sc_sim.set_rounds(curr_sc_round) # ???
             curr_sc_round += 1
             played_sc = True
-            sc_round = True
 
 
-        round_logger.save_round(curr_round, sc_rounds, jhg_rounds)
-
-
-        if create_round_graphs_bool:
-            create_round_graphs(round_logger, curr_round, sc_rounds, jhg_rounds)
-
-    if create_game_graphs_bool:
-        game_logger.save_game(played_sc, played_jhg)
-        create_game_graphs(game_logger)
-
-    return sc_sim, jhg_sim, pops
+    return sc_sim, jhg_sim, played_sc, played_jhg
 
 
 def run_sc_stuff(sc_sim, jhg_sim, total_order, influence_matrix, curr_round, num_cycles, peep_constant):
@@ -175,17 +191,21 @@ def generate_peeps(total_order, jhg_sim, sc_sim, peep_constant):
     # new goal -- figure out how zip works
     overall_probability_array = []
     alpha = peep_constant
+    # this should be better.
     for pop, util in zip(normalized_popularity_array, normalized_utility_array):
         new_val = alpha * pop + (1 - alpha) * util
         overall_probability_array.append(new_val)
 
-    overall_probability_array = [(p + u) / 2 for p, u in zip(normalized_popularity_array, normalized_utility_array)]
     probabilities = np.array(overall_probability_array)
     new_world_order = np.array(total_order)
     # shoudl pull without replacement from total order using the overall probability array, gives 3 choies without replacement.
-    new_peeps = np.random.choice(new_world_order, p=probabilities, size=3, replace=False)
-    indexes = peeps_to_total_order(new_peeps, total_order)
-    return new_peeps, indexes
+    try:
+        new_peeps = np.random.choice(new_world_order, p=probabilities, size=3, replace=False)
+        indexes = peeps_to_total_order(new_peeps, total_order)
+        return new_peeps, indexes
+    except ValueError:
+        print("Here the pops, stop here ")
+        return 0, 0
 
 
 def create_round_graphs(round_logger, curr_round, played_jhg, played_sc):
@@ -272,7 +292,6 @@ def create_total_order(total_players, num_humans):
 def determine_rounds(jhg_rounds_per_sc_game_list):
     new_list = [] # WHEEE gotta start somewhere
     if jhg_rounds_per_sc_game_list[0] == "J" or jhg_rounds_per_sc_game_list[0] == "S":
-        print("engaging pure opertaiopns, standing by")
         if jhg_rounds_per_sc_game_list[0] == "J":
             num_rounds = int(jhg_rounds_per_sc_game_list[-1]) # possibly one of the jankier lines that I have ever written but here we are
             for i in range(num_rounds):
@@ -332,7 +351,7 @@ def loadPopulationFromFile(popSize, num_gene_pools, agent_name):
     return thePopulation
 
 
-def create_agents(num_players, new_list, agent_name):
+def create_agents(num_players, agent_name, forcedRandom):
     popSize = 100
     num_gene_pools = 1
     tokens_per_player = 2
@@ -340,16 +359,6 @@ def create_agents(num_players, new_list, agent_name):
     theGenePools = loadPopulationFromFile(popSize, num_gene_pools, agent_name)  # this gets us our fetcher
 
     initial_pops = [100 for _ in range(num_players)]
-
-    plyrs = []
-    for i in range(0, num_players-len(new_list)):
-        plyrs.append(theGenePools[i])  # just add the first guys and go form there
-
-    for i in new_list:
-        if i == -1:
-            plyrs.append(ImprovedJakeCat())
-        if i == -2:
-            plyrs.append(ProjectCat())
 
 
     agents = np.array(plyrs)
@@ -377,144 +386,164 @@ def create_agents(num_players, new_list, agent_name):
 
     }
 
-    forcedRandom = True
-
     for a in agents:
         a.setGameParams(game_params, forcedRandom)
 
     return agents
 
 
+def run_attempt(attempt, num_players, num_humans, peep_constant, agent,
+                agents, tokens_per_player, jhg_bot_type, enforce_majority, round_list, num_cycles):
+
+    total_order = create_total_order(num_players, num_humans)  # scrambel them as we go for security reasons.
+    round_logger = RoundLogger()
+    # game_logger = GameLogger(num_players, bot_types, peep_constant,
+                             # agent)  # might be the wrong place to ahve this, as I don't actually have the gen number yet.
+    # current_jhg_engine = create_jhg_engine(num_humans, num_players, total_order, tokens_per_player, jhg_bot_type,
+                                            #addAgents)
+     #current_jhg_sim = create_jhg_sim(num_humans, num_players, total_order, tokens_per_player, jhg_bot_type, addAgents,
+                                    #  agents, current_jhg_engine)
+    current_sc_sim = create_sim(num_players, num_humans, total_order, enforce_majority)
+    current_sc_sim.create_bots("", []) # no cats don't worry about it... yet.
+    # round_logger.reset_up(current_jhg_sim, current_sc_sim)
+    # game_logger.resetup(current_jhg_sim, current_sc_sim)
+
+    sc_sim, jhg_engine, sc_played, jhg_played = run_trial(agents, current_sc_sim, round_list,
+                                                num_cycles, total_order, peep_constant)  # This is really whats getting run round times
+
+    if sc_played:
+        utility_to_log = sc_sim.results_sums
+    else:
+        utility_to_log = "NAN"
+
+    if jhg_played:
+        popularity_to_log = jhg_engine.get_popularity()
+    else:
+        popularity_to_log = "NAN"
+
+    result = {
+        "Attempt": attempt,
+        "Utility": utility_to_log,
+        "Popularity": popularity_to_log,
+    }
+    return result
+
+
 if __name__ == "__main__":
+     # gets the the number of logical cores that we possess.
+    max_workers = max(1, os.cpu_count()-2) # save a couple of cores for other processes, don't want to overwhelm.
 
-    # import random
-    # import numpy as np
-    #
-    # SEED = 42  # pick any constant
-    #
-    # random.seed(SEED)  # Python’s stdlib RNG
-    # np.random.seed(SEED)  # NumPy’s RNG
-
-    # various batch scenarios I keep on hand for reference.
-    # jhg_games_per_sc_round = [4, 3, 3, 3, 3, 3, 3, 3, 3]
-    # jhg_games_per_sc_round = ["J", 30]
-    jhg_games_per_sc_round = ["S", 1000]
-    ForcedRandom = False
-    enforce_majority = True
-
-    round_list = determine_rounds(jhg_games_per_sc_round)
+    # this section is just stuff that stays the same from batch to batch. Don't touch it.
+    forcedRandom = False
     num_cycles = 3
     num_players = 10
-    peep_constant = 0.5 # relates to the balance of which we us
+    # lets try a couple fo different peep constants for fun, just to see
 
 
     num_humans = 0
     tokens_per_player = 2
     utility_per_player = 3
-    create_round_graphs_bool = False
-    create_game_graphs_bool = True
-    create_influence = False
-    chromosomes_directory = "testChromosome"
+
+    # none of these matter anymroe. leave them in for now, but get rid of them as we go.
+    chromosomes_directory = "highestFromTesting"
     group = ""
-    # cat_scenario = "2OldKitties"
-    cat_scenario = "SelfPlay"
     # these paths are relative to the file location, so as long as you don't move the file it can and will run from anywhere.
-    jhg_bot_type = 0 # 0 is gene bots, 2 is social welfare and 3 is random. 4 is the new social welfare that I am developing that is just a hair smarter.
+    jhg_bot_type = 0 # 0 is gene bots, 2 is social welfare and 3 is random. ## Social welfare and random are deprecated, don't look at them.
+    num_attempts = 1000 # number of batches to do.
 
-    num_attempts = 1 # number of batches to do.
-    num_rounds = sum(jhg_games_per_sc_round) if len(jhg_games_per_sc_round) > 2 else jhg_games_per_sc_round[-1] # if its a list, len of list. else, grab the second identifier
+                # all consideratiosn about the new cats have been removed. we need to add a self play thing.
+    agent_names = ["cheetahBot"]
+    round_types = [["S", 30]]
+    # round_types = [["J", 3], ["S", 3], [4,3]]  # small example to make sure everything is getting written appropriately.
+    scenarios = ["SelfPlay"] # For now, worry only about self play stuff.
+                        # 1 pure pops, 1 pure util, third has a bunch of constants that I want to test.
+    # peep_constants_list = [[1], [0], [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]] # not sure the best way to test this
+    # ROUND STATE: JHG, SC, COMBINED
+    enforce_majorities_list = [[True, False]]
 
-    file_name = os.path.join("..", "Server", "Engine", "scenarios", cat_scenario)
-    my_path = os.path.dirname(os.path.abspath(__file__))
-    file_path = os.path.normpath(os.path.join(my_path, file_name))
-    addAgents = file_path
-    new_list = []
-    fp = open(addAgents, "r")
+    create_round_graphs_bool = False # leftovers from earlier iterations, not important.
+    create_game_graphs_bool = False
 
-    for line in fp:
-        if line.startswith("OldKitty"):
-            new_list.append(-1)
-        if line.startswith("NewKitty"):
-            new_list.append(-2)
-        if line.startswith("SocialWelfare"):
-            new_list.append(-3)
-    num_vanilla_bots = num_players - num_humans - len(new_list)
+    # used for adding cats or whatever.
 
 
-    bot_types = [jhg_bot_type for _ in range(num_vanilla_bots)]
-    bot_types += new_list
+    # good HEAVENS this is nested.
+    for agent_index in tqdm(range(len(agent_names))):
+        agent = agent_names[agent_index] # so we can use the TQDM
+        agents = create_agents(num_players, agent_names[agent_index], forcedRandom)
 
-    # for individual testing
-    # file_name = os.path.join(file_name, "gen_199.csv") # JHG cab agents as used in the study
-    # file_name = os.path.join(file_name, "homogenousCatKillers.csv")
-    # file_name = os.path.join(file_name, "heterogenousCatKillers.csv")
-    # file_name = os.path.join(file_name, "homoNewCats.csv")
-    agent_name = "mixedSelfPlay.csv"
+        for round_type in round_types:
 
-    # bunch of stuff for print statements
-    utility_to_log = []
-    popularity_to_log = []
-    pops = []
+            round_list = determine_rounds(round_type)
+            num_rounds = sum(round_type) if len(round_type) > 2 else round_type[-1]  # if its a list, len of list. else, grab the second identifier
+            round_state = RoundState(round_type)
+            index = round_state.return_round_state().index(True) # just find the index where its true and go from there.
+            peep_constants = [0.5] # Doesn't actually matter here.
+            enforce_majorities = enforce_majorities_list[index]
 
+            for scenario in scenarios:
 
-    # bot_types = [0 for _ in range(len(agents))]  # they are all cab doesn't REALLY matter here.
+                for enforce_majority in enforce_majorities:
+                    # auto plugged in, no reason to change it at all.
 
-    # I want every bot type, in every scenario, with every type of cat, and on their own
-    # which means we actually need to use the different scenarios.
-    # don't worry about 1 vs 2 cats IG.
+                    for peep_constant in peep_constants:
+                    # auto plugged in, no reason to change it at all.
+                        results = []
 
-    agents = create_agents(num_players, new_list, agent_name)
+                        with ProcessPoolExecutor(max_workers=max_workers) as executor:
+                            futures = []
+                            for attempt in range(num_attempts):
+                                futures.append(executor.submit(run_attempt, attempt, num_players, num_humans, peep_constant, agent,
+                                                agents, tokens_per_player, jhg_bot_type, enforce_majority, round_list, num_cycles))
 
-    for attempt in tqdm(range(num_attempts)): # create a new sim for each attempt to prevent bleeding over.
-    # for attempt in (range(num_attempts)): # create a new sim for each attempt to prevent bleeding over.
-        # stuff that we used to od outside that we now have to do inside.
-        total_order = create_total_order(num_players, num_humans) # unfortunately we have to make that in here now just bc we are changing the num players
-        round_logger = RoundLogger()
-        game_logger = GameLogger(num_players, bot_types, peep_constant, agent_name)  # might be the wrong place to ahve this, as I don't actually have the gen number yet.
-        complete_grapher = CompleteGrapher()
+                            for future in as_completed(futures):
+                                results.append(future.result())
 
-
-        offset = num_rounds * attempt # for logging purposes, lets us know the relationship between the logger round and current round
-        current_jhg_engine = create_jhg_engine(num_humans, num_players, total_order, tokens_per_player, jhg_bot_type, addAgents)
-        current_jhg_sim = create_jhg_sim(num_humans, num_players, total_order, tokens_per_player, jhg_bot_type, addAgents, agents, current_jhg_engine)
-        current_sc_sim = create_sim(num_players, num_humans, total_order, enforce_majority)
-        current_sc_sim.bot_ovveride(agents, len(new_list)) # tells the SC sim to make sure that it is using the same bots as the JHG by passing htem as a reference to both voting and allocation slots.
-        round_logger.reset_up(current_jhg_sim, current_sc_sim)
-        game_logger.resetup(current_jhg_sim, current_sc_sim)
-
-        sc_sim, jhg_engine, pops = run_trial(agents, current_sc_sim, current_jhg_engine, round_list, num_cycles, group, total_order, pops, round_logger, create_round_graphs_bool, game_logger, create_game_graphs_bool, current_jhg_sim, peep_constant) # This is really whats getting run round times
-        utility_to_log.append(sc_sim.results_sums)
-        popularity_to_log.append(jhg_engine.get_popularity())
-
-    pops_by_player = np.array(pops).T
+                        # aight we are going to extract the results from the dictionary and put them back in lists like we had them before
+                        utility_to_log = np.array([r["Utility"] for r in results if isinstance(r.get("Utility"), (list, np.ndarray))]) # auto filer out the NAN's
+                        popularity_to_log = np.array([r["Popularity"] for r in results if isinstance(r.get("Popularity"), (list, np.ndarray))])
 
 
+                        # get the utilities to log and the popularities to log from the results?
+
+
+                        if isinstance(utility_to_log, np.ndarray) and utility_to_log.size > 0:
+                            average_utility = np.sum(utility_to_log, axis=0) / len(utility_to_log)
+                            average_utility_non_cats = average_utility[:num_normal].mean() if num_normal > 0 else "NAN"
+                            average_utility_cats = average_utility[num_normal:].mean() if num_cats > 0 else "NAN"
+
+                        else:
+                            average_utility_cats = "NAN"
+                            average_utility_non_cats = "NAN"
+
+
+                        if isinstance(popularity_to_log, np.ndarray) and popularity_to_log.size > 0:
+                            average_popularity = np.sum(popularity_to_log, axis=0) / len(popularity_to_log)
+                            average_popularity_non_cats = average_popularity[:num_normal].mean() if num_normal > 0 else "NAN"
+                            average_popularity_cats = average_popularity[num_normal:].mean() if num_cats > 0 else "NAN"
+
+                        else:
+                            average_popularity_cats = "NAN"
+                            average_popularity_non_cats = "NAN"
+
+                        # go ahead and write anyway just
+                        current_results_saver.write_result_row(
+                            agent=agent,
+                            round_type=round_type,
+                            scenario=scenario,
+                            peep_constant=peep_constant,
+                            enforce_majority=enforce_majority,
+                            average_utility_non_cats=average_utility_non_cats,
+                            average_utility_cats=average_utility_cats,
+                            average_popularity_non_cats=average_popularity_non_cats,
+                            average_popularity_cats=average_popularity_cats,
+                            utility_to_log=utility_to_log,
+                            popularity_to_log=popularity_to_log,
+                        )
+
+    current_results_saver.close_file()
 
 
 
-    # num_kitties = 2
-    # non_cats = (num_players - num_kitties)
-    # cumulative_cat_score = sum(new_results[non_cats:])
-    # cumulative_non_cat_score = sum(new_results)- cumulative_cat_score
-    # avg_cat_score = cumulative_cat_score / num_kitties
-    # avg_non_cat_score = cumulative_non_cat_score / non_cats
-    # print('here is the average cat / added agent ', avg_cat_score, " and here is the average non cat utility ", avg_non_cat_score)
-    # # print("here is the average Gene3agent score ", avg_non_cat_score)
-    # inverted_results.clear()
-    #
-    #
-    # # man this sucks
-    # popularity_to_log = np.round(np.array(popularity_to_log).astype(float), 2).tolist()
-    #
-    # inverted_results = list(zip(*popularity_to_log))
-    # new_results = []
-    # for i in range(len(inverted_results)):
-    #     new_sum = sum(inverted_results[i]) / len(inverted_results[i])
-    #     new_results.append(new_sum)
-    #
-    # non_cats = (num_players - num_kitties)
-    # cumulative_cat_score = sum(new_results[non_cats:])
-    # cumulative_non_cat_score = sum(new_results)   - cumulative_cat_score
-    # avg_cat_score = cumulative_cat_score / num_kitties
-    # avg_non_cat_score = cumulative_non_cat_score / non_cats
-    # print('here is the average cat / added agent popualrity ', avg_cat_score, " and here is the average non cat popularity ", avg_non_cat_score)
+
+

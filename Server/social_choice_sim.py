@@ -14,6 +14,9 @@ from Server.Engine.completeBots.improvedJakeCate import ImprovedJakeCat
 from Server.Engine.completeBots.projectCat import ProjectCat
 from Server.Engine.completeBots.antiCat import AntiCat
 
+from Server.SC_Bots.optimalHuman import OptimalHuman
+from Server.SC_Bots.possibleCheetahBot import cheetahBot
+
 from Server.Node import Node
 from Server.OptionGenerators.options_creation import generate_two_plus_one_groups
 NUM_CAUSES = 3 # if its ever not this a LOT of math breaks, so just leave it be.
@@ -85,6 +88,7 @@ class Social_Choice_Sim:
         self.num_cats = -1 # used for logging. -1 breaks everything, should get overrriden to 0
         self.peeps = [] # just an empty list for now. used for logging if the cats got the bag.
         self.most_recent_influence = None # keep this fetcher around somewhere.
+        self.allocation_bots = [] # don't ask me whats going on man I don't even work here.
 
     def create_total_order(self, total_players, num_humans):
         num_bots = total_players - num_humans
@@ -128,6 +132,18 @@ class Social_Choice_Sim:
         self.num_cats = num_cats
         self.allocation_bots = bots
         self.total_types = self.create_total_types() # make this cause we need it now
+
+    ##TODO: extraAgents isn't actually implemented yet. fix that in a minute.
+    def create_bots(self, chromosome, extraAgents):
+        # chromosome = [10.0,2.0,2.5]
+        chromosome = [4, 5, 1, 1.0]
+        new_bots = [cheetahBot(i) for i in range(self.num_bots)]
+        for bot in new_bots:
+            bot.set_chromosome(chromosome)
+
+        self.num_cats = len(extraAgents)
+        self.bots = new_bots
+        self.allocation_bots = new_bots
 
 
     def create_players(self):
@@ -637,7 +653,7 @@ class Social_Choice_Sim:
         else:
             list_of_columns = []
             for peep in bot_peeps: # as far as I can tell this is no longer used ever.
-                list_of_columns.append(self.allocation_bots[self.bot_index_dict[peep]].create_column(self.total_players))
+                list_of_columns.append(self.allocation_bots[int(peep[-1])].create_column(self.total_players))
             current_options_matrix = np.transpose(list_of_columns).tolist()
 
 
