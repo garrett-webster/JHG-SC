@@ -152,9 +152,6 @@ class JHG_simulator():
 
 
 
-
-
-
     def reorder_agents(self, plyrs):
         bots = [a for a in plyrs if a.whoami != "Human"]
         players = [a for a in plyrs if a.whoami == "Human"]
@@ -261,7 +258,6 @@ class JHG_simulator():
 
     def get_T(self):
         return self.T
-
 
     def get_bot_votes(self, current_options_matrix):
         votes = {}

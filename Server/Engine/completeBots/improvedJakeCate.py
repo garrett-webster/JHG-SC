@@ -113,9 +113,11 @@ class ImprovedJakeCat(AbstractAgent):
                     allocations[prey_idx] = -steal_tokens
                     allocations[player_idx] = num_tokens - steal_tokens
                 else: # this is what we need to change, her and here.
+                    print("first flag on round ", round_num)
                     allocations[player_idx] = num_tokens # here we have no prey, so there is no one to attack
 
             else:
+                print("second flag on round ", round_num)
                 allocations[player_idx] = num_tokens # here there is no one WORTH attacking. big difference. # lets make social welfare here.
                 num_friends = len(self.the_assassins)
 

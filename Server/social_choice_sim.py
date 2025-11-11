@@ -5,6 +5,7 @@ from collections import Counter
 import numpy as np
 import os
 
+from Server.Engine.completeBots.CantisFirst import CantisFirst
 from Server.Engine.completeBots.geneagent3 import GeneAgent3
 from Server.Engine.completeBots.basicGeneAgent3 import BasicGeneAgent3 # this one can't play SC games.
 from Server.Engine.completeBots.completeSocialWelfare import SocialWelfare
@@ -217,7 +218,7 @@ class Social_Choice_Sim:
         for i, bot in enumerate(self.bots):
             # print("this is the bot id ", bot.self_id, " an dthis is the i index ", i)
             # print("this is the cycle we are working with ", cycle, " and the round ", round)
-            if isinstance(bot, GeneAgent3) or isinstance(bot, JakeCAT) or isinstance(bot, ImprovedJakeCat) or isinstance(bot, ProjectCat) or isinstance(bot, SocialWelfare) or isinstance(bot, AntiCat):
+            if isinstance(bot, GeneAgent3) or isinstance(bot, JakeCAT) or isinstance(bot, ImprovedJakeCat) or isinstance(bot, ProjectCat) or isinstance(bot, SocialWelfare) or isinstance(bot, AntiCat) or isinstance(bot, CantisFirst):
                 if cycle == 0:
                     votes_put_in = None
                 else:

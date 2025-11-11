@@ -15,6 +15,8 @@ class GameSimulator:
     def get_influence(self):
         return self.engine.get_influence()
 
+    def set_new_influence(self, new_influence):
+        self.engine.influence = new_influence
 
     def get_prev_influence(self):
         return self.engine.get_prev_influence()

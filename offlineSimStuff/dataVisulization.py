@@ -103,8 +103,6 @@ def create_jhg_stuff(subsets, directory):
 
     filtered_pure_jhg = pure_jhg[pure_jhg["EnforceMajority"] == True]
 
-    # still beign pissy, idk why.
-
     homo = filtered_pure_jhg[filtered_pure_jhg["AgentType"] == "homoSelfPlay.csv"]["PopularityLog"]
     mixed = filtered_pure_jhg[filtered_pure_jhg["AgentType"] == "mixedSelfPlay.csv"]["PopularityLog"]
 
@@ -114,19 +112,58 @@ def create_jhg_stuff(subsets, directory):
     max_value = max(max(flat_values_homo), max(flat_values_mixed))
     min_value = min(min(flat_values_homo), min(flat_values_mixed))
 
-
-
     fig, axes = plt.subplots(1, 2)
     fig.suptitle("Agent Performance in Pure JHG")
     current_axes = axes.flatten()
 
-    current_axes[0].scatter(flat_values_homo)
+    current_axes[0].boxplot(flat_values_homo)
     current_axes[0].set_title("HomoSelfPlay")
-    current_axes[0].set_ylim(min_value,max_value)
+    current_axes[0].set_ylim(min_value, max_value)
 
-    current_axes[1].scatter(flat_values_mixed)
+    current_axes[1].boxplot(flat_values_mixed)
     current_axes[1].set_title("MixedSelfPlay")
-    current_axes[1].set_ylim(min_value,max_value)
+    current_axes[1].set_ylim(min_value, max_value)
+
+    # better possible way to try and do dynamic filtering and graphing later down the road. not terribly important rn.
+    # # still beign pissy, idk why.
+    # # SCENARIO IS PRE FILTERED, THATS HOW WE GET THE SUBSET>
+    # agent_types = subsets["AgentType"].unique()
+    # enforce_majority = subsets["EnforceMajority"].unique()
+    # peep_constants = subsets["PeepConstant"].unique()
+
+    # util_empty = any(len(lst) == 0 for _, lst in subsets["UtilityLog"].items())
+    # pops_empty = any(len(lst) == 0 for _, lst in subsets["PopularityLog"].items())
+    #
+    # possible_graphs = [util_empty, pops_empty]
+    # graphs_map = ["UtilityLog", "PopularityLog"]
+    #
+    #
+    #
+    # for i, graph in enumerate(possible_graphs):
+    #     if graph == True:
+    #         new_list = []
+    #         labels = []
+    #
+    #         for type in agent_types:
+    #             for enforced in enforce_majority:
+    #                 for peep_constant in peep_constants:
+    #                     new_label = "Pure_JHG" + "_" + str(type) + "_" + str(enforced)
+    #                     labels.append(new_label)
+    #
+    #                     current_subset = subsets[
+    #                         (subsets["AgentType"] == type) &
+    #                         (subsets["EnforceMajority"] == enforced) &
+    #                         (subsets["PeepConstant"] == peep_constant)
+    #                         ]
+    #                     labels.append(new_label)
+    #                     new_list_entry = (list(flatten(current_subset[graphs_map[i]])))
+    #                     if len(new_list_entry) > 0:
+    #                         new_list.append(new_list_entry)
+
+
+
+
+    # for graph in new_list
 
     filepath = os.path.join(directory, "JHGPureReults.png")
     plt.savefig(str(filepath), dpi=300, bbox_inches="tight")
@@ -152,21 +189,43 @@ def create_sc_stuff(subsets, directory):
     fig.suptitle("Agents and Enforce Majority in Pure SC")
     current_axes = axes.flatten()
 
-    current_axes[0].boxplot(homo_true)
+
+    homo_true_flat = list(flatten(homo_true))
+    homo_false_flat = list(flatten(homo_false))
+
+    mixed_true_flat = list(flatten(mixed_true))
+    mixed_false_flat = list(flatten(mixed_false))
+
+    min_val = min(
+        min(homo_true_flat),
+        min(homo_false_flat),
+        min(mixed_true_flat),
+        min(mixed_false_flat)
+    )
+
+    max_val = max(
+        max(homo_true_flat),
+        max(homo_false_flat),
+        max(mixed_true_flat),
+        max(mixed_false_flat)
+    )
+
+
+    current_axes[0].boxplot(homo_true_flat)
     current_axes[0].set_title("homo_true")
-    current_axes[0].set_ylim(8, 24)
+    current_axes[0].set_ylim(min_val, max_val)
 
-    current_axes[1].boxplot(homo_false)
+    current_axes[1].boxplot(homo_false_flat)
     current_axes[1].set_title("homo_false")
-    current_axes[1].set_ylim(8, 24)
+    current_axes[1].set_ylim(min_val, max_val)
 
-    current_axes[2].boxplot(mixed_true)
+    current_axes[2].boxplot(mixed_true_flat)
     current_axes[2].set_title("mixed_true")
-    current_axes[2].set_ylim(8, 24)
+    current_axes[2].set_ylim(min_val, max_val)
 
-    current_axes[3].boxplot(mixed_false)
+    current_axes[3].boxplot(mixed_false_flat)
     current_axes[3].set_title("mixed_false")
-    current_axes[3].set_ylim(8, 24)
+    current_axes[3].set_ylim(min_val, max_val)
 
     filepath = os.path.join(directory, "SCPureReults.png")
     plt.savefig(str(filepath), dpi=300, bbox_inches="tight")
