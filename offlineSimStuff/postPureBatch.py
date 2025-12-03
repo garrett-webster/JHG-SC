@@ -2,7 +2,7 @@
 
 from tqdm import tqdm
 
-from offlineSimStuff.runnerHelper import * # get all the functions
+from offlineSimStuff.runningTools.runnerHelper import * # get all the functions
 from offlineSimStuff.variousGraphingTools.individualLoggers.gameLogger import GameLogger
 from offlineSimStuff.variousGraphingTools.individualLoggers.roundLogger import RoundLogger
 
@@ -31,7 +31,7 @@ def run_trial(agents, sc_sim: "Social_Choice_Sim", jhg_sim, round_list, num_cycl
             pops.append(jhg_sim.get_popularity())
 
         if sc_rounds:
-            influence_matrix, winning_vote = run_sc_stuff(sc_sim, jhg_sim, total_order, influence_matrix, curr_round, num_cycles, peep_constant)
+            influence_matrix, winning_vote = run_sc_stuff(sc_sim, jhg_sim.get_popularity(), total_order, influence_matrix, curr_round, num_cycles, peep_constant)
             sc_sim.set_rounds(curr_sc_round) # ???
             curr_sc_round += 1
             played_sc = True
@@ -51,20 +51,21 @@ def run_trial(agents, sc_sim: "Social_Choice_Sim", jhg_sim, round_list, num_cycl
 
 if __name__ == "__main__":
 
-    # import random
+    import random
     # import numpy as np
     #
-    # SEED = 42  # pick any constant
-    #
-    # random.seed(SEED)  # Python’s stdlib RNG
-    # np.random.seed(SEED)  # NumPy’s RNG
+    SEED = 42  # pick any constant
+
+    random.seed(SEED)  # Python’s stdlib RNG
+    np.random.seed(SEED)  # NumPy’s RNG
 
     # various batch scenarios I keep on hand for reference.
-    jhg_games_per_sc_round = [4, 3, 3, 3, 3, 3, 3, 3, 3]
-    # jhg_games_per_sc_round = ["J", 30]
+    # jhg_games_per_sc_round = [4, 3, 3, 3, 3, 3, 3, 3, 3]
+    jhg_games_per_sc_round = ["J", 30]
     # jhg_games_per_sc_round = ["S", 10]
-    forcedRandom = True
-    enforce_majority = False
+    forcedRandom = True # TRUE uses the list, so thats cool.
+    enforce_majority = False # what we used in the other fetcher.
+    random_agents = False # this is what we typically do.
 
     round_list = determine_rounds(jhg_games_per_sc_round)
     num_cycles = 3
@@ -80,12 +81,13 @@ if __name__ == "__main__":
     create_influence = False
     chromosomes_directory = "testChromosome"
     group = ""
-    cat_scenario = "2OldKitties"
-    # cat_scenario = "SelfPlay"
+    # cat_scenario = "2OldKitties"
+    cat_scenario = "SelfPlay"
+    # cat_scenario = "2SCKitties"
     # these paths are relative to the file location, so as long as you don't move the file it can and will run from anywhere.
     jhg_bot_type = 0 # 0 is gene bots, 2 is social welfare and 3 is random. 4 is the new social welfare that I am developing that is just a hair smarter.
 
-    num_attempts = 1 # number of batches to do.
+    num_attempts = 3 # number of batches to do.
     num_rounds = sum(jhg_games_per_sc_round) if len(jhg_games_per_sc_round) > 2 else jhg_games_per_sc_round[-1] # if its a list, len of list. else, grab the second identifier
 
     file_name = os.path.join("..", "Server", "Engine", "scenarios", cat_scenario)
@@ -100,8 +102,10 @@ if __name__ == "__main__":
             new_list.append(-1)
         if line.startswith("NewKitty"):
             new_list.append(-2)
-        if line.startswith("SocialWelfare"):
+        if line.startswith("SCKitty"):
             new_list.append(-3)
+        if line.startswith("SocialWelfare"):
+            new_list.append(-4)
     num_vanilla_bots = num_players - num_humans - len(new_list)
 
 
@@ -114,6 +118,7 @@ if __name__ == "__main__":
     # file_name = os.path.join(file_name, "heterogenousCatKillers.csv")
     # file_name = os.path.join(file_name, "homoNewCats.csv")
     agent_name = "mixedSelfPlay.csv"
+    # agent_name = "pureSCLonger.csv"
 
     # bunch of stuff for print statements
     utility_to_log = []
@@ -127,7 +132,7 @@ if __name__ == "__main__":
     # which means we actually need to use the different scenarios.
     # don't worry about 1 vs 2 cats IG.
 
-    agents = create_agents(num_players, new_list, agent_name, forcedRandom)
+    agents = create_agents(num_players, new_list, agent_name, forcedRandom, random_agents)
 
     for attempt in tqdm(range(num_attempts)): # create a new sim for each attempt to prevent bleeding over.
     # for attempt in (range(num_attempts)): # create a new sim for each attempt to prevent bleeding over.

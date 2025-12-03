@@ -256,6 +256,7 @@ class GeneAgent3(GeneAgentMixin, AbstractAgent):
 
 
     def play_round(self, player_idx, round_num, received, popularities, influence, extra_data, extra_flag=False):
+        # don't worry about the current options matrix, he gest used in the cat thing.y
         if np.isnan(popularities).all():
             print("STack trace this fetcher please and thank you!")
         # if round_num == 1:

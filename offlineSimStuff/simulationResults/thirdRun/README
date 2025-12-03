@@ -1,0 +1,2 @@
+Contains HOMOSELFPLAY and MIXEDSELFPLAY wiht RANDOM agents, as opposed to deterministic top 10 agents, should give a somewhat better spread / idea of what is going on
+second run contains the data for the non random agents, this one contains data for the random agents. should be neat.

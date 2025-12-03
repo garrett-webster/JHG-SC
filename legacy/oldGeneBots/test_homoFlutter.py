@@ -1,5 +1,3 @@
-from offlineSimStuff.geneticStuff.homogenous.homoFlutter import *
-
 def test_randomGeneString():
     numGeneCopies = 1
     newGene1 = randomGeneString(numGeneCopies)

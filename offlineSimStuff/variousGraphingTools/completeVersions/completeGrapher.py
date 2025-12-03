@@ -162,6 +162,7 @@ class CompleteGrapher():
 
 
         color_library = {
+            -3: "purple", # these are the sc pure cats.
             -2: "orange", # my improved(?) cat agents
             -1: "red", # standard cat agents
             0: "blue", # Gene3agnets and variants

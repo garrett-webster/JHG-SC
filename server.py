@@ -4,7 +4,7 @@ from Server.JHGManager import JHGManager
 from Server.OptionGenerators.generators import generator_factory
 from Server.SCManager import SCManager
 from Server.ServerConnectionManager import ServerConnectionManager
-from offlineSimStuff.batch_tester_JHG_SC import create_round_graphs, create_game_graphs
+from offlineSimStuff.runningTools.batch_tester_JHG_SC import create_game_graphs
 from offlineSimStuff.variousGraphingTools.individualLoggers.roundLogger import RoundLogger
 from offlineSimStuff.variousGraphingTools.individualLoggers.gameLogger import GameLogger
 import numpy as np

@@ -1,3 +1,5 @@
 Contains results for the homo and mixed agents with differing peep scores across both pure SC, pure JHG, and scenarios. The most in depth simulation I have ever run.
 think 60 mb of data. which is a HUGE amount of data.
 lets run stuff on this and go from there.
+
+NOTE THAT THESE ARE NOT RANDOM AGENTS AND ARE INSTEAD THE BEST ONES. THIRD RUN WILL CONTAIN RANDOMIZED AGENTS. WE SHALL SEE IF THAT AFFECTS PREFORMANCE.

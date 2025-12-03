@@ -621,7 +621,7 @@ class Social_Choice_Sim:
         self.peeps = bot_peeps
         for peep in bot_peeps:
             indexes.append(bot_peeps.index(peep) + 1)
-        if isinstance(self.allocation_bots[0], GeneAgent3) or isinstance(self.allocation_bots[0], SocialWelfare) or isinstance(self.allocation_bots[0], AntiCat): # make sure he is in there too
+        if isinstance(self.allocation_bots[0], GeneAgent3) or isinstance(self.allocation_bots[0], SocialWelfare) or isinstance(self.allocation_bots[0], CantisFirst): # make sure he is in there too
             if self.new_v is not None:
                 T_prev = self.new_v # constructs the previous, like, received matrix. kind of.
             else:

@@ -1,0 +1,3 @@
+Plots preformance in JHG and SC for the hcabs, using random agents, between enforcing and not enforcimg majoriyt.
+
+without the freakin uhh PeepConstant games, it only takes about 13 minutes using 22 cores to get the job done, which tells me it could very well take all night on a single core.

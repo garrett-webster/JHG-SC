@@ -14,7 +14,7 @@ import math
 import numpy as np
 
 from Server.social_choice_sim import Social_Choice_Sim
-from offlineSimStuff.batch_tester_JHG_SC import determine_rounds
+from offlineSimStuff.runningTools.batch_tester_JHG_SC import determine_rounds
 from legacy.oldGeneBots.geneticLogger import geneticLogger
 from offlineSimStuff.variousGraphingTools.individualLoggers.gameLogger import GameLogger
 from offlineSimStuff.variousGraphingTools.completeVersions.completeGrapher import CompleteGrapher

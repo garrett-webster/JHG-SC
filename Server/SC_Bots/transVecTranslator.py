@@ -15,7 +15,10 @@ def translateVecToIndex(transVec, currentOptionsMatrix, enforce_majority):
     new_options_matrix = copy.deepcopy(currentOptionsMatrix)
     new_options_matrix = [[0] + row for row in new_options_matrix]  # add a 0 column right off the bat.
     transposed_matrix = list(zip(*new_options_matrix))  # Now each item is a column
+    transVec = np.array(transVec)
     for column in transposed_matrix:
+        if transVec.shape[0] != np.array(column).shape[0]:
+            print("uh oh")
         distance = np.linalg.norm(
             np.array(transVec) - np.array(column))  # remember that euclidian distances are always positive
         total_distances.append(distance)
