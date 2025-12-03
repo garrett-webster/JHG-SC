@@ -58,8 +58,7 @@ def run_attempt(attempt_id, num_players, num_humans, bot_types, peep_constant, a
     round_logger = RoundLogger()
     game_logger = GameLogger(num_players, bot_types, peep_constant,
                              agent)  # might be the wrong place to ahve this, as I don't actually have the gen number yet.
-    current_jhg_engine = create_jhg_engine(num_humans, num_players, total_order, tokens_per_player, jhg_bot_type,
-                                           addAgents)
+    current_jhg_engine = create_jhg_engine(num_players)
     current_jhg_sim = create_jhg_sim(num_humans, num_players, total_order, tokens_per_player, jhg_bot_type, addAgents,
                                      agents, current_jhg_engine)
     current_sc_sim = create_sim(num_players, num_humans, total_order, enforce_majority)
@@ -110,7 +109,7 @@ if __name__ == "__main__":
     num_attempts = 1000 # number of batches to do.
 
                 # all consideratiosn about the new cats have been removed. we need to add a self play thing.
-    agent_names = ["homoSelfPlay.csv", "mixedSelfPlay.csv"]
+    agent_names = ["homoJHGSelfPlay.csv", "mixedJHGSelfPlay.csv"]
     # round_types = [["J", 30], ["S", 30], [4, 3, 3, 3, 3, 3, 3, 3, 3]]
     round_types = [["J", 30], ["S", 30]]
     # round_types = [["J", 3], ["S", 3]]  # small example to make sure everything is getting written appropriately.
@@ -125,7 +124,7 @@ if __name__ == "__main__":
     create_game_graphs_bool = False
 
     # used for adding cats or whatever.
-    file_name = os.path.join("../..", "Server", "Engine", "scenarios", "SelfPlay")
+    file_name = os.path.join("../../..", "Server", "Engine", "scenarios", "SelfPlay")
     my_path = os.path.dirname(os.path.abspath(__file__))
     file_path = os.path.normpath(os.path.join(my_path, file_name))
     addAgents = file_path
@@ -151,7 +150,7 @@ if __name__ == "__main__":
 
             for scenario in scenarios:
 
-                file_name = os.path.join("../..", "Server", "Engine", "scenarios", scenario)
+                file_name = os.path.join("../../..", "Server", "Engine", "scenarios", scenario)
                 my_path = os.path.dirname(os.path.abspath(__file__))
                 file_path = os.path.normpath(os.path.join(my_path, file_name))
                 addAgents = file_path

@@ -104,8 +104,8 @@ def create_jhg_stuff(subsets, directory):
 
     filtered_pure_jhg = pure_jhg[pure_jhg["EnforceMajority"] == True]
 
-    homo = filtered_pure_jhg[filtered_pure_jhg["AgentType"] == "homoSelfPlay.csv"]["PopularityLog"]
-    mixed = filtered_pure_jhg[filtered_pure_jhg["AgentType"] == "mixedSelfPlay.csv"]["PopularityLog"]
+    homo = filtered_pure_jhg[filtered_pure_jhg["AgentType"] == "homoJHGSelfPlay.csv"]["PopularityLog"]
+    mixed = filtered_pure_jhg[filtered_pure_jhg["AgentType"] == "mixedJHGSelfPlay.csv"]["PopularityLog"]
 
     flat_values_homo = list(flatten(homo))
     flat_values_mixed = list(flatten(mixed))
@@ -141,12 +141,12 @@ def create_sc_stuff(subsets, directory):
     pure_sc_false = pure_sc[pure_sc["EnforceMajority"] == False]
 
 
-    homo_true = pure_sc_true[pure_sc_true["AgentType"] == "homoSelfPlay.csv"]["UtilityLog"]
-    homo_false = pure_sc_false[pure_sc_false["AgentType"] == "homoSelfPlay.csv"]["UtilityLog"]
+    homo_true = pure_sc_true[pure_sc_true["AgentType"] == "homoJHGSelfPlay.csv"]["UtilityLog"]
+    homo_false = pure_sc_false[pure_sc_false["AgentType"] == "homoJHGSelfPlay.csv"]["UtilityLog"]
 
 
-    mixed_true = pure_sc_true[pure_sc_true["AgentType"] == "mixedSelfPlay.csv"]["UtilityLog"]
-    mixed_false = pure_sc_false[pure_sc_false["AgentType"] == "mixedSelfPlay.csv"]["UtilityLog"]
+    mixed_true = pure_sc_true[pure_sc_true["AgentType"] == "mixedJHGSelfPlay.csv"]["UtilityLog"]
+    mixed_false = pure_sc_false[pure_sc_false["AgentType"] == "mixedJHGSelfPlay.csv"]["UtilityLog"]
 
     fig, axes = plt.subplots(1, 4, figsize=(15, 5))
     fig.suptitle("Agents and Enforce Majority in Pure SC")
@@ -201,11 +201,11 @@ def create_mixed_stuff(subsets, directory):
     mixed_false = mixed[mixed["EnforceMajority"] == False]
 
 
-    homo_true = mixed_true[mixed_true["AgentType"] == "homoSelfPlay.csv"]
-    homo_false = mixed_false[mixed_false["AgentType"] == "homoSelfPlay.csv"]
+    homo_true = mixed_true[mixed_true["AgentType"] == "homoJHGSelfPlay.csv"]
+    homo_false = mixed_false[mixed_false["AgentType"] == "homoJHGSelfPlay.csv"]
 
-    mixed_true = mixed_true[mixed_true["AgentType"] == "mixedSelfPlay.csv"]
-    mixed_false = mixed_false[mixed_false["AgentType"] == "mixedSelfPlay.csv"]
+    mixed_true = mixed_true[mixed_true["AgentType"] == "mixedJHGSelfPlay.csv"]
+    mixed_false = mixed_false[mixed_false["AgentType"] == "mixedJHGSelfPlay.csv"]
 
     peep_values = mixed_true["PeepConstant"].unique()  # get all unique peep values
 

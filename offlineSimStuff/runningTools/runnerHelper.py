@@ -6,6 +6,7 @@ from Server.Engine.simulator import GameSimulator
 
 import numpy as np
 import os
+import copy
 
 from Server.OptionGenerators.generators import generator_factory
 
@@ -14,6 +15,7 @@ from offlineSimStuff.variousGraphingTools.completeVersions.completeGrapher impor
 from Server.Engine.completeBots.projectCat import ProjectCat
 from Server.Engine.completeBots.improvedJakeCate import ImprovedJakeCat
 from Server.Engine.completeBots.CantisFirst import CantisFirst
+
 
 ## TODO: remove the "total_order" from this call. should already be under the SC sim, if that makes sense.
 def run_sc_stuff(sc_sim, jhg_sim_popularity, total_order, influence_matrix, curr_round, num_cycles, peep_constant):
@@ -146,13 +148,13 @@ def create_sim(total_players, num_humans, total_order=None, enforce_majority=Fal
     sc_sim = Social_Choice_Sim(total_players, num_causes, num_humans, generator, cycle, curr_round, total_order, enforce_majority)
     return sc_sim
 
-def create_jhg_sim(num_humans, num_players, total_order, tokens_per_player, jhg_bot_type, addAgents, new_agents, new_engine):
-    jhg_sim = JHG_simulator(num_humans, num_players, total_order, tokens_per_player, jhg_bot_type, agent_config=addAgents)
+def create_jhg_sim(num_humans, num_players, total_order, jhg_bot_type, addAgents, new_agents, new_engine):
+    jhg_sim = JHG_simulator(num_humans, num_players, total_order, bot_type=jhg_bot_type, agent_config=addAgents)
     jhg_sim.override_everything(new_engine, new_agents)
     return jhg_sim
 
 
-def create_jhg_engine(num_humans, num_players, total_order, tokens_per_player, jhg_bot_type, addAgents):
+def create_jhg_engine(num_players):
     poverty_line = 0
 
     alpha_min, alpha_max = 0.20, 0.20
@@ -231,7 +233,7 @@ def loadPopulationFromFile(popSize, num_gene_pools, agent_name):
 
         fp = open(fnombre, "r")
 
-        # C:\Users\Sean Smith\Documents\GitHub\JHG - SC\Server\Engine\botGenerations\mixedSelfPlay.csv
+        # C:\Users\Sean Smith\Documents\GitHub\JHG - SC\Server\Engine\botGenerations\mixedJHGSelfPlay.csv
 
     except FileNotFoundError:
         try:
@@ -345,3 +347,33 @@ class RoundState:
 
     def print(self):
         return str(self.return_round_state())
+
+# most stripped down version of run trial. Just plays the thing, returns the new sims, and then what was played. simple as.
+def run_trial(agents, sc_sim, jhg_sim, round_list, num_cycles, total_order, current_jhg_sim, peep_constant):
+    group = ""  # get rid fo this at some point, IKD why its till here.
+    sc_sim.set_group(group)
+    played_sc = False
+    played_jhg = False
+    curr_sc_round = 0
+    influence_matrix = None  # this should get overwritten pretty quick, but its there so there's no error.
+    for list_index in (range(0, len(round_list))):  # fixed, we start at 0 now.
+
+        sc_rounds = round_list[list_index][-1] == "*"
+        jhg_rounds = round_list[list_index][-1] == "-"
+        curr_round = int(round_list[list_index][:-1])  # useful, yes, but not quite the logger round
+
+        # print("*****************************ROUND ", curr_round, "********************************")
+
+        if jhg_rounds:
+            influence_matrix = run_jhg_stuff(jhg_sim, curr_round, agents, len(agents), current_jhg_sim)
+            played_jhg = True
+
+        if sc_rounds:
+            old_influence_matrix = copy.copy(influence_matrix)
+            influence_matrix, winning_vote = run_sc_stuff(sc_sim, jhg_sim.get_popularity(), total_order,
+                                                          influence_matrix, curr_round, num_cycles, peep_constant)
+            sc_sim.set_rounds(curr_sc_round)  # ???
+            curr_sc_round += 1
+            played_sc = True
+
+    return sc_sim, jhg_sim, played_sc, played_jhg

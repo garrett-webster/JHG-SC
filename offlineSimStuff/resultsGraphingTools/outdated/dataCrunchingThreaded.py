@@ -438,7 +438,7 @@ if __name__ == "__main__":
     num_attempts = 1 # number of batches to do.
 
                 # all consideratiosn about the new cats have been removed. we need to add a self play thing.
-    agent_names = ["homoSelfPlay.csv", "mixedSelfPlay.csv"]
+    agent_names = ["homoJHGSelfPlay.csv", "mixedJHGSelfPlay.csv"]
     # round_types = [["S", 30], ["J", 30], [4, 3, 3, 3, 3, 3, 3, 3, 3]]
     round_types = [["S", 3], ["J", 3]] # small example to make sure everything is getting written appropriately.
     scenarios = ["SelfPlay"] # For now, worry only about self play stuff.
@@ -449,7 +449,7 @@ if __name__ == "__main__":
     create_game_graphs_bool = False
 
     # used for adding cats or whatever.
-    file_name = os.path.join("../..", "Server", "Engine", "scenarios", "workingDirectory")
+    file_name = os.path.join("../../..", "Server", "Engine", "scenarios", "workingDirectory")
     my_path = os.path.dirname(os.path.abspath(__file__))
     file_path = os.path.normpath(os.path.join(my_path, file_name))
     addAgents = file_path
@@ -472,7 +472,7 @@ if __name__ == "__main__":
 
             for scenario in scenarios:
 
-                file_name = os.path.join("../..", "Server", "Engine", "scenarios", scenario)
+                file_name = os.path.join("../../..", "Server", "Engine", "scenarios", scenario)
                 my_path = os.path.dirname(os.path.abspath(__file__))
                 file_path = os.path.normpath(os.path.join(my_path, file_name))
                 addAgents = file_path

@@ -430,7 +430,7 @@ if __name__ == "__main__":
     create_game_graphs_bool = False
 
     # used for adding cats or whatever.
-    file_name = os.path.join("../..", "Server", "Engine", "scenarios", "workingDirectory")
+    file_name = os.path.join("../../..", "Server", "Engine", "scenarios", "workingDirectory")
     my_path = os.path.dirname(os.path.abspath(__file__))
     file_path = os.path.normpath(os.path.join(my_path, file_name))
     addAgents = file_path
@@ -463,7 +463,7 @@ if __name__ == "__main__":
 
             for scenario in scenarios:
 
-                file_name = os.path.join("../..", "Server", "Engine", "scenarios", "workingDirectory")
+                file_name = os.path.join("../../..", "Server", "Engine", "scenarios", "workingDirectory")
                 my_path = os.path.dirname(os.path.abspath(__file__))
                 file_path = os.path.normpath(os.path.join(my_path, file_name))
                 addAgents = file_path

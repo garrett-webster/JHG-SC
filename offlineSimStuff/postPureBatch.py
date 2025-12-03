@@ -9,7 +9,7 @@ from offlineSimStuff.variousGraphingTools.individualLoggers.roundLogger import R
 
 # starts the sim, could make this take command line arguments
 # takes in a bot type, a number of rounds, and then runs it and plots the results. plans for expansion coming soon.
-def run_trial(agents, sc_sim: "Social_Choice_Sim", jhg_sim, round_list, num_cycles, group, total_order, pops, round_logger, create_round_graphs_bool, game_logger, create_game_graphs_bool, current_jhg_sim, peep_constant):
+def run_trial_graphing(agents, sc_sim: "Social_Choice_Sim", jhg_sim, round_list, num_cycles, group, total_order, pops, round_logger, create_round_graphs_bool, game_logger, create_game_graphs_bool, current_jhg_sim, peep_constant):
 
     sc_sim.set_group(group)
     played_sc = False
@@ -61,8 +61,8 @@ if __name__ == "__main__":
 
     # various batch scenarios I keep on hand for reference.
     # jhg_games_per_sc_round = [4, 3, 3, 3, 3, 3, 3, 3, 3]
-    jhg_games_per_sc_round = ["J", 30]
-    # jhg_games_per_sc_round = ["S", 10]
+    # jhg_games_per_sc_round = ["J", 30]
+    jhg_games_per_sc_round = ["S", 30]
     forcedRandom = True # TRUE uses the list, so thats cool.
     enforce_majority = False # what we used in the other fetcher.
     random_agents = False # this is what we typically do.
@@ -117,8 +117,9 @@ if __name__ == "__main__":
     # file_name = os.path.join(file_name, "homogenousCatKillers.csv")
     # file_name = os.path.join(file_name, "heterogenousCatKillers.csv")
     # file_name = os.path.join(file_name, "homoNewCats.csv")
-    agent_name = "mixedSelfPlay.csv"
-    # agent_name = "pureSCLonger.csv"
+    # agent_name = "mixedJHGSelfPlay.csv"
+    # agent_name = "homoSCSelfPlay.csv"
+    agent_name = "mixedSCSelfPlay.csv"
 
     # bunch of stuff for print statements
     utility_to_log = []
@@ -144,14 +145,14 @@ if __name__ == "__main__":
 
 
         offset = num_rounds * attempt # for logging purposes, lets us know the relationship between the logger round and current round
-        current_jhg_engine = create_jhg_engine(num_humans, num_players, total_order, tokens_per_player, jhg_bot_type, addAgents)
+        current_jhg_engine = create_jhg_engine(num_players)
         current_jhg_sim = create_jhg_sim(num_humans, num_players, total_order, tokens_per_player, jhg_bot_type, addAgents, agents, current_jhg_engine)
         current_sc_sim = create_sim(num_players, num_humans, total_order, enforce_majority)
         current_sc_sim.bot_ovveride(agents, len(new_list)) # tells the SC sim to make sure that it is using the same bots as the JHG by passing htem as a reference to both voting and allocation slots.
         round_logger.reset_up(current_jhg_sim, current_sc_sim)
         game_logger.resetup(current_jhg_sim, current_sc_sim)
 
-        sc_sim, jhg_engine, pops = run_trial(agents, current_sc_sim, current_jhg_engine, round_list, num_cycles, group, total_order, pops, round_logger, create_round_graphs_bool, game_logger, create_game_graphs_bool, current_jhg_sim, peep_constant) # This is really whats getting run round times
+        sc_sim, jhg_engine, pops = run_trial_graphing(agents, current_sc_sim, current_jhg_engine, round_list, num_cycles, group, total_order, pops, round_logger, create_round_graphs_bool, game_logger, create_game_graphs_bool, current_jhg_sim, peep_constant) # This is really whats getting run round times
         utility_to_log.append(sc_sim.results_sums)
         popularity_to_log.append(jhg_engine.get_popularity())
 
