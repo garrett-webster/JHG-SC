@@ -40,17 +40,7 @@ def run_genetic_stuff():
                                 extraAgents, max_workers, enforce_majority)
 
 
-
-
-
-
-if __name__ == "__main__":
-    cpu_count = os.cpu_count()
-    max_workers = max(1, os.cpu_count() - 2) # save some cores for the rest of us!
-
-    # we will get to this in a moment. for now...
-    # run_genetic_stuff()
-
+def run_simulations():
     # this section is just stuff that stays the same from batch to batch. Don't touch it.
     forcedRandom = False
     num_players = 10
@@ -78,7 +68,19 @@ if __name__ == "__main__":
     # ok there has GOT to be a better way to run this stuff.
     run_data_crunching_simulations(max_workers, forcedRandom, num_players, random_agents, num_humans,
                   jhg_bot_type, num_attempts, agent_names,
-                  round_types, scenarios, peep_constants_list, enforce_majorities_list)
+                  round_types, scenarios, peep_constants_list, enforce_majorities_list, new_list)
+
+
+
+if __name__ == "__main__":
+    cpu_count = os.cpu_count()
+    max_workers = max(1, os.cpu_count() - 2) # save some cores for the rest of us!
+
+    # we will get to this in a moment. for now...
+    # run_genetic_stuff()
+
+    # this will still need to be tested.
+    run_simulations()
 
 
 
