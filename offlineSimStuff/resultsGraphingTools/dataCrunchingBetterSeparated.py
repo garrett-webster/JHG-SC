@@ -5,7 +5,6 @@ from tqdm import tqdm
 
 from offlineSimStuff.variousGraphingTools.individualLoggers.gameLogger import GameLogger
 from offlineSimStuff.variousGraphingTools.individualLoggers.roundLogger import RoundLogger
-from resultsSaver import ResultsSaver  # logger for long term savings.
 from concurrent.futures import ProcessPoolExecutor, as_completed  # where the multiprocessing magic happens
 
 from offlineSimStuff.runningTools.runnerHelper import *  # get all the functions
@@ -83,7 +82,7 @@ def run_data_crunching_simulations(max_workers, forcedRandom, num_players, rando
 
             for scenario in scenarios:
 
-                file_name = os.path.join("..", "Server", "Engine", "scenarios", scenario)
+                file_name = os.path.join("../..", "Server", "Engine", "scenarios", scenario)
                 my_path = os.path.dirname(os.path.abspath(__file__))
                 file_path = os.path.normpath(os.path.join(my_path, file_name))
                 addAgents = file_path
@@ -170,7 +169,7 @@ def run_data_crunching_simulations(max_workers, forcedRandom, num_players, rando
 
                         )
 
-        current_results_saver.close_file()
+                        current_results_saver.close_file()
 
 
 if __name__ == "__main__":

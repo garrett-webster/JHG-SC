@@ -7,6 +7,8 @@ from Server.Engine.completeBots.improvedJakeCate import ImprovedJakeCat # not th
 import os
 from offlineSimStuff.resultsGraphingTools.dataCrunchingBetterSeparated import run_data_crunching_simulations
 
+import shutil
+
 
 def run_genetic_stuff():
     popSize = 40
@@ -49,10 +51,10 @@ def run_simulations():
     num_cats = 0
 
     jhg_bot_type = 0  # 0 is gene bots, 2 is social welfare and 3 is random. ## Social welfare and random are deprecated, don't look at them.
-    num_attempts = 1000  # number of batches to do.
+    num_attempts = 2  # number of batches to do.
 
     # all considerations about the new cats have been removed. we need to add a self play thing.
-    agent_names = ["homoJHGSelfPlay.csv", "mixedJHGSelfPlay.csv"]
+    agent_names = ["homoJHGSelfPlay.csv", "mixedJHGSelfPlay.csv"] # sure
     # round_types = [["J", 30], ["S", 30]] # no mixing.
     round_types = [["J", 3], ["S", 3]]  # small example to make sure everything is getting written appropriately.
     scenarios = ["SelfPlay"]  # For now we are only concerned with self play stuff.
@@ -79,8 +81,22 @@ if __name__ == "__main__":
     # we will get to this in a moment. for now...
     # run_genetic_stuff()
 
+
+    # ok so before we run the simulations
+    source_1 = r"C:\Users\Sean Smith\Documents\GitHub\JHG - SC\offlineSimStuff\geneticStuff\pureSC\homo\homoSCselfPlayMFalse\gen_0.csv"
+    destination_1 = r"C:\Users\Sean Smith\Documents\GitHub\JHG-SC\Server\Engine\botGenerations\homoSCselfPlayMFalse.csv"
+    shutil.copy(source_1, destination_1)
+
+
+    # r"C:\Users\Sean Smith\Documents\GitHub\JHG - SC\offlineSimStuff\geneticStuff\pureSC\homo\homoSCselfPlayMTrue"
+    #
+    # r"C:\Users\Sean Smith\Documents\GitHub\JHG - SC\offlineSimStuff\geneticStuff\pureSC\mixed\mixedSCselfPlayMFalse"
+    # r"C:\Users\Sean Smith\Documents\GitHub\JHG - SC\offlineSimStuff\geneticStuff\pureSC\mixed\mixedSCselfPlayMTrue"
+
+
+
     # this will still need to be tested.
-    run_simulations()
+    # run_simulations()
 
 
 

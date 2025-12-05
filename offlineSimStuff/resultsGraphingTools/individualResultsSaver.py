@@ -21,7 +21,8 @@ class IndividualResultsSaver():
 
     def __init__(self, output_dir, file_name):
         os.makedirs(output_dir, exist_ok=True)
-        self.file_name = os.path.join(output_dir, file_name, ".csv")
+        file_name += ".csv"
+        self.file_name = os.path.join(output_dir, file_name)
 
         # if file names repeat you are just fetched, so make sure that that DOESN"T happen.
         self.csv_file = open(self.file_name, "w", newline="", encoding="utf-8")
