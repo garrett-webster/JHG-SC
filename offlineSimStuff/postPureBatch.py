@@ -70,7 +70,7 @@ if __name__ == "__main__":
     round_list = determine_rounds(jhg_games_per_sc_round)
     num_cycles = 3
     num_players = 10
-    peep_constant = 0.5 # relates to the balance of which we us
+    peep_constant = 0 # relates to the balance of which we us
 
 
     num_humans = 0

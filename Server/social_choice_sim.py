@@ -527,7 +527,10 @@ class Social_Choice_Sim:
         popSize = 60
         player_idxs = list(np.arange(0, num_agents))
         # file_name = r"Engine\botGenerations\assassins_gen_175.csv"
-        file_name = os.path.join("Engine", "botGenerations", "gen_199.csv")
+
+        #  long story. use these guys for now an dfind a way to not to create so many fake agents just to throw them away.
+        file_name = os.path.join("Engine", "botGenerations", "gen_99.csv")
+        # file_name = os.path.join("Engine", "botGenerations", "gen_199.csv")
 
 
         # file_name = r"Engine\botGenerations\sc_jhg_gen_299.csv"  # # JHG_SC agnets I trained.

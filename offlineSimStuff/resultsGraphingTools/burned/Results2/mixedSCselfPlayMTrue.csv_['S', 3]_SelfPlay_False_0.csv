@@ -1,0 +1,2 @@
+AgentType,RandomAgents,RoundType,Scenario,PeepConstant,EnforceMajority,AverageUtilityNonCats,AverageUtilityCats,AveragePopularityNonCats,AveragePopularityCats,UtilityLog,PopularityLog
+mixedSCselfPlayMTrue.csv,True,"[""S"", 3]",SelfPlay,0,False,15.5,NAN,NAN,NAN,"[[21.0, 20.0, 13.0, 10.0, 14.0, 11.0, 23.0, 17.0, 13.0, 18.0], [22.0, 14.0, 10.0, 15.0, 13.0, 10.0, 20.0, 18.0, 11.0, 17.0]]",[]

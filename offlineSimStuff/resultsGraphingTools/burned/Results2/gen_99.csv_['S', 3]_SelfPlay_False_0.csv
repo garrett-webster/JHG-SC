@@ -1,0 +1,2 @@
+AgentType,RandomAgents,RoundType,Scenario,PeepConstant,EnforceMajority,AverageUtilityNonCats,AverageUtilityCats,AveragePopularityNonCats,AveragePopularityCats,UtilityLog,PopularityLog
+gen_99.csv,True,"[""S"", 3]",SelfPlay,0,False,16.0,NAN,NAN,NAN,"[[20.0, 10.0, 11.0, 10.0, 10.0, 36.0, 11.0, 17.0, 13.0, 22.0], [10.0, 12.0, 10.0, 12.0, 14.0, 11.0, 34.0, 20.0, 25.0, 12.0]]",[]

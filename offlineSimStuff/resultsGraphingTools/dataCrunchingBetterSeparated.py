@@ -67,6 +67,7 @@ def run_data_crunching_simulations(max_workers, forcedRandom, num_players, rando
     # good HEAVENS this is nested.
     for agent_index in tqdm(range(len(agent_names))):
         agent = agent_names[agent_index]  # so we can use the TQDM
+        # print("this is the agent ", agent)
         agents = create_agents(num_players, new_list, agent, forcedRandom, random_agents)
 
         for round_type in round_types:

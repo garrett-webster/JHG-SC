@@ -97,7 +97,7 @@ def run_jhg_stuff(jhg_engine, curr_round, agents, num_players, current_jhg_sim):
 
     return jhg_engine.get_influence()  # return da influence matrix, the change in popularitry, and the new popularities.
 
-
+# should be 0 for the pure SC environment, and 1 for the pure JHG environment. anythign in the middle is mixed.
 def generate_peeps(total_order, popularity_array, sc_sim, peep_constant):
     total = sum(popularity_array) # use her here
     # this is easy bc this will always be positive
@@ -149,7 +149,7 @@ def create_sim(total_players, num_humans, total_order=None, enforce_majority=Fal
     return sc_sim
 
 def create_jhg_sim(num_humans, num_players, total_order, jhg_bot_type, addAgents, new_agents, new_engine):
-    jhg_sim = JHG_simulator(num_humans, num_players, total_order, bot_type=jhg_bot_type, agent_config=addAgents)
+    jhg_sim = JHG_simulator(num_humans, num_players, total_order, bot_type=jhg_bot_type, agent_config=addAgents, start_game=False)
     jhg_sim.override_everything(new_engine, new_agents)
     return jhg_sim
 
@@ -264,7 +264,6 @@ def create_agents(num_players, new_list, agent_name, forcedRandom, random_agents
     popSize = 100
     num_gene_pools = 1
     tokens_per_player = 2
-
     theGenePools = loadPopulationFromFile(popSize, num_gene_pools, agent_name)  # this gets us our fetcher
 
     initial_pops = [100 for _ in range(num_players)]
@@ -347,6 +346,13 @@ class RoundState:
 
     def print(self):
         return str(self.return_round_state())
+
+def get_file_names(agent_directory):
+    files = os.listdir(agent_directory)
+    files = [f for f in files if os.path.isfile(agent_directory+'/'+f)]
+    return files
+
+
 
 # most stripped down version of run trial. Just plays the thing, returns the new sims, and then what was played. simple as.
 def run_trial(agents, sc_sim, jhg_sim, round_list, num_cycles, total_order, current_jhg_sim, peep_constant):

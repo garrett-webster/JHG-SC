@@ -1,0 +1,2 @@
+AgentType,RandomAgents,RoundType,Scenario,PeepConstant,EnforceMajority,AverageUtilityNonCats,AverageUtilityCats,AveragePopularityNonCats,AveragePopularityCats,UtilityLog,PopularityLog
+mixedJHGCatKillers.csv,True,"[""S"", 3]",SelfPlay,0,False,13.0,NAN,NAN,NAN,"[[20.0, 20.0, 10.0, 10.0, 10.0, 10.0, 10.0, 10.0, 20.0, 10.0], [10.0, 10.0, 10.0, 10.0, 30.0, 10.0, 10.0, 10.0, 20.0, 10.0]]",[]

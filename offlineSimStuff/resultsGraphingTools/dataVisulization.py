@@ -7,6 +7,7 @@ import numpy as np
 from IPython.core.pylabtools import figsize
 from pytz.reference import first_sunday_on_or_after
 import os
+from offlineSimStuff.runningTools.runnerHelper import get_file_names
 from itertools import product
 
 def extract_lists(curr_dict):
@@ -293,11 +294,24 @@ def generalized_graphing_code(subset, directory, scenario_name):
         else:
             print("NO VALID DATA CHEIF")
 
+def get_file_paths(directory):
+    file_names = get_file_names(directory)
+    file_directories = [os.path.join(directory, x) for x in file_names]
+    return file_directories
+
+
+
 if __name__ == "__main__":
 
-    file_path = "../simulationResults/thirdRun/simulation_results.csv"
+    # file_path = "../simulationResults/thirdRun/simulation_results.csv"
+    # need to make the super csv
+
+    file_directory = r"C:\Users\Sean Smith\Documents\GitHub\JHG-SC\offlineSimStuff\resultsGraphingTools\burned\Results2"
+    file_paths = get_file_paths(file_directory)
+    total_df = pd.read_csv(file_paths[0]) # just give it something
+
     # just trust the system on the file pathD
-    df = pd.read_csv(file_path, converters={
+    df = pd.read_csv(file_paths, converters={
         "UtilityLog": json.loads, # this should making loading the list of lists better.
         "PopularityLog": json.loads,
         "RoundType": json.loads,
@@ -328,17 +342,21 @@ if __name__ == "__main__":
         subsets.append(df[df["RoundType"] == round_variant])
         scenario_names.append(round_variant)
 
+
+    # uncomment this out once you get it working
     # Get the absolute path to the directory containing this script
-    script_dir = os.path.dirname(os.path.abspath(__file__))
-    filepath = os.path.join(script_dir, file_path)
-    filepath = os.path.join("../..", filepath)
+    # script_dir = os.path.dirname(os.path.abspath(__file__))
+    # filepath = os.path.join(script_dir, file_path)
+    # filepath = os.path.join("../..", filepath)
+    #
+    # directory = os.path.dirname(filepath)
+    #
+    # os.makedirs(directory, exist_ok=True)
+    #
+    # for i, subset in enumerate(subsets):
+    #     generalized_graphing_code(subset, directory, scenario_names[i])
 
-    directory = os.path.dirname(filepath)
 
-    os.makedirs(directory, exist_ok=True)
-
-    for i, subset in enumerate(subsets):
-        generalized_graphing_code(subset, directory, scenario_names[i])
 
     # create_jhg_stuff(subsets[0], directory)
     # create_sc_stuff(subsets[1], directory)

@@ -1,0 +1,2 @@
+AgentType,RandomAgents,RoundType,Scenario,PeepConstant,EnforceMajority,AverageUtilityNonCats,AverageUtilityCats,AveragePopularityNonCats,AveragePopularityCats,UtilityLog,PopularityLog
+homoSCSelfPlay.csv,True,"[""S"", 3]",SelfPlay,0,False,16.0,NAN,NAN,NAN,"[[11.0, 10.0, 23.0, 15.0, 10.0, 22.0, 15.0, 17.0, 17.0, 20.0], [16.0, 14.0, 13.0, 10.0, 21.0, 10.0, 17.0, 19.0, 22.0, 18.0]]",[]
