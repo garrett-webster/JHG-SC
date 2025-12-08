@@ -306,16 +306,17 @@ if __name__ == "__main__":
     # file_path = "../simulationResults/thirdRun/simulation_results.csv"
     # need to make the super csv
 
-    file_directory = r"C:\Users\Sean Smith\Documents\GitHub\JHG-SC\offlineSimStuff\resultsGraphingTools\burned\Results2"
-    file_paths = get_file_paths(file_directory)
-    total_df = pd.read_csv(file_paths[0]) # just give it something
-
-    # just trust the system on the file pathD
-    df = pd.read_csv(file_paths, converters={
-        "UtilityLog": json.loads, # this should making loading the list of lists better.
+    converters = {
+        "UtilityLog": json.loads,  # this should making loading the list of lists better.
         "PopularityLog": json.loads,
         "RoundType": json.loads,
-    })
+    }
+
+    file_directory = r"C:\Users\Sean Smith\Documents\GitHub\JHG-SC\offlineSimStuff\resultsGraphingTools\burned\results2actual"
+    file_paths = get_file_paths(file_directory)
+    df_for_each_csv = (pd.read_csv(df, converters=converters) for df in file_paths)
+
+    df = pd.concat(df_for_each_csv, ignore_index=True)
 
     numeric_cols = [
         "PeepConstant",
@@ -345,16 +346,16 @@ if __name__ == "__main__":
 
     # uncomment this out once you get it working
     # Get the absolute path to the directory containing this script
-    # script_dir = os.path.dirname(os.path.abspath(__file__))
-    # filepath = os.path.join(script_dir, file_path)
-    # filepath = os.path.join("../..", filepath)
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    filepath = os.path.join(script_dir, file_directory)
+    filepath = os.path.join("../..", filepath)
+
+    directory = os.path.dirname(filepath)
+
+    os.makedirs(directory, exist_ok=True)
     #
-    # directory = os.path.dirname(filepath)
-    #
-    # os.makedirs(directory, exist_ok=True)
-    #
-    # for i, subset in enumerate(subsets):
-    #     generalized_graphing_code(subset, directory, scenario_names[i])
+    for i, subset in enumerate(subsets):
+        generalized_graphing_code(subset, directory, scenario_names[i])
 
 
 

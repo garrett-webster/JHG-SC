@@ -6,7 +6,7 @@ from Server.Engine.completeBots.improvedJakeCate import ImprovedJakeCat # not th
         # but if we want to run cats in the future could be useful.
 import os
 from offlineSimStuff.resultsGraphingTools.dataCrunchingBetterSeparated import run_data_crunching_simulations
-from offlineSimStuff.runningTools.runnerHelper.py import get_file_names
+from offlineSimStuff.runningTools.runnerHelper import get_file_names
 
 import shutil
 
@@ -15,10 +15,10 @@ def run_genetic_stuff():
     popSize = 100
     numGeneCopies = 1
     startIndex = 0
-    numGens = 2
+    numGens = 200
     gamesPerGen = popSize # for HOMO, needs same number. better practice to just always set.
-    agentsPerGame = 8
-    roundsPerGame = 10
+    agentsPerGame = 10 # should be 10 agents.
+    roundsPerGame = 30
     numCats = 0
     povertyLine = 0
     # folder = ""
@@ -51,18 +51,19 @@ def run_simulations():
     num_cats = 0
 
     jhg_bot_type = 0  # 0 is gene bots, 2 is social welfare and 3 is random. ## Social welfare and random are deprecated, don't look at them.
-    num_attempts = 2  # number of batches to do.
+    num_attempts = 1000  # number of batches to do.
 
     # all considerations about the new cats have been removed. we need to add a self play thing.
     # agent_names = ["homoJHGSelfPlay.csv", "mixedJHGSelfPlay.csv"] # sure
     #  lets dynamically grab all the agent names
     agent_directory = r"C:\Users\Sean Smith\Documents\GitHub\JHG-SC\Server\Engine\botGenerations"
-    agent_names = get_file_names(agent_directory)
+    # agent_names = get_file_names(agent_directory) # go aheand and only run the ones we need.
+    agent_names = ["mixedSCselfPlayMFalse.csv", "mixedSCselfPlayMTrue.csv"]
 
 
 
-    # round_types = [["J", 30], ["S", 30]] # no mixing.
-    round_types = [["J", 3], ["S", 3]]  # small example to make sure everything is getting written appropriately.
+    round_types = [["J", 30], ["S", 30]] # no mixing.
+    # round_types = [["J", 3], ["S", 3]]  # small example to make sure everything is getting written appropriately.
     scenarios = ["SelfPlay"]  # For now we are only concerned with self play stuff.
     # 1 pure pops, 1 pure util, third has a bunch of constants that I want to test.
     # peep_constants_list = [[1], [0], [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]] # not sure the best way to test this
@@ -80,19 +81,19 @@ def run_simulations():
 
 
 def copy_the_genetic_stuff():
-    source_1 = r"C:\Users\Sean Smith\Documents\GitHub\JHG-SC\offlineSimStuff\geneticStuff\pureSC\homo\homoSCselfPlayMFalse\gen_1.csv"
+    source_1 = r"C:\Users\Sean Smith\Documents\GitHub\JHG-SC\offlineSimStuff\geneticStuff\pureSC\homo\homoSCselfPlayMFalse\gen_199.csv"
     destination_1 = r"C:\Users\Sean Smith\Documents\GitHub\JHG-SC\Server\Engine\botGenerations\homoSCselfPlayMFalse.csv"
     shutil.copy(source_1, destination_1) # THIS WILL OVERWRITE DESTINATION 1 if you are NOT careful
 
-    source_2 = r"C:\Users\Sean Smith\Documents\GitHub\JHG-SC\offlineSimStuff\geneticStuff\pureSC\homo\homoSCselfPlayMTrue\gen_1.csv"
+    source_2 = r"C:\Users\Sean Smith\Documents\GitHub\JHG-SC\offlineSimStuff\geneticStuff\pureSC\homo\homoSCselfPlayMTrue\gen_199.csv"
     destination_2 = r"C:\Users\Sean Smith\Documents\GitHub\JHG-SC\Server\Engine\botGenerations\homoSCselfPlayMTrue.csv"
     shutil.copy(source_2, destination_2)
 
-    source_3 = r"C:\Users\Sean Smith\Documents\GitHub\JHG-SC\offlineSimStuff\geneticStuff\pureSC\mixed\mixedSCselfPlayMFalse\gen_1.csv"
+    source_3 = r"C:\Users\Sean Smith\Documents\GitHub\JHG-SC\offlineSimStuff\geneticStuff\pureSC\mixed\mixedSCselfPlayMFalse\gen_199.csv"
     destination_3 = r"C:\Users\Sean Smith\Documents\GitHub\JHG-SC\Server\Engine\botGenerations\mixedSCselfPlayMFalse.csv"
     shutil.copy(source_3, destination_3)
 
-    source_4 = r"C:\Users\Sean Smith\Documents\GitHub\JHG-SC\offlineSimStuff\geneticStuff\pureSC\mixed\mixedSCselfPlayMTrue\gen_1.csv"
+    source_4 = r"C:\Users\Sean Smith\Documents\GitHub\JHG-SC\offlineSimStuff\geneticStuff\pureSC\mixed\mixedSCselfPlayMTrue\gen_199.csv"
     destination_4 = r"C:\Users\Sean Smith\Documents\GitHub\JHG-SC\Server\Engine\botGenerations\mixedSCselfPlayMTrue.csv"
     shutil.copy(source_4, destination_4)
 
@@ -102,11 +103,13 @@ if __name__ == "__main__":
     cpu_count = os.cpu_count()
     max_workers = max(1, os.cpu_count() - 2) # save some cores for the rest of us!
 
-    run_genetic_stuff()
+    # looks like the simulations and writing crashed, lets try running it again and see what happens.
 
-    copy_the_genetic_stuff()
+    # run_genetic_stuff()
 
-    run_simulations()
+    # copy_the_genetic_stuff()
+
+    # run_simulations()
 
 
 
