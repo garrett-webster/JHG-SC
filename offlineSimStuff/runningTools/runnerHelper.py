@@ -16,6 +16,7 @@ from Server.Engine.completeBots.projectCat import ProjectCat
 from Server.Engine.completeBots.improvedJakeCate import ImprovedJakeCat
 from Server.Engine.completeBots.CantisFirst import CantisFirst
 
+from Server.SC_Bots.optimalHuman import OptimalHuman
 
 ## TODO: remove the "total_order" from this call. should already be under the SC sim, if that makes sense.
 def run_sc_stuff(sc_sim, jhg_sim_popularity, total_order, influence_matrix, curr_round, num_cycles, peep_constant):
@@ -258,6 +259,14 @@ def loadPopulationFromFile(popSize, num_gene_pools, agent_name):
     fp.close()
 
     return thePopulation
+
+
+def create_sc_agents(num_players, agent_name):
+    new_bots = [OptimalHuman(i) for i in range(num_players)]
+    # chromosome auto set, don't worry about it
+
+    return new_bots
+
 
 
 def create_agents(num_players, new_list, agent_name, forcedRandom, random_agents):

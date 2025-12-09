@@ -274,14 +274,19 @@ def generalized_graphing_code(subset, directory, scenario_name):
             flat_values = list(flatten(filtered[log_col]))
             if len(flat_values) == 0:
                 continue # this should never happen but allas here we are
-            label = f"Agent: {agent_type} Enforced:{enforced} PeepConst: {peep_const}"
+            if enforced == True:
+                new_char = "T"
+            elif enforced == False:
+                new_char = "F"
+
+            label = f"{agent_type} E:{new_char} Pc: {peep_const}"
             data_to_plot.append(flat_values)
             labels.append(label)
 
         if data_to_plot:
             plt.figure(figsize=(12, 6), dpi=450)
             plt.boxplot(data_to_plot, tick_labels=labels, widths=0.2)
-            plt.title(f"{scenario_name} - {log_col}")
+            plt.title(f"{scenario_name} - {log_col} - {enforced}")
             plt.xticks(rotation=45)
             plt.tight_layout()
             plt.show()
@@ -317,6 +322,8 @@ if __name__ == "__main__":
     df_for_each_csv = (pd.read_csv(df, converters=converters) for df in file_paths)
 
     df = pd.concat(df_for_each_csv, ignore_index=True)
+
+    df = df[df.EnforceMajority != False] # drop some stuff
 
     numeric_cols = [
         "PeepConstant",

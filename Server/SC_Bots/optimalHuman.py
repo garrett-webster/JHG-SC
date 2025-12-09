@@ -13,7 +13,8 @@ class OptimalHuman(AbstractVotingBot):
     def __init__(self, self_id):
         self.self_id = self_id # the id of ourself in realtion to other bots.
         self.type = "BG" # used for graphing purposes
-        self.chromosome = None # used as a default holder, will be assinged later.
+        self.chromosome = [10.0, 2.0, 2.5]  # highest from testing so I don't need to assign scenario or anything.
+        # self.chromosome = None # used as a default holder, will be assinged later.
         self.risk_adversity = "MAX" # never used, actually.
         self.number_type = 6 # used for logging purposes.
         super(OptimalHuman, self).__init__()
@@ -165,6 +166,18 @@ class OptimalHuman(AbstractVotingBot):
 
     def create_column(self, total_players):
         # work on cat detection later.
+
+        num_utility = 2 * total_players # thats hard coded, definitely ways to make that better.
+        new_allocations = [0 for _ in range(total_players)]
+        for i in range(len(new_allocations)):
+            new_allocations[i] = 1
+        self_allocation = num_utility - sum(new_allocations)
+        new_allocations[self.self_id] = self_allocation
+        return new_allocations
+
+
+    def play_round(self, index, curr_round, influence, popularities, influences, extra_data):
+        total_players = len(popularities)
 
         num_utility = 2 * total_players # thats hard coded, definitely ways to make that better.
         new_allocations = [0 for _ in range(total_players)]

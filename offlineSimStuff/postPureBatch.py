@@ -61,8 +61,8 @@ if __name__ == "__main__":
 
     # various batch scenarios I keep on hand for reference.
     # jhg_games_per_sc_round = [4, 3, 3, 3, 3, 3, 3, 3, 3]
-    # jhg_games_per_sc_round = ["J", 30]
-    jhg_games_per_sc_round = ["S", 30]
+    jhg_games_per_sc_round = ["J", 30]
+    # jhg_games_per_sc_round = ["S", 30]
     forcedRandom = True # TRUE uses the list, so thats cool.
     enforce_majority = False # what we used in the other fetcher.
     random_agents = False # this is what we typically do.
@@ -119,7 +119,7 @@ if __name__ == "__main__":
     # file_name = os.path.join(file_name, "homoNewCats.csv")
     # agent_name = "mixedJHGSelfPlay.csv"
     # agent_name = "homoSCSelfPlay.csv"
-    agent_name = "mixedSCSelfPlay.csv"
+    agent_name = "gen_99.csv" # use this as sort of the default, for now.
 
     # bunch of stuff for print statements
     utility_to_log = []
@@ -133,7 +133,8 @@ if __name__ == "__main__":
     # which means we actually need to use the different scenarios.
     # don't worry about 1 vs 2 cats IG.
 
-    agents = create_agents(num_players, new_list, agent_name, forcedRandom, random_agents)
+    # agents = create_agents(num_players, new_list, agent_name, forcedRandom, random_agents)
+    agents = create_sc_agents(num_players, agent_name)
 
     for attempt in tqdm(range(num_attempts)): # create a new sim for each attempt to prevent bleeding over.
     # for attempt in (range(num_attempts)): # create a new sim for each attempt to prevent bleeding over.
@@ -146,7 +147,7 @@ if __name__ == "__main__":
 
         offset = num_rounds * attempt # for logging purposes, lets us know the relationship between the logger round and current round
         current_jhg_engine = create_jhg_engine(num_players)
-        current_jhg_sim = create_jhg_sim(num_humans, num_players, total_order, tokens_per_player, jhg_bot_type, addAgents, agents, current_jhg_engine)
+        current_jhg_sim = create_jhg_sim(num_humans, num_players, total_order, jhg_bot_type, addAgents, agents, current_jhg_engine)
         current_sc_sim = create_sim(num_players, num_humans, total_order, enforce_majority)
         current_sc_sim.bot_ovveride(agents, len(new_list)) # tells the SC sim to make sure that it is using the same bots as the JHG by passing htem as a reference to both voting and allocation slots.
         round_logger.reset_up(current_jhg_sim, current_sc_sim)

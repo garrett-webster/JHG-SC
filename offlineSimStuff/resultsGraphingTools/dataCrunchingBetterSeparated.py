@@ -68,7 +68,10 @@ def run_data_crunching_simulations(max_workers, forcedRandom, num_players, rando
     for agent_index in tqdm(range(len(agent_names))):
         agent = agent_names[agent_index]  # so we can use the TQDM
         # print("this is the agent ", agent)
-        agents = create_agents(num_players, new_list, agent, forcedRandom, random_agents)
+        # agents = create_agents(num_players, new_list, agent, forcedRandom, random_agents)
+
+        agent = "OptimalHuman"
+        agents = create_sc_agents(num_players, agent)
 
         for round_type in round_types:
 

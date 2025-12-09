@@ -56,9 +56,11 @@ def run_simulations():
     # all considerations about the new cats have been removed. we need to add a self play thing.
     # agent_names = ["homoJHGSelfPlay.csv", "mixedJHGSelfPlay.csv"] # sure
     #  lets dynamically grab all the agent names
-    agent_directory = r"C:\Users\Sean Smith\Documents\GitHub\JHG-SC\Server\Engine\botGenerations"
+
+    # agent_directory = r"C:\Users\Sean Smith\Documents\GitHub\JHG-SC\Server\Engine\botGenerations"
     # agent_names = get_file_names(agent_directory) # go aheand and only run the ones we need.
-    agent_names = ["mixedSCselfPlayMFalse.csv", "mixedSCselfPlayMTrue.csv"]
+
+    agent_names = ["mixedSCselfPlayMFalse.csv"]
 
 
 
@@ -109,7 +111,7 @@ if __name__ == "__main__":
 
     # copy_the_genetic_stuff()
 
-    # run_simulations()
+    run_simulations()
 
 
 

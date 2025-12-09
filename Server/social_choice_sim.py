@@ -135,10 +135,10 @@ class Social_Choice_Sim:
         self.total_types = self.create_total_types() # make this cause we need it now
 
     ##TODO: extraAgents isn't actually implemented yet. fix that in a minute.
-    def create_bots(self, chromosome, extraAgents):
+    def create_bots(self):
         # chromosome = [10.0,2.0,2.5]
         chromosome = [4, 5, 1, 1.0]
-        new_bots = [cheetahBot(i) for i in range(self.num_bots)]
+        new_bots = [optimalHuman(i) for i in range(self.num_bots)]
         for bot in new_bots:
             bot.set_chromosome(chromosome)
 
