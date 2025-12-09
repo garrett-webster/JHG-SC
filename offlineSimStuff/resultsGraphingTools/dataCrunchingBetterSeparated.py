@@ -37,8 +37,11 @@ def run_attempt(attempt_id, num_players, num_humans, bot_types, peep_constant, a
                                                           peep_constant)  # This is really whats getting run round times
     if sc_played:
         utility_to_log = sc_sim.results_sums
+        cooperation_score = sc_sim.get_cooperation_score() # go aheand and slap that in
+        print('this is the cooperation score ', cooperation_score)
     else:
         utility_to_log = "NAN"
+        cooperation_score = "NAN"
 
     if jhg_played:
         popularity_to_log = jhg_engine.get_popularity()
@@ -49,6 +52,7 @@ def run_attempt(attempt_id, num_players, num_humans, bot_types, peep_constant, a
         "Attempt": attempt_id,
         "Utility": utility_to_log,
         "Popularity": popularity_to_log,
+        "Cooperation_Score": cooperation_score,
     }
     return result
 
@@ -68,10 +72,10 @@ def run_data_crunching_simulations(max_workers, forcedRandom, num_players, rando
     for agent_index in tqdm(range(len(agent_names))):
         agent = agent_names[agent_index]  # so we can use the TQDM
         # print("this is the agent ", agent)
-        # agents = create_agents(num_players, new_list, agent, forcedRandom, random_agents)
+        agents = create_agents(num_players, new_list, agent, forcedRandom, random_agents)
 
-        agent = "OptimalHuman"
-        agents = create_sc_agents(num_players, agent)
+        # agent = "OptimalHuman"
+        # agents = create_sc_agents(num_players, agent)
 
         for round_type in round_types:
 

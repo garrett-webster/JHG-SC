@@ -323,7 +323,7 @@ if __name__ == "__main__":
 
     df = pd.concat(df_for_each_csv, ignore_index=True)
 
-    df = df[df.EnforceMajority != False] # drop some stuff
+    df = df[df.EnforceMajority != True] # drop some stuff
 
     numeric_cols = [
         "PeepConstant",

@@ -283,6 +283,7 @@ def playGame(theGene, agents, agentsPerGame, numExtraAgents, roundsPerGame, gen,
     sc_sim = create_sim(agentsPerGame, num_humans, total_order=total_order, enforce_majority=enforce_majority) # creates the sim.
     sc_sim.bot_ovveride(agents, numExtraAgents) # for the allocation bots to get written too. Some weird stuff under the hood there.
 
+
     num_cycles = 3
     peep_constant = 0.5 # doesn't actually matter, in a pure context.
 
@@ -449,7 +450,9 @@ def evolve_homogenous_SC(popSize, numGeneCopies, startIndex, numGens, gamesPerGe
         # Sort by absolute fitness
         theGenePools = sorted(theGenePools, key=lambda g: g.absoluteFitness)
         # Save results
-        write_generational_results(theGenePools, popSize, gen, folder, enforce_majority)
+
+        # DISIABLE THIS FOR NOW!! PUT IT BACK IN LATER, WE ARE TESTING SOMETHING
+        # write_generational_results(theGenePools, popSize, gen, folder, enforce_majority)
 
         # Evolve to next generation
         theGenePoolsOld = theGenePools

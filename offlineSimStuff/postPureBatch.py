@@ -61,8 +61,8 @@ if __name__ == "__main__":
 
     # various batch scenarios I keep on hand for reference.
     # jhg_games_per_sc_round = [4, 3, 3, 3, 3, 3, 3, 3, 3]
-    jhg_games_per_sc_round = ["J", 30]
-    # jhg_games_per_sc_round = ["S", 30]
+    # jhg_games_per_sc_round = ["J", 30]
+    jhg_games_per_sc_round = ["S", 30]
     forcedRandom = True # TRUE uses the list, so thats cool.
     enforce_majority = False # what we used in the other fetcher.
     random_agents = False # this is what we typically do.

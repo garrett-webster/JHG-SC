@@ -12,13 +12,13 @@ import shutil
 
 
 def run_genetic_stuff():
-    popSize = 100
+    popSize = 10
     numGeneCopies = 1
     startIndex = 0
-    numGens = 200
+    numGens = 2
     gamesPerGen = popSize # for HOMO, needs same number. better practice to just always set.
-    agentsPerGame = 10 # should be 10 agents.
-    roundsPerGame = 30
+    agentsPerGame = 6 # should be 10 agents.
+    roundsPerGame = 10
     numCats = 0
     povertyLine = 0
     # folder = ""
@@ -34,10 +34,12 @@ def run_genetic_stuff():
             folder = str(scenario) + "SC" + "selfPlay" + "M" + str(enforce_majority) # need this in here somewhere or I won't know which is which.
 
             if scenario == "homo":
+                print("in the homo one, w/ enforce_majority set to ", enforce_majority)
                 evolve_homogenous_SC(popSize, numGeneCopies, startIndex, numGens, gamesPerGen, agentsPerGame,
                                      roundsPerGame, povertyLine, folder,
                                      extraAgents, max_workers, enforce_majority)
             if scenario == "mixed":
+                print("in the mixed one, w/ enforce_majority set to ", enforce_majority)
                 evolve_mixed_SC(popSize, numGeneCopies, startIndex, numGens, gamesPerGen, agentsPerGame, roundsPerGame,
                                 povertyLine, folder,
                                 extraAgents, max_workers, enforce_majority)
@@ -51,28 +53,39 @@ def run_simulations():
     num_cats = 0
 
     jhg_bot_type = 0  # 0 is gene bots, 2 is social welfare and 3 is random. ## Social welfare and random are deprecated, don't look at them.
-    num_attempts = 1000  # number of batches to do.
+    num_attempts = 3  # number of batches to do.
 
     # all considerations about the new cats have been removed. we need to add a self play thing.
     # agent_names = ["homoJHGSelfPlay.csv", "mixedJHGSelfPlay.csv"] # sure
     #  lets dynamically grab all the agent names
 
-    # agent_directory = r"C:\Users\Sean Smith\Documents\GitHub\JHG-SC\Server\Engine\botGenerations"
-    # agent_names = get_file_names(agent_directory) # go aheand and only run the ones we need.
+    # this will grab all the agents for you.
+    agent_directory = r"C:\Users\Sean Smith\Documents\GitHub\JHG-SC\Server\Engine\botGenerations"
+    agent_names = get_file_names(agent_directory) # go aheand and only run the ones we need.
 
-    agent_names = ["mixedSCselfPlayMFalse.csv"]
+    # agent_names = ["mixedSCselfPlayMFalse.csv"]
 
 
 
-    round_types = [["J", 30], ["S", 30]] # no mixing.
+    # round_types = [["J", 30], ["S", 30]] # no mixing.
+    # # round_types = [["J", 3], ["S", 3]]  # small example to make sure everything is getting written appropriately.
+    # scenarios = ["SelfPlay"]  # For now we are only concerned with self play stuff.
+    # # 1 pure pops, 1 pure util, third has a bunch of constants that I want to test.
+    # # peep_constants_list = [[1], [0], [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]] # not sure the best way to test this
+    # peep_constants_list = [[1], [0]]  # doesn't actually matter yet, still working on support for cross play.
+    # # ROUND STATE: JHG, SC, COMBINED
+    # # enforce_majorities_list = [[True], [True, False], [True, False]]
+    # enforce_majorities_list = [[True], [True, False]] # PURE JHG, PURE SC.
+    #
+    round_types = [["S", 30], ["J", 30]] # no mixing.
     # round_types = [["J", 3], ["S", 3]]  # small example to make sure everything is getting written appropriately.
     scenarios = ["SelfPlay"]  # For now we are only concerned with self play stuff.
     # 1 pure pops, 1 pure util, third has a bunch of constants that I want to test.
     # peep_constants_list = [[1], [0], [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]] # not sure the best way to test this
-    peep_constants_list = [[1], [0]]  # doesn't actually matter yet, still working on support for cross play.
+    peep_constants_list = [[0], [1]]  # doesn't actually matter yet, still working on support for cross play.
     # ROUND STATE: JHG, SC, COMBINED
     # enforce_majorities_list = [[True], [True, False], [True, False]]
-    enforce_majorities_list = [[True], [True, False]] # PURE JHG, PURE SC.
+    enforce_majorities_list = [[True, False], [True]] # PURE JHG, PURE SC.
 
     new_list = [ImprovedJakeCat() for _ in range(num_cats)] # kind of? just as a prototype, its not yet being tested / supported.
 

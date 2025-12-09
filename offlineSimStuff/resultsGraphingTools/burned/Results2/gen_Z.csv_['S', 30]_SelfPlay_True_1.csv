@@ -1,0 +1,2 @@
+AgentType,RandomAgents,RoundType,Scenario,PeepConstant,EnforceMajority,AverageUtilityNonCats,AverageUtilityCats,AveragePopularityNonCats,AveragePopularityCats,UtilityLog,PopularityLog
+gen_Z.csv,True,"[""S"", 30]",SelfPlay,1,True,20.0,NAN,NAN,NAN,"[[10.0, 10.0, 10.0, 10.0, 10.0, 10.0, 10.0, 10.0, 10.0, 10.0], [10.0, 27.0, 38.0, 10.0, 10.0, 32.0, 37.0, 36.0, 10.0, 30.0], [14.0, 29.0, 10.0, 29.0, 33.0, 29.0, 10.0, 35.0, 43.0, 28.0]]",[]

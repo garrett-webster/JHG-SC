@@ -669,6 +669,11 @@ class Social_Choice_Sim:
     ###--- LOGGING TIME. NOT DIRECTLY SIM BUT HOW SIM RECORDS RESULTS ---###
     #########################################################################
 
+    def get_cooperation_score(self):
+        actual_round_num = self.num_rounds + 1  # off by one error
+        cooperation_score = self.cooperation_score / (actual_round_num) if self.num_rounds > 0 else 0  # as a percent, how often we cooperated. (had a non negative cause pass)
+        return cooperation_score
+
     def get_game_deets(self):
         ## TODO: apply a cat filter here so a lot of math works for non cats, rather than whole populartion.
 
