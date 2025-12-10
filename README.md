@@ -1,3 +1,4 @@
+NOTE: I, Garrett Webster, am no longer working the Dr. Crandall's lab, so I have no hand in any development that has occured since Septmeber 1st 2025. At time of writing, Sean Smith is the sole active contributor to the project.
 # JHG-SC
 A project to extend the Junior High Game with a social choice aspect.
 
