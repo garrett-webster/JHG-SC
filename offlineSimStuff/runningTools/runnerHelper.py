@@ -1,5 +1,5 @@
 # this holds all the heavily used functions for post pure batch and for datacrunching better. as we work on those things, make updates here so they stay synced between the two.
-
+from Server.SC_Bots.optimalHuman import OptimalHuman
 from Server.social_choice_sim import Social_Choice_Sim
 from Server.JHGManager import JHG_simulator
 from Server.Engine.simulator import GameSimulator
@@ -16,7 +16,8 @@ from Server.Engine.completeBots.projectCat import ProjectCat
 from Server.Engine.completeBots.improvedJakeCate import ImprovedJakeCat
 from Server.Engine.completeBots.CantisFirst import CantisFirst
 
-from Server.SC_Bots.optimalHuman import OptimalHuman
+# from Server.SC_Bots.optimalHuman import OptimalHuman
+from Server.Engine.completeBots.randomagent import RandomAgent
 
 ## TODO: remove the "total_order" from this call. should already be under the SC sim, if that makes sense.
 def run_sc_stuff(sc_sim, jhg_sim_popularity, total_order, influence_matrix, curr_round, num_cycles, peep_constant):
@@ -222,47 +223,54 @@ def create_total_order(total_players, num_humans):
     return total_order
 
 def loadPopulationFromFile(popSize, num_gene_pools, agent_name):
-    fnombre = "Kill me"
-    try:
-        file_name = os.path.join("Server", "Engine", "botGenerations") # creates standard file path. we then append to this.
-        file_name = os.path.join(file_name, agent_name)
+    if ".csv" in agent_name:
 
-        my_path = os.path.dirname(os.path.abspath(__file__))
-        my_path = os.path.abspath(os.path.join(my_path, "../../"))  # go up 2 levels and resolve path
-        file_path = os.path.join(my_path, file_name)
-        fnombre = file_path
-
-        fp = open(fnombre, "r")
-
-        # C:\Users\Sean Smith\Documents\GitHub\JHG - SC\Server\Engine\botGenerations\mixedJHGSelfPlay.csv
-
-    except FileNotFoundError:
+        fnombre = "Kill me"
         try:
-            fnombre = "../Server/Engine/gen_199.csv"
+            file_name = os.path.join("Server", "Engine", "botGenerations") # creates standard file path. we then append to this.
+            file_name = os.path.join(file_name, agent_name)
+
+            my_path = os.path.dirname(os.path.abspath(__file__))
+            my_path = os.path.abspath(os.path.join(my_path, "../../"))  # go up 2 levels and resolve path
+            file_path = os.path.join(my_path, file_name)
+            fnombre = file_path
+
             fp = open(fnombre, "r")
+
+            # C:\Users\Sean Smith\Documents\GitHub\JHG - SC\Server\Engine\botGenerations\mixedJHGSelfPlay.csv
+
         except FileNotFoundError:
-            print(fnombre + " not found")
-            quit()
+            try:
+                fnombre = "../Server/Engine/gen_199.csv"
+                fp = open(fnombre, "r")
+            except FileNotFoundError:
+                print(fnombre + " not found")
+                quit()
 
-    thePopulation = []
+        thePopulation = []
 
-    for i in range(0,popSize):
-        line = fp.readline()
-        words = line.split(",")
+        for i in range(0,popSize):
+            line = fp.readline()
+            words = line.split(",")
 
-        thePopulation.append(GeneAgent3(words[0], num_gene_pools))
-        # thePopulation.append(BasicGeneAgent3(words[0], num_gene_pools))
-        thePopulation[i].count = float(words[1])
-        # thePopulation[i].relativeFitness = float(words[2])
-        # thePopulation[i].absoluteFitness = float(words[3][0])
+            thePopulation.append(GeneAgent3(words[0], num_gene_pools))
+            # thePopulation.append(BasicGeneAgent3(words[0], num_gene_pools))
+            thePopulation[i].count = float(words[1])
+            # thePopulation[i].relativeFitness = float(words[2])
+            # thePopulation[i].absoluteFitness = float(words[3][0])
 
-    fp.close()
+        fp.close()
+    else:
+        thePopulation = []
 
     return thePopulation
 
 
 def create_sc_agents(num_players, agent_name):
-    new_bots = [OptimalHuman(i) for i in range(num_players)]
+    if "random" in agent_name:
+        new_bots = [RandomAgent(2) for i in range(num_players)]
+    if "optimal" in agent_name:
+        new_bots = [OptimalHuman(i) for i in range(num_players)]
     # chromosome auto set, don't worry about it
 
     return new_bots
@@ -272,8 +280,11 @@ def create_sc_agents(num_players, agent_name):
 def create_agents(num_players, new_list, agent_name, forcedRandom, random_agents):
     popSize = 100
     num_gene_pools = 1
-    tokens_per_player = 2
-    theGenePools = loadPopulationFromFile(popSize, num_gene_pools, agent_name)  # this gets us our fetcher
+
+    if ".csv" in agent_name:
+        theGenePools = loadPopulationFromFile(popSize, num_gene_pools, agent_name)  # this gets us our fetcher
+    else:
+        theGenePools = create_sc_agents(popSize, agent_name)
 
     initial_pops = [100 for _ in range(num_players)]
 

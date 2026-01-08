@@ -19,7 +19,7 @@ class RandomAgent(AbstractAgent):
         return self.whoami
 
 
-    def play_round(self, player_idx, round_num, received, popularities, influence, extra_data):
+    def play_round(self, player_idx, round_num, received, popularities, influence, extra_data, flag=False):
         numPlayers = len(received)
         n = numPlayers
         alpha = [1] * n  # Symmetric Dirichlet distribution parameters
@@ -43,4 +43,16 @@ class RandomAgent(AbstractAgent):
         if transaction_vector[player_idx] < 0:
             transaction_vector[player_idx] = transaction_vector[player_idx] * -1
 
+
+        if flag: # if true, we are in an SC conundrum. scale appropriately.
+            transaction_vector *= numPlayers
+
+            # print("here is the transaction_vector: \n", transaction_vector)
+        # print("Here is the sum of the transaction_vector: \n", np.sum(transaction_vector))
         return transaction_vector
+
+
+
+    def get_vote(self, current_options_matrix, previous_votes, cycle, max_cycle):
+        num_options = [-1, 0, 1, 2]
+        return np.random.choice(num_options)

@@ -310,59 +310,63 @@ if __name__ == "__main__":
 
     # file_path = "../simulationResults/thirdRun/simulation_results.csv"
     # need to make the super csv
+    for i in range(2):
 
-    converters = {
-        "UtilityLog": json.loads,  # this should making loading the list of lists better.
-        "PopularityLog": json.loads,
-        "RoundType": json.loads,
-    }
+        converters = {
+            "UtilityLog": json.loads,  # this should making loading the list of lists better.
+            "PopularityLog": json.loads,
+            "RoundType": json.loads,
+        }
 
-    file_directory = r"C:\Users\Sean Smith\Documents\GitHub\JHG-SC\offlineSimStuff\resultsGraphingTools\burned\results2actual"
-    file_paths = get_file_paths(file_directory)
-    df_for_each_csv = (pd.read_csv(df, converters=converters) for df in file_paths)
+        file_directory = r"C:\Users\Sean Smith\Documents\GitHub\JHG-SC\offlineSimStuff\resultsGraphingTools\burned\results2actual"
+        file_paths = get_file_paths(file_directory)
+        df_for_each_csv = (pd.read_csv(df, converters=converters) for df in file_paths)
 
-    df = pd.concat(df_for_each_csv, ignore_index=True)
+        df = pd.concat(df_for_each_csv, ignore_index=True)
 
-    df = df[df.EnforceMajority != True] # drop some stuff
+        if i == 0:
+            df = df[df.EnforceMajority != True] # drop some stuff
+        else:
+            df = df[df.EnforceMajority == True]
 
-    numeric_cols = [
-        "PeepConstant",
-        "AverageUtilityNonCats",
-        "AverageUtilityCats",
-        "AveragePopularityNonCats",
-        "AveragePopularityCats"
-    ]
+        numeric_cols = [
+            "PeepConstant",
+            "AverageUtilityNonCats",
+            "AverageUtilityCats",
+            "AveragePopularityNonCats",
+            "AveragePopularityCats"
+        ]
 
-    for col in numeric_cols:
-        df[col] = pd.to_numeric(df[col], errors="coerce") # not really sure what this does but we will roll with it
-
-
-    # for this version, we don't need the averageUtilityNonCats or averagePopNonCats, as they will be none
-    df.drop("AverageUtilityCats", axis=1, inplace=True)
-    df.drop("AveragePopularityCats", axis=1, inplace=True)
-
-    # this creates the 3 unique variations that we have.
-    df["RoundType"] = df["RoundType"].apply(lambda x: "_".join(map(str, x)) if isinstance(x, list) else x)
-    # so now I want to create 3 different graphs, depending on the scenario
-    subsets = []
-    scenario_names = []
-    for round_variant in df["RoundType"].unique():
-        subsets.append(df[df["RoundType"] == round_variant])
-        scenario_names.append(round_variant)
+        for col in numeric_cols:
+            df[col] = pd.to_numeric(df[col], errors="coerce") # not really sure what this does but we will roll with it
 
 
-    # uncomment this out once you get it working
-    # Get the absolute path to the directory containing this script
-    script_dir = os.path.dirname(os.path.abspath(__file__))
-    filepath = os.path.join(script_dir, file_directory)
-    filepath = os.path.join("../..", filepath)
+        # for this version, we don't need the averageUtilityNonCats or averagePopNonCats, as they will be none
+        df.drop("AverageUtilityCats", axis=1, inplace=True)
+        df.drop("AveragePopularityCats", axis=1, inplace=True)
 
-    directory = os.path.dirname(filepath)
+        # this creates the 3 unique variations that we have.
+        df["RoundType"] = df["RoundType"].apply(lambda x: "_".join(map(str, x)) if isinstance(x, list) else x)
+        # so now I want to create 3 different graphs, depending on the scenario
+        subsets = []
+        scenario_names = []
+        for round_variant in df["RoundType"].unique():
+            subsets.append(df[df["RoundType"] == round_variant])
+            scenario_names.append(round_variant)
 
-    os.makedirs(directory, exist_ok=True)
-    #
-    for i, subset in enumerate(subsets):
-        generalized_graphing_code(subset, directory, scenario_names[i])
+
+        # uncomment this out once you get it working
+        # Get the absolute path to the directory containing this script
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        filepath = os.path.join(script_dir, file_directory)
+        filepath = os.path.join("../..", filepath)
+
+        directory = os.path.dirname(filepath)
+
+        os.makedirs(directory, exist_ok=True)
+        #
+        for i, subset in enumerate(subsets):
+            generalized_graphing_code(subset, directory, scenario_names[i])
 
 
 

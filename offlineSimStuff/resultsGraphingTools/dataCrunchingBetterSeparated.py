@@ -38,7 +38,7 @@ def run_attempt(attempt_id, num_players, num_humans, bot_types, peep_constant, a
     if sc_played:
         utility_to_log = sc_sim.results_sums
         cooperation_score = sc_sim.get_cooperation_score() # go aheand and slap that in
-        print('this is the cooperation score ', cooperation_score)
+        # print('this is the cooperation score ', cooperation_score)
     else:
         utility_to_log = "NAN"
         cooperation_score = "NAN"
@@ -77,16 +77,21 @@ def run_data_crunching_simulations(max_workers, forcedRandom, num_players, rando
         # agent = "OptimalHuman"
         # agents = create_sc_agents(num_players, agent)
 
-        for round_type in round_types:
+        for i, round_type in enumerate(round_types):
+
+            # if we are trying to deal with 3 or more round types, use this. only works with the 3 round types tho.
+            # # round_list = determine_rounds(round_type)
+            # # num_rounds = sum(round_type) if len(round_type) > 2 else round_type[
+            # #     -1]  # if its a list, len of list. else, grab the second identifier
+            # # round_state = RoundState(round_type)
+            # # index = round_state.return_round_state().index(
+            # #     True)  # just find the index where its true and go from there.
+            # # peep_constants = peep_constants_list[index]
+            # # enforce_majorities = enforce_majorities_list[index]
 
             round_list = determine_rounds(round_type)
-            num_rounds = sum(round_type) if len(round_type) > 2 else round_type[
-                -1]  # if its a list, len of list. else, grab the second identifier
-            round_state = RoundState(round_type)
-            index = round_state.return_round_state().index(
-                True)  # just find the index where its true and go from there.
-            peep_constants = peep_constants_list[index]
-            enforce_majorities = enforce_majorities_list[index]
+            peep_constants = peep_constants_list[i]
+            enforce_majorities = enforce_majorities_list[i]
 
             for scenario in scenarios:
 
@@ -110,6 +115,7 @@ def run_data_crunching_simulations(max_workers, forcedRandom, num_players, rando
                 bot_types += new_list
 
                 for enforce_majority in enforce_majorities:
+                    # print("this is the round_type ", round_type, " and this is the ef ", enforce_majority)
                     # auto plugged in, no reason to change it at all.
 
                     for peep_constant in peep_constants:
@@ -117,7 +123,7 @@ def run_data_crunching_simulations(max_workers, forcedRandom, num_players, rando
                         results = []
 
                         file_name = create_file_name(agent, round_type, scenario, enforce_majority, peep_constant)
-                        output_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "burned", "Results2")
+                        output_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "burned", "Results3")
                         current_results_saver = IndividualResultsSaver(output_dir, file_name)
 
                         with ProcessPoolExecutor(max_workers=max_workers) as executor:

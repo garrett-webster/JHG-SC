@@ -17,6 +17,7 @@ from Server.Engine.completeBots.antiCat import AntiCat
 
 from Server.SC_Bots.optimalHuman import OptimalHuman
 from Server.SC_Bots.possibleCheetahBot import cheetahBot
+from Server.Engine.completeBots.randomagent import RandomAgent
 
 from Server.Node import Node
 from Server.OptionGenerators.options_creation import generate_two_plus_one_groups
@@ -624,7 +625,7 @@ class Social_Choice_Sim:
         self.peeps = bot_peeps
         for peep in bot_peeps:
             indexes.append(bot_peeps.index(peep) + 1)
-        if isinstance(self.allocation_bots[0], GeneAgent3) or isinstance(self.allocation_bots[0], SocialWelfare) or isinstance(self.allocation_bots[0], CantisFirst): # make sure he is in there too
+        if isinstance(self.allocation_bots[0], GeneAgent3) or isinstance(self.allocation_bots[0], SocialWelfare) or isinstance(self.allocation_bots[0], CantisFirst) or isinstance(self.allocation_bots[0], RandomAgent): # make sure he is in there too
             if self.new_v is not None:
                 T_prev = self.new_v # constructs the previous, like, received matrix. kind of.
             else:
