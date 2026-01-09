@@ -53,18 +53,18 @@ def run_simulations():
     num_cats = 0
 
     jhg_bot_type = 0  # 0 is gene bots, 2 is social welfare and 3 is random. ## Social welfare and random are deprecated, don't look at them.
-    num_attempts = 1000  # number of batches to do.
+    num_attempts = 4  # number of batches to do.
 
     # all considerations about the new cats have been removed. we need to add a self play thing.
     # agent_names = ["homoJHGSelfPlay.csv", "mixedJHGSelfPlay.csv"] # sure
     #  lets dynamically grab all the agent names
 
     # this will grab all the agents for you.
-    agent_directory = r"C:\Users\Sean Smith\Documents\GitHub\JHG-SC\Server\Engine\botGenerations"
-    agent_names = get_file_names(agent_directory) # go aheand and only run the ones we need.
+    # agent_directory = r"C:\Users\Sean Smith\Documents\GitHub\JHG-SC\Server\Engine\botGenerations"
+    # agent_names = get_file_names(agent_directory) # go aheand and only run the ones we need.
 
     # agent_directory = r"C:\Users\Sean Smith\Documents\GitHub\JHG-SC\Server\Engine\completeBots"
-    # agent_names = ["randomagent.py"]
+    agent_names = ["randomagent.py"]
 
 
     # agent_names = ["mixedSCselfPlayMFalse.csv"]

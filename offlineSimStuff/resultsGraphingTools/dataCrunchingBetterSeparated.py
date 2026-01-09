@@ -30,6 +30,7 @@ def run_attempt(attempt_id, num_players, num_humans, bot_types, peep_constant, a
     current_sc_sim.bot_ovveride(agents)
     round_logger.reset_up(current_jhg_sim, current_sc_sim)
     game_logger.resetup(current_jhg_sim, current_sc_sim)
+    current_sc_sim.cooperation_score = 0 #just set it all the way down.
 
     # use run trial from the runner helper to make sure its all in the same place.
     sc_sim, jhg_engine, sc_played, jhg_played = run_trial(agents, current_sc_sim, current_jhg_engine, round_list,
@@ -78,7 +79,7 @@ def run_data_crunching_simulations(max_workers, forcedRandom, num_players, rando
         # agents = create_sc_agents(num_players, agent)
 
         for i, round_type in enumerate(round_types):
-
+            print("this is the current rount type ", round_type)
             # if we are trying to deal with 3 or more round types, use this. only works with the 3 round types tho.
             # # round_list = determine_rounds(round_type)
             # # num_rounds = sum(round_type) if len(round_type) > 2 else round_type[
@@ -115,6 +116,7 @@ def run_data_crunching_simulations(max_workers, forcedRandom, num_players, rando
                 bot_types += new_list
 
                 for enforce_majority in enforce_majorities:
+                    print("here is the enforce majority option ", enforce_majority)
                     # print("this is the round_type ", round_type, " and this is the ef ", enforce_majority)
                     # auto plugged in, no reason to change it at all.
 
@@ -123,7 +125,7 @@ def run_data_crunching_simulations(max_workers, forcedRandom, num_players, rando
                         results = []
 
                         file_name = create_file_name(agent, round_type, scenario, enforce_majority, peep_constant)
-                        output_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "burned", "Results3")
+                        output_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "burned", "Results4")
                         current_results_saver = IndividualResultsSaver(output_dir, file_name)
 
                         with ProcessPoolExecutor(max_workers=max_workers) as executor:
@@ -142,6 +144,10 @@ def run_data_crunching_simulations(max_workers, forcedRandom, num_players, rando
                             list, np.ndarray))])  # auto filer out the NAN's
                         popularity_to_log = np.array(
                             [r["Popularity"] for r in results if isinstance(r.get("Popularity"), (list, np.ndarray))])
+                        # coop_to_log = np.array(r["Cooperation_Score"] for r in results if isinstance(r.get("Cooperation_Score"), (list, float)))
+                        coop_to_log = np.array([r["Cooperation_Score"] for r in results if isinstance(r.get("Cooperation_Score"), (list, float))])
+
+                        print("here is the coop to log ", coop_to_log)
 
                         # get the utilities to log and the popularities to log from the results?
                         num_cats = len(new_list)
@@ -166,6 +172,10 @@ def run_data_crunching_simulations(max_workers, forcedRandom, num_players, rando
                             average_popularity_cats = "NAN"
                             average_popularity_non_cats = "NAN"
 
+                        if isinstance(coop_to_log, np.ndarray) and coop_to_log.size == 0:
+                            coop_to_log = np.array(["NA"])
+
+
                         # go ahead and write anyway just
                         current_results_saver.write_result_row(
                             agent=agent,
@@ -180,6 +190,7 @@ def run_data_crunching_simulations(max_workers, forcedRandom, num_players, rando
                             average_popularity_cats=average_popularity_cats,
                             utility_to_log=utility_to_log,
                             popularity_to_log=popularity_to_log,
+                            coop_to_log=coop_to_log,
 
                         )
 

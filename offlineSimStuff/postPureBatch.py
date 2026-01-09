@@ -64,7 +64,7 @@ if __name__ == "__main__":
     # jhg_games_per_sc_round = ["J", 30]
     jhg_games_per_sc_round = ["S", 30]
     forcedRandom = True # TRUE uses the list, so thats cool.
-    enforce_majority = False # what we used in the other fetcher.
+    enforce_majority = True # what we used in the other fetcher.
     random_agents = False # this is what we typically do.
 
     round_list = determine_rounds(jhg_games_per_sc_round)
@@ -133,8 +133,8 @@ if __name__ == "__main__":
     # which means we actually need to use the different scenarios.
     # don't worry about 1 vs 2 cats IG.
 
-    # agents = create_agents(num_players, new_list, agent_name, forcedRandom, random_agents)
-    agents = create_sc_agents(num_players, agent_name)
+    agents = create_agents(num_players, new_list, agent_name, forcedRandom, random_agents)
+    # agents = create_sc_agents(num_players, agent_name)
 
     for attempt in tqdm(range(num_attempts)): # create a new sim for each attempt to prevent bleeding over.
     # for attempt in (range(num_attempts)): # create a new sim for each attempt to prevent bleeding over.

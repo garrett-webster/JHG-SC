@@ -16,7 +16,8 @@ class IndividualResultsSaver():
         "AveragePopularityNonCats",
         "AveragePopularityCats",
         "UtilityLog",
-        "PopularityLog"
+        "PopularityLog",
+        "CoopToLog",
     ]
 
     def __init__(self, output_dir, file_name):
@@ -43,6 +44,7 @@ class IndividualResultsSaver():
         average_popularity_cats,
         utility_to_log,
         popularity_to_log,
+        coop_to_log,
     ):
         self.writer.writerow([
             agent,
@@ -57,6 +59,7 @@ class IndividualResultsSaver():
             average_popularity_cats,
             json.dumps(utility_to_log.tolist()),
             json.dumps(popularity_to_log.tolist()),
+            json.dumps(coop_to_log.tolist()),
         ])
 
         # flush immediately
