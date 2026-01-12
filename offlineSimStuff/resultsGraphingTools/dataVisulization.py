@@ -279,7 +279,11 @@ def generalized_graphing_code(subset, directory, scenario_name):
             elif enforced == False:
                 new_char = "F"
 
-            label = f"{agent_type} E:{new_char} Pc: {peep_const}"
+            coop_score = filtered["CoopToLog"].iloc[0]
+            if isinstance(coop_score, float):
+                coop_score = round(coop_score, 4) # round it to 4 digits.;
+
+            label = f"{agent_type} E:{new_char} Pc: {peep_const} \n Coop: {coop_score}"
             data_to_plot.append(flat_values)
             labels.append(label)
 
@@ -316,10 +320,11 @@ if __name__ == "__main__":
             "UtilityLog": json.loads,  # this should making loading the list of lists better.
             "PopularityLog": json.loads,
             "RoundType": json.loads,
+            "CoopToLog": json.loads,
         }
 
-        file_directory = r"C:\Users\Sean Smith\Documents\GitHub\JHG-SC\offlineSimStuff\resultsGraphingTools\burned\results2actual"
-        # file_directory = r"C:\Users\Sean Smith\Documents\GitHub\JHG-SC\offlineSimStuff\resultsGraphingTools\burned\Results4"
+        # file_directory = r"C:\Users\Sean Smith\Documents\GitHub\JHG-SC\offlineSimStuff\resultsGraphingTools\burned\results2actual"
+        file_directory = r"C:\Users\Sean Smith\Documents\GitHub\JHG-SC\offlineSimStuff\resultsGraphingTools\burned\results4actual"
         file_paths = get_file_paths(file_directory)
         df_for_each_csv = (pd.read_csv(df, converters=converters) for df in file_paths)
 

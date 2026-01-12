@@ -269,7 +269,7 @@ def loadPopulationFromFile(popSize, num_gene_pools, agent_name):
 def create_sc_agents(num_players, agent_name):
     if "random" in agent_name:
         new_bots = [RandomAgent(2) for i in range(num_players)]
-    if "optimal" in agent_name:
+    if "Optimal" in agent_name:
         new_bots = [OptimalHuman(i) for i in range(num_players)]
     # chromosome auto set, don't worry about it
 

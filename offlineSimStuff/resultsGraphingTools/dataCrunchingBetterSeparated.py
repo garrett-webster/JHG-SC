@@ -19,43 +19,49 @@ from offlineSimStuff.resultsGraphingTools.individualResultsSaver import Individu
 
 def run_attempt(attempt_id, num_players, num_humans, bot_types, peep_constant, agent,
                 agents, jhg_bot_type, addAgents, enforce_majority, round_list, num_cycles):
-    total_order = create_total_order(num_players, num_humans)  # scrambel them as we go for security reasons.
-    round_logger = RoundLogger()
-    game_logger = GameLogger(num_players, bot_types, peep_constant,
-                             agent)  # might be the wrong place to ahve this, as I don't actually have the gen number yet.
-    current_jhg_engine = create_jhg_engine(num_players)
-    current_jhg_sim = create_jhg_sim(num_humans, num_players, total_order, jhg_bot_type, addAgents,
-                                     agents, current_jhg_engine)
-    current_sc_sim = create_sim(num_players, num_humans, total_order, enforce_majority)
-    current_sc_sim.bot_ovveride(agents)
-    round_logger.reset_up(current_jhg_sim, current_sc_sim)
-    game_logger.resetup(current_jhg_sim, current_sc_sim)
-    current_sc_sim.cooperation_score = 0 #just set it all the way down.
 
-    # use run trial from the runner helper to make sure its all in the same place.
-    sc_sim, jhg_engine, sc_played, jhg_played = run_trial(agents, current_sc_sim, current_jhg_engine, round_list,
-                                                          num_cycles, total_order, current_jhg_sim,
-                                                          peep_constant)  # This is really whats getting run round times
-    if sc_played:
-        utility_to_log = sc_sim.results_sums
-        cooperation_score = sc_sim.get_cooperation_score() # go aheand and slap that in
-        # print('this is the cooperation score ', cooperation_score)
-    else:
-        utility_to_log = "NAN"
-        cooperation_score = "NAN"
+    try:
+        total_order = create_total_order(num_players, num_humans)  # scrambel them as we go for security reasons.
+        round_logger = RoundLogger()
+        game_logger = GameLogger(num_players, bot_types, peep_constant,
+                                 agent)  # might be the wrong place to ahve this, as I don't actually have the gen number yet.
+        current_jhg_engine = create_jhg_engine(num_players)
+        current_jhg_sim = create_jhg_sim(num_humans, num_players, total_order, jhg_bot_type, addAgents,
+                                         agents, current_jhg_engine)
+        current_sc_sim = create_sim(num_players, num_humans, total_order, enforce_majority)
+        current_sc_sim.bot_ovveride(agents)
+        round_logger.reset_up(current_jhg_sim, current_sc_sim)
+        game_logger.resetup(current_jhg_sim, current_sc_sim)
+        current_sc_sim.cooperation_score = 0 #just set it all the way down.
 
-    if jhg_played:
-        popularity_to_log = jhg_engine.get_popularity()
-    else:
-        popularity_to_log = "NAN"
+        # use run trial from the runner helper to make sure its all in the same place.
+        sc_sim, jhg_engine, sc_played, jhg_played = run_trial(agents, current_sc_sim, current_jhg_engine, round_list,
+                                                              num_cycles, total_order, current_jhg_sim,
+                                                              peep_constant)  # This is really whats getting run round times
+        if sc_played:
+            utility_to_log = sc_sim.results_sums
+            cooperation_score = sc_sim.get_cooperation_score() # go aheand and slap that in
+            # print('this is the cooperation score ', cooperation_score)
+        else:
+            utility_to_log = "NAN"
+            cooperation_score = "NAN"
 
-    result = {
-        "Attempt": attempt_id,
-        "Utility": utility_to_log,
-        "Popularity": popularity_to_log,
-        "Cooperation_Score": cooperation_score,
-    }
-    return result
+        if jhg_played:
+            popularity_to_log = jhg_engine.get_popularity()
+        else:
+            popularity_to_log = "NAN"
+
+        result = {
+            "Attempt": attempt_id,
+            "Utility": utility_to_log,
+            "Popularity": popularity_to_log,
+            "Cooperation_Score": cooperation_score,
+        }
+        return result
+    # try and catch the bugger
+    except Exception as e:
+        print("exception ", e)
+        self.outputQueue.put(e)
 
 def create_file_name(agent_name, round_type, scenario, enforce_majority, peep_constant):
     file_name = str(agent_name) + "_" + str(round_type) + "_" + str(scenario) + "_" + str(enforce_majority) + "_" + str(peep_constant)
@@ -73,13 +79,12 @@ def run_data_crunching_simulations(max_workers, forcedRandom, num_players, rando
     for agent_index in tqdm(range(len(agent_names))):
         agent = agent_names[agent_index]  # so we can use the TQDM
         # print("this is the agent ", agent)
-        agents = create_agents(num_players, new_list, agent, forcedRandom, random_agents)
-
-        # agent = "OptimalHuman"
-        # agents = create_sc_agents(num_players, agent)
+        # agents = create_agents(num_players, new_list, agent, forcedRandom, random_agents)
+        # print("this is the agent we are dealing with ", agent)
+        agent = "OptimalHuman"
+        agents = create_sc_agents(num_players, agent)
 
         for i, round_type in enumerate(round_types):
-            print("this is the current rount type ", round_type)
             # if we are trying to deal with 3 or more round types, use this. only works with the 3 round types tho.
             # # round_list = determine_rounds(round_type)
             # # num_rounds = sum(round_type) if len(round_type) > 2 else round_type[
@@ -95,6 +100,7 @@ def run_data_crunching_simulations(max_workers, forcedRandom, num_players, rando
             enforce_majorities = enforce_majorities_list[i]
 
             for scenario in scenarios:
+                print("testing scenario ", scenario)
 
                 file_name = os.path.join("../..", "Server", "Engine", "scenarios", scenario)
                 my_path = os.path.dirname(os.path.abspath(__file__))
@@ -116,7 +122,7 @@ def run_data_crunching_simulations(max_workers, forcedRandom, num_players, rando
                 bot_types += new_list
 
                 for enforce_majority in enforce_majorities:
-                    print("here is the enforce majority option ", enforce_majority)
+                    print("Trying a different majoritiy ", enforce_majority)
                     # print("this is the round_type ", round_type, " and this is the ef ", enforce_majority)
                     # auto plugged in, no reason to change it at all.
 
@@ -147,8 +153,6 @@ def run_data_crunching_simulations(max_workers, forcedRandom, num_players, rando
                         # coop_to_log = np.array(r["Cooperation_Score"] for r in results if isinstance(r.get("Cooperation_Score"), (list, float)))
                         coop_to_log = np.array([r["Cooperation_Score"] for r in results if isinstance(r.get("Cooperation_Score"), (list, float))])
 
-                        print("here is the coop to log ", coop_to_log)
-
                         # get the utilities to log and the popularities to log from the results?
                         num_cats = len(new_list)
                         num_normal = num_players - num_cats  # number of normal humans
@@ -172,8 +176,10 @@ def run_data_crunching_simulations(max_workers, forcedRandom, num_players, rando
                             average_popularity_cats = "NAN"
                             average_popularity_non_cats = "NAN"
 
-                        if isinstance(coop_to_log, np.ndarray) and coop_to_log.size == 0:
-                            coop_to_log = np.array(["NA"])
+                        if isinstance(coop_to_log, np.ndarray) and coop_to_log.size > 0:
+                            average_coop_score = sum(coop_to_log) / len(coop_to_log) # this should do the trick???
+                        else:
+                            average_coop_score = np.array(["NA"])
 
 
                         # go ahead and write anyway just
@@ -190,7 +196,7 @@ def run_data_crunching_simulations(max_workers, forcedRandom, num_players, rando
                             average_popularity_cats=average_popularity_cats,
                             utility_to_log=utility_to_log,
                             popularity_to_log=popularity_to_log,
-                            coop_to_log=coop_to_log,
+                            coop_to_log=average_coop_score,
 
                         )
 

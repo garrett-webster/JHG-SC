@@ -186,3 +186,6 @@ class OptimalHuman(AbstractVotingBot):
         self_allocation = num_utility - sum(new_allocations)
         new_allocations[self.self_id] = self_allocation
         return new_allocations
+
+    def setGameParams(self, game_params, forcedRandom):
+        pass # not used under this bot, just needs to run
