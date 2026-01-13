@@ -63,8 +63,12 @@ def run_simulations():
     # agent_directory = r"C:\Users\Sean Smith\Documents\GitHub\JHG-SC\Server\Engine\botGenerations"
     # agent_names = get_file_names(agent_directory) # go aheand and only run the ones we need.
 
-    agent_directory = r"C:\Users\Sean Smith\Documents\GitHub\JHG-SC\Server\SC_Bots"
-    agent_names = ["optimalHuman.py"]
+    agent_directory = r"C:\Users\Sean Smith\Documents\GitHub\JHG-SC\Server\Engine\botGenerations"
+    agent_names = ["mixedSCselfPlayMFalse.csv", "mixedSCselfPlayMTrue.csv"]
+
+
+    # agent_directory = r"C:\Users\Sean Smith\Documents\GitHub\JHG-SC\Server\SC_Bots"
+    # agent_names = ["optimalHuman.py"]
 
 
     # agent_names = ["mixedSCselfPlayMFalse.csv"]
