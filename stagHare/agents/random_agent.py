@@ -11,4 +11,4 @@ class Random(Agent):
         return self.random_action(state)
 
     def is_hunting_hare(self) -> bool:
-        return False
+        return True

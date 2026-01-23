@@ -4,6 +4,15 @@ from stagHare.environment.world import StagHare
 from stagHare.environment.allocationTranslator import allocation_to_movement, movement_to_allocation
 from stagHare.visualziationTools.inviduvalRoundGrapher import IndividualRoundGrapher
 from stagHare.agents.random_agent import Random
+from stagHare.agents.hareAgent import HareAgent
+from stagHare.agents.stagAgent import StagAgent
+from stagHare.agents.alegaatr import AlegAATr # litmus test
+
+from Server.Engine.completeBots.geneagent3 import GeneAgent3
+
+
+
+from stagHare.environment.state import State
 # so what do we actually need to do
 # lets create some cab agents
 # and get them to play this fetcher
@@ -14,24 +23,41 @@ from stagHare.agents.random_agent import Random
 # this one has not been built for either of those things.
 def run_trial_graphing(stag_hare, current_round_grapher):
     while True: # the way this gets run is VERY VERY weird.
+
+        # have this generate right off the bat
+        current_round_grapher.create_round_graph(stag_hare)
         rewards = [0] * 5 # 3 hunters, 2 other peeps
+        # this is a reminder to check the action map to make sure that we are hunting what we think we are.
 
         round_rewards = stag_hare.transition()
         for i, reward in enumerate(round_rewards):
             rewards[i] += reward
 
         if stag_hare.is_over():
+            print("something has been captured! 2")
+            print("Hare? ", stag_hare.state.hare_captured())
+            print("Stag? ", stag_hare.state.stag_captured())
+            current_round_grapher.create_round_graph(stag_hare, True)
             return # current_jhg_sim
 
-        current_round_grapher.create_round_graph(stag_hare)
+
 
 def create_hunters(agent_type):
     new_hunters = []
     for i in range(3):
         new_name = "R" + str(i)
 
+        if agent_type == -1:
+            new_hunters.append(AlegAATr(name=new_name, lmbda=0.0, ml_model_type='knn', enhanced=True))
+
         if agent_type == 0:
             new_hunters.append(Random(name=new_name))
+
+        if agent_type == 1:
+            new_hunters.append(HareAgent(name=new_name))
+
+        if agent_type == 2:
+            new_hunters.append(StagAgent(name=new_name))
 
     return new_hunters # just make sure to get those new guys in somewhere.
 
@@ -56,7 +82,7 @@ if __name__ == '__main__':
     new_agents = []
 
     height, width = 6, 6 # lets start there, not too big but there.
-    agent_type = 0 # 0 is a random agent.
+    agent_type = 1 # -1 is ALLEGATR, 0 is a random agent, 1 is the hare greedy agent, 2 is stag greedy agent.
 
     for attempt in range(num_attempts):
         total_order = create_total_order(num_players, num_humans)

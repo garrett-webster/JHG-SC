@@ -53,7 +53,7 @@ def run_simulations():
     num_cats = 0
 
     jhg_bot_type = 0  # 0 is gene bots, 2 is social welfare and 3 is random. ## Social welfare and random are deprecated, don't look at them.
-    num_attempts = 1000  # number of batches to do.
+    num_attempts = 100  # number of batches to do.
 
     # all considerations about the new cats have been removed. we need to add a self play thing.
     # agent_names = ["homoJHGSelfPlay.csv", "mixedJHGSelfPlay.csv"] # sure

@@ -292,6 +292,23 @@ class State:
 
         return n_hunter_neighbors >= N_REQUIRED_TO_CAPTURE_STAG
 
+    agents_to_objects_dict = {
+        "hare": 0,  # np.zeros is our blank backround
+        "stag": 1,
+        "R0": 2,  # first agent
+        "R1": 3,  # second agent
+        "R2": 4,  # third agent
+    }
+
+    def return_as_array(self):
+        nrows, ncols = self.height, self.width
+        image = np.zeros((nrows, ncols))
+        image.fill(-1)
+        for agent_position in self.agent_positions.items():
+            image[agent_position[1][0], agent_position[1][1]] = self.agents_to_objects_dict[agent_position[0]]
+
+        return image
+
     # def collective_distance(self) -> float:
     #     collective_distance, (prey_row, prey_col) = 0, self.agent_positions[Utils.PREY_NAME]
     #

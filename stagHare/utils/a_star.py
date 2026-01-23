@@ -1,4 +1,4 @@
-from environment.state import State
+from stagHare.environment.state import State
 import numpy as np
 from typing import Tuple
 
@@ -79,4 +79,5 @@ class AStar(object):
                 open_list.append(child)
 
         # We might be unable to follow a path if we're blocked in by other agents; in that case, just stay where we are
+        print("We are staying where we are")
         return curr_row, curr_col

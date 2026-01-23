@@ -1,35 +1,59 @@
-from Server.SC_Bots.transVecTranslator import translateVecToIndex
+# from Server.SC_Bots.transVecTranslator import translateVecToIndex
+from stagHare.transVecTranslatorStagHare import translateVecToIndexStagHare
 import numpy as np
+from stagHare.utils.a_star import AStar
+
+
+from stagHare.utils.pathfindingTime import findPath
 
 def allocation_to_movement(new_allocation, id, state):
     pass
-    hare = [-2.5, -2.5, 1]
-    stag = [2, 2, 2]
-    nothing = [0, 0, 0]
-    new_current_options_matrix = [nothing, hare, stag]
-    new_index = translateVecToIndex(new_allocation, new_current_options_matrix, False)
-    if new_index == -1:
-        return [0, 0] # don't move anywhere.
+    # hare = [-2, -2, 2] # just for simplicity sake. # This is just as easy as it gets.
+    # stag = [2, 2, 2]
+
+    # right idea, wrong positions
+
+    # this SHOULD be better.
+    hare = np.zeros(3)
+    hare.fill(-2)
+    hare[id] = 2
+
+    stag = np.zeros(3)
+    stag.fill(2)
+
+    # our abstain option
+    # nothing = [0, 0, 0]
+
+    # print("we are working with id ", id)
+    # print("this is the new allocation ", new_allocation)
+    # print("this is the corresponding hare thing ", hare)
+    # nothing should be created automatically.
+    new_current_options_matrix = [hare, stag]
+    new_index = translateVecToIndexStagHare(new_allocation, new_current_options_matrix, False)
+    new_movement = generate_movement(state, id, new_index)
+    # print('this is the new movement ', new_movement)
+    return new_movement
+
+def generate_movement(state, id, new_index):
+    player_name = "R" + str(id) # zero index, then 2 agetns in front of them.
+    player_position = state.agent_positions[player_name]
+    curr_row, curr_col = player_position[0], player_position[1]
 
     if new_index == 0:
-        move_to_hare(state, id)
+        goal_row, goal_col = state.agent_positions["hare"][0], state.agent_positions["hare"][1]
 
-    if new_index == 1:
-        move_to_stag(state, id)
+    elif new_index == 1:
+        goal_row, goal_col = state.agent_positions["stag"][0], state.agent_positions["stag"][1]
+
+    else:
+        print("this is the new index ", new_index)
+        return [0, 0] # make them move nowhere.
+
+    path =  findPath(state, curr_row, curr_col, goal_row, goal_col)
+    return path
 
 
-def move_to_hare(state, id):
-    hare_position = [0, 0]
-    # hare_position = state.hare
-    # modify these as you go
-    possible_hare_positions = [[[hare_position[0], hare_position[1]], [hare_position[0], hare_position[1]], [hare_position[0], hare_position[1]], [hare_position[0], hare_position[1]]]]
-    player_position = state.player
 
-
-def move_to_stag(state, id):
-    stag_position = state.stag
-    possible_stag_posiitons = state.stag # fix the rest of this to suybtract other occupied spaces
-    player_position = state.player
 
 
 
