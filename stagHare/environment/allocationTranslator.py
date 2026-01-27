@@ -6,12 +6,33 @@ from stagHare.utils.a_star import AStar
 
 from stagHare.utils.pathfindingTime import findPath
 
+
+# def allocation_to_movement(new_allocation, id, state):
+#     movement_type = determine_movement_type(new_allocation)
+#     new_movement = generate_movement(state, id, movement_type)
+#     new_name = "R" + str(id)
+#     print("this is where we are ", state.agent_positions[new_name])
+#     print("this is the new movement ", new_movement)
+#     return new_movement
+#
+#
+#
+# # at the most basic level, lets go with this.
+# def determine_movement_type(new_allocation):
+#     for allocation in new_allocation:
+#         if allocation <= 0:
+#             return 0 # selfish actions result in hare time
+#
+#     else:
+#         return 1 # stag behavior.
+
+# so whoat now?
+
+# old allcation to movement. needs work. tank needs fuel.
 def allocation_to_movement(new_allocation, id, state):
     pass
     # hare = [-2, -2, 2] # just for simplicity sake. # This is just as easy as it gets.
     # stag = [2, 2, 2]
-
-    # right idea, wrong positions
 
     # this SHOULD be better.
     hare = np.zeros(3)
@@ -21,18 +42,22 @@ def allocation_to_movement(new_allocation, id, state):
     stag = np.zeros(3)
     stag.fill(2)
 
-    # our abstain option
-    # nothing = [0, 0, 0]
-
     # print("we are working with id ", id)
     # print("this is the new allocation ", new_allocation)
     # print("this is the corresponding hare thing ", hare)
     # nothing should be created automatically.
     new_current_options_matrix = [hare, stag]
+    # return this so we have a means with which we can specify the bots current eating desire.
     new_index = translateVecToIndexStagHare(new_allocation, new_current_options_matrix, False)
     new_movement = generate_movement(state, id, new_index)
+
+    type = "Stag"
+    if new_index == 0:
+        type = "Hare"
+    print("Here is teh agent ", id, " and here is the movement type ", type)
+
     # print('this is the new movement ', new_movement)
-    return new_movement
+    return new_movement[0], new_movement[1], new_index==0
 
 def generate_movement(state, id, new_index):
     player_name = "R" + str(id) # zero index, then 2 agetns in front of them.

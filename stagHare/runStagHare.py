@@ -8,8 +8,6 @@ from stagHare.agents.hareAgent import HareAgent
 from stagHare.agents.stagAgent import StagAgent
 from stagHare.agents.alegaatr import AlegAATr # litmus test
 
-from Server.Engine.completeBots.geneagent3 import GeneAgent3
-
 
 
 from stagHare.environment.state import State
@@ -25,7 +23,7 @@ def run_trial_graphing(stag_hare, current_round_grapher):
     while True: # the way this gets run is VERY VERY weird.
 
         # have this generate right off the bat
-        current_round_grapher.create_round_graph(stag_hare)
+        # current_round_grapher.create_round_graph(stag_hare)
         rewards = [0] * 5 # 3 hunters, 2 other peeps
         # this is a reminder to check the action map to make sure that we are hunting what we think we are.
 
@@ -42,7 +40,7 @@ def run_trial_graphing(stag_hare, current_round_grapher):
 
 
 
-def create_hunters(agent_type):
+def create_hunters(agent_type, agent_name=""):
     new_hunters = []
     for i in range(3):
         new_name = "R" + str(i)
@@ -58,6 +56,9 @@ def create_hunters(agent_type):
 
         if agent_type == 2:
             new_hunters.append(StagAgent(name=new_name))
+
+        if agent_type == 3:
+            new_hunters.append(CabAgent(i, new_name, agent_name))
 
     return new_hunters # just make sure to get those new guys in somewhere.
 
@@ -75,20 +76,20 @@ if __name__ == '__main__':
     jhg_bot_type = 2 # 0 is gene bots, 2 is social welfare and 3 is random. 4 is the new social welfare that I am developing that is just a hair smarter.
     num_attempts = 1 # don't worry about this
     # don't add cats yet, we will worry about that later.
-    agent_name = "gen_99.csv"
+    agent_name = "mixedJHGSelfPlay.csv"
 
-    # agents = [CabAgent(i, "H"+str(i)) for i in range(num_players)] # they need names or something.
+    # agents = [CabAgent(i, "H"+str(i), agent_name) for i in range(num_players)] # they need names or something.
     addAgents = []
     new_agents = []
 
     height, width = 6, 6 # lets start there, not too big but there.
-    agent_type = 1 # -1 is ALLEGATR, 0 is a random agent, 1 is the hare greedy agent, 2 is stag greedy agent.
+    agent_type = 3 # -1 is ALLEGATR, 0 is a random agent, 1 is the hare greedy agent, 2 is stag greedy agent.
 
     for attempt in range(num_attempts):
         total_order = create_total_order(num_players, num_humans)
         current_jhg_engine = create_jhg_engine(num_players)
         # current_jhg_sim = create_jhg_sim(num_humans, num_players, total_order, jhg_bot_type, addAgents, new_agents, current_jhg_engine)
-        hunters = create_hunters(agent_type)
+        hunters = create_hunters(agent_type, agent_name)
         current_round_grapher = IndividualRoundGrapher()
         while True:
             stag_hare = StagHare(height, width, hunters)
