@@ -309,6 +309,7 @@ class State:
 
         return image
 
+
     # def collective_distance(self) -> float:
     #     collective_distance, (prey_row, prey_col) = 0, self.agent_positions[Utils.PREY_NAME]
     #
