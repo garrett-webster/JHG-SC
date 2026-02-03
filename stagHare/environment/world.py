@@ -66,7 +66,7 @@ class StagHare:
                 id = int(agent.name[-1])
                 agent.set_helpers(self.engine)
                 new_allocation = agent.act(self.state, reward, round_num)
-                print("id: ", id, " new_allocation: ", new_allocation)
+                # print("id: ", id, " new_allocation: ", new_allocation)
                 new_row, new_col, movement_type = allocation_to_movement(new_allocation, id, self.state)
                 agent.set_hunt(movement_type)
                 total_allocations.append(new_allocation)

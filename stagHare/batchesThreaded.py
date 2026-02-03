@@ -1,3 +1,5 @@
+import os
+
 from tqdm import tqdm
 
 from offlineSimStuff.runningTools.runnerHelper import create_jhg_sim, create_total_order, create_jhg_engine
@@ -11,12 +13,15 @@ from stagHare.visualziationTools.gameLogger import GameLogger
 from stagHare.agents.random_agent import Random
 from stagHare.agents.hareAgent import HareAgent
 from stagHare.agents.stagAgent import StagAgent
-from stagHare.agents.alegaatr import AlegAATr # litmus test
+from stagHare.agents.alegaatr import AlegAATr  # litmus test
 
 from concurrent.futures import ProcessPoolExecutor, as_completed
 
+import numpy as np
 
 from stagHare.environment.state import State
+
+
 # so what do we actually need to do
 # lets create some cab agents
 # and get them to play this fetcher
@@ -25,27 +30,33 @@ from stagHare.environment.state import State
 # this is going ot be strange bc the simulator is VERY different from what I have worked with before
 # the SC sim I created and the JHG sim was sort of built for cab agents
 # this one has not been built for either of those things.
-def run_trial_graphing(stag_hare, current_round_grapher, current_game_logger):
-    while True: # the way this gets run is VERY VERY weird.
+def run_trial(agent_type, agent_name):
+
+    height = 6
+    width = 6
+    # create the stag hare fetcher.
+    hunters = create_hunters(agent_type, agent_name)  # no reason to make this every attempt. just once per agent should be fine.
+
+    while True:
+        stag_hare = StagHare(height, width, hunters)
+        if not stag_hare.is_over():
+            break
+
+    while True:  # the way this gets run is VERY VERY weird.
 
         # have this generate right off the bat
         # current_round_grapher.create_round_graph(stag_hare)
-        rewards = [0] * 5 # 3 hunters, 2 other peeps
+        rewards = [0] * 5  # 3 hunters, 2 other peeps
         # this is a reminder to check the action map to make sure that we are hunting what we think we are.
 
         round_rewards = stag_hare.transition()
         for i, reward in enumerate(round_rewards):
             rewards[i] += reward
 
-        current_game_logger.add_round(stag_hare.state)
+        # current_game_logger.add_round(stag_hare.state)
 
         if stag_hare.is_over():
-            # print("something has been captured! 2")
-            # print("Hare? ", stag_hare.state.hare_captured())
-            # print("Stag? ", stag_hare.state.stag_captured())
-            # current_round_grapher.create_round_graph(stag_hare, True)
-            return
-
+            return not stag_hare.state.hare_captured() # return a bool, add it to the list.
 
 
 def create_hunters(agent_type, agent_name=""):
@@ -68,25 +79,30 @@ def create_hunters(agent_type, agent_name=""):
         if agent_type == 3:
             new_hunters.append(CabAgent(i, new_name, agent_name))
 
-
-    return new_hunters # just make sure to get those new guys in somewhere.
+    return new_hunters  # just make sure to get those new guys in somewhere.
 
 
 if __name__ == '__main__':
 
+    max_workers = max(1, os.cpu_count()-2) # save just a few for other processes, plz don't crash.
+
     forcedRandom = True
-    random_agents = True # better for human distribution
+    random_agents = True  # better for human distribution
 
     # no round list unfortunately, doesn't work that way
 
-    num_players = 3 # as dictated by the stag hare thing
-    num_humans = 0 # yeah...
+    num_players = 3  # as dictated by the stag hare thing
+    num_humans = 0  # yeah...
     # for testing purposes right off the bat, lets work with social welfare. that wi
-    jhg_bot_type = 2 # 0 is gene bots, 2 is social welfare and 3 is random. 4 is the new social welfare that I am developing that is just a hair smarter.
-    num_attempts = 1 # don't worry about this
+    jhg_bot_type = 2  # 0 is gene bots, 2 is social welfare and 3 is random. 4 is the new social welfare that I am developing that is just a hair smarter.
+    num_attempts = 1000  # don't worry about this
     # don't add cats yet, we will worry about that later.
     # agent_name = "mixedJHGSelfPlay.csv"
-    # agent_names = ["gen_99.csv", "gen_Z.csv", "homoJHGSelfPlay.csv", "homoSCselfPlayMFalse.csv", "homoSCselfPlayMTrue.csv", "mixedJHGSelfPlay.csv", "mixedSCselfPlayMFalse.csv", "mixedSCselfPlayMTrue.csv"]
+    # agent_names = ["gen_99.csv", "gen_Z.csv", "homoJHGSelfPlay.csv", "homoSCselfPlayMFalse.csv",
+    #                "homoSCselfPlayMTrue.csv"]
+    # agent_names = ["mixedJHGSelfPlay.csv", "mixedSCselfPlayMFalse.csv",
+    #                "mixedSCselfPlayMTrue.csv"]
+
     agent_names = ["homoJHGSelfPlay.csv"]
 
 
@@ -94,35 +110,28 @@ if __name__ == '__main__':
     addAgents = []
     new_agents = []
 
-    height, width = 6, 6 # lets start there, not too big but there.
-    agent_type = 3 # -1 is ALLEGATR, 0 is a random agent, 1 is the hare greedy agent, 2 is stag greedy agent.
-
+    height, width = 6, 6  # lets start there, not too big but there.
+    agent_type = 3  # -1 is ALLEGATR, 0 is a random agent, 1 is the hare greedy agent, 2 is stag greedy agent.
 
     for agent_name in agent_names:
         print("Agent name: " + agent_name)
         current_batch_logger = BatchLogger()
-
-        for attempt in tqdm(range(num_attempts)):
-            current_game_logger = GameLogger(height, width) # need this per game, not per batch.
-            total_order = create_total_order(num_players, num_humans)
-            current_jhg_engine = create_jhg_engine(num_players)
-            # current_jhg_sim = create_jhg_sim(num_humans, num_players, total_order, jhg_bot_type, addAgents, new_agents, current_jhg_engine)
-            hunters = create_hunters(agent_type, agent_name)
-            current_round_grapher = IndividualRoundGrapher()
-            while True:
-                stag_hare = StagHare(height, width, hunters)
-                if not stag_hare.is_over():
-                    break
-
-            # just run the fetcher.
-            run_trial_graphing(stag_hare, current_round_grapher, current_game_logger)
-            current_batch_logger.add_game(stag_hare)
+        # unless we want randomize it, then that could a problem.
+        # actually yeah thats a problem.
+        results = []
 
 
-            game_grapher = GameGrapher(stag_hare)
 
-            game_grapher.playback_game(current_game_logger)
-            game_grapher.create_game_graph(current_game_logger)
+        with ProcessPoolExecutor(max_workers=num_players) as executor:
+            futures = []
+            for attempt in range(num_attempts):
+                futures.append(executor.submit(run_trial, agent_type, agent_name))
 
-        new_num = current_batch_logger.get_results()
+            for future in as_completed(futures):
+                results.append(future.result())
+
+
+
+
+        new_num = np.mean(results)
         print("the ration of stag to hare was ", new_num, " for agent ", agent_name)

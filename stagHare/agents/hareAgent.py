@@ -4,8 +4,9 @@ from typing import Tuple
 import numpy as np
 
 class HareAgent(Agent):
-    def __init__(self, name: str) -> None:
+    def __init__(self, id: int, name: str) -> None:
         Agent.__init__(self, name)
+        self.id = id
 
     def act(self, state: State, reward: float, round_num: int) -> Tuple[int, int]:
         # the allocation is going to be weird but we got this
