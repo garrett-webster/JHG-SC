@@ -28,6 +28,7 @@ from stagHare.environment.state import State
 def run_trial_graphing(stag_hare, current_round_grapher, current_game_logger):
     while True: # the way this gets run is VERY VERY weird.
 
+        current_game_logger.add_round(stag_hare.state)
         # have this generate right off the bat
         # current_round_grapher.create_round_graph(stag_hare)
         rewards = [0] * 5 # 3 hunters, 2 other peeps
@@ -37,9 +38,10 @@ def run_trial_graphing(stag_hare, current_round_grapher, current_game_logger):
         for i, reward in enumerate(round_rewards):
             rewards[i] += reward
 
-        current_game_logger.add_round(stag_hare.state)
+
 
         if stag_hare.is_over():
+            current_game_logger.add_round(stag_hare.state)
             # print("something has been captured! 2")
             # print("Hare? ", stag_hare.state.hare_captured())
             # print("Stag? ", stag_hare.state.stag_captured())
@@ -113,6 +115,9 @@ if __name__ == '__main__':
                 stag_hare = StagHare(height, width, hunters)
                 if not stag_hare.is_over():
                     break
+
+            # does this suck? possibly.
+            stag_hare.state.hunting_hare_map = {"R"+str(i) : 2 for i in range(3)}
 
             # just run the fetcher.
             run_trial_graphing(stag_hare, current_round_grapher, current_game_logger)

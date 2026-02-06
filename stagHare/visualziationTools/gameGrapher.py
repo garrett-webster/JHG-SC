@@ -158,8 +158,20 @@ class GameGrapher():
                             intent_value = intent[actual_player_id]
 
                             # Color mapping: 0 = Stag = Green, 1 = Hare = Red
-                            color = 'green' if intent_value == 0 else 'red'
-                            intent_text = 'S' if intent_value == 0 else 'H'
+                            # on start up, we actually don't have an intent. make it blue.
+                            # color = 'green' if intent_value == 0 else 'red'
+                            # intent_text = 'S' if intent_value == 0 else 'H'
+                            if intent_value == 0:
+                                color = 'green'
+                                intent_text = 'S'
+                            elif intent_value == 1:
+                                color = 'red'
+                                intent_text = 'H'
+                            else:
+                                color = 'yellow'
+                                intent_text = 'N'
+
+
 
                             ax.scatter(x, y, s=400, color=color, alpha=0.6,
                                        edgecolors='white', linewidth=2, zorder=10)

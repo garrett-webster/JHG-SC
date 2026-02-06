@@ -58,9 +58,8 @@ def findPathGreedy(state: State, p_curr_row, p_curr_col, goal_row, goal_col) -> 
     return curr_row, curr_col # don't move at all. hope this works.
 
 
-def findPathTeamAware(self, state: State, reward: float, round_num: int) -> Tuple[int, int]:
-    stag_row, stag_col = state.agent_positions[STAG_NAME]
-    curr_row, curr_col = state.agent_positions[self.name]
+def findPathTeamAware(name, state, curr_row, curr_col, stag_row, stag_col) -> Tuple[int, int]:
+    # if this bricks, it might be becuase we need the goal row and col to be idfferent than the stag row and col. room for thoughtg.
     stag_neighboring_positions = state.neighboring_positions(stag_row, stag_col)
 
     # If we are already neighbors with the stag, try to move to its current position in case it moves
@@ -104,7 +103,7 @@ def findPathTeamAware(self, state: State, reward: float, round_num: int) -> Tupl
             if (row, col) not in assigned:
                 assigned.add((row, col))
 
-                if agent_name == self.name:
+                if agent_name == name: # well this sucks.
                     goal = (row, col)
 
                 break

@@ -20,7 +20,13 @@ class GameLogger():
         new_list = []
         for key in new_state.hunting_hare_map:
             if key not in ("hare", "stag"): # we aren't interested in their nefarious purposes
-                new_constant = 0 if new_state.hunting_hare_map[key] == 0 else 1
+                # new_constant = 0 if new_state.hunting_hare_map[key] == 0 else 1
+                if new_state.hunting_hare_map[key] == 0:
+                    new_constant = 0
+                elif new_state.hunting_hare_map[key] == 1:
+                    new_constant = 1
+                else:
+                    new_constant = 2 # something is wrong, whatever, happens.
                 new_list.append(new_constant) # just add what we are looking at
         self.hare_hunting_history.append(new_list)
         for agent in new_state.agent_positions:

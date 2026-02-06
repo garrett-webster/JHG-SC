@@ -4,7 +4,8 @@ import numpy as np
 from stagHare.utils.a_star import AStar
 
 
-from stagHare.utils.pathfindingTime import findPath
+from stagHare.utils.pathfindingTime import findPathGreedy
+from stagHare.utils.pathfindingTime import findPathTeamAware
 
 
 # old allcation to movement. needs work. tank needs fuel.
