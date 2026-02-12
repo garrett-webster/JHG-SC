@@ -18,8 +18,10 @@ from stagHare.agents.alegaatr import AlegAATr  # litmus test
 from concurrent.futures import ProcessPoolExecutor, as_completed
 
 import numpy as np
-
 from stagHare.environment.state import State
+
+
+from stagHare.runnerHelper import run_trial, process_scores # this SHOULD be all we need.
 
 
 # so what do we actually need to do
@@ -30,56 +32,7 @@ from stagHare.environment.state import State
 # this is going ot be strange bc the simulator is VERY different from what I have worked with before
 # the SC sim I created and the JHG sim was sort of built for cab agents
 # this one has not been built for either of those things.
-def run_trial(agent_type, agent_name):
 
-    height = 6
-    width = 6
-    # create the stag hare fetcher.
-    hunters = create_hunters(agent_type, agent_name)  # no reason to make this every attempt. just once per agent should be fine.
-
-    while True:
-        stag_hare = StagHare(height, width, hunters)
-        if not stag_hare.is_over():
-            break
-
-    while True:  # the way this gets run is VERY VERY weird.
-
-        # have this generate right off the bat
-        # current_round_grapher.create_round_graph(stag_hare)
-        rewards = [0] * 5  # 3 hunters, 2 other peeps
-        # this is a reminder to check the action map to make sure that we are hunting what we think we are.
-
-        round_rewards = stag_hare.transition()
-        for i, reward in enumerate(round_rewards):
-            rewards[i] += reward
-
-        # current_game_logger.add_round(stag_hare.state)
-
-        if stag_hare.is_over():
-            return not stag_hare.state.hare_captured() # return a bool, add it to the list.
-
-
-def create_hunters(agent_type, agent_name=""):
-    new_hunters = []
-    for i in range(3):
-        new_name = "R" + str(i)
-
-        if agent_type == -1:
-            new_hunters.append(AlegAATr(name=new_name, lmbda=0.0, ml_model_type='knn', enhanced=True))
-
-        if agent_type == 0:
-            new_hunters.append(Random(name=new_name))
-
-        if agent_type == 1:
-            new_hunters.append(HareAgent(name=new_name))
-
-        if agent_type == 2:
-            new_hunters.append(StagAgent(name=new_name))
-
-        if agent_type == 3:
-            new_hunters.append(CabAgent(i, new_name, agent_name))
-
-    return new_hunters  # just make sure to get those new guys in somewhere.
 
 
 if __name__ == '__main__':
@@ -122,16 +75,12 @@ if __name__ == '__main__':
 
 
 
-        with ProcessPoolExecutor(max_workers=num_players) as executor:
+        with ProcessPoolExecutor(max_workers=max_workers) as executor:
             futures = []
             for attempt in range(num_attempts):
                 futures.append(executor.submit(run_trial, agent_type, agent_name))
 
-            for future in as_completed(futures):
+            for future in tqdm(as_completed(futures), desc="Submitting Results", total=num_attempts):
                 results.append(future.result())
 
-
-
-
-        new_num = np.mean(results)
-        print("the ration of stag to hare was ", new_num, " for agent ", agent_name)
+        cooperation_score, scores_per_player = process_scores(results)

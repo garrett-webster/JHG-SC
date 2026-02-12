@@ -2,6 +2,8 @@ from stagHare.environment.state import State
 import numpy as np
 from typing import Tuple
 
+import traceback
+
 # PLEASE NOTE: There's probably a cleaner way to implement A* along with the team aware agent in general, but this still
 # is a fairly straightforward and simple implementation, so hopefully it is understandable.  I also tried to insert
 # comments in key places
@@ -80,4 +82,5 @@ class AStar(object):
 
         # We might be unable to follow a path if we're blocked in by other agents; in that case, just stay where we are
         print("We are staying where we are")
+        traceback.print_stack()
         return curr_row, curr_col
