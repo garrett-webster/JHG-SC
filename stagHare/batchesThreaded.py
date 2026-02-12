@@ -48,7 +48,7 @@ if __name__ == '__main__':
     num_humans = 0  # yeah...
     # for testing purposes right off the bat, lets work with social welfare. that wi
     jhg_bot_type = 2  # 0 is gene bots, 2 is social welfare and 3 is random. 4 is the new social welfare that I am developing that is just a hair smarter.
-    num_attempts = 1000  # don't worry about this
+    num_attempts = 4  # don't worry about this
     # don't add cats yet, we will worry about that later.
     # agent_name = "mixedJHGSelfPlay.csv"
     # agent_names = ["gen_99.csv", "gen_Z.csv", "homoJHGSelfPlay.csv", "homoSCselfPlayMFalse.csv",
