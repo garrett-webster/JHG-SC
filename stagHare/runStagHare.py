@@ -29,7 +29,7 @@ from stagHare.environment.state import State
 def run_trial_graphing(stag_hare, current_round_grapher, current_game_logger, scores):
     while True: # the way this gets run is VERY VERY weird.
 
-        current_game_logger.add_round(stag_hare.state)
+        # current_game_logger.add_round(stag_hare.state)
         # have this generate right off the bat
         # current_round_grapher.create_round_graph(stag_hare)
         rewards = [0] * 5 # 3 hunters, 2 other peeps
@@ -42,36 +42,44 @@ def run_trial_graphing(stag_hare, current_round_grapher, current_game_logger, sc
 
 
         if stag_hare.is_over():
-            current_game_logger.add_round(stag_hare.state)
-            if stag_hare.state.stag_captured():
-                print("Stag captured")
-                scores.append([2, 2, 2])
-
-            if stag_hare.state.hare_captured():
-                current_game_logger.add_round(stag_hare.state)
-                current_round_grapher.create_round_graph(stag_hare)
-
-                new_score = [0 for _ in range(3)] # only ever have 3 playuers.
-                # gotta figure out WHO did it.
-                hare_x, hare_y = stag_hare.state.agent_positions["hare"]
-                # possible_hare_captures = stag_hare.state.neighboring_positions(hare_x, hare_y)
-                possible_hare_captures = get_possible_agent_captures(hare_x, hare_y, stag_hare.state.height) # if its not square kill me
-                for agent in stag_hare.state.agent_positions:
-                    if agent == "hare" or agent == "stag":
-                        pass
-                    else:
-                        agent_position = stag_hare.state.agent_positions[agent]
-                        if list(agent_position) in possible_hare_captures:
-                            id = int(agent[-1])
-                            new_score[id] = 1 # add a rabbit to that thing.
-
-                scores.append(new_score)
+            # current_game_logger.add_round(stag_hare.state)
+            # passes by value. thanks python.
+            create_new_score(stag_hare, scores)
 
             # current_round_grapher.create_round_graph(stag_hare, True)
-
-
-            print("here are the scores ", scores)
+            # print("here are the scores ", scores)
             return
+
+
+def create_new_score(stag_hare, scores):
+    # optional last round printing thing... I think.
+    # current_round_grapher.create_round_graph(stag_hare)
+
+
+    if stag_hare.state.stag_captured():
+        scores.append([2, 2, 2])
+
+    if stag_hare.state.hare_captured():
+        current_game_logger.add_round(stag_hare.state)
+
+        new_score = [0 for _ in range(3)]  # only ever have 3 playuers.
+        # gotta figure out WHO did it.
+        hare_x, hare_y = stag_hare.state.agent_positions["hare"]
+        # possible_hare_captures = stag_hare.state.neighboring_positions(hare_x, hare_y)
+        possible_hare_captures = get_possible_agent_captures(hare_x, hare_y,
+                                                             stag_hare.state.height)  # if its not square kill me
+        for agent in stag_hare.state.agent_positions:
+            if agent == "hare" or agent == "stag":
+                pass
+            else:
+                agent_position = stag_hare.state.agent_positions[agent]
+                if list(agent_position) in possible_hare_captures:
+                    id = int(agent[-1])
+                    new_score[id] = 1  # add a rabbit to that thing.
+
+        scores.append(new_score)
+
+    return scores
 
 def get_possible_agent_captures(hare_x, hare_y, board_size):
     # possible_moves_col = [[0, -1], [0, 1]]
@@ -151,6 +159,8 @@ def create_hunters(agent_type, agent_name="", agent_scenario=0):
             if agent_type == 3:
                 new_hunters.append(CabAgent(i, new_name, agent_name))
 
+        # print("this shoudl fire")
+
 
     return new_hunters # just make sure to get those new guys in somewhere.
 
@@ -166,7 +176,7 @@ if __name__ == '__main__':
     num_humans = 0 # yeah...
     # for testing purposes right off the bat, lets work with social welfare. that wi
     jhg_bot_type = 2 # 0 is gene bots, 2 is social welfare and 3 is random. 4 is the new social welfare that I am developing that is just a hair smarter.
-    num_attempts = 1 # don't worry about this
+    num_attempts = 100 # don't worry about this
     # don't add cats yet, we will worry about that later.
     # agent_name = "mixedJHGSelfPlay.csv"
     # agent_names = ["gen_99.csv", "gen_Z.csv", "homoJHGSelfPlay.csv", "homoSCselfPlayMFalse.csv", "homoSCselfPlayMTrue.csv", "mixedJHGSelfPlay.csv", "mixedSCselfPlayMFalse.csv", "mixedSCselfPlayMTrue.csv"]
@@ -178,7 +188,7 @@ if __name__ == '__main__':
     new_agents = []
 
     height, width = 6, 6 # lets start there, not too big but there.
-    agent_type = 1 # -1 is ALLEGATR, 0 is a random agent, 1 is the hare greedy agent, 2 is stag greedy agent.
+    agent_type = 3 # -1 is ALLEGATR, 0 is a random agent, 1 is the hare greedy agent, 2 is stag greedy agent, 3 is CAB
 
     scores = []
 
@@ -208,8 +218,16 @@ if __name__ == '__main__':
 
             game_grapher = GameGrapher(stag_hare)
 
-            game_grapher.playback_game(current_game_logger)
+            # game_grapher.playback_game(current_game_logger)
             # game_grapher.create_game_graph(current_game_logger)
 
         # new_num = current_batch_logger.get_results()
         # print("the ration of stag to hare was ", new_num, " for agent ", agent_name)
+        score_per_player = list(zip(*scores))
+        scores_per_player = [sum(score) for score in score_per_player]
+        cooperation_score = sum([2,2,2] == score for score in scores) / len(scores)
+
+        # I should be doing this in a json logger thing but I don't care.
+        print("here was the cooperation score \n", cooperation_score)
+        print("here was the scores per player \n", scores_per_player)
+
