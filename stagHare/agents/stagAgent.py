@@ -3,14 +3,14 @@ from stagHare.environment.state import State
 from typing import Tuple
 import numpy as np
 
+# this guy hunts exclusively stags.
 class StagAgent(Agent):
     def __init__(self, name: str) -> None:
         Agent.__init__(self, name)
 
-    def act(self, state: State, reward: float, round_num: int) -> Tuple[int, int]:
-        # the allocation is going to be weird but we got this
-        print("HEY THIS SHOULDN'T BE TRIPPING!!! ")
-        return [0, 0] # don't move anywhere.
+    def act(self, state: State, reward: float, round_num: int):
+        new_allocation = [2 for _ in range(3)]
+        return new_allocation
 
     # for the hare agent, it shoudl return [2, -2, -2] if we are the first player.
     def create_allocation(self, index, state):

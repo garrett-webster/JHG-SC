@@ -66,8 +66,38 @@ def staghunt_to_jhg(action_map, old_agent_positions, old_state, hare_captured):
             new_allocation = np.add(new_allocation, allocations_list[1])
             # allocations.append([allocations_list[1]])
 
+        # imma be so real I no longer really remember what edge case this code was supposedd to account for
+        # like yeah I know the specific edge case we are protecting
+        # but the code doesn't seem to actually have anything to do with that edgecase
+        # which is silly at best.
+
+
+        # means we didn't move, so this is where stuff gets tricky.
         if list(new_allocation) == [0 for _ in range(3)]:
-            print("SOMETHING WENT TERRIBLY WRONG HERE SIRE")
+            # means that we haven't really moved in a way that makes sense,
+            # so we are going to try and just give ourselves the in between allocation bc I don't know
+            # how to handle this edge case.
+            print("We haven't moved. Rerouting...")
+            keys = list(action_map.keys())
+            actionable_moves = []
+            for key in keys:
+                if key == "stag" or key == "hare":
+                    keys.remove(key)
+                else:
+                    actionable_moves.append(action_map[key])
+
+
+            # so if we haven't moved, lets see if that move was cau
+            if action in actionable_moves: # we basically just want to check if we stayed in place.
+                id = int(name[-1])
+                                        # stored as a tuple, not a list.
+                if action_map[name] == list(old_agent_positions[name]): # if our action doesn't take us anywhere new, create complex combination.
+                    # create 2, 2, 8 or whatever from our thingy
+                    # best to use this instead of the 0, 0, 4 becuase of normalization purposes. more distinct vector direction.
+                    new_allocation = [2 for _ in range(3)]
+                    new_allocation[id] = 8
+
+
 
         # make sure that the split moves make sense and it really does have no idea where they are going.
         # unfortunately the difference between hare move and hare take still isn't as well defined as I would like
@@ -75,12 +105,14 @@ def staghunt_to_jhg(action_map, old_agent_positions, old_state, hare_captured):
         # the real problem is I just want to keep working on my website.
 
         if list(new_allocation) not in [l.tolist() for l in allocations_list]:
-            print("\n WOMBO COMBO! HAPPY FEET!")
-            print("round num ", (old_state.round_num + 1))
-            print("here is the name and action ", name, " ", action, " and here was the movement: from ", old_agent_positions[name][0], old_agent_positions[name][1],
-                  " to ", action_map[name][0], " ", action_map[name][1])
-            print("here was the final allocation: ", new_allocation)
-            print("did that make sense?")
+            pass # yeah there was a lot of debugging going on here. we shall see.
+            # print("\n WOMBO COMBO! HAPPY FEET!")
+            # print("this is the new allocation: ", new_allocation)
+            # print("round num ", (old_state.round_num + 1))
+            # print("here is the name and action ", name, " ", action, " and here was the movement: from ", old_agent_positions[name][0], old_agent_positions[name][1],
+            #       " to ", action_map[name][0], " ", action_map[name][1])
+            # print("here was the final allocation: ", new_allocation)
+            # print("did that make sense?")
 
         allocations.append(new_allocation)
 

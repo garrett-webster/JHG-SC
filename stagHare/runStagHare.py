@@ -2,6 +2,7 @@ from tqdm import tqdm
 
 from offlineSimStuff.runningTools.runnerHelper import create_jhg_sim, create_total_order, create_jhg_engine
 from stagHare.agents.cabAgentThing import CabAgent
+from stagHare.agents.fetcherBot import FetcherBot
 from stagHare.environment.world import StagHare
 from stagHare.environment.allocationTranslator import allocation_to_movement, movement_to_allocation
 from stagHare.visualziationTools.batchLogger import BatchLogger
@@ -25,7 +26,7 @@ from stagHare.environment.state import State
 # this is going ot be strange bc the simulator is VERY different from what I have worked with before
 # the SC sim I created and the JHG sim was sort of built for cab agents
 # this one has not been built for either of those things.
-def run_trial_graphing(stag_hare, current_round_grapher, current_game_logger):
+def run_trial_graphing(stag_hare, current_round_grapher, current_game_logger, scores):
     while True: # the way this gets run is VERY VERY weird.
 
         current_game_logger.add_round(stag_hare.state)
@@ -42,33 +43,113 @@ def run_trial_graphing(stag_hare, current_round_grapher, current_game_logger):
 
         if stag_hare.is_over():
             current_game_logger.add_round(stag_hare.state)
-            # print("something has been captured! 2")
-            # print("Hare? ", stag_hare.state.hare_captured())
-            # print("Stag? ", stag_hare.state.stag_captured())
+            if stag_hare.state.stag_captured():
+                print("Stag captured")
+                scores.append([2, 2, 2])
+
+            if stag_hare.state.hare_captured():
+                current_game_logger.add_round(stag_hare.state)
+                current_round_grapher.create_round_graph(stag_hare)
+
+                new_score = [0 for _ in range(3)] # only ever have 3 playuers.
+                # gotta figure out WHO did it.
+                hare_x, hare_y = stag_hare.state.agent_positions["hare"]
+                # possible_hare_captures = stag_hare.state.neighboring_positions(hare_x, hare_y)
+                possible_hare_captures = get_possible_agent_captures(hare_x, hare_y, stag_hare.state.height) # if its not square kill me
+                for agent in stag_hare.state.agent_positions:
+                    if agent == "hare" or agent == "stag":
+                        pass
+                    else:
+                        agent_position = stag_hare.state.agent_positions[agent]
+                        if list(agent_position) in possible_hare_captures:
+                            id = int(agent[-1])
+                            new_score[id] = 1 # add a rabbit to that thing.
+
+                scores.append(new_score)
+
             # current_round_grapher.create_round_graph(stag_hare, True)
+
+
+            print("here are the scores ", scores)
             return
 
+def get_possible_agent_captures(hare_x, hare_y, board_size):
+    # possible_moves_col = [[0, -1], [0, 1]]
+    # possible_moves_row = [[-1, 0], [1, 0]]
+
+    # all possible move combinations
+            # col moves        # row moves
+    deltas = [[0, -1], [0, 1], [-1, 0], [1, 0]]
+
+    neighboring_moves = []
+
+    for delta in deltas:
+        new_x, new_y = hare_x + delta[0], hare_y + delta[1]
+
+        if new_x < 0:
+            new_x = board_size - 1
+        elif new_x == board_size:
+            new_x = 0
+
+        if new_y < 0:
+            new_y = board_size - 1
+        elif new_y == board_size:
+            new_y = 0
+
+        neighboring_moves.append([new_x, new_y])
+
+    return neighboring_moves
 
 
-def create_hunters(agent_type, agent_name=""):
+
+
+
+
+def create_hunters(agent_type, agent_name="", agent_scenario=0):
+
     new_hunters = []
-    for i in range(3):
-        new_name = "R" + str(i)
 
-        if agent_type == -1:
-            new_hunters.append(AlegAATr(name=new_name, lmbda=0.0, ml_model_type='knn', enhanced=True))
+    if agent_scenario == 2:
+        for i in range(2):
+            new_name = "R" + str(i)
 
-        if agent_type == 0:
-            new_hunters.append(Random(name=new_name))
+            if agent_type == -1:
+                new_hunters.append(AlegAATr(name=new_name, lmbda=0.0, ml_model_type='knn', enhanced=True))
 
-        if agent_type == 1:
-            new_hunters.append(HareAgent(name=new_name))
+            if agent_type == 0:
+                new_hunters.append(Random(name=new_name))
 
-        if agent_type == 2:
-            new_hunters.append(StagAgent(name=new_name))
+            if agent_type == 1:
+                new_hunters.append(HareAgent(i, name=new_name))
 
-        if agent_type == 3:
-            new_hunters.append(CabAgent(i, new_name, agent_name))
+            if agent_type == 2:
+                new_hunters.append(StagAgent(name=new_name))
+
+            if agent_type == 3:
+                new_hunters.append(CabAgent(i, new_name, agent_name))
+
+        # this guy doesn't need an agent name or anything.
+        new_name = "R2"
+        new_hunters.append(FetcherBot(2, new_name))
+
+    else:
+        for i in range(3):
+            new_name = "R" + str(i)
+
+            if agent_type == -1:
+                new_hunters.append(AlegAATr(name=new_name, lmbda=0.0, ml_model_type='knn', enhanced=True))
+
+            if agent_type == 0:
+                new_hunters.append(Random(name=new_name))
+
+            if agent_type == 1:
+                new_hunters.append(HareAgent(i, name=new_name))
+
+            if agent_type == 2:
+                new_hunters.append(StagAgent(name=new_name))
+
+            if agent_type == 3:
+                new_hunters.append(CabAgent(i, new_name, agent_name))
 
 
     return new_hunters # just make sure to get those new guys in somewhere.
@@ -97,11 +178,12 @@ if __name__ == '__main__':
     new_agents = []
 
     height, width = 6, 6 # lets start there, not too big but there.
-    agent_type = 3 # -1 is ALLEGATR, 0 is a random agent, 1 is the hare greedy agent, 2 is stag greedy agent.
+    agent_type = 1 # -1 is ALLEGATR, 0 is a random agent, 1 is the hare greedy agent, 2 is stag greedy agent.
 
+    scores = []
 
     for agent_name in agent_names:
-        print("Agent name: " + agent_name)
+        # print("Agent name: " + agent_name)
         current_batch_logger = BatchLogger()
 
         for attempt in tqdm(range(num_attempts)):
@@ -120,14 +202,14 @@ if __name__ == '__main__':
             stag_hare.state.hunting_hare_map = {"R"+str(i) : 2 for i in range(3)}
 
             # just run the fetcher.
-            run_trial_graphing(stag_hare, current_round_grapher, current_game_logger)
+            run_trial_graphing(stag_hare, current_round_grapher, current_game_logger, scores)
             current_batch_logger.add_game(stag_hare)
 
 
             game_grapher = GameGrapher(stag_hare)
 
             game_grapher.playback_game(current_game_logger)
-            game_grapher.create_game_graph(current_game_logger)
+            # game_grapher.create_game_graph(current_game_logger)
 
-        new_num = current_batch_logger.get_results()
-        print("the ration of stag to hare was ", new_num, " for agent ", agent_name)
+        # new_num = current_batch_logger.get_results()
+        # print("the ration of stag to hare was ", new_num, " for agent ", agent_name)

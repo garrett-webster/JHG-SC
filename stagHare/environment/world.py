@@ -59,8 +59,8 @@ class StagHare:
 
         action_map, hunting_hare_map, old_allocations = jhg_to_staghunt(self.agents, self.state, rewards, round_num) # this does contain the hare and stag.
 
-        print("These were the old allocations ", old_allocations)
-        print("This was the hunting hare map \n", hunting_hare_map)
+        # print("These were the old allocations ", old_allocations)
+        # print("This was the hunting hare map \n", hunting_hare_map)
 
 
         # now, we need to actually execute the moves.
@@ -76,12 +76,12 @@ class StagHare:
         # turn this into something that the JHG engine can understand and slam that through. or something like that.
         hare_captured = self.state.hare_captured # we use this for the differing hare allocation upon capture. Not sure if it really matters.
         allocations = staghunt_to_jhg(action_map, old_agent_positions, old_state, hare_captured) # need the action map to do things.
-        print("Here were the interpreted allocations \n", allocations)
+        # print("Here were the interpreted allocations \n", allocations)
         self.update_engine(allocations, round_num)
 
 
         influence = self.engine.get_influence()
-        print("here is the current influence: \n", influence) # not sure how much this will actually tell me.
+        # print("here is the current influence: \n", influence) # not sure how much this will actually tell me.
         return self.rewards # return the rewards.
 
 

@@ -3,15 +3,16 @@ from stagHare.environment.state import State
 from typing import Tuple
 import numpy as np
 
+# this guy exclusively hunts hares. He's just for other stuff.
 class HareAgent(Agent):
     def __init__(self, id: int, name: str) -> None:
         Agent.__init__(self, name)
         self.id = id
 
-    def act(self, state: State, reward: float, round_num: int) -> Tuple[int, int]:
-        # the allocation is going to be weird but we got this
-        print("HEY THIS SHOULDN'T BE TRIPPING!!! ")
-        return [0, 0] # don't move anywhere.
+    def act(self, state: State, reward: float, round_num: int):
+        new_allocation = [0 for _ in range(3)]
+        new_allocation[self.id] = 6
+        return new_allocation
 
     # for the hare agent, it shoudl return [2, -2, -2] if we are the first player.
     def create_allocation(self, index, state):

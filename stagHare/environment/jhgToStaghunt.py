@@ -1,5 +1,8 @@
 # from Server.SC_Bots.transVecTranslator import translateVecToIndex
 from stagHare.agents.cabAgentThing import CabAgent
+from stagHare.agents.fetcherBot import FetcherBot
+from stagHare.agents.hareAgent import HareAgent
+from stagHare.agents.stagAgent import StagAgent
 from stagHare.transVecTranslatorStagHare import translateVecToIndexStagHare
 import numpy as np
 from stagHare.utils.a_star import AStar
@@ -24,7 +27,7 @@ def jhg_to_staghunt(agents, state, reward, round_num):
     random.shuffle(indices) # this should do the trick.
     for i in indices:
         agent = agents[i]
-        if not isinstance(agent, CabAgent):
+        if not isinstance(agent, CabAgent) and not isinstance(agent, FetcherBot) and not isinstance(agent, HareAgent) and not isinstance(agent, StagAgent):
             new_moves[agent.name] = agent.act(state, reward, round_num) # should be noted that these are just prey moves. they are essentialy random.
         else:
             allocation = agent.act(state, reward, round_num)
