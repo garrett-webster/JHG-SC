@@ -62,7 +62,7 @@ if __name__ == '__main__':
     new_agents = []
 
     height, width = 6, 6  # lets start there, not too big but there.
-    agent_type = 3  # -1 is ALLEGATR, 0 is a random agent, 1 is the hare greedy agent, 2 is stag greedy agent. 3 is cab
+    agent_type = 4  # -1 is ALLEGATR, 0 is a random agent, 1 is the hare greedy agent, 2 is stag greedy agent. 3 is cab
 
     for agent_name in agent_names:
         print("Agent name: " + agent_name)

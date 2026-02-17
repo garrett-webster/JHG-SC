@@ -3,6 +3,7 @@ from stagHare.agents.agent import Agent
 from stagHare.agents.alegaatr import AlegAATr
 from stagHare.agents.cabAgentThing import CabAgent
 from stagHare.agents.prey import Prey
+from stagHare.agents.qalegaatr import QAlegAATr
 from stagHare.environment.state import State
 import numpy as np
 from typing import List
@@ -45,7 +46,7 @@ class StagHare:
 
     def transition(self) -> List[float]:
         # we need to split this into an init and 2 stages
-        if isinstance(self.agents[4], AlegAATr):
+        if isinstance(self.agents[4], AlegAATr) or isinstance(self.agents[4], QAlegAATr):
             rewards = self.transition_ethan()
         else:
             rewards = self.transition_sean()

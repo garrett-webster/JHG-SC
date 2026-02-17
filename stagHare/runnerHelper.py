@@ -18,6 +18,7 @@ from stagHare.agents.random_agent import Random
 from stagHare.agents.hareAgent import HareAgent
 from stagHare.agents.stagAgent import StagAgent
 from stagHare.agents.alegaatr import AlegAATr # litmus test
+from stagHare.agents.qalegaatr import QAlegAATr
 
 from concurrent.futures import ProcessPoolExecutor, as_completed
 
@@ -183,6 +184,11 @@ def create_hunters(agent_type, agent_name="", agent_scenario=0):
 
             if agent_type == 3:
                 new_hunters.append(CabAgent(i, new_name, agent_name))
+
+            if agent_type == 4:
+                new_hunters.append(QAlegAATr(name=new_name, enhanced=True))
+
+
 
         # print("this shoudl fire")
 
