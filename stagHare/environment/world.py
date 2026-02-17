@@ -45,7 +45,14 @@ class StagHare:
 
     def transition(self) -> List[float]:
         # we need to split this into an init and 2 stages
+        if isinstance(self.agents[4], AlegAATr):
+            rewards = self.transition_ethan()
+        else:
+            rewards = self.transition_sean()
+        return rewards # PLEASE PLEASE PLEASE.
 
+
+    def transition_sean(self):
         # first, lets just set and init some stuff.
         action_map, hunting_hare_map = {}, {}
         round_num = self.state.round_num
@@ -57,32 +64,31 @@ class StagHare:
 
         # first, lets run the JHG to staghunt portion
 
-        action_map, hunting_hare_map, old_allocations = jhg_to_staghunt(self.agents, self.state, rewards, round_num) # this does contain the hare and stag.
+        action_map, hunting_hare_map, old_allocations = jhg_to_staghunt(self.agents, self.state, rewards,
+                                                                        round_num)  # this does contain the hare and stag.
 
         # print("These were the old allocations ", old_allocations)
         # print("This was the hunting hare map \n", hunting_hare_map)
 
-
         # now, we need to actually execute the moves.
 
-        old_agent_positions = self.state.agent_positions.copy() # make a copy of this, trust me.
-        old_state = deepcopy(self.state) # this SHOULD work?
+        old_agent_positions = self.state.agent_positions.copy()  # make a copy of this, trust me.
+        old_state = deepcopy(self.state)  # this SHOULD work?
         # process the actions IG
         if not self.is_over():
             self.state.update_intent(hunting_hare_map)
             self.rewards = self.state.process_actions(action_map)
 
-
         # turn this into something that the JHG engine can understand and slam that through. or something like that.
-        hare_captured = self.state.hare_captured # we use this for the differing hare allocation upon capture. Not sure if it really matters.
-        allocations = staghunt_to_jhg(action_map, old_agent_positions, old_state, hare_captured) # need the action map to do things.
+        hare_captured = self.state.hare_captured  # we use this for the differing hare allocation upon capture. Not sure if it really matters.
+        allocations = staghunt_to_jhg(action_map, old_agent_positions, old_state,
+                                      hare_captured)  # need the action map to do things.
         # print("Here were the interpreted allocations \n", allocations)
         self.update_engine(allocations, round_num)
 
-
         influence = self.engine.get_influence()
         # print("here is the current influence: \n", influence) # not sure how much this will actually tell me.
-        return self.rewards # return the rewards.
+        return self.rewards  # return the rewards.
 
 
     def update_action_map(self, action_map) -> dict:
@@ -153,25 +159,25 @@ class StagHare:
 
 
     # # This was for Ethan's transition algorithm. I'm gonna need to tweak it a fair bit
-    # def transition(self) -> List[float]:
-    #     # Randomize the order in which the agents will act
-    #     indices = list(range(len(self.agents)))
-    #     np.random.shuffle(indices)
-    #     action_map, hunting_hare_map = {}, {}
-    #     round_num = self.state.round_num
-    #
-    #     for i in indices:
-    #         agent = self.agents[i]
-    #         reward = 0 if (i == 0 or i == 1) else self.rewards[i]
-    #         new_row, new_col = agent.act(self.state, reward, round_num)
-    #         action_map[agent.name] = (new_row, new_col)
-    #         hunting_hare_map[agent.name] = agent.is_hunting_hare()
-    #
-    #     if not self.is_over():
-    #         self.state.update_intent(hunting_hare_map)
-    #         self.rewards = self.state.process_actions(action_map)
-    #
-    #     return self.rewards
+    def transition_ethan(self) -> List[float]:
+        # Randomize the order in which the agents will act
+        indices = list(range(len(self.agents)))
+        np.random.shuffle(indices)
+        action_map, hunting_hare_map = {}, {}
+        round_num = self.state.round_num
+
+        for i in indices:
+            agent = self.agents[i]
+            reward = 0 if (i == 0 or i == 1) else self.rewards[i]
+            new_row, new_col = agent.act(self.state, reward, round_num)
+            action_map[agent.name] = (new_row, new_col)
+            hunting_hare_map[agent.name] = agent.is_hunting_hare()
+
+        if not self.is_over():
+            self.state.update_intent(hunting_hare_map)
+            self.rewards = self.state.process_actions(action_map)
+
+        return self.rewards
 
     def iterate_engine(self, transactions, curr_round, agents, num_players):
         self.engine.play_round(transactions)

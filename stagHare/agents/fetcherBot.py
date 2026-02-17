@@ -37,9 +37,11 @@ class FetcherBot(Agent):
         hare_movements = state.n_movements(current_x, current_y, hare_x, hare_y)
 
         if hare_movements <= 1: # if they are one tile from the hare or right next to it:
-            print("DEFECTING SIRE GREE HE HE ")
+            # print("DEFECTING SIRE GREE HE HE ")
             self.hunt = False # just realized their intents and their everything else wasn't working out.
-            new_allocation = [2, -2, -2] # I want this guy to be MEAN
+            new_allocation = [-2 for _ in range(3)] # always three agents.
+            new_allocation[self.id] = 2
+
         else:
             self.hunt = True
             new_allocation = [2, 2, 2]

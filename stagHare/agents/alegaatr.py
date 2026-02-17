@@ -24,6 +24,7 @@ class AlegAATr(Agent):
         self.train = train
         self.tracked_vector = None
         self.generators_used = set()
+        self.name = name # gotta keep this somewhere IG>
 
     def _read_in_generator_models(self, ml_model_type: str, enhanced: bool) -> None:
         folder = '../stagHare/aat/knn_models/' if ml_model_type == 'knn' else '../aat/nn_models/'

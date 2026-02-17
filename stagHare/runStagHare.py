@@ -46,7 +46,7 @@ if __name__ == '__main__':
     new_agents = []
 
     height, width = 6, 6 # lets start there, not too big but there.
-    agent_type = 3 # -1 is ALLEGATR, 0 is a random agent, 1 is the hare greedy agent, 2 is stag greedy agent, 3 is CAB
+    agent_type = -1 # -1 is ALLEGATR, 0 is a random agent, 1 is the hare greedy agent, 2 is stag greedy agent, 3 is CAB
     scores = []
 
     for agent_name in agent_names:
@@ -58,7 +58,7 @@ if __name__ == '__main__':
             total_order = create_total_order(num_players, num_humans)
             current_jhg_engine = create_jhg_engine(num_players)
             # current_jhg_sim = create_jhg_sim(num_humans, num_players, total_order, jhg_bot_type, addAgents, new_agents, current_jhg_engine)
-            hunters = create_hunters(agent_type, agent_name)
+            hunters = create_hunters(agent_type, agent_name, agent_scenario=0)
             current_round_grapher = IndividualRoundGrapher()
             while True:
                 stag_hare = StagHare(height, width, hunters)

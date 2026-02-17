@@ -51,7 +51,8 @@ def run_trial(agent_type, agent_name):
     height = 6
     width = 6
 
-    hunters = create_hunters(agent_type, agent_name)
+    # want to monitor how things work.
+    hunters = create_hunters(agent_type, agent_name, agent_scenario=0)
 
     while True:
         stag_hare = StagHare(height, width, hunters)
@@ -191,11 +192,19 @@ def create_hunters(agent_type, agent_name="", agent_scenario=0):
 
 def process_scores(scores):
     score_per_player = list(zip(*scores))
-    scores_per_player = [sum(score) for score in score_per_player]
+    total_sum_per_player = [sum(score) for score in score_per_player]
+    scores_per_player = [] # empty list, will hold tuples.
+    for i, player in enumerate(score_per_player):
+        new_score = [0 for _ in range(3)] # three different types of animals
+        for entry in player:
+            new_score[entry] += 1
+        scores_per_player.append(new_score)
+
     cooperation_score = sum([2, 2, 2] == score for score in scores) / len(scores)
 
     # I should be doing this in a json logger thing but I don't care.
     print("here was the cooperation score \n", cooperation_score)
     print("here was the scores per player \n", scores_per_player)
+    print("here were the total scores \n", total_sum_per_player)
 
     return cooperation_score, scores_per_player
