@@ -61,7 +61,7 @@ class StagHare:
         # there has GOT to be a more elegant way to do this. I swear.
         for agent in self.agents:
             if isinstance(agent, CabAgent):
-                agent.set_helpers(self.engine)
+                agent.set_helpers(self.engine) # sets all the JHG engine stuff.
 
         # first, lets run the JHG to staghunt portion
 
@@ -82,7 +82,7 @@ class StagHare:
 
         # turn this into something that the JHG engine can understand and slam that through. or something like that.
         hare_captured = self.state.hare_captured  # we use this for the differing hare allocation upon capture. Not sure if it really matters.
-        allocations = staghunt_to_jhg(action_map, old_agent_positions, old_state,
+        allocations = staghunt_to_jhg(self.state, action_map, old_agent_positions, old_state,
                                       hare_captured)  # need the action map to do things.
         # print("Here were the interpreted allocations \n", allocations)
         self.update_engine(allocations, round_num)

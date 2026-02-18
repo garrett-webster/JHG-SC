@@ -7,7 +7,7 @@ from stagHare.utils.a_star import AStar
 from stagHare.utils.pathfindingTime import findPathGreedy, findPathTeamAware
 
 
-def staghunt_to_jhg(action_map, old_agent_positions, old_state, hare_captured):
+def staghunt_to_jhg(state, action_map, old_agent_positions, old_state, hare_captured):
     allocations = []
 
     for name, action in action_map.items():
@@ -22,6 +22,12 @@ def staghunt_to_jhg(action_map, old_agent_positions, old_state, hare_captured):
 
 
         old_row, old_col = old_agent_positions[name]
+
+        hare_x, hare_y = state.agents_positions["hare"]
+        stag_x, stag_y = state.agents_positions["stag"]
+
+        num_steps_hare = state.n_movements(action[0], action[1], hare_x, hare_y)
+        num_steps_stag = state.n_movements(action[0], action[1], stag_x, stag_y)
 
         # need to try both generatros
         # first, hare stuff
