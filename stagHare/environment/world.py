@@ -3,7 +3,7 @@ from stagHare.agents.agent import Agent
 from stagHare.agents.alegaatr import AlegAATr
 from stagHare.agents.cabAgentThing import CabAgent
 from stagHare.agents.prey import Prey
-from stagHare.agents.qalegaatr import QAlegAATr
+# from stagHare.agents.qalegaatr import QAlegAATr
 from stagHare.environment.state import State
 import numpy as np
 from typing import List
@@ -46,7 +46,7 @@ class StagHare:
 
     def transition(self) -> List[float]:
         # we need to split this into an init and 2 stages
-        if isinstance(self.agents[4], AlegAATr) or isinstance(self.agents[4], QAlegAATr):
+        if isinstance(self.agents[4], AlegAATr): # or isinstance(self.agents[4], QAlegAATr):
             rewards = self.transition_ethan()
         else:
             rewards = self.transition_sean()
@@ -67,6 +67,10 @@ class StagHare:
 
         action_map, hunting_hare_map, old_allocations = jhg_to_staghunt(self.agents, self.state, rewards,
                                                                         round_num)  # this does contain the hare and stag.
+        print("here are the moves ", action_map)
+        print("Here are the intents ", hunting_hare_map)
+
+
 
         # print("These were the old allocations ", old_allocations)
         # print("This was the hunting hare map \n", hunting_hare_map)
@@ -84,6 +88,8 @@ class StagHare:
         hare_captured = self.state.hare_captured  # we use this for the differing hare allocation upon capture. Not sure if it really matters.
         allocations = staghunt_to_jhg(self.state, action_map, old_agent_positions, old_state,
                                       hare_captured)  # need the action map to do things.
+
+        print("interpreted allocations ", allocations)
         # print("Here were the interpreted allocations \n", allocations)
         self.update_engine(allocations, round_num)
 

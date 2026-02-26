@@ -18,7 +18,7 @@ from stagHare.agents.random_agent import Random
 from stagHare.agents.hareAgent import HareAgent
 from stagHare.agents.stagAgent import StagAgent
 from stagHare.agents.alegaatr import AlegAATr # litmus test
-from stagHare.agents.qalegaatr import QAlegAATr
+# from stagHare.agents.qalegaatr import QAlegAATr
 
 from concurrent.futures import ProcessPoolExecutor, as_completed
 
@@ -30,7 +30,7 @@ def run_trial_graphing(stag_hare, current_round_grapher, current_game_logger):
 
         # current_game_logger.add_round(stag_hare.state)
         # have this generate right off the bat
-        # current_round_grapher.create_round_graph(stag_hare)
+        current_round_grapher.create_round_graph(stag_hare)
         rewards = [0] * 5 # 3 hunters, 2 other peeps
         # this is a reminder to check the action map to make sure that we are hunting what we think we are.
 
@@ -42,6 +42,7 @@ def run_trial_graphing(stag_hare, current_round_grapher, current_game_logger):
 
         if stag_hare.is_over():
             # current_game_logger.add_round(stag_hare.state)
+            current_round_grapher.create_round_graph(stag_hare)
             # passes by value. thanks python.
             return create_new_score(stag_hare)
 
@@ -185,8 +186,8 @@ def create_hunters(agent_type, agent_name="", agent_scenario=0):
             if agent_type == 3:
                 new_hunters.append(CabAgent(i, new_name, agent_name))
 
-            if agent_type == 4:
-                new_hunters.append(QAlegAATr(name=new_name, enhanced=True))
+            # if agent_type == 4:
+            #     new_hunters.append(QAlegAATr(name=new_name, enhanced=True))
 
 
 

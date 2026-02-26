@@ -34,7 +34,7 @@ class SCManager:
         chromosomes = "../JHG-SC/offlineSimStuff/chromosomes/experiment"
         allocation_scenario = "../JHG-SC/offlineSimStuff/allocations_scenarios/social_welfare"
         #print("this is the total ordering ", total_order)
-        self.sc_sim = Social_Choice_Sim(num_players, 3, num_humans, options_generator, 3, 0, chromosomes, scenario, "", total_order, allocation_scenario, utility_per_player)
+        self.sc_sim = Social_Choice_Sim(num_players, 3, num_humans, options_generator, 0, self.round_num, total_order, False)
         self.sc_sim.bot_ovveride(bots)
         #self.sc_groups = generate_two_plus_one_groups(num_players, sc_group_option)
         self.num_players = num_players

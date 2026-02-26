@@ -35,6 +35,8 @@ def jhg_to_staghunt(agents, state, reward, round_num):
 
     # allocation to generators (for which we have the translator)
     keys = new_allocations.keys()
+    print("here are hte new allocations ", new_allocations)
+
     for key in keys:
         id = int(key[-1])
         new_row, new_col, movement_type = allocation_to_movement(new_allocations[key], id, state)

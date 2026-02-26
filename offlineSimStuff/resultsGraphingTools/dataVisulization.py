@@ -247,7 +247,7 @@ def create_mixed_stuff(subsets, directory):
     plt.savefig(str(filepath), dpi=300, bbox_inches="tight")
 
 
-def generalized_graphing_code(subset, directory, scenario_name):
+def generalized_graphing_code(subset, scenario_name):
 
     agent_types = subset["AgentType"].unique()
     enforce_majority = subset["EnforceMajority"].unique()
@@ -324,11 +324,18 @@ if __name__ == "__main__":
         }
 
         # file_directory = r"C:\Users\Sean Smith\Documents\GitHub\JHG-SC\offlineSimStuff\resultsGraphingTools\burned\results2actual"
-        file_directory = r"C:\Users\Sean Smith\Documents\GitHub\JHG-SC\offlineSimStuff\resultsGraphingTools\burned\results4actual"
-        file_paths = get_file_paths(file_directory)
-        df_for_each_csv = (pd.read_csv(df, converters=converters) for df in file_paths)
+        file_directory_1 = r"C:\Users\Sean Smith\Documents\GitHub\JHG-SC\offlineSimStuff\resultsGraphingTools\burned\results4actual"
+        file_paths_1 = get_file_paths(file_directory_1)
+        dfs_1 = [pd.read_csv(df, converters=converters) for df in file_paths_1]
 
-        df = pd.concat(df_for_each_csv, ignore_index=True)
+        file_directory_2 = r"C:\Users\Sean Smith\Documents\GitHub\JHG-SC\offlineSimStuff\resultsGraphingTools\burned\optimalHuman"
+        file_paths_2 = get_file_paths(file_directory_2)
+        dfs_2 = [pd.read_csv(df, converters=converters) for df in file_paths_2]
+
+        all_dfs = dfs_1 + dfs_2
+
+
+        df = pd.concat(all_dfs, ignore_index=True)
 
         if i == 0:
             df = df[df.EnforceMajority != True] # drop some stuff
@@ -364,15 +371,16 @@ if __name__ == "__main__":
         # uncomment this out once you get it working
         # Get the absolute path to the directory containing this script
         script_dir = os.path.dirname(os.path.abspath(__file__))
-        filepath = os.path.join(script_dir, file_directory)
-        filepath = os.path.join("../..", filepath)
+        # filepath = os.path.join(script_dir, file_directory)
+        # filepath = os.path.join("../..", filepath)
 
-        directory = os.path.dirname(filepath)
+        # directory = os.path.dirname(filepath)
 
-        os.makedirs(directory, exist_ok=True)
+        # os.makedirs(directory, exist_ok=True)
         #
         for i, subset in enumerate(subsets):
-            generalized_graphing_code(subset, directory, scenario_names[i])
+            # feel free to add the directory back in later if you so desire.
+            generalized_graphing_code(subset, scenario_names[i])
 
 
 

@@ -52,9 +52,9 @@ if __name__ == '__main__':
     num_attempts = 2000  # don't worry about this
     # don't add cats yet, we will worry about that later.
     # agent_name = "mixedJHGSelfPlay.csv"
-    # agent_names = ["gen_99.csv", "gen_Z.csv", "homoJHGSelfPlay.csv", "mixedJHGSelfPlay.csv"]
+    agent_names = ["gen_99.csv", "gen_Z.csv", "mixedJHGSelfPlay.csv"]
 
-    agent_names = ["homoJHGSelfPlay.csv"]
+    # agent_names = ["homoJHGSelfPlay.csv"]
 
 
     # agents = [CabAgent(i, "H"+str(i), agent_name) for i in range(num_players)] # they need names or something.
@@ -62,7 +62,7 @@ if __name__ == '__main__':
     new_agents = []
 
     height, width = 6, 6  # lets start there, not too big but there.
-    agent_type = 4  # -1 is ALLEGATR, 0 is a random agent, 1 is the hare greedy agent, 2 is stag greedy agent. 3 is cab
+    agent_type = 3  # -1 is ALLEGATR, 0 is a random agent, 1 is the hare greedy agent, 2 is stag greedy agent. 3 is cab
 
     for agent_name in agent_names:
         print("Agent name: " + agent_name)

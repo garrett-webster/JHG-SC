@@ -200,14 +200,14 @@ def determine_rounds(jhg_rounds_per_sc_game_list):
 
 
     else:
-        print("YOU DECIDED YOU WERE REMOVING SUPPORT FOR THIS UNTIL LATER. WRONG!")
-        # new_list = []
-        # current = 0  # Tracks number for "-" entries
-        # for instance in jhg_rounds_per_sc_game_list:
-        #     for _ in range(instance):
-        #         new_list.append(f"{current}-")
-        #         current += 1
-        #     new_list.append(f"{current - 1}*")  # Append the last "-" number with "*"
+        # print("YOU DECIDED YOU WERE REMOVING SUPPORT FOR THIS UNTIL LATER. WRONG!")
+        new_list = []
+        current = 0  # Tracks number for "-" entries
+        for instance in jhg_rounds_per_sc_game_list:
+            for _ in range(instance):
+                new_list.append(f"{current}-")
+                current += 1
+            new_list.append(f"{current - 1}*")  # Append the last "-" number with "*"
 
     return new_list
 

@@ -34,7 +34,7 @@ if __name__ == '__main__':
     num_humans = 0 # yeah...
     # for testing purposes right off the bat, lets work with social welfare. that wi
     jhg_bot_type = 2 # 0 is gene bots, 2 is social welfare and 3 is random. 4 is the new social welfare that I am developing that is just a hair smarter.
-    num_attempts = 5 # don't worry about this
+    num_attempts = 1 # don't worry about this
     # don't add cats yet, we will worry about that later.
     # agent_name = "mixedJHGSelfPlay.csv"
     # agent_names = ["gen_99.csv", "gen_Z.csv", "homoJHGSelfPlay.csv", "homoSCselfPlayMFalse.csv", "homoSCselfPlayMTrue.csv", "mixedJHGSelfPlay.csv", "mixedSCselfPlayMFalse.csv", "mixedSCselfPlayMTrue.csv"]
@@ -46,14 +46,14 @@ if __name__ == '__main__':
     new_agents = []
 
     height, width = 6, 6 # lets start there, not too big but there.
-    agent_type = -1 # -1 is ALLEGATR, 0 is a random agent, 1 is the hare greedy agent, 2 is stag greedy agent, 3 is CAB
+    agent_type = 3 # -1 is ALLEGATR, 0 is a random agent, 1 is the hare greedy agent, 2 is stag greedy agent, 3 is CAB
     scores = []
 
     for agent_name in agent_names:
         # print("Agent name: " + agent_name)
         current_batch_logger = BatchLogger()
 
-        for attempt in tqdm(range(num_attempts)):
+        for attempt in range(num_attempts):
             current_game_logger = GameLogger(height, width) # need this per game, not per batch.
             total_order = create_total_order(num_players, num_humans)
             current_jhg_engine = create_jhg_engine(num_players)
@@ -76,8 +76,8 @@ if __name__ == '__main__':
 
             game_grapher = GameGrapher(stag_hare)
 
-            # game_grapher.playback_game(current_game_logger)
-            # game_grapher.create_game_graph(current_game_logger)
+            game_grapher.playback_game(current_game_logger)
+            game_grapher.create_game_graph(current_game_logger)
 
         # new_num = current_batch_logger.get_results()
         # print("the ration of stag to hare was ", new_num, " for agent ", agent_name)

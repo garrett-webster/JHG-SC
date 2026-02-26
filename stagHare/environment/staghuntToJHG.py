@@ -15,75 +15,83 @@ def staghunt_to_jhg(state, action_map, old_agent_positions, old_state, hare_capt
         if name == "stag" or name == "hare":
             continue # we don't actually care about these guys
 
-        # the ID will brick here if not continued correctly.
+        # [hare_move, hare_take, stag_move, stag_take]
         allocations_list = create_allocations(name) # take just the number off of this thing.
 
-        new_allocation = [0 for _ in range(3)]  # make a vector of zero's trust.
-
+        # separating them and then we will weigh them by relative position for resonance.
+        new_hare_allocation = np.array([0 for _ in range(3)])
+        new_stag_allocation = np.array([0 for _ in range(3)])
 
         old_row, old_col = old_agent_positions[name]
 
-        hare_x, hare_y = state.agents_positions["hare"]
-        stag_x, stag_y = state.agents_positions["stag"]
+        hare_x, hare_y = state.agent_positions["hare"]
+        stag_x, stag_y = state.agent_positions["stag"]
 
         num_steps_hare = state.n_movements(action[0], action[1], hare_x, hare_y)
         num_steps_stag = state.n_movements(action[0], action[1], stag_x, stag_y)
 
-        # need to try both generatros
+
+        # reworked some stuff on the backend. Now, we only use greedy and team aware generators to generate paths
+        # and then check just those two paths. should simplify generator checking and allow for move spatial potitioning
+        # checking in larger projects.
+
+        # need to try both generators.
         # first, hare stuff
         hare_row, hare_col = old_state.agent_positions["hare"][0], old_state.agent_positions["hare"][1]
         path1 = list(findPathGreedy(old_state, old_row, old_col, hare_row, hare_col))
 
 
-
-        # then, both forms of stag
+        # then, stag stuff
         stag_row, stag_col = old_state.agent_positions["stag"][0], old_state.agent_positions["stag"][1]
-        path2 = list(findPathGreedy(old_state, old_row, old_col, stag_row, stag_col))
-        # then stagTeamAware
-        path3 = list(findPathTeamAware(name, old_state, old_row, old_col, stag_row, stag_col))
-
-        # we do also have to check if
-        # you know
-        # the hare has been gobbled
-        # becuase that is a DIFFERENT allocation.
-
-        # so this is goign to be weird
-        # but we have a vector of 0's , and every time a path matches up, we are just going to ADD it ot the new allocation.
-        # by doing that, we don't need to manually check if the paths line up at all, it will proceed through them.
-        # just make sure to normalize it at the end or whatever.
+        path2 = list(findPathTeamAware(name, old_state, old_row, old_col, stag_row, stag_col))
 
 
         # allocations are in the following order:
         # [hare, stag, hare_move]
         if action == path1:
-            if hare_captured: # hare bad allocation
-                new_allocation = np.add(new_allocation, allocations_list[0])
+            # we can now run a VERY rudimentary filter based on close they are to specific things.
+            if num_steps_hare <= 1: # if they are right next to or close to the hair
+                new_hare_allocation = np.add(new_hare_allocation, allocations_list[1])
                 # allocations.append(allocations_list[0])
             else: # hare movement allocation
-                new_allocation = np.add(new_allocation, allocations_list[2])
+                new_hare_allocation = np.add(new_hare_allocation, allocations_list[0])
                 # allocations.append(allocations_list[2])
 
         # we actually shouldn't do this, as path2 and path3 are likely to be the same. only add this once.
-        if action == path2: # stag from the team aware
-            new_allocation = np.add(new_allocation, allocations_list[1])
-            # allocations.append(allocations_list[1])
         # pretty sure we should only do this once, because either way stag is declared.
-        elif action == path3: # stag from greedy # this could serve as another allocation, like double-dipping as opposed to whatever else.
-            new_allocation = np.add(new_allocation, allocations_list[1])
-            # allocations.append([allocations_list[1]])
+        if action == path2:
+            if num_steps_stag <= 1:
+                new_stag_allocation = np.add(new_stag_allocation, allocations_list[3])
+            else:
+                new_stag_allocation = np.add(new_stag_allocation, allocations_list[2])
 
-        # imma be so real I no longer really remember what edge case this code was supposedd to account for
-        # like yeah I know the specific edge case we are protecting
-        # but the code doesn't seem to actually have anything to do with that edgecase
-        # which is silly at best.
+        # we will refine these based on a distance metric in the future. keep them here for now though.
+        # prevent the np.inf from 0 stesp and add 1 to it.
+        stag_weight = 5 / (num_steps_stag + 1)
+        hare_weight = 5 / (num_steps_hare + 1)
+
+        if stag_weight == np.inf or hare_weight == np.inf:
+            print("EYAH")
+
+        ##TODO: finish debugging this later. 
+        # print("here is the new_stag_allocation:")
+
+
+        # print("here is the stag weight ", stag_weight)
+        # print("here is the hare weight ", hare_weight)
+
+        new_allocation = (new_stag_allocation * stag_weight) + (new_hare_allocation * hare_weight)
+        # print("here be the new allocaction ", new_allocation)
+
 
 
         # means we didn't move, so this is where stuff gets tricky.
         if list(new_allocation) == [0 for _ in range(3)]:
+            print("yeah we have no idea what they did or why they did what they did, sire. Printing...")
             # means that we haven't really moved in a way that makes sense,
             # so we are going to try and just give ourselves the in between allocation bc I don't know
             # how to handle this edge case.
-            print("We haven't moved. Rerouting...")
+            # print("We haven't moved. Rerouting...")
             keys = list(action_map.keys())
             actionable_moves = []
             for key in keys:
@@ -148,19 +156,44 @@ def staghunt_to_jhg(state, action_map, old_agent_positions, old_state, hare_capt
     # bars.
 
 
+# def create_allocations(name):
+#     id = int(name[-1])
+#     hare_move = np.zeros(3)
+#     hare_move.fill(-2)
+#     hare_move[id] = 2
+#
+#     # way less altruistic version we got going on here.
+#     hare = np.zeros(3)
+#     hare.fill(0)
+#     hare[id] = 6
+#
+#
+#     stag = np.zeros(3)
+#     stag.fill(2)
+#
+#     stag_move = np.zeros(1)
+#     stag_move[id] = 3
+#
+#
+#     return [hare, stag, hare_move]
+
 def create_allocations(name):
     id = int(name[-1])
+
+    #
+    hare_take = np.zeros(3)
+    hare_take[id] = 6
+
     hare_move = np.zeros(3)
     hare_move.fill(-2)
     hare_move[id] = 2
 
-    # way less altruistic version we got going on here.
-    hare = np.zeros(3)
-    hare.fill(0)
-    hare[id] = 6
+    stag_take = np.zeros(3)
+    stag_take.fill(2)
+
+    stag_move = np.zeros(3)
+    stag_move.fill(1.5)
+    stag_move[id] = 3
 
 
-    stag = np.zeros(3)
-    stag.fill(2)
-
-    return [hare, stag, hare_move]
+    return [hare_move, hare_take, stag_move, stag_take]
