@@ -1,7 +1,7 @@
-from environment.state import State
+from stagHare.environment.state import State
 import numpy as np
 from typing import List
-from utils.utils import HARE_NAME, N_HUNTERS, STAG_NAME
+from stagHare.utils.utils import HARE_NAME, N_HUNTERS, STAG_NAME
 
 
 class AssumptionChecker:

@@ -45,10 +45,13 @@ def staghunt_to_jhg(state, action_map, old_agent_positions, old_state, hare_capt
         stag_row, stag_col = old_state.agent_positions["stag"][0], old_state.agent_positions["stag"][1]
         path2 = list(findPathTeamAware(name, old_state, old_row, old_col, stag_row, stag_col))
 
+        if name == "H1":
+            print("Here was our action ", action, " and here was path 1 ", path1, " and here was path 2 ", path2)
 
         # allocations are in the following order:
         # [hare, stag, hare_move]
-        if action == path1:
+        # action likes being a tuple
+        if list(action) == path1:
             # we can now run a VERY rudimentary filter based on close they are to specific things.
             if num_steps_hare <= 1: # if they are right next to or close to the hair
                 new_hare_allocation = np.add(new_hare_allocation, allocations_list[1])
@@ -59,7 +62,8 @@ def staghunt_to_jhg(state, action_map, old_agent_positions, old_state, hare_capt
 
         # we actually shouldn't do this, as path2 and path3 are likely to be the same. only add this once.
         # pretty sure we should only do this once, because either way stag is declared.
-        if action == path2:
+        # action likes being a tuple for some inane reason.
+        if list(action) == path2:
             if num_steps_stag <= 1:
                 new_stag_allocation = np.add(new_stag_allocation, allocations_list[3])
             else:
@@ -130,6 +134,7 @@ def staghunt_to_jhg(state, action_map, old_agent_positions, old_state, hare_capt
 
         allocations.append(new_allocation)
 
+    print("here are the allocations ", allocations)
     return allocations
 
 

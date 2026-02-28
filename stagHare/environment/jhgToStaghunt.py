@@ -1,4 +1,5 @@
 # from Server.SC_Bots.transVecTranslator import translateVecToIndex
+from Server.Engine.completeBots.humanagent import HumanAgent
 from stagHare.agents.cabAgentThing import CabAgent
 from stagHare.agents.fetcherBot import FetcherBot
 from stagHare.agents.hareAgent import HareAgent
@@ -25,17 +26,19 @@ def jhg_to_staghunt(agents, state, reward, round_num):
     new_intents = {}
     indices = list(range(len(agents)))
     random.shuffle(indices) # this should do the trick.
+    hunting_hare_map = {}
     for i in indices:
         agent = agents[i]
-        if not isinstance(agent, CabAgent) and not isinstance(agent, FetcherBot) and not isinstance(agent, HareAgent) and not isinstance(agent, StagAgent):
+        if not isinstance(agent, CabAgent) and not isinstance(agent, FetcherBot) and not isinstance(agent, HareAgent) and not isinstance(agent, StagAgent) and not isinstance(agent, HumanAgent):
             new_moves[agent.name] = agent.act(state, reward, round_num) # should be noted that these are just prey moves. they are essentialy random.
+            hunting_hare_map[agent.name] = agent.is_hunting_hare()
         else:
             allocation = agent.act(state, reward, round_num)
             new_allocations[agent.name] = allocation
 
     # allocation to generators (for which we have the translator)
     keys = new_allocations.keys()
-    print("here are hte new allocations ", new_allocations)
+    # print("here are hte new allocations ", new_allocations)
 
     for key in keys:
         id = int(key[-1])
@@ -44,7 +47,10 @@ def jhg_to_staghunt(agents, state, reward, round_num):
         new_moves[key] = new_move # bars??
         new_intents[key] = movement_type
 
-    hunting_hare_map = create_map_from_intents(new_intents)
+    print("this is what new intents looks like ", new_intents)
+
+    # need TO PASS IT IN to account for discrepancies.
+    hunting_hare_map = create_map_from_intents(new_intents, hunting_hare_map)
     return new_moves, hunting_hare_map, new_allocations # then just give the moves back.
     # note that these are in a dictionary, I'll have to do weird things to randomize the order that this happens in.
 
@@ -52,8 +58,7 @@ def jhg_to_staghunt(agents, state, reward, round_num):
     # that way I cna do things ot keep track and randomize things and keep track of who moved where.
 
 # new_current_options_matrix = [hare, stag, hare_move]
-def create_map_from_intents(intents):
-    hunting_hare_map = {}
+def create_map_from_intents(intents, hunting_hare_map):
     for name, intent in intents.items():
         if intent == 0 or intent == 2:
             hunting_hare_map[name] = True

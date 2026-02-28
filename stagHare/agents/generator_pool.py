@@ -1,7 +1,7 @@
 from stagHare.agents.agent import Agent
 from stagHare.agents.generator import GreedyHareGen, GreedyPlannerHareGen, GreedyPlannerStagGen, TeamAwareGen
 import csv
-from environment.state import State
+from stagHare.environment.state import State
 import numpy as np
 from typing import List
 

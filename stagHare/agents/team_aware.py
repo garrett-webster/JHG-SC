@@ -1,8 +1,8 @@
-from agents.agent import Agent
-from environment.state import State
+from stagHare.agents.agent import Agent
+from stagHare.environment.state import State
 from typing import Tuple
-from utils.a_star import AStar
-from utils.utils import HARE_NAME, STAG_NAME
+from stagHare.utils.a_star import AStar
+from stagHare.utils.utils import HARE_NAME, STAG_NAME
 
 
 class TeamAware(Agent):

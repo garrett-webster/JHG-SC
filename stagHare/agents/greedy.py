@@ -1,8 +1,8 @@
-from agents.agent import Agent
-from environment.state import State
+from stagHare.agents.agent import Agent
+from stagHare.environment.state import State
 import numpy as np
 from typing import Tuple
-from utils.utils import HARE_NAME, POSSIBLE_DELTA_VALS, STAG_NAME
+from stagHare.utils.utils import HARE_NAME, POSSIBLE_DELTA_VALS, STAG_NAME
 
 
 class Greedy(Agent):

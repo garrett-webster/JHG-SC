@@ -9,6 +9,7 @@ import time # tit for tat pausing?
 
 from stagHare.agents.generator import GreedyHareGen
 from stagHare.agents.greedy import Greedy
+from stagHare.agents.cabAgentThing import CabAgent
 
 
 PAUSE_TIME = 5
@@ -66,6 +67,8 @@ class gameInstance():
             agent_types = [1,1]
         if situation == "PS": # Stag Greedy again
             agent_types = [2,2]
+        if situation == "CAB":
+            agent_types = [3,3]
         return agent_types
 
     # where da magic happens.
@@ -305,6 +308,9 @@ class gameInstance():
                 new_hunters.append(GreedyHareGen(new_name))
             if agent_type == 2:
                 new_hunters.append(Greedy(new_name, "stag"))
+            if agent_type == 3:
+                agent_name = "homoJHGSelfPlay.csv" # I DON"T Feel like adding a bunch of support for this. start small.
+                new_hunters.append(CabAgent(i, new_name, agent_name))
 
             # if self.agentType == 2:
             #     new_hunters.append(AlegAATr(name=new_name, lmbda=0.0, ml_model_type='knn', enhanced=True))

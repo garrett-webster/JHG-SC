@@ -34,6 +34,7 @@ class StagHare:
         self.agent_names = [agent.name for agent in self.agents]
         self.state = State(height, width, self.agent_names)
         self.rewards = [0] * len(self.agent_names)
+        self.new_action_map = None
 
         # ok we are going to need a way to actually process the allocations.
         # lets start at the highest possible level and work our way down.
@@ -67,8 +68,7 @@ class StagHare:
 
         action_map, hunting_hare_map, old_allocations = jhg_to_staghunt(self.agents, self.state, rewards,
                                                                         round_num)  # this does contain the hare and stag.
-        print("here are the moves ", action_map)
-        print("Here are the intents ", hunting_hare_map)
+        self.action_map = action_map
 
 
 
@@ -80,6 +80,7 @@ class StagHare:
         old_agent_positions = self.state.agent_positions.copy()  # make a copy of this, trust me.
         old_state = deepcopy(self.state)  # this SHOULD work?
         # process the actions IG
+
         if not self.is_over():
             self.state.update_intent(hunting_hare_map)
             self.rewards = self.state.process_actions(action_map)
@@ -107,6 +108,8 @@ class StagHare:
         self.popularity_over_time.append(self.engine.get_popularity())
 
 
+    def get_action_map(self):
+        return self.action_map
 
 
 
