@@ -89,7 +89,8 @@ def staghunt_to_jhg(state, action_map, old_agent_positions, old_state, hare_capt
 
 
 
-        # means we didn't move, so this is where stuff gets tricky.
+        # this is to check if we didn't move, make sure that we were locked in place
+        # and then create a new allocation for the non movers.
         if list(new_allocation) == [0 for _ in range(3)]:
             print("yeah we have no idea what they did or why they did what they did, sire. Printing...")
             # means that we haven't really moved in a way that makes sense,
@@ -104,7 +105,6 @@ def staghunt_to_jhg(state, action_map, old_agent_positions, old_state, hare_capt
                 else:
                     actionable_moves.append(action_map[key])
 
-
             # so if we haven't moved, lets see if that move was cau
             if action in actionable_moves: # we basically just want to check if we stayed in place.
                 id = int(name[-1])
@@ -114,6 +114,15 @@ def staghunt_to_jhg(state, action_map, old_agent_positions, old_state, hare_capt
                     # best to use this instead of the 0, 0, 4 becuase of normalization purposes. more distinct vector direction.
                     new_allocation = [2 for _ in range(3)]
                     new_allocation[id] = 8
+
+            else: # so basically we did NOT stay in place.
+                new_allocation = interpret_uncertain_move_to_allocation(state, action_map, old_agent_positions, old_state, action,
+                                                                        state.agent_positions["hare"], state.agent_positions["stag"], name)
+
+
+        # literally no clue whats happenign here.
+        if list(new_allocation) == [10 for _ in range(3)]:
+            print("Somethign is wrong stack trace this fetcher")
 
 
 
@@ -136,6 +145,25 @@ def staghunt_to_jhg(state, action_map, old_agent_positions, old_state, hare_capt
 
     print("here are the allocations ", allocations)
     return allocations
+
+
+def interpret_uncertain_move_to_allocation(state, action_map, old_agent_positions, old_state, action, hare_position, stag_position, name):
+    hare_x, hare_y = hare_position
+    stag_x, stag_y = stag_position
+
+    num_steps_hare_new = state.n_movements(action[0], action[1], hare_x, hare_y)
+    num_steps_stag_new = state.n_movements(action[0], action[1], stag_x, stag_y)
+
+    old_action = old_agent_positions[name] # moving here WAS the old action.
+
+    num_steps_hare_old = state.n_movements(old_action[0], old_action[1], hare_x, hare_y)
+    num_steps_stag_old = state.n_movements(old_action[0], old_action[1], stag_x, stag_y)
+
+    # check comparative stag steps and whatnot here.
+
+
+    new_allocation = []
+    return new_allocation
 
 
 
