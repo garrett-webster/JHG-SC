@@ -13,8 +13,8 @@ from stagHare.agents.cabAgentThing import CabAgent
 
 
 PAUSE_TIME = 5
-HEIGHT = 6
-WIDTH = 6
+HEIGHT = 16
+WIDTH = 16
 
 from stagHare.agents.human import *
 from stagHare.environment.world import StagHare

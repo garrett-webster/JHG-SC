@@ -82,15 +82,7 @@ def staghunt_to_jhg(state, action_map, old_agent_positions, old_state, hare_capt
         stag_weight = (total_steps / num_steps_stag) # num_steps can be 0.
         hare_weight = (total_steps / num_steps_hare) # num steps can be 0
 
-        if stag_weight == np.inf or hare_weight == np.inf:
-            print("EYAH")
 
-        ##TODO: finish debugging this later. 
-        # print("here is the new_stag_allocation:")
-
-
-        # print("here is the stag weight ", stag_weight)
-        # print("here is the hare weight ", hare_weight)
 
         new_allocation = (new_stag_allocation * stag_weight) + (new_hare_allocation * hare_weight)
         # print("here be the new allocaction ", new_allocation)
