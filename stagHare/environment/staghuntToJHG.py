@@ -45,8 +45,8 @@ def staghunt_to_jhg(state, action_map, old_agent_positions, old_state, hare_capt
         stag_row, stag_col = old_state.agent_positions["stag"][0], old_state.agent_positions["stag"][1]
         path2 = list(findPathTeamAware(name, old_state, old_row, old_col, stag_row, stag_col))
 
-        if name == "H1":
-            print("Here was our action ", action, " and here was path 1 ", path1, " and here was path 2 ", path2)
+        # if name == "H1":
+        #     print("Here was our action ", action, " and here was path 1 ", path1, " and here was path 2 ", path2)
 
         # allocations are in the following order:
         # [hare, stag, hare_move]
@@ -65,14 +65,22 @@ def staghunt_to_jhg(state, action_map, old_agent_positions, old_state, hare_capt
         # action likes being a tuple for some inane reason.
         if list(action) == path2:
             if num_steps_stag <= 1:
-                new_stag_allocation = np.add(new_stag_allocation, allocations_list[3])
-            else:
                 new_stag_allocation = np.add(new_stag_allocation, allocations_list[2])
+            else:
+                new_stag_allocation = np.add(new_stag_allocation, allocations_list[3])
 
         # we will refine these based on a distance metric in the future. keep them here for now though.
         # prevent the np.inf from 0 stesp and add 1 to it.
-        stag_weight = 5 / (num_steps_stag + 1)
-        hare_weight = 5 / (num_steps_hare + 1)
+        # stag_weight =  5 / (num_steps_stag + 1)
+        # hare_weight = 5 / (num_steps_hare + 1)
+
+        # experiment with this later.
+        num_steps_hare += 1
+        num_steps_stag += 1
+
+        total_steps = num_steps_hare + num_steps_stag
+        stag_weight = (total_steps / num_steps_stag) # num_steps can be 0.
+        hare_weight = (total_steps / num_steps_hare) # num steps can be 0
 
         if stag_weight == np.inf or hare_weight == np.inf:
             print("EYAH")
@@ -92,7 +100,7 @@ def staghunt_to_jhg(state, action_map, old_agent_positions, old_state, hare_capt
         # this is to check if we didn't move, make sure that we were locked in place
         # and then create a new allocation for the non movers.
         if list(new_allocation) == [0 for _ in range(3)]:
-            print("yeah we have no idea what they did or why they did what they did, sire. Printing...")
+            # print("yeah we have no idea what they did or why they did what they did, sire. Printing...")
             # means that we haven't really moved in a way that makes sense,
             # so we are going to try and just give ourselves the in between allocation bc I don't know
             # how to handle this edge case.
@@ -115,9 +123,13 @@ def staghunt_to_jhg(state, action_map, old_agent_positions, old_state, hare_capt
                     new_allocation = [2 for _ in range(3)]
                     new_allocation[id] = 8
 
-            else: # so basically we did NOT stay in place.
+
+            if list(new_allocation) == [0,0,0]: # if that DIDN"t work
+
+                # print("we did NOT stay in place, so now we have different issues ")
                 new_allocation = interpret_uncertain_move_to_allocation(state, action_map, old_agent_positions, old_state, action,
-                                                                        state.agent_positions["hare"], state.agent_positions["stag"], name)
+                                                                        state.agent_positions["hare"], state.agent_positions["stag"], name,
+                                                                        allocations_list)
 
 
         # literally no clue whats happenign here.
@@ -143,11 +155,16 @@ def staghunt_to_jhg(state, action_map, old_agent_positions, old_state, hare_capt
 
         allocations.append(new_allocation)
 
-    print("here are the allocations ", allocations)
+    allocations = np.array(allocations)
+    row_sums = allocations.sum(axis=1, keepdims=True)
+    normalized = allocations / row_sums
+    allocations = list(normalized)
+    # print("Here are the allocations they are returning ", allocations)
     return allocations
 
 
-def interpret_uncertain_move_to_allocation(state, action_map, old_agent_positions, old_state, action, hare_position, stag_position, name):
+def interpret_uncertain_move_to_allocation(state, action_map, old_agent_positions, old_state,
+                                           action, hare_position, stag_position, name, allocations_list):
     hare_x, hare_y = hare_position
     stag_x, stag_y = stag_position
 
@@ -159,18 +176,59 @@ def interpret_uncertain_move_to_allocation(state, action_map, old_agent_position
     num_steps_hare_old = state.n_movements(old_action[0], old_action[1], hare_x, hare_y)
     num_steps_stag_old = state.n_movements(old_action[0], old_action[1], stag_x, stag_y)
 
+    new_hare_allocation = np.array([0 for _ in range(3)])
+    new_stag_allocation = np.array([0 for _ in range(3)])
+
     # check comparative stag steps and whatnot here.
+    if num_steps_stag_new < num_steps_stag_old: # they have moved closer
+        if num_steps_stag_new <= 1:
+            new_stag_allocation = np.add(new_stag_allocation, allocations_list[3])
+        else:
+            new_stag_allocation = np.add(new_stag_allocation, allocations_list[2])
 
+    if num_steps_hare_new < num_steps_hare_old:
+        if num_steps_hare_new <= 1:  # if they are right next to or close to the hair
+            new_hare_allocation = np.add(new_hare_allocation, allocations_list[1])
+            # allocations.append(allocations_list[0])
+        else:  # hare movement allocation
+            new_hare_allocation = np.add(new_hare_allocation, allocations_list[0])
+            # allocations.append(allocations_list[2])
 
-    new_allocation = []
+    new_allocation = (new_stag_allocation * (num_steps_stag_new + 1)) + (new_hare_allocation * (num_steps_hare_new + 1))
+    # print("UNCERTAIN ALLOCATION IN BOUND ", new_allocation)
+    if list(new_allocation) == [0 for _ in range(3)]:
+        # print("THAT WAS A RANDOM MOVE. RANDOM ALLOCATION?")
+        new_allocation = create_random_allocation(3, int(name[-1]))
+
     return new_allocation
 
 
 
 
+def create_random_allocation(numPlayers, player_idx):
+    n = numPlayers
+    alpha = [1] * n  # Symmetric Dirichlet distribution parameters
+    alpha[1] = 0.1  # not sure why or even if this matters.
+    alpha = np.ones(n)  # np.random.uniform(0, 10, size=n)
+    c = 1  # Constant for the L1 norm
 
+    # Generate a number of samples
+    num_samples = 1
+    samples = (np.random.dirichlet(alpha, size=num_samples) * np.hstack
+    ([np.ones((num_samples, 1)), np.random.choice([-1, 1], p=[0.5, 0.5], size=(num_samples, n - 1))]))
+    transaction_vector = samples[0]
 
+    # we need to do a little swap er roo bc the first value is never negative.
+    temp_var = transaction_vector[player_idx]
+    transaction_vector[player_idx] = transaction_vector[0]
+    transaction_vector[0] = temp_var
 
+    if transaction_vector[player_idx] < 0:
+        transaction_vector[player_idx] = transaction_vector[player_idx] * -1
+
+        # print("here is the transaction_vector: \n", transaction_vector)
+    # print("Here is the sum of the transaction_vector: \n", np.sum(transaction_vector))
+    return transaction_vector
 
 
 
@@ -212,21 +270,21 @@ def interpret_uncertain_move_to_allocation(state, action_map, old_agent_position
 
 def create_allocations(name):
     id = int(name[-1])
-
-    #
-    hare_take = np.zeros(3)
-    hare_take[id] = 6
+    id -= 1
 
     hare_move = np.zeros(3)
-    hare_move.fill(-2)
-    hare_move[id] = 2
+    hare_move[id] = 6
 
-    stag_take = np.zeros(3)
-    stag_take.fill(2)
+    hare_take = np.zeros(3)
+    hare_take.fill(-2)
+    hare_take[id] = 2
 
     stag_move = np.zeros(3)
     stag_move.fill(1.5)
     stag_move[id] = 3
+
+    stag_take = np.zeros(3)
+    stag_take.fill(2)
 
 
     return [hare_move, hare_take, stag_move, stag_take]

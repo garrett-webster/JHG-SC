@@ -75,3 +75,4 @@ class HumanAgent(AbstractAgent):
         #     else:
         #         # human allocations not found
         #         time.sleep(0.1)
+

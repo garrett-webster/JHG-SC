@@ -5,6 +5,10 @@ import copy
 def translateVecToIndexStagHare(transVec, currentOptionsMatrix, enforce_majority):
     total_distances = []
 
+    # NORMALIZE EVERYTHING PLEASE.
+    currentOptionsMatrix = [row / sum(row) for row in currentOptionsMatrix]
+    transVec = [num / sum(transVec) for num in transVec]
+
     # Add abstention as a new row (all zeros)
     new_options_matrix = copy.deepcopy(currentOptionsMatrix)
     new_options_matrix = [[0, 0, 0]] + new_options_matrix  # Add abstention as first option
@@ -17,4 +21,5 @@ def translateVecToIndexStagHare(transVec, currentOptionsMatrix, enforce_majority
         total_distances.append(distance)
 
     index_to_return = total_distances.index(min(total_distances))
-    return index_to_return - 1  # Adjust for abstention being at inde
+    #  print("this be the index we are returning ", index_to_return)
+    return index_to_return - 1 # account for abstention as an option.

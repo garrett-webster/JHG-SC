@@ -13,8 +13,8 @@ from stagHare.agents.cabAgentThing import CabAgent
 
 
 PAUSE_TIME = 5
-HEIGHT = 15
-WIDTH = 15
+HEIGHT = 6
+WIDTH = 6
 
 from stagHare.agents.human import *
 from stagHare.environment.world import StagHare
@@ -23,6 +23,7 @@ import random
 
 class gameInstance():
     def __init__(self, connected_clients, client_id_dict, situation, round=0, save=True):
+        print("par 2")
         self.connected_clients = connected_clients
         self.client_id_dict = client_id_dict
         #self.agentType = situation
@@ -72,49 +73,56 @@ class gameInstance():
         return agent_types
 
     # where da magic happens.
-    def main_game_loop(self):
-        index = 0
-        while True:
-            client_input = {}
-            client_intent = {}
-            client_wait_times = []
-            current_time = time.time()
-            timer = Timer(self.client_time)
+    def collect_inputs(self, current_time, timer):
+        # returns client input, client intent and wait times.
+        client_input = {}
+        client_intent = {}
+        client_wait_times = []
 
+        if self.HUMAN_PLAYERS > 0:
             while True:
                 data = self.get_client_data()
                 for client, received_json in data.items():
-                    if "NEW_INPUT" in received_json and received_json["NEW_INPUT"] != None:
+                    if "NEW_INPUT" in received_json and received_json["NEW_INPUT"] is not None:
                         new_time = time.time() - current_time
                         client_input[self.client_id_dict[client]] = received_json["NEW_INPUT"]
                         client_intent[self.client_id_dict[client]] = received_json["INTENT"]
-                        client_wait_times.append(new_time) # tit for tat pausing. Great SCOTT that sucked.
-
+                        client_wait_times.append(new_time)
                 self.send_state(client_input)
-                # Check if all clients have provided input
                 if len(client_input) == len(self.connected_clients):
-                    break  # gets us out of the input loop.
+                    break  # all human players have responded
 
-            if not timer.time_out(): # egg timer for bot input
-                time.sleep(self.client_time - timer.time()) # gotta get how much time is left.
+        return client_input, client_intent, client_wait_times
 
-            # after sleeping, reset the timer based on the previous rounds input.
-            pause_time = 2 * sum(client_wait_times) / len(client_wait_times) # average wait time
-            self.client_time = min(random.uniform(0, pause_time), 2) # just pick a time somewhere in there.
+    # where the magic happens.
+    def main_game_loop(self):
+        index = 0
+        while True:
+            current_time = time.time()
+            timer = Timer(self.client_time)
+
+            # if we need anything.
+            client_input, client_intent, client_wait_times = self.collect_inputs(current_time, timer)
+
+            # only need the timer if we have human players that care about that sort of thing.
+            if self.HUMAN_PLAYERS > 0:
+                if not timer.time_out():
+                    time.sleep(self.client_time - timer.time())
+                pause_time = 2 * sum(client_wait_times) / len(client_wait_times)
+                self.client_time = min(random.uniform(0, pause_time), 2)
+
+            # running time! execute the actual loop.
             running = self.stag_hunt_game_loop(self.player_points, client_input, client_intent, index)
-
             index += 1
-            if running == False: # just check to see if the round has terminated or not yet.
+            if running == False:
                 break
 
-        # once the game is over, return our kill dict and save our movements and whatnot locally.
         new_points = self.adjust_points()
         new_dict = {}
         new_dict[self.situation] = new_points
         big_dict_finalized = {}
         big_dict_finalized[self.situation] = self.big_dict
         self.big_dict = big_dict_finalized
-        # if of course, we actually want to save the stuff. 
         if self.save:
             self.save_stuff_big(big_dict_finalized, self.round)
         return new_dict
@@ -163,7 +171,6 @@ class gameInstance():
 
     # this is where the actual "game logic" happens.
     def stag_hunt_game_loop(self, player_points, player_input, client_intent, index):
-
         rewards = [0] * (len(self.hunters) + 2) # for the agents.
 
         # plays through a round of the stag hare problem and updates the appropriate variables.
@@ -199,7 +206,7 @@ class gameInstance():
                 "HEIGHT": HEIGHT,
                 "WIDTH": WIDTH,
             }
-
+            print("Here is the stag dead ", stag_dead)
             for i in range(4): # do this a couple of times, to make sure they get the packet, but not too many times. Once was not enough.
                 for client in self.connected_clients:  # does this update the points correctly?
                     new_message = json.dumps(response).encode()
@@ -240,10 +247,17 @@ class gameInstance():
             new_name = "H" + str(i+1)
             new_dict[new_name] = {}
         bot_number = 1
-        for i in range(3-len(self.connected_clients), 4):
-            new_name = "R" + str(bot_number)
-            bot_number+=1
-            new_dict[new_name] = {}
+        if len(self.connected_clients.keys()) > 0:
+            for i in range(3-len(self.connected_clients), 4):
+                new_name = "R" + str(bot_number)
+                bot_number+=1
+                new_dict[new_name] = {}
+        else: # no humans.
+            for i in range(3):
+                new_name = "R" + str(bot_number)
+                bot_number +=1
+                new_dict[new_name] = {}
+
 
 
         for agent in self.stag_hare.state.agent_positions: # grab the before positions

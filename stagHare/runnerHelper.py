@@ -37,6 +37,7 @@ def run_trial_graphing(stag_hare, current_round_grapher, current_game_logger):
         round_rewards = stag_hare.transition()
         for i, reward in enumerate(round_rewards):
             rewards[i] += reward
+        stag_hare.engine
 
 
 

@@ -95,6 +95,7 @@ class StagHare:
         self.update_engine(allocations, round_num)
 
         influence = self.engine.get_influence()
+        # print("Here is the influence matrix ", influence)
         # print("here is the current influence: \n", influence) # not sure how much this will actually tell me.
         return self.rewards  # return the rewards.
 
