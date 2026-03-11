@@ -105,6 +105,7 @@ def findPathTeamAware(name, state, curr_row, curr_col, stag_row, stag_col) -> Tu
 
                 if agent_name == name: # well this sucks.
                     goal = (row, col)
+                    break # inner break. this might help.
 
                 break
 

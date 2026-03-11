@@ -161,7 +161,7 @@ def create_hunters(agent_type, agent_name="", agent_scenario=0):
                 new_hunters.append(HareAgent(i, name=new_name))
 
             if agent_type == 2:
-                new_hunters.append(StagAgent(name=new_name))
+                new_hunters.append(StagAgent(i, name=new_name))
 
             if agent_type == 3:
                 new_hunters.append(CabAgent(i, new_name, agent_name))
@@ -169,6 +169,24 @@ def create_hunters(agent_type, agent_name="", agent_scenario=0):
         # this guy doesn't need an agent name or anything.
         new_name = "R2"
         new_hunters.append(FetcherBot(2, new_name))
+
+    elif agent_scenario == 3: # put one cab agent in with a bunch of guys.
+        new_name = "R0"
+        new_hunters.append(CabAgent(0, new_name, agent_name))
+        new_name = "R1"
+        new_hunters.append(StagAgent(1, name=new_name))
+        new_name = "R2"
+        new_hunters.append(StagAgent(2, name=new_name))
+
+    elif agent_scenario == 4: # put one cab agent in with a bunch of guys.
+        new_name = "R0"
+        new_hunters.append(CabAgent(0, new_name, agent_name))
+        new_name = "R1"
+        new_hunters.append(HareAgent(1, name=new_name))
+        new_name = "R2"
+        new_hunters.append(HareAgent(2, name=new_name))
+
+
 
     else:
         for i in range(3):

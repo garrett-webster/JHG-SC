@@ -5,8 +5,9 @@ import numpy as np
 
 # this guy hunts exclusively stags.
 class StagAgent(Agent):
-    def __init__(self, name: str) -> None:
+    def __init__(self,  id: int, name: str) -> None:
         Agent.__init__(self, name)
+        self.id = id
 
     def act(self, state: State, reward: float, round_num: int):
         new_allocation = [2 for _ in range(3)]

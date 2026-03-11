@@ -45,9 +45,11 @@ if __name__ == '__main__':
     addAgents = []
     new_agents = []
 
-    height, width = 6, 6 # lets start there, not too big but there.
+    height, width = 16, 16 # lets start there, not too big but there.
     agent_type = 3 # -1 is ALLEGATR, 0 is a random agent, 1 is the hare greedy agent, 2 is stag greedy agent, 3 is CAB
     scores = []
+    # 0 is standard, 1 is nothing, 2 is 2 of whatever bots with a fectcher bot, 3 is a cab with 2 stag and 4 is a cab with 2 hares.
+    agent_scenario = 3
 
     for agent_name in agent_names:
         # print("Agent name: " + agent_name)
@@ -58,7 +60,7 @@ if __name__ == '__main__':
             total_order = create_total_order(num_players, num_humans)
             current_jhg_engine = create_jhg_engine(num_players)
             # current_jhg_sim = create_jhg_sim(num_humans, num_players, total_order, jhg_bot_type, addAgents, new_agents, current_jhg_engine)
-            hunters = create_hunters(agent_type, agent_name, agent_scenario=0)
+            hunters = create_hunters(agent_type, agent_name, agent_scenario)
             current_round_grapher = IndividualRoundGrapher()
             while True:
                 stag_hare = StagHare(height, width, hunters)
@@ -66,7 +68,7 @@ if __name__ == '__main__':
                     break
 
             # does this suck? possibly.
-            stag_hare.state.hunting_hare_map = {"R"+str(i) : 2 for i in range(3)}
+            stag_hare.state.hunting_hare_map = {"R"+str(i) : 2 for i in range(3)} # value that it can never be, sort of a NAN. 
 
             # just run the fetcher.
             new_score = run_trial_graphing(stag_hare, current_round_grapher, current_game_logger)

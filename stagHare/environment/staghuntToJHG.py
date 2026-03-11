@@ -9,6 +9,7 @@ from stagHare.utils.pathfindingTime import findPathGreedy, findPathTeamAware
 
 def staghunt_to_jhg(state, action_map, old_agent_positions, old_state, hare_captured):
     allocations = []
+    allocations_dict = {}
 
     for name, action in action_map.items():
 
@@ -17,29 +18,7 @@ def staghunt_to_jhg(state, action_map, old_agent_positions, old_state, hare_capt
 
         # [hare_move, hare_take, stag_move, stag_take]
         allocations_list = create_allocations(name) # take just the number off of this thing.
-        #
-        #
-        # old_row, old_col = old_agent_positions[name]
-        #
-        # hare_x, hare_y = state.agent_positions["hare"]
-        # stag_x, stag_y = state.agent_positions["stag"]
-        #
-        # num_steps_hare = state.n_movements(action[0], action[1], hare_x, hare_y)
-        # num_steps_stag = state.n_movements(action[0], action[1], stag_x, stag_y)
-        #
-        #
-        #
-        # # to prevent division by one errors.
-        # num_steps_hare += 1
-        # num_steps_stag += 1
-        #
-        # total_steps = num_steps_hare + num_steps_stag
-        # stag_weight = (total_steps / num_steps_stag) # num_steps can be 0.
-        # hare_weight = (total_steps / num_steps_hare) # num steps can be 0
 
-                # print("we did NOT stay in place, so now we have different issues ")
-        # if name == "H1":
-        #     print("Aight whats going on here ")
 
         new_allocation = interpret_uncertain_move_to_allocation(state, action_map, old_agent_positions, old_state, action,
                                                                         state.agent_positions["hare"], state.agent_positions["stag"], name,
@@ -47,13 +26,17 @@ def staghunt_to_jhg(state, action_map, old_agent_positions, old_state, hare_capt
 
         # if name == "H1":
         #     print("this was the human allocation ", new_allocation)
+        new_allocation = new_allocation / sum(new_allocation)
         allocations.append(new_allocation)
+        allocations_dict[name] = new_allocation
 
     allocations = np.array(allocations)
     row_sums = allocations.sum(axis=1, keepdims=True)
     normalized = allocations / row_sums
     allocations = list(normalized)
-    # print("Here are the allocations they are returning ", allocations)
+    allocations_dict = dict(sorted(allocations_dict.items()))
+    print("Here are the allocations they are returning ", allocations_dict)
+    print("            ")
     return allocations
 
 
