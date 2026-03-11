@@ -23,7 +23,6 @@ import random
 
 class gameInstance():
     def __init__(self, connected_clients, client_id_dict, situation, round=0, save=True):
-        print("par 2")
         self.connected_clients = connected_clients
         self.client_id_dict = client_id_dict
         #self.agentType = situation

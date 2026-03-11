@@ -1,4 +1,6 @@
 # from Server.SC_Bots.transVecTranslator import translateVecToIndex
+from operator import itemgetter
+
 from Server.Engine.completeBots.humanagent import HumanAgent
 from stagHare.agents.cabAgentThing import CabAgent
 from stagHare.agents.fetcherBot import FetcherBot
@@ -11,6 +13,7 @@ from stagHare.utils.a_star import AStar
 import random
 
 from stagHare.utils.pathfindingTime import findPathGreedy, findPathTeamAware # maybe
+
 
 
 
@@ -50,7 +53,7 @@ def jhg_to_staghunt(agents, state, reward, round_num):
 
     # need TO PASS IT IN to account for discrepancies.
     hunting_hare_map = create_map_from_intents(new_intents, hunting_hare_map)
-    print("Here is the hunting hare map ", hunting_hare_map)
+    print_hare_hunting_map(hunting_hare_map)
     return new_moves, hunting_hare_map, new_allocations # then just give the moves back.
     # note that these are in a dictionary, I'll have to do weird things to randomize the order that this happens in.
 
@@ -149,3 +152,14 @@ def generate_movement(state, id, new_index):
 
 
     return path
+
+
+
+def print_hare_hunting_map(hunting_hare_map):
+    new_hunting_map = []
+    for key in hunting_hare_map:
+        if key == "stag" or key == "hare":
+            continue
+        new_hunting_map.append([key, hunting_hare_map[key]])
+    new_hunting_map.sort(key=itemgetter(0))
+    print(new_hunting_map)

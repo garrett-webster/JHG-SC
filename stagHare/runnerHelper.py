@@ -3,6 +3,8 @@
 # it all in one spot. That way, as I modify and upgrade it, we can make all the changes IN THIS FILE
 # so all the functions are on the same level.
 # yes we have had problems with it before. Don't worry about it.
+from operator import itemgetter
+
 from tqdm import tqdm
 
 from offlineSimStuff.runningTools.runnerHelper import create_jhg_sim, create_total_order, create_jhg_engine
@@ -216,3 +218,4 @@ def process_scores(scores):
     print("here were the total scores \n", total_sum_per_player)
 
     return cooperation_score, scores_per_player
+

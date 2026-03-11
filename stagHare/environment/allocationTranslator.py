@@ -29,8 +29,8 @@ def allocation_to_movement(new_allocation, id, state):
     stag = np.zeros(3)
     stag.fill(2)
 
-    print("we are working with id ", id)
-    print("this is the new allocation ", new_allocation)
+    # print("we are working with id ", id)
+    # print("this is the new allocation ", new_allocation)
     # print("this is the corresponding hare thing ", hare)
     # nothing should be created automatically.
     new_current_options_matrix = [hare, stag]

@@ -38,15 +38,15 @@ def staghunt_to_jhg(state, action_map, old_agent_positions, old_state, hare_capt
         # hare_weight = (total_steps / num_steps_hare) # num steps can be 0
 
                 # print("we did NOT stay in place, so now we have different issues ")
-        if name == "H1":
-            print("Aight whats going on here ")
+        # if name == "H1":
+        #     print("Aight whats going on here ")
 
         new_allocation = interpret_uncertain_move_to_allocation(state, action_map, old_agent_positions, old_state, action,
                                                                         state.agent_positions["hare"], state.agent_positions["stag"], name,
                                                                         allocations_list)
 
-        if name == "H1":
-            print("this was the human allocation ", new_allocation)
+        # if name == "H1":
+        #     print("this was the human allocation ", new_allocation)
         allocations.append(new_allocation)
 
     allocations = np.array(allocations)
@@ -133,19 +133,19 @@ def interpret_uncertain_move_to_allocation(state, action_map, old_agent_position
         print("SOMETHING SI VERTY VEYR WORNG SIRE")
         new_allocation = [9, 0, 0]
 
-    weighted_allocation = weight(stag_weight, hare_weight, allocations_list) * abs((stag_weight - hare_weight) * 10) # make it a number
+    weighted_allocation = weight(stag_weight, hare_weight, allocations_list) * abs((stag_weight - hare_weight) * 2) # make it a number
                                                                             # in the middle? very low number
                                                                             # right next to them? very high.
-    print("New allocation: ", new_allocation)
-    print("Weight allocation ", weighted_allocation)
+    # print("New allocation: ", new_allocation)
+    # print("Weight allocation ", weighted_allocation)
     return_allocation = new_allocation + weighted_allocation
 
     return return_allocation
 
 
 def weight(stag_weight, hare_weight, allocations_list): # new allocation that sits right in the middle of the fetcher.
-    print("Doing a weighted allocation")
-    print("Here is the hare wieght ", hare_weight, " and here is the stag weight ", stag_weight)
+    # print("Doing a weighted allocation")
+    # print("Here is the hare wieght ", hare_weight, " and here is the stag weight ", stag_weight)
     new_array = (stag_weight * allocations_list[2]) + (hare_weight * allocations_list[0])
     return new_array
 

@@ -90,7 +90,7 @@ class StagHare:
         allocations = staghunt_to_jhg(self.state, action_map, old_agent_positions, old_state,
                                       hare_captured)  # need the action map to do things.
 
-        print("interpreted allocations ", allocations)
+        # print("interpreted allocations ", allocations)
         # print("Here were the interpreted allocations \n", allocations)
         self.update_engine(allocations, round_num)
 
