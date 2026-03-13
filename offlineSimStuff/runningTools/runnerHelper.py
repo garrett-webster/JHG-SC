@@ -255,6 +255,8 @@ def loadPopulationFromFile(popSize, num_gene_pools, agent_name):
 
             thePopulation.append(GeneAgent3(words[0], num_gene_pools))
             # thePopulation.append(BasicGeneAgent3(words[0], num_gene_pools))
+            if len(words) == 1:
+                print("what is going on here")
             thePopulation[i].count = float(words[1])
             # thePopulation[i].relativeFitness = float(words[2])
             # thePopulation[i].absoluteFitness = float(words[3][0])
@@ -278,7 +280,7 @@ def create_sc_agents(num_players, agent_name):
 
 
 def create_agents(num_players, new_list, agent_name, forcedRandom, random_agents):
-    popSize = 100
+    popSize = 60
     num_gene_pools = 1
 
     if ".csv" in agent_name:

@@ -17,11 +17,11 @@ class CabAgent(Agent):
         self.name = name
         # doing 1 gene copy becuase 3 doesn't appera to really imporve performance appreciably.
         # create a Gene3agent that we can reference.
-        if gene == "":
-            self.agent = GeneAgent3("", 1)
-        else:
-            self.agent = create_agents(1, [gene], agent_name, True, True)[0]
-            self.agent.gene = gene # MAYBE???
+        if gene != "": # if we want to insert a gene of some kind, create a new agent and then insert the gene
+            self.agent = GeneAgent3(gene, 1)
+        else: # otherwise create an entire new agent.
+            self.agent = create_agents(1, [], agent_name, True, True)[0]
+
 
         # print("This is the first agent chromosome ", self.agent.genes_long[0]["alpha"])
         self.hunt = True # by default, they hunt the hare.

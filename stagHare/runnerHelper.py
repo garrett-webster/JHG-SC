@@ -173,6 +173,8 @@ def create_hunters_with_genes(genes):
         new_name = "R" + str(i)
         new_hunters.append(CabAgent(i, new_name, agent_name, gene=genes[i]))
 
+    return new_hunters
+
 
 def create_hunters_scenario(agent_name, agent_scenario):
     new_hunters = []

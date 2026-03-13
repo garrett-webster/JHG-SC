@@ -314,8 +314,8 @@ def evolve_step_based_SH(popSize, numGeneCopies, startIndex, numGens, gamesPerGe
     # can further modify this for tests, we can have a random folder (rnums.text) and make sure results are consistent between bots or whatever.
     if startIndex == 0:
         for j in range(popSize):
-
-            theGenePools.append(CabAgent(-1, "", ""))  # just have it give them a random ID that it can't be.
+            # the agent name doesn't matter, just needs to have .csv in there somewhere.
+            theGenePools.append(CabAgent(-1, "", "gen_199.csv", gene=""))  # just have it give them a random ID that it can't be.
 
     for gen in tqdm(range(numGens), desc="Mixed", leave=False):
         print("starting gen", gen)
@@ -376,11 +376,11 @@ if __name__ == "__main__":
     # random.seed(GLOBAL_SEED)
     # np.random.seed(GLOBAL_SEED)
 
-    cpu_count = os.cpu_count()
-    max_workers = max(1, os.cpu_count() - 2) # save some cores for the rest of us!
+    # cpu_count = os.cpu_count()
+    # max_workers = max(1, os.cpu_count() - 2) # save some cores for the rest of us!
+    max_workers = 1 # I just want one thread please. we debugging rn sire.
 
-
-    popSize = 100
+    popSize = 60
     numGeneCopies = 1
     startIndex = 0
     numGens = 50
