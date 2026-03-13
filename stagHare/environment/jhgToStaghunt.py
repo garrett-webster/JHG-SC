@@ -52,7 +52,7 @@ def jhg_to_staghunt(agents, state, reward, round_num):
         new_intents[key] = movement_type
 
     new_allocations = dict(sorted(new_allocations.items(), key=lambda item: item[0]))
-    print("The initial allocations are as follows : ", new_allocations)
+    # print("The initial allocations are as follows : ", new_allocations)
     # need TO PASS IT IN to account for discrepancies.
     hunting_hare_map = create_map_from_intents(new_intents, hunting_hare_map)
     print_hare_hunting_map(hunting_hare_map)
@@ -164,4 +164,4 @@ def print_hare_hunting_map(hunting_hare_map):
             continue
         new_hunting_map.append([key, hunting_hare_map[key]])
     new_hunting_map.sort(key=itemgetter(0))
-    print("This is the new hunting hare map ", new_hunting_map)
+    # print("This is the new hunting hare map ", new_hunting_map)

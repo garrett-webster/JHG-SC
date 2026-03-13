@@ -11,13 +11,24 @@ from Server.Engine.completeBots.geneagent3 import GeneAgent3
 class CabAgent(Agent):
     # this might not be the neatest way to do it, it might be better
     # we might need ot go back and do the smae thing to the SC gene3 agents for consistency.
-    def __init__(self, id, name: str, agent_name: str) -> None:
+    def __init__(self, id, name: str, agent_name: str, gene="") -> None:
         super().__init__(name) # super based off the agent call
         self.id = id
         self.name = name
+        # doing 1 gene copy becuase 3 doesn't appera to really imporve performance appreciably.
         # create a Gene3agent that we can reference.
-        self.agent = create_agents(1, [], agent_name, True, True)[0]# just start wiht something,
+        if gene == "":
+            self.agent = GeneAgent3("", 1)
+        else:
+            self.agent = create_agents(1, [gene], agent_name, True, True)[0]
+            self.agent.gene = gene # MAYBE???
+
+        # print("This is the first agent chromosome ", self.agent.genes_long[0]["alpha"])
         self.hunt = True # by default, they hunt the hare.
+
+
+    def set_id(self, id):
+        self.id = id # just throw this in there for the genetic algorithm.
 
     # this however, this is gonna be a fetcher.
     def act(self, state: State, reward: float, round_num: int) -> Tuple[int, int]:

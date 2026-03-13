@@ -35,8 +35,8 @@ def staghunt_to_jhg(state, action_map, old_agent_positions, old_state, hare_capt
     normalized = allocations / row_sums
     allocations = list(normalized)
     allocations_dict = dict(sorted(allocations_dict.items()))
-    print("Here are the allocations they are returning ", allocations_dict)
-    print("            ")
+    # print("Here are the allocations they are returning ", allocations_dict)
+    # print("            ")
     return allocations
 
 

@@ -44,7 +44,7 @@ class GameServer():
         for i in range(1, 11):
             current_round = i
             players_indicies_round_1 = [[0]]
-            situations = [["CAB"]]
+            situations = [["PS"]]
             games_list = self.create_game_processes(players_indicies_round_1, current_round, new_clients, q, situations)
             self.run_games(games_list, q, current_round)
             self.append_average_points(current_round)

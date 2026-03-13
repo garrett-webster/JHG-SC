@@ -249,7 +249,7 @@ def loadPopulationFromFile(popSize, num_gene_pools, agent_name):
 
         thePopulation = []
 
-        for i in range(0,popSize):
+        for i in range(0,popSize): # so this is NOT random. oh FETCH.
             line = fp.readline()
             words = line.split(",")
 

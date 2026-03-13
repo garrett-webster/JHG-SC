@@ -39,9 +39,6 @@ def run_trial_graphing(stag_hare, current_round_grapher, current_game_logger):
         round_rewards = stag_hare.transition()
         for i, reward in enumerate(round_rewards):
             rewards[i] += reward
-        stag_hare.engine
-
-
 
         if stag_hare.is_over():
             # current_game_logger.add_round(stag_hare.state)
@@ -50,11 +47,38 @@ def run_trial_graphing(stag_hare, current_round_grapher, current_game_logger):
             return create_new_score(stag_hare)
 
 
+def run_trial_genetic(hunters):
+
+    height, width = 16, 16
+
+    # create the instance simulator
+    while True:
+        stag_hare = StagHare(height, width, hunters)
+        if not stag_hare.is_over():
+            break
+
+    # IDK if this is necessary but I figure it can't hurt.
+    stag_hare.state.hunting_hare_map = {"R" + str(i): 2 for i in range(3)}  # value that it can never be, sort of a NAN.
+
+    while True: # the way this gets run is VERY VERY weird.
+
+        # this is importnat for reasons.
+        rewards = [0] * 5 # 3 hunters, 2 other peeps
+        # this is a reminder to check the action map to make sure that we are hunting what we think we are.
+
+        round_rewards = stag_hare.transition()
+        for i, reward in enumerate(round_rewards):
+            rewards[i] += reward
+
+        if stag_hare.is_over():
+            return create_new_score(stag_hare)
+
+
 
 def run_trial(agent_type, agent_name):
 
-    height = 6
-    width = 6
+    height = 16
+    width = 16
 
     # want to monitor how things work.
     hunters = create_hunters(agent_type, agent_name, agent_scenario=0)
@@ -141,6 +165,24 @@ def get_possible_agent_captures(hare_x, hare_y, board_size):
 
     return neighboring_moves
 
+def create_hunters_with_genes(genes):
+    new_hunters = []
+    agent_name = "gen_199.csv"
+
+    for i in range(3):
+        new_name = "R" + str(i)
+        new_hunters.append(CabAgent(i, new_name, agent_name, gene=genes[i]))
+
+
+def create_hunters_scenario(agent_name, agent_scenario):
+    new_hunters = []
+
+    if agent_scenario == 1:
+        for i in range(3):
+            new_name = "R" + str(i)
+            new_hunters.append(CabAgent(i, new_name, agent_name))
+
+    # start of the ecab v experts portion.
 
 
 def create_hunters(agent_type, agent_name="", agent_scenario=0):
@@ -178,11 +220,28 @@ def create_hunters(agent_type, agent_name="", agent_scenario=0):
         new_name = "R2"
         new_hunters.append(StagAgent(2, name=new_name))
 
+    elif agent_scenario == 5:
+        new_name = "R0"
+        new_hunters.append(CabAgent(0, new_name, agent_name))
+        new_name = "R1"
+        new_hunters.append(CabAgent(1, new_name, agent_name))
+        new_name = "R2"
+        new_hunters.append(StagAgent(2, name=new_name))
+
+
     elif agent_scenario == 4: # put one cab agent in with a bunch of guys.
         new_name = "R0"
         new_hunters.append(CabAgent(0, new_name, agent_name))
         new_name = "R1"
         new_hunters.append(HareAgent(1, name=new_name))
+        new_name = "R2"
+        new_hunters.append(HareAgent(2, name=new_name))
+
+    elif agent_scenario == 6:
+        new_name = "R0"
+        new_hunters.append(CabAgent(0, new_name, agent_name))
+        new_name = "R1"
+        new_hunters.append(CabAgent(1, new_name, agent_name))
         new_name = "R2"
         new_hunters.append(HareAgent(2, name=new_name))
 

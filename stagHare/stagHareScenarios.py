@@ -26,6 +26,14 @@ from stagHare.runnerHelper import *
 
 if __name__ == '__main__':
 
+    # scenario 1: ecab on ecab
+    # secnario 2: ecab vs experts (4 of em)
+    # scenario 3: stagCab v experts
+    # fortunately I can only do the first 3.
+    # scenario 4: ecab vs humans
+    # scenario 5: human on human
+
+
     height, width = 16, 16 # lets start there, not too big but there.
     forcedRandom = True
     random_agents = True # better for human distribution
@@ -39,7 +47,7 @@ if __name__ == '__main__':
     curr_logger = stagHareLogger()
 
     # agent_names = ["gen_99.csv", "gen_Z.csv", "homoJHGSelfPlay.csv", "homoSCselfPlayMFalse.csv", "homoSCselfPlayMTrue.csv", "mixedJHGSelfPlay.csv", "mixedSCselfPlayMFalse.csv", "mixedSCselfPlayMTrue.csv"]
-    agent_names = ["homoJHGSelfPlay.csv"]
+    agent_names = ["gen_199.csv"] # apparently these are the ones that they want me to use.
 
     # keep this as cab for now. we will figure out the rest later.
     # this only works assuming that we are doing self play. use the agent scenario instead.
@@ -55,6 +63,8 @@ if __name__ == '__main__':
 
         for attempt in range(num_attempts):
             current_game_logger = GameLogger(height, width) # need this per game, not per batch.
+            total_order = create_total_order(num_players, num_humans)
+            current_jhg_engine = create_jhg_engine(num_players)
             hunters = create_hunters(agent_type, agent_name, agent_scenario)
             current_round_grapher = IndividualRoundGrapher()
             while True:
@@ -63,7 +73,7 @@ if __name__ == '__main__':
                     break
 
             # does this suck? possibly.
-            stag_hare.state.hunting_hare_map = {"R"+str(i) : 2 for i in range(3)} # value that it can never be, sort of a NAN. 
+            stag_hare.state.hunting_hare_map = {"R"+str(i) : 2 for i in range(3)} # value that it can never be, sort of a NAN.
 
             # just run the fetcher.
             new_score = run_trial_graphing(stag_hare, current_round_grapher, current_game_logger)
