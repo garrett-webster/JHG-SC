@@ -95,13 +95,13 @@ def run_trial_test(agents):
             # passes by value. thanks python.
             return create_new_score(stag_hare)  # should return the new score array.
 
-def run_trial(agent_type, agent_name, height, width):
+def run_trial(agent_type, agent_name, height, width, random_agents, forced_random):
     try:
         start = time.time()
         # changed on 3/17 to allow height and width to be passed in instead of specified here.
 
         # want to monitor how things work.
-        hunters = create_hunters(agent_type, agent_name, agent_scenario=0)
+        hunters = create_hunters(agent_type, random_agents, forced_random, agent_name, agent_scenario=0)
         round = 0
 
         while True:
@@ -252,7 +252,7 @@ def create_hunters_scenario(agent_name, agent_scenario):
     # start of the ecab v experts portion.
 
 
-def create_hunters(agent_type, agent_name="", agent_scenario=0):
+def create_hunters(agent_type, random_agents, forced_random, agent_name="", agent_scenario=0):
 
     new_hunters = []
 
@@ -273,7 +273,7 @@ def create_hunters(agent_type, agent_name="", agent_scenario=0):
                 new_hunters.append(StagAgent(i, name=new_name))
 
             if agent_type == 3:
-                new_hunters.append(CabAgent(i, new_name, agent_name))
+                new_hunters.append(CabAgent(i, new_name, gene="", agent_name=agent_name))
 
         # this guy doesn't need an agent name or anything.
         new_name = "R2"
@@ -331,7 +331,7 @@ def create_hunters(agent_type, agent_name="", agent_scenario=0):
                 new_hunters.append(StagAgent(i, name=new_name))
 
             if agent_type == 3:
-                new_hunters.append(CabAgent(i, new_name, gene="", agent_name=agent_name))
+                new_hunters.append(CabAgent(i, new_name, random_agents, forced_random, gene="", agent_name=agent_name))
 
 
             # if agent_type == 4:

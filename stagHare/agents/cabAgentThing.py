@@ -11,7 +11,7 @@ from Server.Engine.completeBots.geneagent3 import GeneAgent3
 class CabAgent(Agent):
     # this might not be the neatest way to do it, it might be better
     # we might need ot go back and do the smae thing to the SC gene3 agents for consistency.
-    def __init__(self, id, name: str, gene="", agent_name="") -> None:
+    def __init__(self, id, name: str, random_agents: bool, forced_random: bool, gene="", agent_name="") -> None:
         super().__init__(name) # super based off the agent call
         self.id = id
         self.name = name
@@ -23,7 +23,7 @@ class CabAgent(Agent):
         # don't got gene? use that.
         else:
             if agent_name != "":    # just trying this for now.
-                self.agent = create_agents(1, [], agent_name, False, False)[0]# just start wiht something,
+                self.agent = create_agents(1, [], agent_name, forced_random, random_agents)[0]# just start wiht something,
             else:
                 self.agent = GeneAgent3("", 1)  # create a random geneAgent3.
 

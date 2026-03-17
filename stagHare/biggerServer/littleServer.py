@@ -13,8 +13,8 @@ from stagHare.agents.cabAgentThing import CabAgent
 from stagHare.runnerHelper import run_trial, run_trial_test
 
 PAUSE_TIME = 5
-HEIGHT = 6
-WIDTH = 6
+HEIGHT = 16
+WIDTH = 16
 
 from stagHare.agents.human import *
 from stagHare.environment.world import StagHare
@@ -50,6 +50,8 @@ class gameInstance():
         self.stag_hare = stag_hare  # just to have that down.
         self.main_game_loop()
         # run_trial_test(agents=self.hunters)
+        self.random_agents = True
+        self.forced_random = False
 
     # yeah this one is kind of a mess. We could probably have done this better as well.
     def set_situation(self, situation):
@@ -331,7 +333,7 @@ class gameInstance():
                 new_hunters.append(CabAgent(i, new_name, agent_name))
             if agent_type == 4:
                 agent_name = "6x6Round1.csv"
-                new_hunters.append(CabAgent(i, new_name, gene="", agent_name=agent_name))
+                new_hunters.append(CabAgent(i, new_name, self.random_agents, self.forced_random, gene="", agent_name=agent_name))
 
 
 

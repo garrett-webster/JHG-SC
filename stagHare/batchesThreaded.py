@@ -23,7 +23,7 @@ if __name__ == '__main__':
     max_workers = max(1, os.cpu_count()-2) # save just a few for other processes, plz don't crash.
     # max_workers = 1 # just... just do this for rn. makes debugging a little easier.
 
-    forcedRandom = True
+    forced_random = True
     random_agents = True  # better for human distribution
 
     # no round list unfortunately, doesn't work that way
@@ -43,8 +43,7 @@ if __name__ == '__main__':
     # agents = [CabAgent(i, "H"+str(i), agent_name) for i in range(num_players)] # they need names or something.
     addAgents = []
     new_agents = []
-
-    height, width = 16, 16  # lets start there, not too big but there.
+    height, width = 6, 6  # lets start there, not too big but there.
     agent_type = 3  # -1 is ALLEGATR, 0 is a random agent, 1 is the hare greedy agent, 2 is stag greedy agent. 3 is cab
 
     for agent_name in agent_names:
@@ -57,7 +56,7 @@ if __name__ == '__main__':
         with ProcessPoolExecutor(max_workers=max_workers) as executor:
             futures = []
             for attempt in range(num_attempts):
-                futures.append(executor.submit(run_trial, agent_type, agent_name, height, width))
+                futures.append(executor.submit(run_trial, agent_type, agent_name, height, width, random_agents, forced_random))
 
             for future in tqdm(as_completed(futures), desc="Submitting Results", total=num_attempts):
                 results.append(future.result())

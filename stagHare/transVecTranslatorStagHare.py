@@ -8,6 +8,8 @@ def translateVecToIndexStagHare(transVec, currentOptionsMatrix, enforce_majority
     # NORMALIZE EVERYTHING PLEASE.
     currentOptionsMatrix = [row / sum(row) for row in currentOptionsMatrix]
     total = sum(abs(transVec)) # we can have negative and positive allocations. should be scaling by abs, not by the whole thing.
+    # transVec = [num / sum(transVec) for num in transVec]
+    # total = sum(abs(transVec)) # we can have negative and positive allocations. should be scaling by abs, not by the whole thing.
     # make sure to keep track of him when possible.
     transVec = [num / total for num in transVec]
 

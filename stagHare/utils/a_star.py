@@ -82,36 +82,39 @@ class AStar(object):
                 if node.f < min_score:
                     curr_node, idx, min_score = node, i, node.f
 
+            # Remove node with smallest F score and add it to the closed/visited list
             open_list.pop(idx)
             closed_nodes.add(curr_node)
 
-            # Path has been found — reconstruct and return first step
+            # Path has been found
             if curr_node == end_node:
                 path = []
+
                 while curr_node != start_node:
                     path.append(curr_node.position())
                     curr_node = curr_node.parent
+
                 return path[-1]
 
+            # Otherwise, continue with the algorithm - next step is to generate the children of the current node
             available_neighbors = state.neighboring_positions(curr_node.row, curr_node.col)
             children = [PathNode(row, col, curr_node) for row, col in available_neighbors]
 
+            # Visit the children and update their g, h, and f values
             for child in children:
                 if child in closed_nodes:
                     continue
 
-                new_g = curr_node.g + 1
-                new_h = state.n_movements(child.row, child.col, end_node.row, end_node.col)
+                new_g, new_h = curr_node.g + 1, state.n_movements(child.row, child.col, end_node.row, end_node.col)
                 child.update_values(new_g, new_h)
 
-                # *** THE FIX: actually skip if a better version exists ***
-                skip = False
                 for node in open_list:
-                    if child == node and child.g >= node.g:
-                        skip = True
-                        break
+                    if child == node and child.g > node.g:
+                        continue
 
-                if not skip:
-                    open_list.append(child)
+                open_list.append(child)
 
-        return curr_row, curr_col  # blocked, stay put
+        # We might be unable to follow a path if we're blocked in by other agents; in that case, just stay where we are
+        print("We are staying where we are")
+        traceback.print_stack()
+        return curr_row, curr_col
