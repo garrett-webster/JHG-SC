@@ -367,7 +367,7 @@ def loadPopulationFromFile(popSize, generationFolder, startIndex, num_gene_pools
         file_name = os.path.join("Engine", "botGenerations") # creates standard file path. we then append to this.
 
         # file_name = os.path.join(file_name, "assassins_gen_175")  # trying to be better and mroe aggressive on group forming
-        file_name = os.path.join(file_name, "gen_99.csv") # JHG cab agents as used in the study
+        file_name = os.path.join(file_name, "6x6Round1.csv") # JHG cab agents as used in the study
         # file_name = os.path.join(file_name, "longerConvex2.csv")
         # file_name = os.path.join(file_name, "sc_jhg_gen_299.csv") # the smartest vanilla agents
         # file_name = os.path.join(file_name, "w_kitties_gen_256.csv") # attempting to overcome cats

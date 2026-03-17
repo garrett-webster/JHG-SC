@@ -31,9 +31,9 @@ class PopularityMetrics:
 
 # try using this to hold things upstream of pmetrics to cauge agent metrics.
 class AgentMetrics:
-    def __init__(self, idx, score, count=1):
+    def __init__(self, idx, absoluteFitness, count=1):
         self.idx = idx
-        self.score = score
+        self.absoluteFitness = absoluteFitness
         self.count = count
 
 
@@ -63,7 +63,7 @@ def write_generational_results(theGenePools, popSize, gen, folder):
     script_dir = os.path.dirname(os.path.abspath(__file__))
     # Construct the full output directory path
     if folder == "":
-        output_dir = os.path.join(script_dir, "I have utterly pooped the bed", "theGenerations") # just to give it somewhere to go
+        output_dir = os.path.join(script_dir, "second attempt, 6x6", "theGenerations") # just to give it somewhere to go
     else:
         output_dir = os.path.join(script_dir, folder) # just to give it somewhere to go
     # Ensure output directory exists
@@ -87,7 +87,7 @@ def write_generational_results(theGenePools, popSize, gen, folder):
     # force it to squeeze the scalar value out. not sure what the problem was.
     avg_fitness = np.sum([float(np.squeeze(agent.absoluteFitness)) for agent in theGenePools]) / popSize
     avg_popularity = np.sum([float(np.squeeze(agent.absolutePopularity)) for agent in theGenePools]) / popSize
-    # print(f"Average utility in generation {gen}: {float(avg_fitness):.4f} Average Popularity: {float(avg_popularity):.4f}")
+    print(f"Average utility in generation {gen}: {float(avg_fitness):.4f} Average Popularity: {float(avg_popularity):.4f}")
 
 
 def selectByFitness(thePopulation, popSize, _rank):
@@ -96,14 +96,14 @@ def selectByFitness(thePopulation, popSize, _rank):
         if _rank:
             mag += thePopulation[i].relativeFitness
         else:
-            mag += thePopulation[i].score
+            mag += thePopulation[i].absoluteFitness
     num = random.random()
     sum = 0.0
     for i in range(popSize):
         if _rank:
             sum += thePopulation[i].relativeFitness / mag
         else:
-            sum += thePopulation[i].score / mag
+            sum += thePopulation[i].absoluteFitness / mag
         if num < sum:
             return i  # no clue what this does to be so honest with you
 
@@ -203,11 +203,11 @@ def runGame(agent_genes, numGeneCopies, agentsPerGame, roundsPerGame, gen, game_
 
     metrics = []
     for i in range(agentsPerGame):
-        score = pmetrics[i]["score"]
+        absoluteFitness = pmetrics[i]["absoluteFitness"]
 
         metrics.append(AgentMetrics(
             idx=game_idx,
-            score=score,
+            absoluteFitness=absoluteFitness,
         ))
     return metrics
 
@@ -253,7 +253,6 @@ def playGame(theGenes, game):
     # agent params should already be in there sire.
     agent_scenario = 3
     agent_type = 3
-    scores = []
 
     height, width = 16, 16
 
@@ -269,11 +268,11 @@ def playGame(theGenes, game):
     # we can use the gen adn the game to write the results to a file if we really want to.
 
     # we shall rework this in a second methinks.
-    pmetrics = getPmetrics(game, new_scores)
+    pmetrics = getPmetrics(game, new_scores, 3)
     return pmetrics  # this is the only thing we actually care about from this game.
 
 
-def getPmetrics(game, new_scores):
+def getPmetrics(game, new_scores, agentsPerGame):
     pmetrics = []
 
     # unfortunately, with only 1 game and not a really good way to try and understand whats going on, there isn't
@@ -281,7 +280,7 @@ def getPmetrics(game, new_scores):
     for i in range(agentsPerGame):
         metric = {
             "idx" : game,
-            "score" : new_scores[i],
+            "absoluteFitness" : new_scores[i],
             "count" : 1,
         }
         pmetrics.append(metric)
@@ -315,7 +314,7 @@ def evolve_step_based_SH(popSize, numGeneCopies, startIndex, numGens, gamesPerGe
     if startIndex == 0:
         for j in range(popSize):
             # the agent name doesn't matter, just needs to have .csv in there somewhere.
-            theGenePools.append(CabAgent(-1, "", "gen_199.csv", gene=""))  # just have it give them a random ID that it can't be.
+            theGenePools.append(GeneAgent3("", 1)) # no gene string, random inititlization. maybe he initil  # just have it give them a random ID that it can't be.
 
     for gen in tqdm(range(numGens), desc="Mixed", leave=False):
         print("starting gen", gen)
@@ -325,7 +324,7 @@ def evolve_step_based_SH(popSize, numGeneCopies, startIndex, numGens, gamesPerGe
         for game_idx in range(gamesPerGen):
             agent_indices = [random.randrange(popSize) for _ in range(agentsPerGame)]
             agent_genes = [
-                extractGene(theGenePools[idx].agent.genes_long[0])
+                extractGene(theGenePools[idx].genes_long[0])
                 for idx in agent_indices
             ]
 
@@ -339,31 +338,32 @@ def evolve_step_based_SH(popSize, numGeneCopies, startIndex, numGens, gamesPerGe
 
             all_metrics = list(itertools.chain.from_iterable(all_metrics_nested))
 
-            agg = defaultdict(lambda: {"score": 0.0, "count": 0})
+            agg = defaultdict(lambda: {"absoluteFitness": 0.0, "count": 0})
             for m in all_metrics:
                 idx = m.idx
-                agg[idx]["score"] += m.score
+                agg[idx]["absoluteFitness"] += m.absoluteFitness
                 agg[idx]["count"] += m.count
 
             for idx, vals in agg.items():
-                theGenePools[idx].score += vals["score"]
+                theGenePools[idx].absoluteFitness += vals["absoluteFitness"]
                 theGenePools[idx].count += vals["count"]
 
             for g in theGenePools:
                 if g.count > 0:
-                    g.score /= g.count
+                    g.absoluteFitness /= g.count
                 else:
                     g.absoluteFitness = 0
 
-            total_abs = sum(g.score for g in theGenePools)
+            total_abs = sum(g.absoluteFitness for g in theGenePools)
             for g in theGenePools:
-                g.relativeFitness = g.score / total_abs if total_abs > 0 else 0
+                g.relativeFitness = g.absoluteFitness / total_abs if total_abs > 0 else 0
 
-            theGenePools = sorted(theGenePools, key=lambda g: g.score)
+            theGenePools = sorted(theGenePools, key=lambda g: g.absoluteFitness)
             write_generational_results(theGenePools, popSize, gen, folder)
 
             theGenePoolsOld = theGenePools
             theGenePools = evolvePopulationPairs(theGenePoolsOld, popSize, numGeneCopies)
+
 
 
 
@@ -376,16 +376,16 @@ if __name__ == "__main__":
     # random.seed(GLOBAL_SEED)
     # np.random.seed(GLOBAL_SEED)
 
-    # cpu_count = os.cpu_count()
-    # max_workers = max(1, os.cpu_count() - 2) # save some cores for the rest of us!
-    max_workers = 1 # I just want one thread please. we debugging rn sire.
+    cpu_count = os.cpu_count()
+    max_workers = max(1, os.cpu_count() - 2) # save some cores for the rest of us!
+    # max_workers = 1 # I just want one thread please. we debugging rn sire.
 
     popSize = 60
     numGeneCopies = 1
     startIndex = 0
-    numGens = 50
-    gamesPerGen = 100
-    agentsPerGame = 8
+    numGens = 100
+    gamesPerGen = 20
+    agentsPerGame = 3 # we can only fit 3 hunters in there at at time...
     roundsPerGame = 30
     numCats = 0
     povertyLine = 0

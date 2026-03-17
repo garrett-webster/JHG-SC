@@ -11,20 +11,30 @@ from Server.Engine.completeBots.geneagent3 import GeneAgent3
 class CabAgent(Agent):
     # this might not be the neatest way to do it, it might be better
     # we might need ot go back and do the smae thing to the SC gene3 agents for consistency.
-    def __init__(self, id, name: str, agent_name: str, gene="") -> None:
+    def __init__(self, id, name: str, gene="", agent_name="") -> None:
         super().__init__(name) # super based off the agent call
         self.id = id
         self.name = name
         # doing 1 gene copy becuase 3 doesn't appera to really imporve performance appreciably.
         # create a Gene3agent that we can reference.
-        if gene != "": # if we want to insert a gene of some kind, create a new agent and then insert the gene
+        # got gene? use that
+        if gene != "":
             self.agent = GeneAgent3(gene, 1)
-        else: # otherwise create an entire new agent.
-            self.agent = create_agents(1, [], agent_name, True, True)[0]
+        # don't got gene? use that.
+        else:
+            if agent_name != "":    # just trying this for now.
+                self.agent = create_agents(1, [], agent_name, False, False)[0]# just start wiht something,
+            else:
+                self.agent = GeneAgent3("", 1)  # create a random geneAgent3.
+
 
 
         # print("This is the first agent chromosome ", self.agent.genes_long[0]["alpha"])
         self.hunt = True # by default, they hunt the hare.
+
+    # not sure if we will ever need this
+    def set_agent(self, agent):
+        self.agent = agent
 
 
     def set_id(self, id):

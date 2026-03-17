@@ -10,11 +10,11 @@ import time # tit for tat pausing?
 from stagHare.agents.generator import GreedyHareGen
 from stagHare.agents.greedy import Greedy
 from stagHare.agents.cabAgentThing import CabAgent
-
+from stagHare.runnerHelper import run_trial, run_trial_test
 
 PAUSE_TIME = 5
-HEIGHT = 16
-WIDTH = 16
+HEIGHT = 6
+WIDTH = 6
 
 from stagHare.agents.human import *
 from stagHare.environment.world import StagHare
@@ -49,6 +49,7 @@ class gameInstance():
         self.player_points_initialization()
         self.stag_hare = stag_hare  # just to have that down.
         self.main_game_loop()
+        # run_trial_test(agents=self.hunters)
 
     # yeah this one is kind of a mess. We could probably have done this better as well.
     def set_situation(self, situation):
@@ -69,6 +70,8 @@ class gameInstance():
             agent_types = [2,2]
         if situation == "CAB":
             agent_types = [3,3]
+        if situation == "GA":
+            agent_types = [4,4]
         return agent_types
 
     # where da magic happens.
@@ -186,9 +189,11 @@ class gameInstance():
             if self.stag_hare.state.hare_captured():
                 self.find_hunter_hare()
                 hare_dead = True
+                print("hare dead ")
             else:
                 self.find_hunter_stag()
                 stag_dead = True
+                print("Stag dead")
 
             small_dict = {}  # helps me know who to light up red on death.
             small_dict["HARE_DEAD"] = hare_dead
@@ -205,7 +210,7 @@ class gameInstance():
                 "HEIGHT": HEIGHT,
                 "WIDTH": WIDTH,
             }
-            print("Here is the stag dead ", stag_dead)
+
             for i in range(4): # do this a couple of times, to make sure they get the packet, but not too many times. Once was not enough.
                 for client in self.connected_clients:  # does this update the points correctly?
                     new_message = json.dumps(response).encode()
@@ -243,9 +248,9 @@ class gameInstance():
         # set up the dict for players and bots, dynamically.
 
         for i in range(len(self.connected_clients)):
-            new_name = "H" + str(i+1)
+            new_name = "H" + str(i) # let H start at 0 instead of 1.
             new_dict[new_name] = {}
-        bot_number = 1
+        bot_number = 0 # START THIS AT 0
         if len(self.connected_clients.keys()) > 0:
             for i in range(3-len(self.connected_clients), 4):
                 new_name = "R" + str(bot_number)
@@ -314,7 +319,7 @@ class gameInstance():
 
         for i in range(3 - len(self.connected_clients)): # bc they always need to add up to 3
             index = 0
-            new_name = "R" + str(i+1)
+            new_name = "R" + str(i)
             agent_type = self.agentType[index]
             # different types of agents can go here, might be work making a different functioun
             if agent_type == 1:
@@ -324,6 +329,11 @@ class gameInstance():
             if agent_type == 3:
                 agent_name = "homoJHGSelfPlay.csv" # I DON"T Feel like adding a bunch of support for this. start small.
                 new_hunters.append(CabAgent(i, new_name, agent_name))
+            if agent_type == 4:
+                agent_name = "6x6Round1.csv"
+                new_hunters.append(CabAgent(i, new_name, gene="", agent_name=agent_name))
+
+
 
             # if self.agentType == 2:
             #     new_hunters.append(AlegAATr(name=new_name, lmbda=0.0, ml_model_type='knn', enhanced=True))

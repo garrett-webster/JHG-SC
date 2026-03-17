@@ -122,7 +122,7 @@ if __name__ == "__main__":
     # file_name = os.path.join(file_name, "homoNewCats.csv")
     # agent_name = "mixedJHGSelfPlay.csv"
     # agent_name = "homoSCSelfPlay.csv"
-    agent_name = "gen_99.csv" # use this as sort of the default, for now.
+    agent_name = "6x6Round1.csv" # use this as sort of the default, for now.
 
     # bunch of stuff for print statements
     utility_to_log = []

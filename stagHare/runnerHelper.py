@@ -21,7 +21,7 @@ from stagHare.agents.hareAgent import HareAgent
 from stagHare.agents.stagAgent import StagAgent
 from stagHare.agents.alegaatr import AlegAATr # litmus test
 # from stagHare.agents.qalegaatr import QAlegAATr
-
+import numpy as np
 from concurrent.futures import ProcessPoolExecutor, as_completed
 
 
@@ -32,7 +32,7 @@ def run_trial_graphing(stag_hare, current_round_grapher, current_game_logger):
 
         # current_game_logger.add_round(stag_hare.state)
         # have this generate right off the bat
-        current_round_grapher.create_round_graph(stag_hare)
+        # current_round_grapher.create_round_graph(stag_hare)
         rewards = [0] * 5 # 3 hunters, 2 other peeps
         # this is a reminder to check the action map to make sure that we are hunting what we think we are.
 
@@ -42,14 +42,14 @@ def run_trial_graphing(stag_hare, current_round_grapher, current_game_logger):
 
         if stag_hare.is_over():
             # current_game_logger.add_round(stag_hare.state)
-            current_round_grapher.create_round_graph(stag_hare)
+            # current_round_grapher.create_round_graph(stag_hare)
             # passes by value. thanks python.
             return create_new_score(stag_hare)
 
 
 def run_trial_genetic(hunters):
 
-    height, width = 16, 16
+    height, width = 6, 6
 
     # create the instance simulator
     while True:
@@ -73,12 +73,44 @@ def run_trial_genetic(hunters):
         if stag_hare.is_over():
             return create_new_score(stag_hare)
 
+def run_trial_test(agents):
+    height = 6
+    width = 6
 
+    hunters = agents
+
+    while True:
+        stag_hare = StagHare(height, width, hunters)
+        if not stag_hare.is_over():
+            break  # no reason to start in a finished configuration.
+
+    while True:  # the way this gets run is VERY VERY weird.
+
+        # current_game_logger.add_round(stag_hare.state)
+        # have this generate right off the bat
+        # current_round_grapher.create_round_graph(stag_hare)
+        rewards = [0] * 5  # 3 hunters, 2 other peeps
+        # this is a reminder to check the action map to make sure that we are hunting what we think we are.
+
+        round_rewards = stag_hare.transition()
+        for i, reward in enumerate(round_rewards):
+            rewards[i] += reward
+
+        if stag_hare.is_over():
+            # if stag_hare.state.hare_captured():
+            #     print("hare dead")
+            # else:
+            #     print('stag dead')
+
+            # current_game_logger.add_round(stag_hare.state)
+            # passes by value. thanks python.
+            return create_new_score(stag_hare)  # should return the new score array.
 
 def run_trial(agent_type, agent_name):
 
-    height = 16
-    width = 16
+    # lets try this first...
+    height = 6
+    width = 6
 
     # want to monitor how things work.
     hunters = create_hunters(agent_type, agent_name, agent_scenario=0)
@@ -103,6 +135,11 @@ def run_trial(agent_type, agent_name):
 
 
         if stag_hare.is_over():
+            # if stag_hare.state.hare_captured():
+            #     print("hare dead")
+            # else:
+            #     print('stag dead')
+
             # current_game_logger.add_round(stag_hare.state)
             # passes by value. thanks python.
             return create_new_score(stag_hare) # should return the new score array.
@@ -168,10 +205,37 @@ def get_possible_agent_captures(hare_x, hare_y, board_size):
 def create_hunters_with_genes(genes):
     new_hunters = []
     agent_name = "gen_199.csv"
+    forcedRandom = False # just do this for now.
 
     for i in range(3):
         new_name = "R" + str(i)
-        new_hunters.append(CabAgent(i, new_name, agent_name, gene=genes[i]))
+        new_hunters.append(CabAgent(i, new_name, genes[i]))
+
+
+    alpha_min, alpha_max = 0.20, 0.20
+    beta_min, beta_max = 0.5, 1.0
+    keep_min, keep_max = 0.95, 0.95
+    give_min, give_max = 1.30, 1.30
+    steal_min, steal_max = 1.6, 1.60
+
+    num_players = 3
+
+    poverty_line = 0
+
+    game_params = {
+        "num_players": num_players,
+        "alpha": alpha_min,  # np.random.uniform(alpha_min, alpha_max),
+        "beta": beta_min,  # np.random.uniform(beta_min, beta_max),
+        "keep": keep_min,  # np.random.uniform(keep_min, keep_max),
+        "give": give_min,  # np.random.uniform(give_min, give_max),
+        "steal": steal_min,  # np.random.uniform(steal_min, steal_max),
+        "poverty_line": poverty_line,
+        "base_popularity": np.array([100,100,100])
+
+    }
+
+    for a in new_hunters:
+        a.agent.setGameParams(game_params, forcedRandom)
 
     return new_hunters
 
@@ -263,10 +327,11 @@ def create_hunters(agent_type, agent_name="", agent_scenario=0):
                 new_hunters.append(HareAgent(i, name=new_name))
 
             if agent_type == 2:
-                new_hunters.append(StagAgent(name=new_name))
+                new_hunters.append(StagAgent(i, name=new_name))
 
             if agent_type == 3:
-                new_hunters.append(CabAgent(i, new_name, agent_name))
+                new_hunters.append(CabAgent(i, new_name, gene="", agent_name=agent_name))
+
 
             # if agent_type == 4:
             #     new_hunters.append(QAlegAATr(name=new_name, enhanced=True))

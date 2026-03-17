@@ -46,7 +46,7 @@ if __name__ == '__main__':
     # with that out of the way, its time to angrily insert the logger in here.
     curr_logger = stagHareLogger()
 
-    # agent_names = ["gen_99.csv", "gen_Z.csv", "homoJHGSelfPlay.csv", "homoSCselfPlayMFalse.csv", "homoSCselfPlayMTrue.csv", "mixedJHGSelfPlay.csv", "mixedSCselfPlayMFalse.csv", "mixedSCselfPlayMTrue.csv"]
+    # agent_names = ["6x6Round1.csv", "gen_Z.csv", "homoJHGSelfPlay.csv", "homoSCselfPlayMFalse.csv", "homoSCselfPlayMTrue.csv", "mixedJHGSelfPlay.csv", "mixedSCselfPlayMFalse.csv", "mixedSCselfPlayMTrue.csv"]
     agent_names = ["gen_199.csv"] # apparently these are the ones that they want me to use.
 
     # keep this as cab for now. we will figure out the rest later.

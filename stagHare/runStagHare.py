@@ -26,27 +26,27 @@ from stagHare.runnerHelper import *
 
 if __name__ == '__main__':
 
-    height, width = 16, 16 # lets start there, not too big but there.
+    height, width = 6, 6 # lets start there, not too big but there.
     forcedRandom = True
     random_agents = True # better for human distribution
 
     num_players = 3 # as dictated by the stag hare thing
     num_humans = 0 # yeah...
 
-    num_attempts = 1 # don't worry about this
+    num_attempts = 100 # don't worry about this
 
     # with that out of the way, its time to angrily insert the logger in here.
     curr_logger = stagHareLogger()
 
-    # agent_names = ["gen_99.csv", "gen_Z.csv", "homoJHGSelfPlay.csv", "homoSCselfPlayMFalse.csv", "homoSCselfPlayMTrue.csv", "mixedJHGSelfPlay.csv", "mixedSCselfPlayMFalse.csv", "mixedSCselfPlayMTrue.csv"]
-    agent_names = ["homoJHGSelfPlay.csv"]
+    # agent_names = ["6x6Round1.csv", "gen_Z.csv", "homoJHGSelfPlay.csv", "homoSCselfPlayMFalse.csv", "homoSCselfPlayMTrue.csv", "mixedJHGSelfPlay.csv", "mixedSCselfPlayMFalse.csv", "mixedSCselfPlayMTrue.csv"]
+    agent_names = ["6x6Round1.csv"]
 
     # keep this as cab for now. we will figure out the rest later.
     # this only works assuming that we are doing self play. use the agent scenario instead.
     agent_type = 3 # -1 is ALLEGATR, 0 is a random agent, 1 is the hare greedy agent, 2 is stag greedy agent, 3 is CAB
     # 0 is standard, 1 is nothing, 2 is 2 of whatever bots with a fectcher bot, 3 is a cab with 2 stag and 4 is a cab with 2 hares.
                                                                      # 5 is 2 cabs with 1 stag and 6 is 2 cabs with 1 hare.
-    agent_scenario = 3
+    agent_scenario = 0 # normal whatever I say goes type beat.
     scores = []
 
     for agent_name in agent_names:
@@ -70,10 +70,10 @@ if __name__ == '__main__':
             scores.append(new_score)
             current_batch_logger.add_game(stag_hare)
 
-            game_grapher = GameGrapher(stag_hare)
+            # game_grapher = GameGrapher(stag_hare)
 
-            game_grapher.playback_game(current_game_logger)
-            game_grapher.create_game_graph(current_game_logger)
+            # game_grapher.playback_game(current_game_logger)
+            # game_grapher.create_game_graph(current_game_logger)
 
         cooperation_score, scores_per_player = process_scores(scores)
 
