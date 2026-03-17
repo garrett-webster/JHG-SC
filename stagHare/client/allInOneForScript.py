@@ -231,7 +231,7 @@ def initalize(server_response):
 
     # add the human agnets and instantiate them correctly.
     for i in range(HUMAN_AGENTS):
-        new_name = "H" + str(i+1)  # Name always needs to be H1, H2, ETC
+        new_name = "H" + str(i+1)  # have h start at one
         my_player = False
         if client_ID_list[i] == client_ID: # pretty sure there is an off by one error there.
             my_player = True
@@ -240,7 +240,7 @@ def initalize(server_response):
 
     # make the AI agents specifically.
     for i in range(AI_AGENTS):
-        new_name = "R" + str(i+1)
+        new_name = "R" + str(i) # DON"T HAVE AQ PLUS ONE HERE PLEASE
         new_agent = Enemy(new_name, HEIGHT, WIDTH)
         agents.append(new_agent)
 
@@ -463,9 +463,9 @@ class Enemy(pygame.sprite.Sprite):
             self.original_surf = stag_sprite
         elif name == "hare":
             self.original_surf = hare_sprite
-        elif name == "R1":
+        elif name == "R0":
             self.original_surf = other_hunter
-        elif name == "R2":
+        elif name == "R1":
             self.original_surf = other_hunter
 
         if name[0] == "H":

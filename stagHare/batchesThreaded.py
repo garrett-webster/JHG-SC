@@ -1,26 +1,9 @@
+
+
 import os
-
 from tqdm import tqdm
-
-from offlineSimStuff.runningTools.runnerHelper import create_jhg_sim, create_total_order, create_jhg_engine
-from stagHare.agents.cabAgentThing import CabAgent
-from stagHare.environment.world import StagHare
-from stagHare.environment.allocationTranslator import allocation_to_movement, movement_to_allocation
 from stagHare.visualziationTools.batchLogger import BatchLogger
-from stagHare.visualziationTools.inviduvalRoundGrapher import IndividualRoundGrapher
-from stagHare.visualziationTools.gameGrapher import GameGrapher
-from stagHare.visualziationTools.gameLogger import GameLogger
-from stagHare.agents.random_agent import Random
-from stagHare.agents.hareAgent import HareAgent
-from stagHare.agents.stagAgent import StagAgent
-from stagHare.agents.alegaatr import AlegAATr  # litmus test
-
 from concurrent.futures import ProcessPoolExecutor, as_completed
-
-import numpy as np
-from stagHare.environment.state import State
-
-
 from stagHare.runnerHelper import run_trial, process_scores # this SHOULD be all we need.
 
 
@@ -61,7 +44,7 @@ if __name__ == '__main__':
     addAgents = []
     new_agents = []
 
-    height, width = 6, 6  # lets start there, not too big but there.
+    height, width = 16, 16  # lets start there, not too big but there.
     agent_type = 3  # -1 is ALLEGATR, 0 is a random agent, 1 is the hare greedy agent, 2 is stag greedy agent. 3 is cab
 
     for agent_name in agent_names:
@@ -74,7 +57,7 @@ if __name__ == '__main__':
         with ProcessPoolExecutor(max_workers=max_workers) as executor:
             futures = []
             for attempt in range(num_attempts):
-                futures.append(executor.submit(run_trial, agent_type, agent_name))
+                futures.append(executor.submit(run_trial, agent_type, agent_name, height, width))
 
             for future in tqdm(as_completed(futures), desc="Submitting Results", total=num_attempts):
                 results.append(future.result())

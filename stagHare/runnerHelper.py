@@ -3,28 +3,17 @@
 # it all in one spot. That way, as I modify and upgrade it, we can make all the changes IN THIS FILE
 # so all the functions are on the same level.
 # yes we have had problems with it before. Don't worry about it.
-from operator import itemgetter
+import traceback
 
-from tqdm import tqdm
-
-from offlineSimStuff.runningTools.runnerHelper import create_jhg_sim, create_total_order, create_jhg_engine
 from stagHare.agents.cabAgentThing import CabAgent
 from stagHare.agents.fetcherBot import FetcherBot
 from stagHare.environment.world import StagHare
-from stagHare.environment.allocationTranslator import allocation_to_movement, movement_to_allocation
-from stagHare.visualziationTools.batchLogger import BatchLogger
-from stagHare.visualziationTools.inviduvalRoundGrapher import IndividualRoundGrapher
-from stagHare.visualziationTools.gameGrapher import GameGrapher
-from stagHare.visualziationTools.gameLogger import GameLogger
 from stagHare.agents.random_agent import Random
 from stagHare.agents.hareAgent import HareAgent
 from stagHare.agents.stagAgent import StagAgent
 from stagHare.agents.alegaatr import AlegAATr # litmus test
-# from stagHare.agents.qalegaatr import QAlegAATr
 import numpy as np
-from concurrent.futures import ProcessPoolExecutor, as_completed
-
-
+import time
 
 
 def run_trial_graphing(stag_hare, current_round_grapher, current_game_logger):
@@ -106,43 +95,55 @@ def run_trial_test(agents):
             # passes by value. thanks python.
             return create_new_score(stag_hare)  # should return the new score array.
 
-def run_trial(agent_type, agent_name):
+def run_trial(agent_type, agent_name, height, width):
+    try:
+        start = time.time()
+        # changed on 3/17 to allow height and width to be passed in instead of specified here.
 
-    # lets try this first...
-    height = 6
-    width = 6
+        # want to monitor how things work.
+        hunters = create_hunters(agent_type, agent_name, agent_scenario=0)
+        round = 0
 
-    # want to monitor how things work.
-    hunters = create_hunters(agent_type, agent_name, agent_scenario=0)
+        while True:
+            stag_hare = StagHare(height, width, hunters)
+            if not stag_hare.is_over():
+                break # no reason to start in a finished configuration.
 
-    while True:
-        stag_hare = StagHare(height, width, hunters)
-        if not stag_hare.is_over():
-            break # no reason to start in a finished configuration.
-
-    while True: # the way this gets run is VERY VERY weird.
-
-        # current_game_logger.add_round(stag_hare.state)
-        # have this generate right off the bat
-        # current_round_grapher.create_round_graph(stag_hare)
-        rewards = [0] * 5 # 3 hunters, 2 other peeps
-        # this is a reminder to check the action map to make sure that we are hunting what we think we are.
-
-        round_rewards = stag_hare.transition()
-        for i, reward in enumerate(round_rewards):
-            rewards[i] += reward
-
-
-
-        if stag_hare.is_over():
-            # if stag_hare.state.hare_captured():
-            #     print("hare dead")
-            # else:
-            #     print('stag dead')
-
+        while True: # the way this gets run is VERY VERY weird.
+            # print("do we get here")
+            round += 1
             # current_game_logger.add_round(stag_hare.state)
-            # passes by value. thanks python.
-            return create_new_score(stag_hare) # should return the new score array.
+            # have this generate right off the bat
+            # current_round_grapher.create_round_graph(stag_hare)
+            rewards = [0] * 5 # 3 hunters, 2 other peeps
+            # this is a reminder to check the action map to make sure that we are hunting what we think we are.
+
+            round_rewards = stag_hare.transition()
+            for i, reward in enumerate(round_rewards):
+                rewards[i] += reward
+
+            if round > 100:
+                print("l9onger than 100 rounds")
+            if round > 500:
+                print("longer than 500 rounds")
+            if round > 1000:
+                print("longer than 1000 rounds")
+
+            elapsed = time.time() - start
+            if elapsed > 10.0:
+                print("AYO WE GOT A STRAGLER HERE, num rounds ", str(round))
+            if stag_hare.is_over():
+                # if stag_hare.state.hare_captured():
+                #     print("hare dead")
+                # else:
+                #     print('stag dead')
+
+                # current_game_logger.add_round(stag_hare.state)
+                # passes by value. thanks python.
+                return create_new_score(stag_hare) # should return the new score array.
+    except Exception as e:
+        print("FUTURE CRASHED: ", e)
+        traceback.print_exc()
 
 
 

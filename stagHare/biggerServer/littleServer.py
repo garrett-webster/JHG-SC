@@ -248,7 +248,7 @@ class gameInstance():
         # set up the dict for players and bots, dynamically.
 
         for i in range(len(self.connected_clients)):
-            new_name = "H" + str(i) # let H start at 0 instead of 1.
+            new_name = "H" + str(i+1) # let H start at 1 i guess.
             new_dict[new_name] = {}
         bot_number = 0 # START THIS AT 0
         if len(self.connected_clients.keys()) > 0:
@@ -478,10 +478,10 @@ class gameInstance():
                     if self.player_points[key][(currRound)]["hare"] == True: # only replace it if they ACTUALLY killed the hare.
                         self.player_points[key][(currRound)]["hare"] = hareKillers
         # erase agents from final dict entirely after we finish updating it.
+        if "R0" in self.player_points:
+            del self.player_points["R0"]
         if "R1" in self.player_points:
             del self.player_points["R1"]
-        if "R2" in self.player_points:
-            del self.player_points["R2"]
 
         new_points = {}
 

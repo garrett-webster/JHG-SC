@@ -4,6 +4,7 @@ import numpy as np
 from typing import Tuple
 from stagHare.utils.utils import HARE_NAME, POSSIBLE_DELTA_VALS, STAG_NAME
 from stagHare.utils.a_star import AStar # this SHOULD do the trick.
+from stagHare.utils.a_star import BFS # This SHOULD be faster. maybe.
 # I have no idea if this will actually work the way that I want it to.
 
 def findPathGreedy(state: State, p_curr_row, p_curr_col, goal_row, goal_col) -> Tuple[int, int]:
@@ -115,4 +116,5 @@ def findPathTeamAware(name, state, curr_row, curr_col, stag_row, stag_col) -> Tu
 
     goal_row, goal_col = goal
 
-    return AStar.find_path(curr_row, curr_col, goal_row, goal_col, state)
+    return BFS.find_path(curr_row, curr_col, goal_row, goal_col, state)
+    # return AStar.find_path(curr_row, curr_col, goal_row, goal_col, state)

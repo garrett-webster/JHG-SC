@@ -46,7 +46,7 @@ class RoundLogger():
 
 
     def actually_close_the_thing(self, filename):  # actually closes the thing.
-        print("do we get here ")
+        # print("do we get here ")
         base_dir = os.path.dirname(os.path.abspath(__file__))  # gets our current location
         relative_path = os.path.join(base_dir, "roundFiles", filename + ".json")  # assembles the full file path
         os.makedirs(os.path.dirname(relative_path), exist_ok=True)  # double check that we are free to boogy

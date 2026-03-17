@@ -26,14 +26,14 @@ from stagHare.runnerHelper import *
 
 if __name__ == '__main__':
 
-    height, width = 6, 6 # lets start there, not too big but there.
+    height, width = 16, 16 # lets start there, not too big but there.
     forcedRandom = True
     random_agents = True # better for human distribution
 
     num_players = 3 # as dictated by the stag hare thing
     num_humans = 0 # yeah...
 
-    num_attempts = 100 # don't worry about this
+    num_attempts = 1000 # don't worry about this
 
     # with that out of the way, its time to angrily insert the logger in here.
     curr_logger = stagHareLogger()

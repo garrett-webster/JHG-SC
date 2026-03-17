@@ -1,6 +1,3 @@
-
-
-
 class BatchLogger():
     def __init__(self):
         pass

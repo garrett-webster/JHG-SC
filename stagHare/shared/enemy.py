@@ -1,7 +1,7 @@
-from array import array
-
+#
+import warnings
+warnings.filterwarnings("ignore", category=UserWarning, module="pygame")
 import pygame
-
 
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 800

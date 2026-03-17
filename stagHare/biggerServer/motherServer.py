@@ -5,7 +5,7 @@ import copy
 from stagHare.shared import enemy
 from stagHare.biggerServer.gameServer import GameServer
 
-HUMAN_PLAYERS = 0
+HUMAN_PLAYERS = 1
 HEADLESS = HUMAN_PLAYERS == 0  # just in case I decide to run it headless it saves us a headache.
 
 PAUSE_TIME = 3
@@ -18,11 +18,6 @@ client_id_dict = {}
 hunters = []
 MAX_ROUNDS = 2
 round = 1
-
-HARE_POINTS = 10
-STAG_POINTS = 20
-stag = enemy.Enemy("stag", HEIGHT, WIDTH)
-hare = enemy.Enemy("hare", HEIGHT, WIDTH)
 
 def maybe_start_game():
     """Start a game session if we have enough players."""
