@@ -35,7 +35,7 @@ if __name__ == '__main__':
     num_attempts = 1000  # don't worry about this
     # don't add cats yet, we will worry about that later.
     # agent_name = "mixedJHGSelfPlay.csv"
-    agent_names = ["6x6Round1.csv"]
+    agent_names = ["6x6round3.csv"]
 
     # agent_names = ["homoJHGSelfPlay.csv"]
 

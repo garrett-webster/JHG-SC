@@ -25,6 +25,8 @@ class gameInstance():
     def __init__(self, connected_clients, client_id_dict, situation, round=0, save=True):
         self.connected_clients = connected_clients
         self.client_id_dict = client_id_dict
+        self.random_agents = True
+        self.forced_random = False
         #self.agentType = situation
         self.agentType = self.set_situation(situation)
         self.create_hunters()
@@ -50,8 +52,7 @@ class gameInstance():
         self.stag_hare = stag_hare  # just to have that down.
         self.main_game_loop()
         # run_trial_test(agents=self.hunters)
-        self.random_agents = True
-        self.forced_random = False
+
 
     # yeah this one is kind of a mess. We could probably have done this better as well.
     def set_situation(self, situation):
@@ -332,7 +333,7 @@ class gameInstance():
                 agent_name = "homoJHGSelfPlay.csv" # I DON"T Feel like adding a bunch of support for this. start small.
                 new_hunters.append(CabAgent(i, new_name, agent_name))
             if agent_type == 4:
-                agent_name = "6x6Round1.csv"
+                agent_name = "16x16Round1.csv"
                 new_hunters.append(CabAgent(i, new_name, self.random_agents, self.forced_random, gene="", agent_name=agent_name))
 
 

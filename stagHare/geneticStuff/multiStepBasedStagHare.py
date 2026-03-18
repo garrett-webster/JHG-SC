@@ -63,7 +63,7 @@ def write_generational_results(theGenePools, popSize, gen, folder):
     script_dir = os.path.dirname(os.path.abspath(__file__))
     # Construct the full output directory path
     if folder == "":
-        output_dir = os.path.join(script_dir, "first attempt, 16x16", "theGenerations") # just to give it somewhere to go
+        output_dir = os.path.join(script_dir, "third attempt, 6x6", "theGenerations") # just to give it somewhere to go
     else:
         output_dir = os.path.join(script_dir, folder) # just to give it somewhere to go
     # Ensure output directory exists
@@ -125,12 +125,63 @@ def mutateIt(gene):  # expect gene to be an int. if its not there is going to be
             g = 100
     return g
 
+def selectByTournament(thePopulation, popSize, use_relative, tournament_size=4):
+    contestants = random.sample(range(popSize), tournament_size)
+    if use_relative:
+        return max(contestants, key=lambda i: thePopulation[i].relativeFitness)
+    else:
+        return max(contestants, key=lambda i: thePopulation[i].absoluteFitness)
 
-def writeGenerationalResults(theGenePools, popSize, gen, agentsPerGame, folder):
-    # create a file here
-    for i in range(popSize):
-        # want the Gene, the Count, the Relative Fitness, the absoluteFitness, and the CVS formatted gene string
-        pass
+
+def evolvePopulationPairsAgressive(theGenePoolsOld, popSize, numGeneCopies):
+    theNewGenePools = []
+    num_genes = len(theGenePoolsOld[0].genes_long[0]) # bars??
+    ind1 = -1
+    ind2 = -1
+
+    # elitism addedd - carry the top agents forward unchanged.
+    num_elites = max(1, popSize // 10) # top 10 percent survive.
+    sorted_by_relative = sorted(range(popSize), key=lambda i: theGenePoolsOld[i].relativeFitness, reverse=True)
+
+    for i in range(num_elites):
+        elite_genes = extractGene(theGenePoolsOld[sorted_by_relative[i]].genes_long[0])
+        theNewGenePools.append(GeneAgent3(elite_genes, numGeneCopies))
+
+    for i in range(popSize - num_elites):
+        if i < popSize * 0.35: # 35% elite crossover paris
+            ind1 = selectByTournament(theGenePoolsOld, popSize, use_relative=True)
+            ind2 = selectByTournament(theGenePoolsOld, popSize, use_relative=False)
+            while ind2 == ind1:
+                ind2 = selectByTournament(theGenePoolsOld, popSize, use_relative=False)
+        else:
+            ind1 = selectByTournament(theGenePoolsOld, popSize, use_relative=False)
+            ind2 = selectByTournament(theGenePoolsOld, popSize, use_relative=False)
+            while ind2 == ind1:
+                ind2 = selectByTournament(theGenePoolsOld, popSize, use_relative=False)
+
+        if ind1 == -1 or ind2 == -1:
+            print("Something wrong in the evolve thing")
+
+        geneStr = "gene_"
+        ind1Genes = extractGene(theGenePoolsOld[ind1].genes_long[0]).split("_")[1:]
+        ind2Genes = extractGene(theGenePoolsOld[ind1].genes_long[0]).split("_")[1:]
+
+        for g in range(num_genes):
+            minKeepindex = 12
+            if g == minKeepindex:
+                geneStr += "0_"
+                continue
+            if bool(random.getrandbits(1)):
+                geneStr +=str(mutateIt(int(ind1Genes[g])))
+                if g < num_genes - 1:
+                    geneStr += "_"
+            else:
+                geneStr += str(mutateIt(int(ind2Genes[g])))
+                if g < num_genes - 1:
+                    geneStr += "_"
+        theNewGenePools.append(GeneAgent3(geneStr, numGeneCopies))
+
+    return theNewGenePools
 
 
 def evolvePopulationPairs(theGenePoolsOld, popSize, numGeneCopies):
@@ -140,7 +191,7 @@ def evolvePopulationPairs(theGenePoolsOld, popSize, numGeneCopies):
     ind2 = -1
 
     for i in range(popSize):
-        if i < popSize / 5.0:  # this is making the assumption that popSize is 100 people large.
+        if i < popSize / 5.0:  # this is making the assumption that popSize is 60 people large.
             ind1 = selectByFitness(theGenePoolsOld, popSize, True)
             ind2 = selectByFitness(theGenePoolsOld, popSize, False)
             while ind2 == ind1:  # prevent themselves from self breeding
@@ -187,7 +238,7 @@ def evolvePopulationPairs(theGenePoolsOld, popSize, numGeneCopies):
 def compute_game_seed(global_seed, generation_idx, game_idx):
     return global_seed + generation_idx * 100 + game_idx
 
-def runGame(agent_genes, numGeneCopies, agentsPerGame, roundsPerGame, gen, game_idx, folder, enforce_majority, random_agents, forced_random):
+def runGame(agent_genes, numGeneCopies, agentsPerGame, roundsPerGame, gen, game_idx, folder, enforce_majority, random_agents, forced_random, height, width):
 
 
     # seed = compute_game_seed(GLOBAL_SEED, gen, game_idx)
@@ -198,7 +249,7 @@ def runGame(agent_genes, numGeneCopies, agentsPerGame, roundsPerGame, gen, game_
     # should save us a lot of copying and passing aroudn overhead.
 
 
-    pmetrics = playGame(agent_genes, game_idx, random_agents, forced_random) # this should be all we need
+    pmetrics = playGame(agent_genes, game_idx, random_agents, forced_random, height, width) # this should be all we need
 
 
     metrics = []
@@ -245,7 +296,7 @@ def set_game_params(agents):
 
 
 # this is exactly the same actually. nice.
-def playGame(theGenes, game, random_agents, forced_random):
+def playGame(theGenes, game, random_agents, forced_random, height, width):
     # so this is the part I was kinda worried about, and there isn't a godo way to replicate it bc the flutter thing just works so differently
     # so we are going to addlib this portion.
     num_humans = 0 # never a reason to change this, but does make code more readable.
@@ -253,8 +304,6 @@ def playGame(theGenes, game, random_agents, forced_random):
     # agent params should already be in there sire.
     agent_scenario = 3
     agent_type = 3
-
-    height, width = 16, 16
 
     hunters = create_hunters_with_genes(theGenes, random_agents, forced_random) # the assingment has been undererstood
 
@@ -293,9 +342,9 @@ def extractGene(gene_dict):
 
 
 def run_game_helper(args):
-    (game_idx, agent_indices, agent_genes, numGeneCopies, agentsPerGame, roundsPerGame, folder, gen, enforce_majority, random_agents, forced_random) = args
+    (game_idx, agent_indices, agent_genes, numGeneCopies, agentsPerGame, roundsPerGame, folder, gen, enforce_majority, random_agents, forced_random, height, width) = args
 
-    metrics = runGame(agent_genes, numGeneCopies, agentsPerGame, roundsPerGame, gen, game_idx, folder, enforce_majority, random_agents, forced_random)
+    metrics = runGame(agent_genes, numGeneCopies, agentsPerGame, roundsPerGame, gen, game_idx, folder, enforce_majority, random_agents, forced_random, height, width)
 
     for i, m in enumerate(metrics):
         m.idx = agent_indices[i]
@@ -303,12 +352,14 @@ def run_game_helper(args):
 
 
 def evolve_step_based_SH(popSize, numGeneCopies, startIndex, numGens, gamesPerGen, agentsPerGame, roundsPerGame, povertyLine, folder,
-           max_workers, enforce_majority, random_agents, forced_random):
+           max_workers, enforce_majority, random_agents, forced_random, height, width):
     theGenePools = []
     theGenePoolsOld = []
 
-    # we can kind of assume that we start at 0, just as a matter of course. started from the bottom now we here.
-    # can further modify this for tests, we can have a random folder (rnums.text) and make sure results are consistent between bots or whatever.
+    # implementatino specifc to this: We just do everything through gene pools, like before. we extract the genes, pass those down,
+    # then take the pmetrics back up and attach them back to each gene. By doing this, we don't have to worry about different bot types
+    # and can use this same algorithm with minimal changes to all sorts of test beds.
+
     if startIndex == 0:
         for j in range(popSize):
             # the agent name doesn't matter, just needs to have .csv in there somewhere.
@@ -328,7 +379,7 @@ def evolve_step_based_SH(popSize, numGeneCopies, startIndex, numGens, gamesPerGe
 
             args_list.append((
                 game_idx, agent_indices, agent_genes, numGeneCopies, agentsPerGame, roundsPerGame,
-                folder, gen, enforce_majority, random_agents, forced_random
+                folder, gen, enforce_majority, random_agents, forced_random, height, width
             ))
 
         with ProcessPoolExecutor(max_workers=max_workers) as executor:
@@ -360,7 +411,8 @@ def evolve_step_based_SH(popSize, numGeneCopies, startIndex, numGens, gamesPerGe
             write_generational_results(theGenePools, popSize, gen, folder)
 
             theGenePoolsOld = theGenePools
-            theGenePools = evolvePopulationPairs(theGenePoolsOld, popSize, numGeneCopies)
+            # lets just see if htis works at all.
+            theGenePools = evolvePopulationPairsAgressive(theGenePoolsOld, popSize, numGeneCopies)
 
 
 
@@ -391,6 +443,8 @@ if __name__ == "__main__":
     enforce_majority = False
     random_agents = True
     forced_random = False
+    height = 6
+    width = 6
     evolve_step_based_SH(popSize, numGeneCopies, startIndex, numGens, gamesPerGen, agentsPerGame, roundsPerGame, povertyLine, folder,
-                    max_workers, enforce_majority, random_agents, forced_random)
+                    max_workers, enforce_majority, random_agents, forced_random, height, width)
     # we are running no fear, no chat
