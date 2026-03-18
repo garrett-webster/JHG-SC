@@ -63,7 +63,7 @@ def write_generational_results(theGenePools, popSize, gen, folder):
     script_dir = os.path.dirname(os.path.abspath(__file__))
     # Construct the full output directory path
     if folder == "":
-        output_dir = os.path.join(script_dir, "second attempt, 6x6", "theGenerations") # just to give it somewhere to go
+        output_dir = os.path.join(script_dir, "first attempt, 16x16", "theGenerations") # just to give it somewhere to go
     else:
         output_dir = os.path.join(script_dir, folder) # just to give it somewhere to go
     # Ensure output directory exists
@@ -187,7 +187,7 @@ def evolvePopulationPairs(theGenePoolsOld, popSize, numGeneCopies):
 def compute_game_seed(global_seed, generation_idx, game_idx):
     return global_seed + generation_idx * 100 + game_idx
 
-def runGame(agent_genes, numGeneCopies, agentsPerGame, roundsPerGame, gen, game_idx, folder, enforce_majority):
+def runGame(agent_genes, numGeneCopies, agentsPerGame, roundsPerGame, gen, game_idx, folder, enforce_majority, random_agents, forced_random):
 
 
     # seed = compute_game_seed(GLOBAL_SEED, gen, game_idx)
@@ -198,7 +198,7 @@ def runGame(agent_genes, numGeneCopies, agentsPerGame, roundsPerGame, gen, game_
     # should save us a lot of copying and passing aroudn overhead.
 
 
-    pmetrics = playGame(agent_genes, game_idx) # this should be all we need
+    pmetrics = playGame(agent_genes, game_idx, random_agents, forced_random) # this should be all we need
 
 
     metrics = []
@@ -245,7 +245,7 @@ def set_game_params(agents):
 
 
 # this is exactly the same actually. nice.
-def playGame(theGenes, game):
+def playGame(theGenes, game, random_agents, forced_random):
     # so this is the part I was kinda worried about, and there isn't a godo way to replicate it bc the flutter thing just works so differently
     # so we are going to addlib this portion.
     num_humans = 0 # never a reason to change this, but does make code more readable.
@@ -256,12 +256,10 @@ def playGame(theGenes, game):
 
     height, width = 16, 16
 
-    agent_name = "gen_199.csv"
-
-    hunters = create_hunters_with_genes(theGenes) # the assingment has been undererstood
+    hunters = create_hunters_with_genes(theGenes, random_agents, forced_random) # the assingment has been undererstood
 
     # get dat new score.
-    new_scores = run_trial_genetic(hunters)
+    new_scores = run_trial_genetic(hunters, height, width)
 
 
 
@@ -295,9 +293,9 @@ def extractGene(gene_dict):
 
 
 def run_game_helper(args):
-    (game_idx, agent_indices, agent_genes, numGeneCopies, agentsPerGame, roundsPerGame, folder, gen, enforce_majority) = args
+    (game_idx, agent_indices, agent_genes, numGeneCopies, agentsPerGame, roundsPerGame, folder, gen, enforce_majority, random_agents, forced_random) = args
 
-    metrics = runGame(agent_genes, numGeneCopies, agentsPerGame, roundsPerGame, gen, game_idx, folder, enforce_majority)
+    metrics = runGame(agent_genes, numGeneCopies, agentsPerGame, roundsPerGame, gen, game_idx, folder, enforce_majority, random_agents, forced_random)
 
     for i, m in enumerate(metrics):
         m.idx = agent_indices[i]
@@ -305,7 +303,7 @@ def run_game_helper(args):
 
 
 def evolve_step_based_SH(popSize, numGeneCopies, startIndex, numGens, gamesPerGen, agentsPerGame, roundsPerGame, povertyLine, folder,
-           max_workers, enforce_majority):
+           max_workers, enforce_majority, random_agents, forced_random):
     theGenePools = []
     theGenePoolsOld = []
 
@@ -330,7 +328,7 @@ def evolve_step_based_SH(popSize, numGeneCopies, startIndex, numGens, gamesPerGe
 
             args_list.append((
                 game_idx, agent_indices, agent_genes, numGeneCopies, agentsPerGame, roundsPerGame,
-                folder, gen, enforce_majority
+                folder, gen, enforce_majority, random_agents, forced_random
             ))
 
         with ProcessPoolExecutor(max_workers=max_workers) as executor:
@@ -391,6 +389,8 @@ if __name__ == "__main__":
     povertyLine = 0
     folder = ""
     enforce_majority = False
+    random_agents = True
+    forced_random = False
     evolve_step_based_SH(popSize, numGeneCopies, startIndex, numGens, gamesPerGen, agentsPerGame, roundsPerGame, povertyLine, folder,
-                    max_workers, enforce_majority)
+                    max_workers, enforce_majority, random_agents, forced_random)
     # we are running no fear, no chat

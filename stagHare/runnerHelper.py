@@ -36,9 +36,7 @@ def run_trial_graphing(stag_hare, current_round_grapher, current_game_logger):
             return create_new_score(stag_hare)
 
 
-def run_trial_genetic(hunters):
-
-    height, width = 6, 6
+def run_trial_genetic(hunters, height, width):
 
     # create the instance simulator
     while True:
@@ -203,14 +201,14 @@ def get_possible_agent_captures(hare_x, hare_y, board_size):
 
     return neighboring_moves
 
-def create_hunters_with_genes(genes):
+def create_hunters_with_genes(genes, random_agents, forced_random):
     new_hunters = []
     agent_name = "gen_199.csv"
-    forcedRandom = False # just do this for now.
+
 
     for i in range(3):
         new_name = "R" + str(i)
-        new_hunters.append(CabAgent(i, new_name, genes[i]))
+        new_hunters.append(CabAgent(i, new_name, random_agents, forced_random, gene=genes[i], agent_name=agent_name))
 
 
     alpha_min, alpha_max = 0.20, 0.20
@@ -236,18 +234,20 @@ def create_hunters_with_genes(genes):
     }
 
     for a in new_hunters:
-        a.agent.setGameParams(game_params, forcedRandom)
+        a.agent.setGameParams(game_params, forced_random)
 
     return new_hunters
 
 
 def create_hunters_scenario(agent_name, agent_scenario):
     new_hunters = []
+    random_agents = True
+    forced_random = False
 
     if agent_scenario == 1:
         for i in range(3):
             new_name = "R" + str(i)
-            new_hunters.append(CabAgent(i, new_name, agent_name))
+            new_hunters.append(CabAgent(i, new_name, random_agents, forced_random, gene="", agent_name=agent_name))
 
     # start of the ecab v experts portion.
 
@@ -273,7 +273,7 @@ def create_hunters(agent_type, random_agents, forced_random, agent_name="", agen
                 new_hunters.append(StagAgent(i, name=new_name))
 
             if agent_type == 3:
-                new_hunters.append(CabAgent(i, new_name, gene="", agent_name=agent_name))
+                new_hunters.append(CabAgent(i, new_name, random_agents, forced_random, gene="", agent_name=agent_name))
 
         # this guy doesn't need an agent name or anything.
         new_name = "R2"

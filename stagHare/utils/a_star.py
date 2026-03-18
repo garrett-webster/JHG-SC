@@ -115,6 +115,6 @@ class AStar(object):
                 open_list.append(child)
 
         # We might be unable to follow a path if we're blocked in by other agents; in that case, just stay where we are
-        print("We are staying where we are")
-        traceback.print_stack()
+        # print("We are staying where we are")
+        # traceback.print_stack()
         return curr_row, curr_col
