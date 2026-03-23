@@ -117,5 +117,6 @@ def findPathTeamAware(name, state, curr_row, curr_col, stag_row, stag_col) -> Tu
     goal_row, goal_col = goal
 
     # BFS is slightly faster but for consistency? we can still use A*. THere was a slight bug causing slowdowns on duplicate nodes.
-    # return BFS.find_path(curr_row, curr_col, goal_row, goal_col, state)
-    return AStar.find_path(curr_row, curr_col, goal_row, goal_col, state)
+    # BFS is WAAY faster on the 16x16 grid, so we are no longer using A*. might need to retrain the genetic model.
+    return BFS.find_path(curr_row, curr_col, goal_row, goal_col, state)
+    # return AStar.find_path(curr_row, curr_col, goal_row, goal_col, state)

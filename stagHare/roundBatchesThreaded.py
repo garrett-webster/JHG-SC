@@ -4,7 +4,7 @@ import os
 from tqdm import tqdm
 from stagHare.visualziationTools.batchLogger import BatchLogger
 from concurrent.futures import ProcessPoolExecutor, as_completed
-from stagHare.runnerHelper import run_trial, process_scores # this SHOULD be all we need.
+from stagHare.runnerHelper import * # this SHOULD be all we need.
 
 
 # so what do we actually need to do
@@ -39,11 +39,12 @@ if __name__ == '__main__':
 
     # agent_names = ["homoJHGSelfPlay.csv"]
 
-
+    print("Step based")
     # agents = [CabAgent(i, "H"+str(i), agent_name) for i in range(num_players)] # they need names or something.
     addAgents = []
     new_agents = []
     height, width = 16, 16  # lets start there, not too big but there.
+    print("height, wdith ", height, " ", width)
     agent_type = 3  # -1 is ALLEGATR, 0 is a random agent, 1 is the hare greedy agent, 2 is stag greedy agent. 3 is cab
 
     for agent_name in agent_names:
@@ -56,7 +57,7 @@ if __name__ == '__main__':
         with ProcessPoolExecutor(max_workers=max_workers) as executor:
             futures = []
             for attempt in range(num_attempts):
-                futures.append(executor.submit(run_trial, agent_type, agent_name, height, width, random_agents, forced_random))
+                futures.append(executor.submit(run_trial_step, agent_type, agent_name, height, width, random_agents, forced_random))
 
             for future in tqdm(as_completed(futures), desc="Submitting Results", total=num_attempts):
                 results.append(future.result())

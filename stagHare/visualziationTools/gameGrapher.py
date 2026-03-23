@@ -72,11 +72,11 @@ class GameGrapher():
                 hunt_axes[i].axhline(y=1, color='gray', linestyle='--', alpha=0.3, linewidth=0.5)
 
                 # Set y-axis to only show 0 and 1 with custom labels
-                hunt_axes[i].set_yticks([0, 1])
-                hunt_axes[i].set_yticklabels(['Stag (0)', 'Hare (1)'])
+                hunt_axes[i].set_yticks([0, 1, 2])
+                hunt_axes[i].set_yticklabels(['Stag (0)', 'Hare (1)', 'Null (2)'])
 
                 # Set y-limits with small padding
-                hunt_axes[i].set_ylim(-0.1, 1.1)
+                hunt_axes[i].set_ylim(-0.1, 2.1)
 
                 # Set x-limits to match round count
                 hunt_axes[i].set_xlim(-0.5, round_state.round_num - 0.5)

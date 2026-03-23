@@ -32,6 +32,34 @@ class State:
         # Map that keeps track of which agents (if any) are hunting the hare - required for termination conditions
         self.hunting_hare_map = None
 
+
+    def reset_positions(self) -> None:
+        self.height, self.width, self.agent_positions, self.round_num = self.height, self.width, {}, self.round_num
+
+        # Initialize the grid
+        self.grid = []
+
+        for _ in range(self.height):
+            new_row = [AVAILABLE for _ in range(self.width)]
+            self.grid.append(new_row)
+
+        assert len(self.grid) == self.height and len(self.grid[0]) == self.width
+
+        # Randomly assign starting positions for the hunters, hare, and stag
+        for i, agent_name in enumerate(self.agent_names):
+            while True:
+                row_index = np.random.choice(list(range(self.height)))
+                col_index = np.random.choice(list(range(self.width)))
+
+                if self.grid[row_index][col_index] == AVAILABLE:
+                    self.grid[row_index][col_index] = i
+                    self.agent_positions[agent_name] = (row_index, col_index)
+                    break
+
+        # Map that keeps track of which agents (if any) are hunting the hare - required for termination conditions
+        self.hunting_hare_map = None
+
+
     def __hash__(self):
         return hash(str(self.grid))
 

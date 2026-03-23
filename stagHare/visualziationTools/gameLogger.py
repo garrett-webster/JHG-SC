@@ -12,6 +12,7 @@ class GameLogger():
         for agent in list:
             self.position_history[agent] = [] # give it a list
         self.rounds = 0
+        self.scores = []
 
 
 
@@ -32,3 +33,4 @@ class GameLogger():
         for agent in new_state.agent_positions:
             self.position_history[agent].append(new_state.agent_positions[agent])
         self.rounds += 1
+

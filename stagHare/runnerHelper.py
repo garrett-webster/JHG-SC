@@ -19,7 +19,7 @@ import time
 def run_trial_graphing(stag_hare, current_round_grapher, current_game_logger):
     while True: # the way this gets run is VERY VERY weird.
 
-        # current_game_logger.add_round(stag_hare.state)
+        current_game_logger.add_round(stag_hare.state)
         # have this generate right off the bat
         # current_round_grapher.create_round_graph(stag_hare)
         rewards = [0] * 5 # 3 hunters, 2 other peeps
@@ -30,7 +30,7 @@ def run_trial_graphing(stag_hare, current_round_grapher, current_game_logger):
             rewards[i] += reward
 
         if stag_hare.is_over():
-            # current_game_logger.add_round(stag_hare.state)
+            current_game_logger.add_round(stag_hare.state)
             # current_round_grapher.create_round_graph(stag_hare)
             # passes by value. thanks python.
             return create_new_score(stag_hare)
@@ -92,6 +92,56 @@ def run_trial_test(agents):
             # current_game_logger.add_round(stag_hare.state)
             # passes by value. thanks python.
             return create_new_score(stag_hare)  # should return the new score array.
+
+def run_trial_step(agent_type, agent_name, height, width, random_agents, forced_random):
+    try:
+        start = time.time()
+        # changed on 3/17 to allow height and width to be passed in instead of specified here.
+        new_scores = []
+        # want to monitor how things work.
+        hunters = create_hunters(agent_type, random_agents, forced_random, agent_name, agent_scenario=0)
+        round = 0
+        num_per_batch = 5
+
+        while True:
+            stag_hare = StagHare(height, width, hunters)
+            if not stag_hare.is_over():
+                break # no reason to start in a finished configuration.
+
+        i = 0
+        while True: # the way this gets run is VERY VERY weird.
+            # print("do we get here")
+            round += 1
+            # current_game_logger.add_round(stag_hare.state)
+            # have this generate right off the bat
+            # current_round_grapher.create_round_graph(stag_hare)
+            rewards = [0] * 5 # 3 hunters, 2 other peeps
+            # this is a reminder to check the action map to make sure that we are hunting what we think we are.
+
+            round_rewards = stag_hare.transition()
+            for i, reward in enumerate(round_rewards):
+                rewards[i] += reward
+
+
+
+            if stag_hare.is_over():
+                new_scores.append(create_new_score(stag_hare))
+                i += 1
+                if i == num_per_batch: # gotta get out here at some point.
+                    break
+
+                while True:
+                    stag_hare.state.reset_positions()  # maybe this will work?
+                    if not stag_hare.is_over():
+                        break
+
+
+
+        return create_new_score(stag_hare) # should return the new score array.
+    except Exception as e:
+        print("FUTURE CRASHED: ", e)
+        traceback.print_exc()
+
 
 def run_trial(agent_type, agent_name, height, width, random_agents, forced_random):
     try:
@@ -274,6 +324,7 @@ def create_hunters(agent_type, random_agents, forced_random, agent_name="", agen
 
             if agent_type == 3:
                 new_hunters.append(CabAgent(i, new_name, random_agents, forced_random, gene="", agent_name=agent_name))
+
 
         # this guy doesn't need an agent name or anything.
         new_name = "R2"

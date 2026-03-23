@@ -31,6 +31,7 @@ class CabAgent(Agent):
 
         # print("This is the first agent chromosome ", self.agent.genes_long[0]["alpha"])
         self.hunt = True # by default, they hunt the hare.
+        self.set_game_params()
 
     # not sure if we will ever need this
     def set_agent(self, agent):
@@ -85,3 +86,33 @@ class CabAgent(Agent):
 
         else:
             return curr_row, curr_col + delta
+
+    def set_game_params(self):
+        num_players = 3 # this is hard coded in a lot of places.
+        poverty_line = 0
+        forcedRandom = False  # replicable. # THIS SHOULD BE FALSE UNDER NORMAL TESTING.
+
+        alpha_min, alpha_max = 0.20, 0.20
+        beta_min, beta_max = 0.5, 1.0
+        keep_min, keep_max = 0.95, 0.95
+        give_min, give_max = 1.30, 1.30
+        steal_min, steal_max = 1.6, 1.60
+
+        initial_pops = [100 for _ in range(num_players)]
+
+        game_params = {
+            "num_players": num_players,
+            "alpha": alpha_min,  # np.random.uniform(alpha_min, alpha_max),
+            "beta": beta_min,  # np.random.uniform(beta_min, beta_max),
+            "keep": keep_min,  # np.random.uniform(keep_min, keep_max),
+            "give": give_min,  # np.random.uniform(give_min, give_max),
+            "steal": steal_min,  # np.random.uniform(steal_min, steal_max),
+            "poverty_line": poverty_line,
+            "base_popularity": np.array(initial_pops)
+            # "base_popularity": np.array([*[base_pop]*(num_players)])
+            # "base_popularity": np.array(random.sample(range(1, 200), num_players))
+
+        }
+
+
+        self.agent.setGameParams(game_params, forcedRandom)
