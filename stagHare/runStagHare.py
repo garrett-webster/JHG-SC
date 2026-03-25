@@ -33,13 +33,13 @@ if __name__ == '__main__':
     num_players = 3 # as dictated by the stag hare thing
     num_humans = 0 # yeah...
 
-    num_attempts = 1000 # don't worry about this
+    num_attempts = 1 # don't worry about this
 
     # with that out of the way, its time to angrily insert the logger in here.
     curr_logger = stagHareLogger()
 
-    # agent_names = ["6x6Round1.csv", "gen_Z.csv", "homoJHGSelfPlay.csv", "homoSCselfPlayMFalse.csv", "homoSCselfPlayMTrue.csv", "mixedJHGSelfPlay.csv", "mixedSCselfPlayMFalse.csv", "mixedSCselfPlayMTrue.csv"]
-    agent_names = ["6x6Round1.csv"]
+    # agent_names = ["gen_199.csv", "6x6Round1.csv", "gen_Z.csv", "homoJHGSelfPlay.csv", "homoSCselfPlayMFalse.csv", "homoSCselfPlayMTrue.csv", "mixedJHGSelfPlay.csv", "mixedSCselfPlayMFalse.csv", "mixedSCselfPlayMTrue.csv"]
+    agent_names = ["6x6Round3.csv"]
 
     # keep this as cab for now. we will figure out the rest later.
     # this only works assuming that we are doing self play. use the agent scenario instead.
@@ -66,7 +66,7 @@ if __name__ == '__main__':
             stag_hare.state.hunting_hare_map = {"R"+str(i) : 2 for i in range(3)} # value that it can never be, sort of a NAN. 
 
             # just run the fetcher.
-            new_score = run_trial_graphing(stag_hare, current_round_grapher, current_game_logger)
+            new_score, intents = run_trial_graphing(stag_hare, current_round_grapher, current_game_logger)
             scores.append(new_score)
             current_batch_logger.add_game(stag_hare)
 
@@ -77,6 +77,5 @@ if __name__ == '__main__':
 
         cooperation_score, scores_per_player = process_scores(scores)
 
-        curr_logger.add_information(agent_scenario, cooperation_score, scores_per_player, agent_name)
+        # curr_logger.add_information_game(agent_scenario, cooperation_score, scores_per_player, agent_name)
 
-    print("this is what the logger currently looks like ", curr_logger)

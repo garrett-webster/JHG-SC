@@ -32,7 +32,7 @@ if __name__ == '__main__':
     num_humans = 0  # yeah...
     # for testing purposes right off the bat, lets work with social welfare. that wi
     jhg_bot_type = 2  # 0 is gene bots, 2 is social welfare and 3 is random. 4 is the new social welfare that I am developing that is just a hair smarter.
-    num_attempts = 1000  # don't worry about this
+    num_attempts = 1  # don't worry about this
     # don't add cats yet, we will worry about that later.
     # agent_name = "mixedJHGSelfPlay.csv"
     agent_names = ["6x6round3.csv"]
@@ -46,6 +46,9 @@ if __name__ == '__main__':
     height, width = 16, 16  # lets start there, not too big but there.
     print("height, wdith ", height, " ", width)
     agent_type = 3  # -1 is ALLEGATR, 0 is a random agent, 1 is the hare greedy agent, 2 is stag greedy agent. 3 is cab
+    agent_scenario = 0 # this allows me to add like cats or whatever as I need to.
+
+    # curr_logger = stagH
 
     for agent_name in agent_names:
         print("Agent name: " + agent_name)
@@ -57,9 +60,14 @@ if __name__ == '__main__':
         with ProcessPoolExecutor(max_workers=max_workers) as executor:
             futures = []
             for attempt in range(num_attempts):
-                futures.append(executor.submit(run_trial_step, agent_type, agent_name, height, width, random_agents, forced_random))
+                futures.append(executor.submit(run_trial_step, agent_type, agent_name, height, width, random_agents, forced_random, agent_scenario))
 
             for future in tqdm(as_completed(futures), desc="Submitting Results", total=num_attempts):
                 results.append(future.result())
 
-        cooperation_score, scores_per_player = process_scores(results)
+
+
+
+
+
+

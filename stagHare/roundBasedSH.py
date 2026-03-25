@@ -27,7 +27,7 @@ from stagHare.runnerHelper import *
 if __name__ == '__main__':
 
     height, width = 16, 16 # lets start there, not too big but there.
-    forcedRandom = True
+    forced_random = True
     random_agents = True # better for human distribution
 
     num_players = 3 # as dictated by the stag hare thing
@@ -48,8 +48,9 @@ if __name__ == '__main__':
                                                                      # 5 is 2 cabs with 1 stag and 6 is 2 cabs with 1 hare.
     agent_scenario = 0 # normal whatever I say goes type beat.
     scores = []
+    intents = []
 
-    num_games_per_batch = 10 # lets start here.
+    num_rounds_per_game = 10 # lets start here.
 
     for agent_name in agent_names:
         # print("Agent name: " + agent_name)
@@ -57,7 +58,7 @@ if __name__ == '__main__':
 
         for attempt in range(num_attempts):
             current_game_logger = GameLogger(height, width) # need this per game, not per batch.
-            hunters = create_hunters(agent_type, agent_name, agent_scenario)
+            hunters = create_hunters(agent_type, random_agents, forced_random, agent_name, agent_scenario)
             current_round_grapher = IndividualRoundGrapher()
 
             while True:
@@ -66,23 +67,23 @@ if __name__ == '__main__':
                     break
 
 
-            for i in range(num_games_per_batch):
+            for i in range(num_rounds_per_game):
 
                 # does this suck? possibly.
                 stag_hare.state.hunting_hare_map = {"R"+str(i) : 2 for i in range(3)} # value that it can never be, sort of a NAN.
 
                 # just run the fetcher.
-                new_score = run_trial_graphing(stag_hare, current_round_grapher, current_game_logger)
-                current_game_logger.
+                new_score, new_intents = run_trial_graphing(stag_hare, current_round_grapher, current_game_logger)
+
                 # just set up a new state that doesn't break immediatel.y
                 while True:
-                    print("How many times does this go off ? ")
                     stag_hare.state.reset_positions() # maybe this will work?
                     if not stag_hare.is_over():
                         break
+
                 scores.append(new_score)
+                intents.append(new_intents)
                 current_batch_logger.add_game(stag_hare)
-                print("Finished game ", i, " at round ", stag_hare.state.round_num)
 
 
             game_grapher = GameGrapher(stag_hare)
@@ -91,7 +92,10 @@ if __name__ == '__main__':
             game_grapher.create_game_graph(current_game_logger)
 
         cooperation_score, scores_per_player = process_scores(scores)
+        print(len(intents))  # how many games?
+        print(len(intents[0]))  # how many rounds in first game?
+        print(intents[0][0])  # what does one round look like?
+        hare_intent_percent_total, hare_intent_percent_player = process_intents(intents)
+        curr_logger.add_information_game(agent_scenario, cooperation_score, scores_per_player, agent_name, hare_intent_percent_total, hare_intent_percent_player)
 
-        curr_logger.add_information(agent_scenario, cooperation_score, scores_per_player, agent_name)
 
-    # print("this is what the logger currently looks like ", curr_logger)

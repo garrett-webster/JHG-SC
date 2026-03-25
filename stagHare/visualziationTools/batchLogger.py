@@ -4,6 +4,7 @@ class BatchLogger():
         self.results = 0 # log whether they got a stag or hare.
         self.attempts = 0
 
+
     def add_game(self, stag_hare):
 
         self.attempts += 1
