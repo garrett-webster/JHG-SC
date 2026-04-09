@@ -42,8 +42,10 @@ def run_trial_graphing(stag_hare, current_round_grapher, current_game_logger):
 
 def run_trial_sim_no_graphing(stag_hare):
     intents = [] # THIs is not elegant, but it does work.
+    agent_positions = []
     while True:
         intents.append(create_intents_list(stag_hare.state.hunting_hare_map)) # Might need to custom cast this to integers.
+        agent_positions.append(stag_hare.state.agent_positions)
         rewards = [0] * 5 # 3 hunters, 2 other peeps
 
         round_rewards = stag_hare.transition()
@@ -51,7 +53,9 @@ def run_trial_sim_no_graphing(stag_hare):
             rewards[i] += reward
 
         if stag_hare.is_over():
-            return create_new_score(stag_hare), intents
+            intents.append(create_intents_list(stag_hare.state.hunting_hare_map))
+            agent_positions.append(stag_hare.state.agent_positions)
+            return create_new_score(stag_hare), intents, agent_positions, stag_hare.popularity_over_time, stag_hare.hunters # that should do the trick.
 
 
 def create_intents_list(current_intents: dict) -> list:
@@ -146,6 +150,8 @@ def run_trial_step(agent_type, agent_name, height, width, random_agents, forced_
 
     scores = []
     intents = []
+    agent_positions = []
+    popularity_over_time = []
 
     num_rounds_per_game = 10 # lets start here.
     current_logger = stagHareLogger()
@@ -165,7 +171,7 @@ def run_trial_step(agent_type, agent_name, height, width, random_agents, forced_
                                             range(3)}  # value that it can never be, sort of a NAN.
 
         # just run the fetcher.
-        new_score, new_intents = run_trial_sim_no_graphing(stag_hare)
+        new_score, new_intents, new_positions, popularity_over_time, hunters = run_trial_sim_no_graphing(stag_hare)
 
         # just set up a new state that doesn't break immediatel.y
         while True:
@@ -175,10 +181,11 @@ def run_trial_step(agent_type, agent_name, height, width, random_agents, forced_
 
         scores.append(new_score)
         intents.append(new_intents)
+        agent_positions.append(new_positions)
 
     cooperation_score, scores_per_player = process_scores(scores)
     hare_intent_percent_total, hare_intent_percent_player = process_intents(intents)
-    game_information = informationObject(agent_scenario, cooperation_score, scores_per_player, agent_name, hare_intent_percent_total, hare_intent_percent_player)
+    game_information = informationObject(agent_scenario, cooperation_score, scores_per_player, agent_name, hare_intent_percent_total, hare_intent_percent_player, agent_positions, popularity_over_time, hunters, height, width, intents)
     return game_information
 
 

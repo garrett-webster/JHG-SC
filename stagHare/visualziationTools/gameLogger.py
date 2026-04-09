@@ -92,3 +92,10 @@ def get_possible_agent_captures(hare_x, hare_y, board_size):
         neighboring_moves.append([new_x, new_y])
 
     return neighboring_moves
+
+def information_object_to_game_logger(info_obj) -> GameLogger:
+    logger = GameLogger(info_obj.height, info_obj.width)
+    logger.hare_hunting_history = info_obj.hare_hunting_history
+    logger.position_history = info_obj.position_history
+    logger.rounds = len(info_obj.hare_hunting_history)
+    return logger

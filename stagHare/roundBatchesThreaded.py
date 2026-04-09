@@ -5,7 +5,8 @@ from tqdm import tqdm
 from stagHare.visualziationTools.batchLogger import BatchLogger
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from stagHare.runnerHelper import * # this SHOULD be all we need.
-
+from stagHare.visualziationTools.gameGrapher import GameGrapher
+from stagHare.visualziationTools.gameLogger import information_object_to_game_logger
 
 # so what do we actually need to do
 # lets create some cab agents
@@ -65,8 +66,10 @@ if __name__ == '__main__':
             for future in tqdm(as_completed(futures), desc="Submitting Results", total=num_attempts):
                 results.append(future.result())
 
-
-
+            for result in results:
+                game_logger = information_object_to_game_logger(result)
+                game_grapher = GameGrapher(result.popularity_over_time,3, len(result.popularity_over_time))
+                game_grapher.create_game_graph(game_logger)
 
 
 

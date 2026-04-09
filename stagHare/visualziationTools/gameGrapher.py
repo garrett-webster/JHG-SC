@@ -16,8 +16,11 @@ cmap = ListedColormap(["White", "Gray", "Black", "#6baed6", "#3182bd", "#08519c"
 
 
 class GameGrapher():
-    def __init__(self, stag_hare):
-        self.stag_hare = stag_hare
+    def __init__(self, popularity_over_time, num_hunters, num_rounds):
+        self.popularity_over_time = popularity_over_time
+        self.num_hunters = num_hunters
+        self.num_rounds = num_rounds
+        # self.hunters = hunters
 
     def create_game_graph(self, current_game_logger):
         # Create main figure
@@ -37,7 +40,7 @@ class GameGrapher():
         min_popularity = 200
 
         for i, player in enumerate(self.stag_hare.hunters):
-            pops = list(zip(*self.stag_hare.popularity_over_time))
+            pops = list(zip(*self.popularity_over_time))
             y = pops[i]
             x = list(range(len(y)))
 
