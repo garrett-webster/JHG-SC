@@ -28,27 +28,22 @@ if __name__ == '__main__':
 
     # no round list unfortunately, doesn't work that way
 
-    num_players = 3  # as dictated by the stag hare thing
-    num_humans = 0  # yeah...
     # for testing purposes right off the bat, lets work with social welfare. that wi
     jhg_bot_type = 2  # 0 is gene bots, 2 is social welfare and 3 is random. 4 is the new social welfare that I am developing that is just a hair smarter.
-    num_attempts = 1000  # don't worry about this
+    num_attempts = 10  # don't worry about this
     # don't add cats yet, we will worry about that later.
     # agent_name = "mixedJHGSelfPlay.csv"
-    agent_names = ["6x6round3.csv"]
+    agent_names = [["6x6round3.csv", "6x6round3.csv", "6x6round3.csv"]]
+    scenario_types = ["HCAB_self_play"]
 
-    # agent_names = ["homoJHGSelfPlay.csv"]
-
-
-    # agents = [CabAgent(i, "H"+str(i), agent_name) for i in range(num_players)] # they need names or something.
-    addAgents = []
-    new_agents = []
     height, width = 16, 16  # lets start there, not too big but there.
     agent_type = 3  # -1 is ALLEGATR, 0 is a random agent, 1 is the hare greedy agent, 2 is stag greedy agent. 3 is cab
 
-    for agent_name in agent_names:
-        print("Agent name: " + agent_name)
+    for i, scenario_type in enumerate(scenario_types):
+        print("Scenario: " + scenario_type)
+        scenario_type += f"_{type}_{num_attempts}"
         current_batch_logger = BatchLogger()
+        curr_agent_names = agent_names[i]
         # unless we want randomize it, then that could a problem.
         # actually yeah thats a problem.
         results = []
@@ -56,7 +51,7 @@ if __name__ == '__main__':
         with ProcessPoolExecutor(max_workers=max_workers) as executor:
             futures = []
             for attempt in range(num_attempts):
-                futures.append(executor.submit(run_trial, agent_type, agent_name, height, width, random_agents, forced_random))
+                futures.append(executor.submit(run_trial, agent_type, curr_agent_names, height, width, random_agents, forced_random))
 
             for future in tqdm(as_completed(futures), desc="Submitting Results", total=num_attempts):
                 results.append(future.result())

@@ -16,15 +16,18 @@ cmap = ListedColormap(["White", "Gray", "Black", "#6baed6", "#3182bd", "#08519c"
 
 
 class GameGrapher():
-    def __init__(self, popularity_over_time, num_hunters, num_rounds):
+    def __init__(self, popularity_over_time, num_hunters, hunter_types, scenario_type):
         self.popularity_over_time = popularity_over_time
         self.num_hunters = num_hunters
-        self.num_rounds = num_rounds
-        # self.hunters = hunters
+        self.hunter_type = hunter_types
+        self.scenario_type = scenario_type
 
     def create_game_graph(self, current_game_logger):
         # Create main figure
         fig = plt.figure(figsize=(15, 8))
+
+        fig.suptitle(f"{self.scenario_type}", fontsize=16, fontweight='bold')
+
 
         # Left plot takes 1/3 of width, full height
         ax_pop = plt.subplot2grid((3, 6), (0, 0), rowspan=3, colspan=2)
@@ -35,23 +38,24 @@ class GameGrapher():
         ax_hunt3 = plt.subplot2grid((3, 6), (2, 2), colspan=4)
 
         # Assume it's the last round at this point.
-        round_state = self.stag_hare.state
+        # round_state = self.stag_hare.state
         max_popularity = 0
         min_popularity = 200
 
-        for i, player in enumerate(self.stag_hare.hunters):
+        for i in range(self.num_hunters):
             pops = list(zip(*self.popularity_over_time))
             y = pops[i]
             x = list(range(len(y)))
 
             ax_pop.plot(x, y, color=COLORS[i % len(COLORS)], linewidth=2)
+            # this is something I have no clue how to solve
             ax_pop.scatter(x, y, s=25, color=COLORS[i % len(COLORS)],
-                           label=f"Player {player.id + 1}")
+                           label=f"{self.hunter_type[i]}")
 
             max_popularity = max(max_popularity, max(y))
             min_popularity = min(min_popularity, min(y))
 
-        ax_pop.set_xlim(0, round_state.round_num)
+        ax_pop.set_xlim(0, len(self.popularity_over_time))
         ax_pop.set_ylim(min_popularity - 10, max_popularity + 10)
 
         # Process intent data for each player
@@ -63,7 +67,7 @@ class GameGrapher():
         for i, player_intent in enumerate(intent):
             if i < 3:
                 x = list(range(len(player_intent)))
-                y = player_intent
+                y = list(zip(*player_intent))[i] # get the columns as rows
 
                 # Plot JUST DOTS (no connecting lines)
                 # Use scatter only, no plot()
@@ -82,7 +86,7 @@ class GameGrapher():
                 hunt_axes[i].set_ylim(-0.1, 2.1)
 
                 # Set x-limits to match round count
-                hunt_axes[i].set_xlim(-0.5, round_state.round_num - 0.5)
+                hunt_axes[i].set_xlim(-0.5, len(y) - 0.5)
 
                 # Customize grid
                 hunt_axes[i].grid(True, axis='x', alpha=0.2)

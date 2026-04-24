@@ -1,6 +1,6 @@
 
 class GameLogger():
-    def __init__(self, height, width):
+    def __init__(self, height, width, agent_names, scenario_type):
         self.height = height
         self.width = width
         self.game_history = {}
@@ -13,6 +13,8 @@ class GameLogger():
             self.position_history[agent] = [] # give it a list
         self.rounds = 0
         self.scores = []
+        self.agent_names = agent_names
+        self.scenario_type = scenario_type
 
 
 
@@ -94,7 +96,7 @@ def get_possible_agent_captures(hare_x, hare_y, board_size):
     return neighboring_moves
 
 def information_object_to_game_logger(info_obj) -> GameLogger:
-    logger = GameLogger(info_obj.height, info_obj.width)
+    logger = GameLogger(info_obj.height, info_obj.width, info_obj.agent_names, info_obj.scenario_type)
     logger.hare_hunting_history = info_obj.hare_hunting_history
     logger.position_history = info_obj.position_history
     logger.rounds = len(info_obj.hare_hunting_history)

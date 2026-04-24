@@ -20,11 +20,14 @@ class stagHareLogger:
 
 
 class informationObject():
-    def __init__(self, agent_types, coop_score, scores_per_player, cabAgentType, hare_intent_percent_total, hare_intent_percent_player, agent_positions, popularity_over_time, hunters, height, width, intents):
-        self.agent_types = agent_types
+
+    # scenario_type, cooperation_score, scores_per_player, agent_names, hare_intent_percent_total, hare_intent_percent_player, agent_positions, popularity_over_time, hunters, height, width, intents)
+
+    def __init__(self, scenario_type, coop_score, scores_per_player, agent_names, hare_intent_percent_total, hare_intent_percent_player, agent_positions, popularity_over_time, hunters, height, width, intents):
+        self.scenario_type = scenario_type
         self.coop_score = coop_score
         self.scores_per_player = scores_per_player
-        self.cabAgentType = cabAgentType
+        self.agent_names = agent_names
         self.hare_intent_percent_total = hare_intent_percent_total
         self.hare_intent_percent_player = hare_intent_percent_player
         self.position_history = agent_positions
@@ -33,7 +36,6 @@ class informationObject():
         self.height = height
         self.width = width
         self.hare_hunting_history = intents
-
 
 
 

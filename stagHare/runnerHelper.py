@@ -5,6 +5,8 @@
 # yes we have had problems with it before. Don't worry about it.
 import traceback
 
+from packaging.utils import canonicalize_name
+
 from stagHare.agents.cabAgentThing import CabAgent
 from stagHare.agents.fetcherBot import FetcherBot
 from stagHare.environment.state import State
@@ -146,7 +148,7 @@ def run_trial_test(agents):
             # passes by value. thanks python.
             return create_new_score(stag_hare)  # should return the new score array.
 
-def run_trial_step(agent_type, agent_name, height, width, random_agents, forced_random, agent_scenario):
+def run_trial_step(agent_names, height, width, random_agents, forced_random, scenario_type):
 
     scores = []
     intents = []
@@ -157,7 +159,7 @@ def run_trial_step(agent_type, agent_name, height, width, random_agents, forced_
     current_logger = stagHareLogger()
 
 
-    hunters = create_hunters(agent_type, random_agents, forced_random, agent_name, agent_scenario)
+    hunters = create_hunters_with_list(random_agents, forced_random, agent_names)
 
 
     while True:
@@ -185,7 +187,7 @@ def run_trial_step(agent_type, agent_name, height, width, random_agents, forced_
 
     cooperation_score, scores_per_player = process_scores(scores)
     hare_intent_percent_total, hare_intent_percent_player = process_intents(intents)
-    game_information = informationObject(agent_scenario, cooperation_score, scores_per_player, agent_name, hare_intent_percent_total, hare_intent_percent_player, agent_positions, popularity_over_time, hunters, height, width, intents)
+    game_information = informationObject(scenario_type, cooperation_score, scores_per_player, agent_names, hare_intent_percent_total, hare_intent_percent_player, agent_positions, popularity_over_time, hunters, height, width, intents)
     return game_information
 
 
@@ -393,6 +395,46 @@ def create_hunters_scenario(agent_name, agent_scenario):
             new_hunters.append(CabAgent(i, new_name, random_agents, forced_random, gene="", agent_name=agent_name))
 
     # start of the ecab v experts portion.
+
+# aight here's the plan
+# I need a much simpler and more effective way to be able to specify agents all in one go
+# instead of this agent scenario agent type agent name tricker.
+# so lets fix that -- pass in a list of agents you will be using and go from there. really is that simple.
+# the reason we haven't fixed this before was because my original code made assumptions about bot types
+# that are no longer reasonable.
+def create_hunters_with_list(random_agents:bool , forced_random:bool, agent_list:list):
+    """
+    :param random_agents: True: Pull random agents from gene pool. False: Pull top agents from gene pool
+    :param forced_random: True: Use random.text for RNG generation. False: Standard Numpy RNG.
+    :param agent_list: A list containing the agent names (Either the gene name or "Allegatr" or "HCAB"
+    """
+
+    new_hunters = []
+
+    for i in range(3):
+        new_name = "R" + str(i)
+        agent_name = agent_list[i]
+        cab_agent = False
+        if agent_name.endswith(".csv"):
+            cab_agent = True
+
+        if cab_agent:
+            new_hunters.append(CabAgent(i, new_name, random_agents, forced_random, gene="", agent_name=agent_name))
+
+        else: # we have 3 options rught now: G_hare, G_stag, and Allegatr.
+            if agent_name == "GHare":
+                new_hunters.append(HareAgent(i, name=new_name))
+            elif agent_name == "GStag":
+                new_hunters.append(StagAgent(i, name=new_name))
+            elif agent_name == "Allegatr":
+                new_hunters.append(AlegAATr(name=new_name, lmbda=0.0, ml_model_type='knn', enhanced=True))
+            elif agent_name == "Random":
+                new_hunters.append(Random(name=new_name))
+            else:
+                print("Unknown agent: ", agent_name, " What are you smoking")
+
+    return new_hunters  # just make sure to get those new guys in somewhere.
+
 
 
 def create_hunters(agent_type, random_agents, forced_random, agent_name="", agent_scenario=0):

@@ -28,47 +28,37 @@ if __name__ == '__main__':
     random_agents = True  # better for human distribution
 
     # no round list unfortunately, doesn't work that way
-
-    num_players = 3  # as dictated by the stag hare thing
-    num_humans = 0  # yeah...
-    # for testing purposes right off the bat, lets work with social welfare. that wi
-    jhg_bot_type = 2  # 0 is gene bots, 2 is social welfare and 3 is random. 4 is the new social welfare that I am developing that is just a hair smarter.
-    num_attempts = 1  # don't worry about this
-    # don't add cats yet, we will worry about that later.
-    # agent_name = "mixedJHGSelfPlay.csv"
-    agent_names = ["6x6round3.csv"]
-
+    num_attempts = 4  # don't worry about this
+    # keep agent names as a list, will make literally EVERYTHING easier.
+    agent_names = [["6x6round3.csv", "6x6round3.csv", "6x6round3.csv"]]
+    scenario_types = ["HCAB_self_play"]
     # agent_names = ["homoJHGSelfPlay.csv"]
 
     print("Step based")
-    # agents = [CabAgent(i, "H"+str(i), agent_name) for i in range(num_players)] # they need names or something.
-    addAgents = []
-    new_agents = []
+    type="step_based"
     height, width = 16, 16  # lets start there, not too big but there.
     print("height, wdith ", height, " ", width)
-    agent_type = 3  # -1 is ALLEGATR, 0 is a random agent, 1 is the hare greedy agent, 2 is stag greedy agent. 3 is cab
-    agent_scenario = 0 # this allows me to add like cats or whatever as I need to.
 
-    # curr_logger = stagH
-
-    for agent_name in agent_names:
-        print("Agent name: " + agent_name)
+    for i, scenario_type in enumerate(scenario_types):
+        print("Scenario: " + scenario_type)
+        scenario_type += f"_{type}_{num_attempts}"
         current_batch_logger = BatchLogger()
         # unless we want randomize it, then that could a problem.
         # actually yeah thats a problem.
         results = []
-
+        curr_agent_name = agent_names[i] # get just the curr agent names.
         with ProcessPoolExecutor(max_workers=max_workers) as executor:
             futures = []
             for attempt in range(num_attempts):
-                futures.append(executor.submit(run_trial_step, agent_type, agent_name, height, width, random_agents, forced_random, agent_scenario))
+                futures.append(executor.submit(run_trial_step, curr_agent_name, height, width, random_agents, forced_random, scenario_type))
 
             for future in tqdm(as_completed(futures), desc="Submitting Results", total=num_attempts):
                 results.append(future.result())
 
             for result in results:
                 game_logger = information_object_to_game_logger(result)
-                game_grapher = GameGrapher(result.popularity_over_time,3, len(result.popularity_over_time))
+                # we should be able to do all of this
+                game_grapher = GameGrapher(result.popularity_over_time,3, curr_agent_name, scenario_type)
                 game_grapher.create_game_graph(game_logger)
 
 
