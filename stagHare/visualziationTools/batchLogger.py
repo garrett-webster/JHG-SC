@@ -6,7 +6,7 @@ class BatchLogger():
 
 
     def add_game(self, stag_hare):
-
+        print("does this get used ??")
         self.attempts += 1
 
         if not stag_hare.state.hare_captured():

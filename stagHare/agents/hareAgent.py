@@ -12,7 +12,7 @@ class HareAgent(Agent):
     def act(self, state: State, reward: float, round_num: int):
         new_allocation = [0 for _ in range(3)]
         new_allocation[self.id] = 6
-        return new_allocation
+        return np.array(new_allocation)
 
     # for the hare agent, it shoudl return [2, -2, -2] if we are the first player.
     def create_allocation(self, index, state):
@@ -20,7 +20,7 @@ class HareAgent(Agent):
         allocation = np.zeros(num_players)
         allocation.fill(-2)
         allocation[index-2] = 2
-        return allocation
+        return np.array(allocation)
 
     def is_hunting_hare(self) -> bool:
         return True

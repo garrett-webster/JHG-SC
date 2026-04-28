@@ -19,16 +19,20 @@ import numpy as np
 import time
 
 from stagHare.loggingStuff.stagHareLogger import stagHareLogger, informationObject
+from stagHare.visualziationTools.gameLogger import GameLogger
+from stagHare.visualziationTools.inviduvalRoundGrapher import IndividualRoundGrapher
 
 
 def run_trial_graphing(stag_hare, current_round_grapher, current_game_logger):
     intents = [] # I want to return this now. this sucks.
+    agent_positions = []
     while True: # the way this gets run is VERY VERY weird.
 
         current_game_logger.add_round(stag_hare.state)
         intents.append(create_intents_list(stag_hare.state.hunting_hare_map)) # Might need to custom cast this to integers.
+        agent_positions.append(stag_hare.state.agent_positions.copy())
         # have this generate right off the bat
-        current_round_grapher.create_round_graph(stag_hare)
+        # current_round_grapher.create_round_graph(stag_hare)
         rewards = [0] * 5 # 3 hunters, 2 other peeps
         # this is a reminder to check the action map to make sure that we are hunting what we think we are.
 
@@ -37,17 +41,20 @@ def run_trial_graphing(stag_hare, current_round_grapher, current_game_logger):
             rewards[i] += reward
 
         if stag_hare.is_over():
+            agent_positions.append(stag_hare.state.agent_positions)
             current_game_logger.add_round(stag_hare.state)
-            current_round_grapher.create_round_graph(stag_hare)
+            intents.append(create_intents_list(stag_hare.state.hunting_hare_map))
+            # current_round_grapher.create_round_graph(stag_hare)
             # passes by value. thanks python.
-            return create_new_score(stag_hare), intents
+            return create_new_score(stag_hare), intents, agent_positions, stag_hare.popularity_over_time, stag_hare.hunters
 
 def run_trial_sim_no_graphing(stag_hare):
     intents = [] # THIs is not elegant, but it does work.
     agent_positions = []
     while True:
         intents.append(create_intents_list(stag_hare.state.hunting_hare_map)) # Might need to custom cast this to integers.
-        agent_positions.append(stag_hare.state.agent_positions)
+        print("here are the intents ", intents)
+        agent_positions.append(stag_hare.state.agent_positions.copy())
         rewards = [0] * 5 # 3 hunters, 2 other peeps
 
         round_rewards = stag_hare.transition()
@@ -57,6 +64,7 @@ def run_trial_sim_no_graphing(stag_hare):
         if stag_hare.is_over():
             intents.append(create_intents_list(stag_hare.state.hunting_hare_map))
             agent_positions.append(stag_hare.state.agent_positions)
+            # print(f"here are the agent positions, {agent_positions}")
             return create_new_score(stag_hare), intents, agent_positions, stag_hare.popularity_over_time, stag_hare.hunters # that should do the trick.
 
 
@@ -85,8 +93,8 @@ def process_intents(current_intents: list) -> tuple[int, list]:
     column_percentages = new_sum / num_rounds
     total_percentage = sum(new_sum) / (num_rounds * num_columns)
 
-    print("Here is the sum ", new_sum, " and the total sum ", sum(new_sum))
-    print("percentages ", column_percentages, " and total ", total_percentage)
+    # print("Bad intents sum ", new_sum, " and the total bad intents ", sum(new_sum))
+    # print("percentages defect ", column_percentages, " and total ", total_percentage)
 
     return total_percentage, column_percentages
 
@@ -238,52 +246,75 @@ def run_trial_step(agent_names, height, width, random_agents, forced_random, sce
 #         traceback.print_exc()
 
 
-def run_trial(agent_type, agent_name, height, width, random_agents, forced_random):
+def run_trial(agent_names, height, width, random_agents, forced_random, scenario_type):
     try:
         start = time.time()
         # changed on 3/17 to allow height and width to be passed in instead of specified here.
 
         # want to monitor how things work.
-        hunters = create_hunters(agent_type, random_agents, forced_random, agent_name, agent_scenario=0)
-        round = 0
+        hunters = create_hunters_with_list(random_agents, forced_random, agent_names)
+        current_game_logger = GameLogger(height, width, agent_names, scenario_type)
+        current_round_grapher = IndividualRoundGrapher()
 
         while True:
-            stag_hare = StagHare(height, width, hunters)
+            stag_hare = StagHare(height, width, hunters) # np
             if not stag_hare.is_over():
                 break # no reason to start in a finished configuration.
 
-        while True: # the way this gets run is VERY VERY weird.
-            # print("do we get here")
-            round += 1
-            # current_game_logger.add_round(stag_hare.state)
-            # have this generate right off the bat
-            # current_round_grapher.create_round_graph(stag_hare)
-            rewards = [0] * 5 # 3 hunters, 2 other peeps
-            # this is a reminder to check the action map to make sure that we are hunting what we think we are.
+        # it will break if you get rid of this. you know, as a heads up.
+        stag_hare.state.hunting_hare_map = {"R" + str(i): 2 for i in
+                                            range(3)}  # value that it can never be, sort of a NAN.
 
-            round_rewards = stag_hare.transition()
-            for i, reward in enumerate(round_rewards):
-                rewards[i] += reward
+        # print(f"this si the fetcher for {stag_hare.state.agent_positions}")
 
-            if round > 100:
-                print("l9onger than 100 rounds")
-            if round > 500:
-                print("longer than 500 rounds")
-            if round > 1000:
-                print("longer than 1000 rounds")
+        # new_score, new_intents, new_positions, popularity_over_time, hunters = run_trial_sim_no_graphing(stag_hare)
+        new_score, new_intents, new_positions, popularity_over_time, hunters = run_trial_graphing(stag_hare, current_round_grapher, current_game_logger)
 
-            elapsed = time.time() - start
-            if elapsed > 10.0:
-                print("AYO WE GOT A STRAGLER HERE, num rounds ", str(round))
-            if stag_hare.is_over():
-                # if stag_hare.state.hare_captured():
-                #     print("hare dead")
-                # else:
-                #     print('stag dead')
+        scores, intents, agent_positions, popularity_over_time = [new_score], [new_intents], new_positions, popularity_over_time
 
-                # current_game_logger.add_round(stag_hare.state)
-                # passes by value. thanks python.
-                return create_new_score(stag_hare) # should return the new score array.
+        cooperation_score, scores_per_player = process_scores(scores)
+        hare_intent_percent_total, hare_intent_percent_player = process_intents(intents)
+        game_information = informationObject(scenario_type, cooperation_score, scores_per_player, agent_names,
+                                             hare_intent_percent_total, hare_intent_percent_player, agent_positions,
+                                             popularity_over_time, hunters, height, width, intents)
+        return game_information
+
+
+        # while True: # the way this gets run is VERY VERY weird.
+        #     # print("do we get here")
+        #     round += 1
+        #     # current_game_logger.add_round(stag_hare.state)
+        #     # have this generate right off the bat
+        #     # current_round_grapher.create_round_graph(stag_hare)
+        #     rewards = [0] * 5 # 3 hunters, 2 other peeps
+        #     # this is a reminder to check the action map to make sure that we are hunting what we think we are.
+        #
+        #     round_rewards = stag_hare.transition()
+        #     for i, reward in enumerate(round_rewards):
+        #         rewards[i] += reward
+        #
+        #     if round > 100:
+        #         print("l9onger than 100 rounds")
+        #     if round > 500:
+        #         print("longer than 500 rounds")
+        #     if round > 1000:
+        #         print("longer than 1000 rounds")
+        #
+        #     elapsed = time.time() - start
+        #     if elapsed > 10.0:
+        #         print("AYO WE GOT A STRAGLER HERE, num rounds ", str(round))
+        #     if stag_hare.is_over():
+        #         # if stag_hare.state.hare_captured():
+        #         #     print("hare dead")
+        #         # else:
+        #         #     print('stag dead')
+        #
+        #         # current_game_logger.add_round(stag_hare.state)
+        #         # passes by value. thanks python.
+        #         return create_new_score(stag_hare) # should return the new score array.
+
+
+
     except Exception as e:
         print("FUTURE CRASHED: ", e)
         traceback.print_exc()
@@ -544,9 +575,9 @@ def process_scores(scores):
     cooperation_score = sum([2, 2, 2] == score for score in scores) / len(scores)
 
     # I should be doing this in a json logger thing but I don't care.
-    print("here was the cooperation score \n", cooperation_score)
-    print("here was the scores per player \n", scores_per_player)
-    print("here were the total scores \n", total_sum_per_player)
+    # print("here was the cooperation score \n", cooperation_score)
+    # print("here was the scores per player \n", scores_per_player)
+    # print("here were the total scores \n", total_sum_per_player)
 
     return cooperation_score, scores_per_player
 

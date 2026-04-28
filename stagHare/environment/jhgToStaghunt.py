@@ -22,17 +22,18 @@ from stagHare.utils.pathfindingTime import findPathGreedy, findPathTeamAware # m
 # what I need is
 
 # take in an allocation, and then return a tuple, which is the new movement.
-def jhg_to_staghunt(agents, state, reward, round_num):
+def jhg_to_staghunt(agents, state, rewards, round_num):
 
     # first, lets grab all the allocations and separate the wheat from the chaff
     new_moves = {}
     new_allocations = {}
     new_intents = {}
     indices = list(range(len(agents)))
-    random.shuffle(indices) # this should do the trick.
+    np.random.shuffle(indices)
     hunting_hare_map = {}
     for i in indices:
         agent = agents[i]
+        reward = 0 if (i == 0 or i == 1) else rewards[i]
         if not isinstance(agent, CabAgent) and not isinstance(agent, FetcherBot) and not isinstance(agent, HareAgent) and not isinstance(agent, StagAgent) and not isinstance(agent, HumanAgent):
             new_moves[agent.name] = agent.act(state, reward, round_num) # should be noted that these are just prey moves. they are essentialy random.
             hunting_hare_map[agent.name] = agent.is_hunting_hare()
@@ -89,7 +90,7 @@ def allocation_to_movement(new_allocation, id, state):
     pass
     # hare = [-2, -2, 2] # just for simplicity sake. # This is just as easy as it gets.
     # stag = [2, 2, 2]
-    id -= 1
+    # id -= 1 # WHY DID I HAVE THIS I REMEMBER THIS BEING IMPORTANT WHY IS IT HERE>
     # hare move represents moving towards the hare
     hare_move = np.zeros(3)
     hare_move.fill(0)
@@ -108,7 +109,7 @@ def allocation_to_movement(new_allocation, id, state):
     stag_take = np.zeros(3)
     stag_take.fill(2)
 
-    id += 1
+    # id += 1
     # 1 is hare move, 2 is hare take, 3 is stag move, 4 is stag take
     new_current_options_matrix = [hare_move, hare_take, stag_move, stag_take]
     normalized = [row / sum(row) for row in new_current_options_matrix]

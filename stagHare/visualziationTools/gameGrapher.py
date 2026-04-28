@@ -59,15 +59,24 @@ class GameGrapher():
         ax_pop.set_ylim(min_popularity - 10, max_popularity + 10)
 
         # Process intent data for each player
-        intent = list(zip(*current_game_logger.hare_hunting_history))
+        # for intesnts, we need to check how deeply it is nested.
+        if isinstance(current_game_logger.hare_hunting_history[0], list):
+            # the problem is this no longer works as anticipated.
+            new_list = []
+            flat_list = list(x for xs in current_game_logger.hare_hunting_history for x in xs)
+            intent = list(zip(*flat_list))
+        else:
+            intent = list(zip(*current_game_logger.hare_hunting_history))
+
+
 
         # Plot intent for each player in their respective subplot
         hunt_axes = [ax_hunt1, ax_hunt2, ax_hunt3]
 
         for i, player_intent in enumerate(intent):
             if i < 3:
-                x = list(range(len(player_intent)))
-                y = list(zip(*player_intent))[i] # get the columns as rows
+                x = range(len(player_intent))
+                y = player_intent
 
                 # Plot JUST DOTS (no connecting lines)
                 # Use scatter only, no plot()
@@ -106,15 +115,46 @@ class GameGrapher():
         plt.show()
 
     def playback_game(self, current_game_logger):
+        if len(current_game_logger.hare_hunting_history) == 1:
+            height, width = current_game_logger.height, current_game_logger.width
+            current_intent = current_game_logger.hare_hunting_history[0]  # its packed, unpack it.
+            rounds = current_game_logger.rounds
+            position_history = current_game_logger.position_history
+            self.graph_with_items(height, width, current_intent, rounds, position_history)
+        else:
+            # adjust then graph funky.
+            height, width = current_game_logger.height, current_game_logger.width
+            for game in range(current_game_logger.rounds): # in the round based, rounds are actually entire games. yeah its bad.
+                num_rounds = len(current_game_logger.hare_hunting_history[game])
+                current_intent = current_game_logger.hare_hunting_history[game]  # unpack it question mark?
+                position_history = current_game_logger.position_history[game]
+                self.graph_with_items(height, width, current_intent, num_rounds, position_history)
+
+
+
+
+    def graph_normally(self, current_game_logger):
         height, width = current_game_logger.height, current_game_logger.width
-        for round in range(current_game_logger.rounds):
-            intent = current_game_logger.hare_hunting_history[round]
+        current_intent = current_game_logger.hare_hunting_history[0]  # unpack it question mark?
+        for curr_round in range(current_game_logger.rounds):
+            intent = current_intent[curr_round]
             positions = {}
-            for key in current_game_logger.position_history:
-                positions[key] = current_game_logger.position_history[key][round]
+            for key in current_game_logger.position_history[curr_round]:
+                positions[key] = current_game_logger.position_history[curr_round][key]
+
+            array = self.create_array(height, width, intent, positions)
+            self.create_round_from_matrix(array, intent, curr_round, last_round=False)
+
+    def graph_with_items(self, height, width, current_intent, rounds, position_history, ):
+        for round in range(rounds):
+            intent = current_intent[round]
+            positions = {}
+            for key in position_history[round]:
+                positions[key] = position_history[round][key]
 
             array = self.create_array(height, width, intent, positions)
             self.create_round_from_matrix(array, intent, round, last_round=False)
+
 
     def create_array(self, height, width, intent, positions):
         nrows, ncols = height, width

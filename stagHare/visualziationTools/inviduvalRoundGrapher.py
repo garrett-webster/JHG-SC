@@ -14,6 +14,7 @@ class IndividualRoundGrapher():
         # not sure what we are goiing to need here.
 
     def create_round_graph(self, stag_hare, last_round=False):
+        print("***********************")
         state = stag_hare.state
         intent_data = stag_hare.state.hunting_hare_map
         new_bool = stag_hare.is_over()

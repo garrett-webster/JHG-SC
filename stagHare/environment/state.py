@@ -2,7 +2,7 @@ import numpy as np
 from typing import Dict, List, Tuple
 from stagHare.utils.utils import AVAILABLE, HARE_NAME, HARE_REWARD, MAX_MOVEMENT_UNITS, N_HUNTERS, N_REQUIRED_TO_CAPTURE_HARE, \
     N_REQUIRED_TO_CAPTURE_STAG, POSSIBLE_DELTA_VALS, POSSIBLE_MOVEMENTS, STAG_NAME, STAG_REWARD, VERTICAL
-
+from stagHare.utils.variousFunctions import fastchoices
 
 class State:
     def __init__(self, height: int, width: int, agent_names: List[str]) -> None:
@@ -21,8 +21,8 @@ class State:
         # Randomly assign starting positions for the hunters, hare, and stag
         for i, agent_name in enumerate(agent_names):
             while True:
-                row_index = np.random.choice(list(range(self.height)))
-                col_index = np.random.choice(list(range(self.width)))
+                row_index = fastchoices(list(range(self.height)))
+                col_index = fastchoices(list(range(self.width)))
 
                 if self.grid[row_index][col_index] == AVAILABLE:
                     self.grid[row_index][col_index] = i
@@ -355,3 +355,14 @@ class State:
     #     row, col = self.agent_positions[name]
     #
     #     return self.n_movements(row, col, prey_row, prey_col)
+
+# def fastchoices(options, weights=None, size=1):
+#     if weights is None:
+#         weights = np.ones(len(options))
+#     cumulative_weights = np.cumsum(weights)
+#     count = np.prod(size)
+#     vals = np.random.uniform(0.0, np.sum(weights), size=count)
+#     result = np.asarray(options)[
+#         np.argmax((vals < cumulative_weights[:, np.newaxis]).T, axis=1)
+#     ]
+#     return result.reshape(size)

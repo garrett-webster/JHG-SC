@@ -2,10 +2,13 @@
 
 import os
 from tqdm import tqdm
+
+from stagHare.loggingStuff.stagHareLogger import BigBatchLogger
 from stagHare.visualziationTools.batchLogger import BatchLogger
 from concurrent.futures import ProcessPoolExecutor, as_completed
-from stagHare.runnerHelper import run_trial, process_scores # this SHOULD be all we need.
-
+from stagHare.runnerHelper import run_trial # this SHOULD be all we need.
+from stagHare.visualziationTools.gameGrapher import GameGrapher
+from stagHare.visualziationTools.gameLogger import information_object_to_game_logger
 
 # so what do we actually need to do
 # lets create some cab agents
@@ -20,8 +23,8 @@ from stagHare.runnerHelper import run_trial, process_scores # this SHOULD be all
 
 if __name__ == '__main__':
 
-    max_workers = max(1, os.cpu_count()-2) # save just a few for other processes, plz don't crash.
-    # max_workers = 1 # just... just do this for rn. makes debugging a little easier.
+    # max_workers = max(1, os.cpu_count()-2) # save just a few for other processes, plz don't crash.
+    max_workers = 1 # just... just do this for rn. makes debugging a little easier.
 
     forced_random = True
     random_agents = True  # better for human distribution
@@ -29,21 +32,22 @@ if __name__ == '__main__':
     # no round list unfortunately, doesn't work that way
 
     # for testing purposes right off the bat, lets work with social welfare. that wi
-    jhg_bot_type = 2  # 0 is gene bots, 2 is social welfare and 3 is random. 4 is the new social welfare that I am developing that is just a hair smarter.
-    num_attempts = 10  # don't worry about this
+    num_attempts = 1  # don't worry about this
     # don't add cats yet, we will worry about that later.
     # agent_name = "mixedJHGSelfPlay.csv"
-    agent_names = [["6x6round3.csv", "6x6round3.csv", "6x6round3.csv"]]
+    # agent_names = [["6x6round3.csv", "6x6round3.csv", "6x6round3.csv"]]
+    agent_names = [["GHare", "GHare", "GHare"]]
     scenario_types = ["HCAB_self_play"]
 
     height, width = 16, 16  # lets start there, not too big but there.
-    agent_type = 3  # -1 is ALLEGATR, 0 is a random agent, 1 is the hare greedy agent, 2 is stag greedy agent. 3 is cab
+    type = "step_based"
 
     for i, scenario_type in enumerate(scenario_types):
         print("Scenario: " + scenario_type)
         scenario_type += f"_{type}_{num_attempts}"
-        current_batch_logger = BatchLogger()
         curr_agent_names = agent_names[i]
+        current_batch_logger = BigBatchLogger(height, width, curr_agent_names, scenario_type)
+
         # unless we want randomize it, then that could a problem.
         # actually yeah thats a problem.
         results = []
@@ -51,9 +55,19 @@ if __name__ == '__main__':
         with ProcessPoolExecutor(max_workers=max_workers) as executor:
             futures = []
             for attempt in range(num_attempts):
-                futures.append(executor.submit(run_trial, agent_type, curr_agent_names, height, width, random_agents, forced_random))
+                futures.append(executor.submit(run_trial, curr_agent_names, height, width, random_agents, forced_random, scenario_type))
 
             for future in tqdm(as_completed(futures), desc="Submitting Results", total=num_attempts):
                 results.append(future.result())
 
-        cooperation_score, scores_per_player = process_scores(results)
+
+        for result in results:
+            game_logger = information_object_to_game_logger(result)
+            # we should be able to do all of this
+            game_grapher = GameGrapher(result.popularity_over_time, 3, curr_agent_names, scenario_type)
+            # game_grapher.create_game_graph(game_logger)
+            game_grapher.playback_game(game_logger)
+            current_batch_logger.add_game(result)  # this SHOULD be the actual information object.
+
+        current_batch_logger.get_batch_results()  # just do this once per scenario
+

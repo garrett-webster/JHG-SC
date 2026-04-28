@@ -33,6 +33,7 @@ class GameLogger():
                 new_list.append(new_constant) # just add what we are looking at
         self.hare_hunting_history.append(new_list)
         for agent in new_state.agent_positions:
+            # print("this is the positon here ", position)
             self.position_history[agent].append(new_state.agent_positions[agent])
         self.rounds += 1
 
@@ -99,5 +100,5 @@ def information_object_to_game_logger(info_obj) -> GameLogger:
     logger = GameLogger(info_obj.height, info_obj.width, info_obj.agent_names, info_obj.scenario_type)
     logger.hare_hunting_history = info_obj.hare_hunting_history
     logger.position_history = info_obj.position_history
-    logger.rounds = len(info_obj.hare_hunting_history)
+    logger.rounds = len(info_obj.position_history)
     return logger

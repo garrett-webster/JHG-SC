@@ -2,6 +2,8 @@
 
 import os
 from tqdm import tqdm
+
+from stagHare.loggingStuff.stagHareLogger import BigBatchLogger
 from stagHare.visualziationTools.batchLogger import BatchLogger
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from stagHare.runnerHelper import * # this SHOULD be all we need.
@@ -28,25 +30,28 @@ if __name__ == '__main__':
     random_agents = True  # better for human distribution
 
     # no round list unfortunately, doesn't work that way
-    num_attempts = 4  # don't worry about this
+    num_attempts = 1  # don't worry about this
     # keep agent names as a list, will make literally EVERYTHING easier.
-    agent_names = [["6x6round3.csv", "6x6round3.csv", "6x6round3.csv"]]
+    # 6x6round3.csv
+    agent_names = [["GHare", "GHare", "GHare"]]
+    # agent_names = [["6x6round3.csv", "6x6round3.csv", "6x6round3.csv"]]
     scenario_types = ["HCAB_self_play"]
     # agent_names = ["homoJHGSelfPlay.csv"]
 
     print("Step based")
-    type="step_based"
+    type="round_based"
     height, width = 16, 16  # lets start there, not too big but there.
     print("height, wdith ", height, " ", width)
 
     for i, scenario_type in enumerate(scenario_types):
+        curr_agent_name = agent_names[i] # get just the curr agent names.
         print("Scenario: " + scenario_type)
         scenario_type += f"_{type}_{num_attempts}"
-        current_batch_logger = BatchLogger()
+        current_batch_logger = BigBatchLogger(height, width, curr_agent_name, scenario_type)
         # unless we want randomize it, then that could a problem.
         # actually yeah thats a problem.
         results = []
-        curr_agent_name = agent_names[i] # get just the curr agent names.
+
         with ProcessPoolExecutor(max_workers=max_workers) as executor:
             futures = []
             for attempt in range(num_attempts):
@@ -56,11 +61,16 @@ if __name__ == '__main__':
                 results.append(future.result())
 
             for result in results:
+                pass
                 game_logger = information_object_to_game_logger(result)
                 # we should be able to do all of this
-                game_grapher = GameGrapher(result.popularity_over_time,3, curr_agent_name, scenario_type)
-                game_grapher.create_game_graph(game_logger)
 
+                # game_grapher = GameGrapher(result.popularity_over_time,3, curr_agent_name, scenario_type)
+                # game_grapher.playback_game(game_logger)
+                # game_grapher.create_game_graph(game_logger)
+                current_batch_logger.add_game(result) # this SHOULD be the actual information object.
+
+        current_batch_logger.get_batch_results() # just do this once per scenario.
 
 
 
