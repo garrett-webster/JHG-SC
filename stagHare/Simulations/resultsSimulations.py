@@ -372,7 +372,8 @@ def create_agent_type_score_breakdown(results, save_dir="graphs/"):
 
 if __name__ == "__main__":
     # Load all results
-    results = load_all_results()
+    json_path = "results2/"
+    results = load_all_results(json_path)
 
     print(f"Loaded {len(results)} result files")
 
@@ -383,11 +384,12 @@ if __name__ == "__main__":
 
     # Create detailed score breakdown graphs
     print("\n=== Creating Score Breakdown Graphs ===")
-    create_score_breakdown_by_agent(results)
-    create_score_breakdown_comparison(results)
+    save_dir = "graphs2/"
+    create_score_breakdown_by_agent(results, save_dir)
+    create_score_breakdown_comparison(results, save_dir)
 
     # Create scenario comparisons
     print("\n=== Creating Scenario Comparisons ===")
-    create_scenario_comparison_by_reward(results)
+    create_scenario_comparison_by_reward(results, save_dir)
 
     print("\n✅ All graphs generated successfully in the 'graphs/' directory!")

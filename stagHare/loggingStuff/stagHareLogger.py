@@ -75,9 +75,9 @@ class BigBatchLogger():
         hare_intent_percent_total = np.round(np.mean(self.hare_intent_percent_total), 3)
         # for this, we need a ranking system. this is gonna suck.
         popularity_over_time = self.get_popularity_over_time_ranking()
-        print("here are the coop scores ", coop_scores)
-        print("here ar ethe scores per plaeyr ", score_per_player)
-        print("here is the hare percent total ", hare_intent_percent_total, " and here is the pop over time ", popularity_over_time)
+        # print("here are the coop scores ", coop_scores)
+        # print("here ar ethe scores per plaeyr ", score_per_player)
+        # print("here is the hare percent total ", hare_intent_percent_total, " and here is the pop over time ", popularity_over_time)
         return coop_scores, score_per_player, hare_intent_percent_total, popularity_over_time # I think thats a good baseline.
 
     def get_popularity_over_time_ranking(self):
