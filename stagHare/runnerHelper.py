@@ -53,7 +53,6 @@ def run_trial_sim_no_graphing(stag_hare):
     agent_positions = []
     while True:
         intents.append(create_intents_list(stag_hare.state.hunting_hare_map)) # Might need to custom cast this to integers.
-        print("here are the intents ", intents)
         agent_positions.append(stag_hare.state.agent_positions.copy())
         rewards = [0] * 5 # 3 hunters, 2 other peeps
 
@@ -156,7 +155,7 @@ def run_trial_test(agents):
             # passes by value. thanks python.
             return create_new_score(stag_hare)  # should return the new score array.
 
-def run_trial_step(agent_names, height, width, random_agents, forced_random, scenario_type):
+def run_trial_round(agent_names, height, width, random_agents, forced_random, scenario_type):
 
     scores = []
     intents = []
@@ -246,7 +245,7 @@ def run_trial_step(agent_names, height, width, random_agents, forced_random, sce
 #         traceback.print_exc()
 
 
-def run_trial(agent_names, height, width, random_agents, forced_random, scenario_type):
+def run_trial_step(agent_names, height, width, random_agents, forced_random, scenario_type):
     try:
         start = time.time()
         # changed on 3/17 to allow height and width to be passed in instead of specified here.
@@ -441,6 +440,7 @@ def create_hunters_with_list(random_agents:bool , forced_random:bool, agent_list
     """
 
     new_hunters = []
+    # print("curr agnet name ", agent_list)
 
     for i in range(3):
         new_name = "R" + str(i)

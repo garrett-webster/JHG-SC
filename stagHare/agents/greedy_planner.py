@@ -3,6 +3,7 @@ from stagHare.environment.state import State
 import numpy as np
 from typing import Tuple
 from stagHare.utils.a_star import AStar
+from stagHare.utils.a_star import BFS # This SHOULD be faster. maybe.
 from stagHare.utils.utils import HARE_NAME, STAG_NAME
 
 
@@ -35,6 +36,9 @@ class GreedyPlanner(Agent):
         goal_row, goal_col = goal
 
         return AStar.find_path(curr_row, curr_col, goal_row, goal_col, state)
+        # return BFS.find_path(curr_row, curr_col, goal_row, goal_col, state)
+
+
 
     def is_hunting_hare(self) -> bool:
         return self.target == HARE_NAME

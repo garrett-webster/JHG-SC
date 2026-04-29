@@ -27,7 +27,11 @@ class AlegAATr(Agent):
         self.name = name # gotta keep this somewhere IG>
 
     def _read_in_generator_models(self, ml_model_type: str, enhanced: bool) -> None:
-        folder = '../stagHare/aat/knn_models/' if ml_model_type == 'knn' else '../aat/nn_models/'
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+
+        folder = os.path.join(current_dir, '../aat/knn_models') if ml_model_type == 'knn' else os.path.join(
+            current_dir, '../aat/nn_models')
+        folder = os.path.normpath(folder) + os.sep
 
         for file in os.listdir(folder):
             if (enhanced and '_enh' not in file) or (not enhanced and '_enh' in file):

@@ -55,7 +55,7 @@ if __name__ == '__main__':
         with ProcessPoolExecutor(max_workers=max_workers) as executor:
             futures = []
             for attempt in range(num_attempts):
-                futures.append(executor.submit(run_trial_step, curr_agent_name, height, width, random_agents, forced_random, scenario_type))
+                futures.append(executor.submit(run_trial_round, curr_agent_name, height, width, random_agents, forced_random, scenario_type))
 
             for future in tqdm(as_completed(futures), desc="Submitting Results", total=num_attempts):
                 results.append(future.result())

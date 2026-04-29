@@ -39,6 +39,12 @@ class informationObject():
         self.width = width
         self.hare_hunting_history = intents
 
+    def __str__(self):
+        return (f"informationObject(scenario_type={self.scenario_type}, "
+                f"coop_score={self.coop_score}, "
+                f"hunters={self.hunters}, "
+                f"hare_intent_percent_total={self.hare_intent_percent_total})")
+
 
 class BigBatchLogger():
     def __init__(self, height, width, agent_names, scenario_type):
@@ -66,12 +72,12 @@ class BigBatchLogger():
         score_per_player = (np.mean(self.score_per_player, axis=0) /
             np.mean(self.score_per_player, axis=0).sum(axis=1, keepdims=True)).tolist()
         assert len(score_per_player) == len(self.agent_names) # BARS
-        hare_intent_percent_total = np.mean(self.hare_intent_percent_total)
+        hare_intent_percent_total = np.round(np.mean(self.hare_intent_percent_total), 3)
         # for this, we need a ranking system. this is gonna suck.
         popularity_over_time = self.get_popularity_over_time_ranking()
-        print("here are the coop scores ", coop_scores)
-        print("here ar ethe scores per plaeyr ", score_per_player)
-        print("here is the hare percent total ", hare_intent_percent_total, " and here is the pop over time ", popularity_over_time)
+        # print("here are the coop scores ", coop_scores)
+        # print("here ar ethe scores per plaeyr ", score_per_player)
+        # print("here is the hare percent total ", hare_intent_percent_total, " and here is the pop over time ", popularity_over_time)
         return coop_scores, score_per_player, hare_intent_percent_total, popularity_over_time # I think thats a good baseline.
 
     def get_popularity_over_time_ranking(self):

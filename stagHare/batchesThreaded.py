@@ -6,7 +6,7 @@ from tqdm import tqdm
 from stagHare.loggingStuff.stagHareLogger import BigBatchLogger
 from stagHare.visualziationTools.batchLogger import BatchLogger
 from concurrent.futures import ProcessPoolExecutor, as_completed
-from stagHare.runnerHelper import run_trial # this SHOULD be all we need.
+from stagHare.runnerHelper import run_trial_step # this SHOULD be all we need.
 from stagHare.visualziationTools.gameGrapher import GameGrapher
 from stagHare.visualziationTools.gameLogger import information_object_to_game_logger
 
@@ -55,7 +55,7 @@ if __name__ == '__main__':
         with ProcessPoolExecutor(max_workers=max_workers) as executor:
             futures = []
             for attempt in range(num_attempts):
-                futures.append(executor.submit(run_trial, curr_agent_names, height, width, random_agents, forced_random, scenario_type))
+                futures.append(executor.submit(run_trial_step, curr_agent_names, height, width, random_agents, forced_random, scenario_type))
 
             for future in tqdm(as_completed(futures), desc="Submitting Results", total=num_attempts):
                 results.append(future.result())

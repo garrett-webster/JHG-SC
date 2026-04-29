@@ -1,28 +1,203 @@
 {
+  "config": {
+    "Height": 6,
+    "Width": 6,
+    "RandomAgents": true,
+    "forced_random": false,
+    "num_attempts": 1
+  },
   "tests": {
     "test1": {
-      "scenario_type": "HcabSelfPlay",
-      "curr_agent_name": ["6x6round3.csv, 6x6round3.csv, 6x6round3.csv"],
-      "GameType": "Step",
-      "GamesPerRound": null,
-      "Height": 16,
-      "Width": 16,
-      "RandomAgents": false,
-      "forced_random": false,
-      "num_attemps": 5,
-      "Status": false
+      "scenario_type": "SCabSelfPlay",
+      "curr_agent_name": ["6x6round3.csv", "6x6round3.csv", "6x6round3.csv"],
+      "GamesPerRound": 10,
+      "Status": {
+        "Step": false,
+        "Round": false
+      }
     },
     "test2": {
-      "scenario_type": "HcabSelfPlay",
-      "curr_agent_name": ["6x6round3.csv, 6x6round3.csv, 6x6round3.csv"],
-      "GameType": "Round",
+      "scenario_type": "SCabVGHare1",
+      "curr_agent_name": ["6x6round3.csv", "6x6round3.csv", "GHare"],
       "GamesPerRound": 10,
-      "Height": 16,
-      "Width": 16,
-      "RandomAgents": false,
-      "forced_random": false,
-      "num_attemps": 5,
-      "Status": false
+      "Status": {
+        "Step": false,
+        "Round": false
+      }
+    },
+    "test3": {
+      "scenario_type": "SCabVGHare2",
+      "curr_agent_name": ["6x6round3.csv", "GHare", "GHare"],
+      "GamesPerRound": 10,
+      "Status": {
+        "Step": false,
+        "Round": false
+      }
+    },
+    "test4": {
+      "scenario_type": "SCabVGStag1",
+      "curr_agent_name": ["6x6round3.csv", "6x6round3.csv", "GStag"],
+      "GamesPerRound": 10,
+      "Status": {
+        "Step": false,
+        "Round": false
+      }
+    },
+    "test5": {
+      "scenario_type": "SCabVGStag2",
+      "curr_agent_name": ["6x6round3.csv", "GStag", "GStag"],
+      "GamesPerRound": 10,
+      "Status": {
+        "Step": false,
+        "Round": false
+      }
+    },
+
+    "test8": {
+      "scenario_type": "HCabSelfPlay",
+      "curr_agent_name": ["gen_Z.csv", "gen_Z.csv", "gen_Z.csv"],
+      "GamesPerRound": 10,
+      "Status": {
+        "Step": false,
+        "Round": false
+      }
+    },
+    "test9": {
+      "scenario_type": "HCabVGHare1",
+      "curr_agent_name": ["gen_Z.csv", "gen_Z.csv", "GHare"],
+      "GamesPerRound": 10,
+      "Status": {
+        "Step": false,
+        "Round": false
+      }
+    },
+    "test10": {
+      "scenario_type": "HCabVGHare2",
+      "curr_agent_name": ["gen_Z.csv", "GHare", "GHare"],
+      "GamesPerRound": 10,
+      "Status": {
+        "Step": false,
+        "Round": false
+      }
+    },
+    "test11": {
+      "scenario_type": "HCabVGStag1",
+      "curr_agent_name": ["gen_Z.csv", "gen_Z.csv", "GStag"],
+      "GamesPerRound": 10,
+      "Status": {
+        "Step": false,
+        "Round": false
+      }
+    },
+    "test12": {
+      "scenario_type": "HCabVGStag2",
+      "curr_agent_name": ["gen_Z.csv", "GStag", "GStag"],
+      "GamesPerRound": 10,
+      "Status": {
+        "Step": false,
+        "Round": false
+      }
+    },
+
+
+    "test15": {
+      "scenario_type": "ECabSelfPlay",
+      "curr_agent_name": ["gen_99.csv", "gen_99.csv", "gen_99.csv"],
+      "GamesPerRound": 10,
+      "Status": {
+        "Step": false,
+        "Round": false
+      }
+    },
+    "test16": {
+      "scenario_type": "ECabVGHare1",
+      "curr_agent_name": ["gen_99.csv", "gen_99.csv", "GHare"],
+      "GamesPerRound": 10,
+      "Status": {
+        "Step": false,
+        "Round": false
+      }
+    },
+    "test17": {
+      "scenario_type": "ECabVGHare2",
+      "curr_agent_name": ["gen_99.csv", "GHare", "GHare"],
+      "GamesPerRound": 10,
+      "Status": {
+        "Step": false,
+        "Round": false
+      }
+    },
+    "test18": {
+      "scenario_type": "ECabVGStag1",
+      "curr_agent_name": ["gen_99.csv", "gen_99.csv", "GStag"],
+      "GamesPerRound": 10,
+      "Status": {
+        "Step": false,
+        "Round": false
+      }
+    },
+    "test19": {
+      "scenario_type": "ECabVGStag2",
+      "curr_agent_name": ["gen_99.csv", "GStag", "GStag"],
+      "GamesPerRound": 10,
+      "Status": {
+        "Step": false,
+        "Round": false
+      }
+    },
+    "test6": {
+      "scenario_type": "SCabVAllegtr1",
+      "curr_agent_name": ["6x6round3.csv", "6x6round3.csv", "Allegatr"],
+      "GamesPerRound": 10,
+      "Status": {
+        "Step": false,
+        "Round": false
+      }
+    },
+    "test7": {
+      "scenario_type": "SCabVAllegtr2",
+      "curr_agent_name": ["6x6round3.csv", "Allegatr", "Allegatr"],
+      "GamesPerRound": 10,
+      "Status": {
+        "Step": false,
+        "Round": false
+      }
+    },
+    "test13": {
+      "scenario_type": "HCabVAllegtr1",
+      "curr_agent_name": ["gen_Z.csv", "gen_Z.csv", "Allegatr"],
+      "GamesPerRound": 10,
+      "Status": {
+        "Step": false,
+        "Round": false
+      }
+    },
+    "test14": {
+      "scenario_type": "HCabVAllegtr2",
+      "curr_agent_name": ["gen_Z.csv", "Allegatr", "Allegatr"],
+      "GamesPerRound": 10,
+      "Status": {
+        "Step": false,
+        "Round": false
+      }
+    },
+    "test20": {
+      "scenario_type": "ECabVAllegtr1",
+      "curr_agent_name": ["gen_99.csv", "gen_99.csv", "Allegatr"],
+      "GamesPerRound": 10,
+      "Status": {
+        "Step": false,
+        "Round": false
+      }
+    },
+    "test21": {
+      "scenario_type": "ECabVAllegtr2",
+      "curr_agent_name": ["gen_99.csv", "Allegatr", "Allegatr"],
+      "GamesPerRound": 10,
+      "Status": {
+        "Step": false,
+        "Round": false
+      }
     }
   }
 }

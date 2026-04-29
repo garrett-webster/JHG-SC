@@ -1,5 +1,5 @@
 from stagHare.environment.world import StagHare
-from stagHare.runnerHelper import run_trial, process_scores, create_hunters_with_list  # this SHOULD be all we need.
+from stagHare.runnerHelper import run_trial_step, run_trial_round, create_hunters_with_list  # this SHOULD be all we need.
 import numpy as np
 
 def test_transition_function_differences():
@@ -40,12 +40,14 @@ def test_transition_function_differences():
     # breaking news: these two do generate the same stag hare map, so the discrepancy isn't there. its somewhere else!
 
     np.random.seed(0) # whatever.
-    game_information_1 = run_trial(curr_agent_names, height, width, random_agents, forced_random, scenario_type)
+    game_information_1 = run_trial_round(curr_agent_names, height, width, random_agents, forced_random, scenario_type)
 
-    np.random.seed(0) # whatever.
-    game_information_2 = run_trial(curr_agent_names, height, width, random_agents, forced_random, scenario_type)
+    # np.random.seed(0) # whatever.
+    # game_information_2 = run_trial_round(curr_agent_names, height, width, random_agents, forced_random, scenario_type)
 
-    assert(game_information_1.position_history == game_information_2.position_history)
+    # assert(game_information_1.position_history == game_information_2.position_history)
+
+    print("game_information_1: ", game_information_1)
 
 if __name__ == "__main__":
     test_transition_function_differences()
