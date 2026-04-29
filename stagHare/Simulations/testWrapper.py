@@ -1,8 +1,7 @@
 import json
 import os
 from tqdm import tqdm
-
-
+from win32cryptcon import szOID_COMMON_NAME
 
 from stagHare.loggingStuff.stagHareLogger import BigBatchLogger
 from stagHare.visualziationTools.batchLogger import BatchLogger
@@ -11,7 +10,7 @@ from stagHare.runnerHelper import *  # this SHOULD be all we need.
 from stagHare.visualziationTools.gameGrapher import GameGrapher
 from stagHare.visualziationTools.gameLogger import information_object_to_game_logger
 
-def run_test(curr_agent_name, scenario_type, game_type, height, width, random_agents, forced_random):
+def run_test(curr_agent_name, scenario_type, game_type, height, width, random_agents, forced_random, GamesPerRound):
 
     # how many resources can we actually devote to this??
     max_workers = max(1, os.cpu_count() - 2)  # save just a few for other processes, plz don't crash.
@@ -29,7 +28,7 @@ def run_test(curr_agent_name, scenario_type, game_type, height, width, random_ag
         for attempt in range(num_attempts):
             futures.append(
                 executor.submit(run_function, curr_agent_name, height, width, random_agents, forced_random,
-                                scenario_type))
+                                scenario_type, GamesPerRound))
 
         for future in as_completed(futures):
             results.append(future.result())
@@ -57,44 +56,81 @@ def write_batch_results_to_file(current_batch_logger, scenario_type):
     with open(directory_path + f"{scenario_type}.json", "w") as f:
         json.dump(new_dict, f, indent=2)
 
+# some global variables
+height = 16
+width = 16
+RandomAgents = True
+forced_random = False
+num_attempts = 1
 
+base_agents = ["SCab", "HCab", "ECab"]
+base_to_csv = {
+    "SCab": "16x16round4.csv",
+    "HCab": "gen_z.csv",
+    "ECab": "gen_99.csv",
+}
 
+games_per_round = 10
+game_types = [run_trial_round, run_trial_step]
+# scenarios = ["SelfPlay", "VGHare1", "VGHare2", "VGStag1", "VGStag2", "Allegatr1", "Allegatr2"]
+scenarios = ["VGHare1", "VGHare2", "VGStag1", "VGStag2", "Allegatr1", "Allegatr2"]
 
+def get_agents(base_agents, scenario):
+    if scenario == "SelfPlay":
+        new_list = [base_to_csv[base_agents] for _ in range(3)]
+    else:
+        type = scenario[1:6]
+        num_bad_guys = int(scenario[-1])
+        num_good_guys = 3 - num_bad_guys
+        good_guys = [base_to_csv[base_agents] for _ in range(num_good_guys)]
+        bad_guys = [type for _ in range(num_bad_guys)]
+        new_list = [good_guys + bad_guys]
+    return new_list
 
+# removing Json implementatino because that was dumb and bad. back to pure script based.
 if __name__ == "__main__":
-    file = "testToRun.json" # where we have all the stuff done
-    with open(file) as f:
-        data = json.load(f)  # Load the entire file as a single JSON object
 
-    tests_list = data["tests"] # this is the object w/ all the test
-    config_list = data["config"]
+    # file = "testToRun.json" # where we have all the stuff done
+    # with open(file) as f:
+    #     data = json.load(f)  # Load the entire file as a single JSON object
 
-    height, width, RandomAgents, forced_random, num_attempts = (config_list["Height"],
-                                                                config_list["Width"], config_list["RandomAgents"],
-                                                                config_list["forced_random"], config_list["num_attempts"])
+    # tests_list = data["tests"] # this is the object w/ all the test
+    # config_list = data["config"]
+
+    # ... this made more sense before. Don't worry about it.
+    height, width, RandomAgents, forced_random, num_attempts = height, width, RandomAgents, forced_random, num_attempts
 
 
-    for test in tqdm(tests_list):
-        curr_test = data["tests"][test]
-        scenario_type = curr_test["scenario_type"]
-        curr_agent_name = curr_test["curr_agent_name"]
-        GamesPerRound = curr_test["GamesPerRound"]
-        statuses = curr_test["Status"]
 
-        # separate status for Round and Step, check both
-        for status in statuses:
-            if statuses[status] == True: # skip already done statuses.
-                continue
-            else:
-                if status == "Round":
-                    game_type = run_trial_round
-                elif status == "Step":
-                    game_type = run_trial_step
-                else:
-                    game_type = None
-                    print(f"Here is the status {status}")
-                    break
 
-                new_batch_logger = run_test(curr_agent_name, scenario_type, game_type, height, width, RandomAgents, forced_random)
-                write_batch_results_to_file(new_batch_logger, scenario_type)
-                statuses[status] = True # mark this as true when we finish.
+
+    for agent in base_agents:
+        for scenario in scenarios:
+            for game_type in game_types:
+                scenario_type = str(agent) + str(scenario) + str(game_type)
+                curr_agent_name = get_agents(agent, scenario)
+
+
+
+        # curr_test = data["tests"][test]
+        # scenario_type = curr_test["scenario_type"]
+        # curr_agent_name = curr_test["curr_agent_name"]
+        # GamesPerRound = curr_test["GamesPerRound"]
+        # statuses = curr_test["Status"]
+        #
+        # # separate status for Round and Step, check both
+        # for status in statuses:
+        #     if statuses[status] == True: # skip already done statuses.
+        #         continue
+        #     else:
+        #         if status == "Round":
+        #             game_type = run_trial_round
+        #         elif status == "Step":
+        #             game_type = run_trial_step
+        #         else:
+        #             game_type = None
+        #             print(f"Here is the status {status}")
+        #             break
+        #
+        #         new_batch_logger = run_test(curr_agent_name, scenario_type, game_type, height, width, RandomAgents, forced_random, GamesPerRound)
+        #         write_batch_results_to_file(new_batch_logger, scenario_type)

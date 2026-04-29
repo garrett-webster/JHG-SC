@@ -63,7 +63,7 @@ def write_generational_results(theGenePools, popSize, gen, folder):
     script_dir = os.path.dirname(os.path.abspath(__file__))
     # Construct the full output directory path
     if folder == "":
-        output_dir = os.path.join(script_dir, "third attempt, 6x6", "theGenerations") # just to give it somewhere to go
+        output_dir = os.path.join(script_dir, "16x16round4", "theGenerations") # just to give it somewhere to go
     else:
         output_dir = os.path.join(script_dir, folder) # just to give it somewhere to go
     # Ensure output directory exists
@@ -87,7 +87,7 @@ def write_generational_results(theGenePools, popSize, gen, folder):
     # force it to squeeze the scalar value out. not sure what the problem was.
     avg_fitness = np.sum([float(np.squeeze(agent.absoluteFitness)) for agent in theGenePools]) / popSize
     avg_popularity = np.sum([float(np.squeeze(agent.absolutePopularity)) for agent in theGenePools]) / popSize
-    print(f"Average utility in generation {gen}: {float(avg_fitness):.4f} Average Popularity: {float(avg_popularity):.4f}")
+    # print(f"Average utility in generation {gen}: {float(avg_fitness):.4f} Average Popularity: {float(avg_popularity):.4f}")
 
 
 def selectByFitness(thePopulation, popSize, _rank):
@@ -366,7 +366,7 @@ def evolve_step_based_SH(popSize, numGeneCopies, startIndex, numGens, gamesPerGe
             theGenePools.append(GeneAgent3("", 1)) # no gene string, random inititlization. maybe he initil  # just have it give them a random ID that it can't be.
 
     for gen in tqdm(range(numGens), desc="Mixed", leave=False):
-        print("starting gen", gen)
+        # print("starting gen", gen)
 
         args_list = [] # just create this so we have it somewhere.
 
@@ -443,8 +443,8 @@ if __name__ == "__main__":
     enforce_majority = False
     random_agents = True
     forced_random = False
-    height = 6
-    width = 6
+    height = 16
+    width = 16
     evolve_step_based_SH(popSize, numGeneCopies, startIndex, numGens, gamesPerGen, agentsPerGame, roundsPerGame, povertyLine, folder,
                     max_workers, enforce_majority, random_agents, forced_random, height, width)
     # we are running no fear, no chat

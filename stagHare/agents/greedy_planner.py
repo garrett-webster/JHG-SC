@@ -35,8 +35,9 @@ class GreedyPlanner(Agent):
 
         goal_row, goal_col = goal
 
-        return AStar.find_path(curr_row, curr_col, goal_row, goal_col, state)
-        # return BFS.find_path(curr_row, curr_col, goal_row, goal_col, state)
+        # swapped to BFS as the Astar had some bugs that I did NOT like
+        # return AStar.find_path(curr_row, curr_col, goal_row, goal_col, state)
+        return BFS.find_path(curr_row, curr_col, goal_row, goal_col, state)
 
 
 

@@ -155,14 +155,14 @@ def run_trial_test(agents):
             # passes by value. thanks python.
             return create_new_score(stag_hare)  # should return the new score array.
 
-def run_trial_round(agent_names, height, width, random_agents, forced_random, scenario_type):
+def run_trial_round(agent_names, height, width, random_agents, forced_random, scenario_type, num_rounds_per_game):
 
     scores = []
     intents = []
     agent_positions = []
     popularity_over_time = []
 
-    num_rounds_per_game = 10 # lets start here.
+    # num_rounds_per_game = 10 # lets start here.
     current_logger = stagHareLogger()
 
 
@@ -245,7 +245,7 @@ def run_trial_round(agent_names, height, width, random_agents, forced_random, sc
 #         traceback.print_exc()
 
 
-def run_trial_step(agent_names, height, width, random_agents, forced_random, scenario_type):
+def run_trial_step(agent_names, height, width, random_agents, forced_random, scenario_type, games_per_round):
     try:
         start = time.time()
         # changed on 3/17 to allow height and width to be passed in instead of specified here.

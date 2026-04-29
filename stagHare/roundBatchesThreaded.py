@@ -30,11 +30,13 @@ if __name__ == '__main__':
     random_agents = True  # better for human distribution
 
     # no round list unfortunately, doesn't work that way
-    num_attempts = 1  # don't worry about this
+    num_attempts = 10  # don't worry about this
+    num_rounds_per_game = 10
     # keep agent names as a list, will make literally EVERYTHING easier.
     # 6x6round3.csv
-    agent_names = [["GHare", "GHare", "GHare"]]
+    # agent_names = [["GHare", "GHare", "GHare"]]
     # agent_names = [["6x6round3.csv", "6x6round3.csv", "6x6round3.csv"]]
+    agent_names = [["16x16round4.csv", "16x16round4.csv", "16x16round4.csv"]]
     scenario_types = ["HCAB_self_play"]
     # agent_names = ["homoJHGSelfPlay.csv"]
 
@@ -55,7 +57,7 @@ if __name__ == '__main__':
         with ProcessPoolExecutor(max_workers=max_workers) as executor:
             futures = []
             for attempt in range(num_attempts):
-                futures.append(executor.submit(run_trial_round, curr_agent_name, height, width, random_agents, forced_random, scenario_type))
+                futures.append(executor.submit(run_trial_round, curr_agent_name, height, width, random_agents, forced_random, scenario_type, num_rounds_per_game))
 
             for future in tqdm(as_completed(futures), desc="Submitting Results", total=num_attempts):
                 results.append(future.result())
