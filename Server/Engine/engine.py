@@ -198,7 +198,7 @@ class JHGEngine():
 
     def apply_transaction(self, T):
         self.t += 1
-
+        # normalization line.
         T = T / np.sum(np.abs(T), axis=1)[:, np.newaxis]
         self.T.append(T)
         self.I.append(np.zeros((self.N, self.N)))  # i = influences => j

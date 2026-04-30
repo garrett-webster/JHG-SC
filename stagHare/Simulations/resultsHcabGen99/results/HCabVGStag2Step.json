@@ -1,0 +1,26 @@
+{
+  "coop_scores": 0.975,
+  "score_per_player": [
+    [
+      0.0,
+      0.025,
+      0.975
+    ],
+    [
+      0.025,
+      0.0,
+      0.975
+    ],
+    [
+      0.025,
+      0.0,
+      0.975
+    ]
+  ],
+  "hare_intent_percent_total": 0.019,
+  "popularity_over_time": [
+    330,
+    326,
+    344
+  ]
+}

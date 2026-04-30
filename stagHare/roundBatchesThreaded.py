@@ -19,8 +19,6 @@ from stagHare.visualziationTools.gameLogger import information_object_to_game_lo
 # the SC sim I created and the JHG sim was sort of built for cab agents
 # this one has not been built for either of those things.
 
-
-
 if __name__ == '__main__':
 
     max_workers = max(1, os.cpu_count()-2) # save just a few for other processes, plz don't crash.
@@ -67,9 +65,9 @@ if __name__ == '__main__':
                 game_logger = information_object_to_game_logger(result)
                 # we should be able to do all of this
 
-                # game_grapher = GameGrapher(result.popularity_over_time,3, curr_agent_name, scenario_type)
+                game_grapher = GameGrapher(result.popularity_over_time,3, curr_agent_name, scenario_type)
                 # game_grapher.playback_game(game_logger)
-                # game_grapher.create_game_graph(game_logger)
+                game_grapher.create_game_graph(game_logger)
                 current_batch_logger.add_game(result) # this SHOULD be the actual information object.
 
         current_batch_logger.get_batch_results() # just do this once per scenario.

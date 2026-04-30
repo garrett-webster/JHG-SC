@@ -37,7 +37,7 @@ def run_test(curr_agent_name, scenario_type, run_function, height, width, random
     return current_batch_logger  # just do this once per scenario.
 
 def write_batch_results_to_file(current_batch_logger, scenario_type):
-    directory_path = "results2/"
+    directory_path = "results/"
     new_dict = {}
     coop_scores, score_per_player, hare_intent_percent_total, popularity_over_time = current_batch_logger.get_batch_results()
     new_dict["coop_scores"] = coop_scores
@@ -54,12 +54,12 @@ RandomAgents = True
 forced_random = False
 num_attempts = 1000
 
-# base_agents = ["SCab", "HCab", "ECab"]
-base_agents = ["SCab"]
+base_agents = ["SCab", "HCab", "ECab"]
+# base_agents = ["SCab"]
 base_to_csv = {
     "SCab": "16x16round4.csv",
     "HCab": "gen_z.csv",
-    "ECab": "gen_99.csv",
+    "ECab": "gen_199.csv",
 }
 game_type_to_name = {
     run_trial_step: "Step",
@@ -93,8 +93,8 @@ if __name__ == "__main__":
     height, width, RandomAgents, forced_random, num_attempts = height, width, RandomAgents, forced_random, num_attempts
 
 
-    for agent in base_agents:
-        for scenario in tqdm(scenarios):
+    for agent in tqdm(base_agents):
+        for scenario in scenarios:
             for game_type in game_types:
                 scenario_type = str(agent) + str(scenario) + str(game_type_to_name[game_type])
 
