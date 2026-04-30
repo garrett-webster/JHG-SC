@@ -72,7 +72,7 @@ class BigBatchLogger():
         score_per_player = (np.mean(self.score_per_player, axis=0) /
             np.mean(self.score_per_player, axis=0).sum(axis=1, keepdims=True)).tolist()
         assert len(score_per_player) == len(self.agent_names) # BARS
-        hare_intent_percent_total = np.round(np.mean(self.hare_intent_percent_total), 3)
+        hare_intent_percent_total = np.round((self.hare_intent_percent_total), 3)
         # for this, we need a ranking system. this is gonna suck.
         popularity_over_time = self.get_popularity_over_time_ranking()
         # print("here are the coop scores ", coop_scores)

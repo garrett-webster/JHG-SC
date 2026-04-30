@@ -73,21 +73,24 @@ game_types = [run_trial_round, run_trial_step]
 scenarios = ["SelfPlay", "VGHare1", "VGHare2", "VGStag1", "VGStag2", "Allegatr1", "Allegatr2"]
 # scenarios = ["Allegatr1", "Allegatr2"]
 
-def get_agents(base_agents, scenario):
+def get_agents(agent, scenario):
     if scenario == "SelfPlay":
-        new_list = [base_to_csv[base_agents] for _ in range(3)]
+        new_list = [base_to_csv[agent] for _ in range(3)]
     else:
         if "Allegatr" in scenario:
-            type = scenario[0:-1]
+            opponent_type = scenario[0:-1]  # "Allegatr"
         else:
-            type = scenario[1:6]
-        num_bad_guys = int(scenario[-1])
-        num_good_guys = 3 - num_bad_guys
-        good_guys = [base_to_csv[base_agents] for _ in range(num_good_guys)]
-        bad_guys = [type for _ in range(num_bad_guys)]
-        new_list = good_guys + bad_guys
+            opponent_type = scenario[1:6]  # "GHare" or "GStag"
 
-    print("this is the new list ", new_list)
+        num_opponents = int(scenario[-1])
+        num_test_agents = 3 - num_opponents
+
+        test_agents = [base_to_csv[agent] for _ in range(num_test_agents)]
+        opponents = [opponent_type for _ in range(num_opponents)]
+
+        new_list = test_agents + opponents
+
+
     return new_list
 
 # removing Json implementatino because that was dumb and bad. back to pure script based.

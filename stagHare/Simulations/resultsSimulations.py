@@ -38,12 +38,17 @@ def extract_agent_info(scenario_name):
     - HCabVGHare1 -> ('HCab', None)
     - ECab99SelfPlay -> ('ECab', '99')
     - ECab199VGHare1 -> ('ECab', '199')
+    - Allegtr -> ('Allegtr', None)
     """
     # Handle SCab and HCab (no gene versions)
     if scenario_name.startswith('SCab'):
         return 'SCab', None
     if scenario_name.startswith('HCab'):
         return 'HCab', None
+    if scenario_name.startswith('Allegatr'):
+        return 'Allegatr', None
+    if scenario_name.startswith('Allegtr'):
+        return 'Allegtr', None
 
     # Handle ECab with possible gene versions
     if scenario_name.startswith('ECab'):
@@ -61,6 +66,7 @@ def extract_agent_info(scenario_name):
             return 'ECab', gene_version
         return 'ECab', None
 
+    print("The scenario name is as follows ", scenario_name)
     return 'Unknown', None
 
 
@@ -520,6 +526,301 @@ def create_hare_intent_graphs(results, game_type, save_dir="graphs/hare_intent/"
         print(f"Created {agent_display} {game_type} hare intent graph")
 
 
+# ==================== SCENARIO COMPARISON GRAPHS ====================
+def create_scenario_reward_distribution(results, game_type, save_dir="graphs/scenario_comparison/reward_distribution/"):
+    """
+    For each scenario type, compare reward distribution across all agent groups
+    """
+    save_dir_game = os.path.join(save_dir, game_type)
+    os.makedirs(save_dir_game, exist_ok=True)
+
+    agent_groups = get_all_agent_groups(results)
+    all_scenarios = sorted(set(extract_scenario_category(name) for name in results.keys()))
+
+    colors = ['#e74c3c', '#f39c12', '#2ecc71']  # Nothing, Hare, Stag
+
+    for scenario in all_scenarios:
+        scenario_data = {}
+
+        for scenario_name, data in results.items():
+            if extract_scenario_category(scenario_name) == scenario:
+                agent_display = get_agent_display_name(scenario_name)
+                scores = data.get('score_per_player', [])
+
+                if scores and isinstance(scores[0], list):
+                    filtered_scores = filter_relevant_scores(scenario_name, scores)
+                    scenario_data[agent_display] = {
+                        'nothing': np.mean([player[0] for player in filtered_scores]),
+                        'hare': np.mean([player[1] for player in filtered_scores]),
+                        'stag': np.mean([player[2] for player in filtered_scores])
+                    }
+
+        if not scenario_data:
+            continue
+
+        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(18, 7))
+
+        agents_present = sorted(scenario_data.keys())
+        x = np.arange(len(agents_present))
+        width = 0.25
+
+        nothing_vals = [scenario_data[agent]['nothing'] for agent in agents_present]
+        hare_vals = [scenario_data[agent]['hare'] for agent in agents_present]
+        stag_vals = [scenario_data[agent]['stag'] for agent in agents_present]
+
+        # Left: Grouped bar chart
+        bars1 = ax1.bar(x - width, nothing_vals, width, label='Nothing (0 pts)', color=colors[0], alpha=0.8)
+        bars2 = ax1.bar(x, hare_vals, width, label='Hare (1 pt)', color=colors[1], alpha=0.8)
+        bars3 = ax1.bar(x + width, stag_vals, width, label='Stag (2 pts)', color=colors[2], alpha=0.8)
+
+        ax1.set_xlabel('Agent Type', fontsize=12, fontweight='bold')
+        ax1.set_ylabel('Average Score', fontsize=12, fontweight='bold')
+        ax1.set_title(f'{scenario} - {game_type}: Reward Distribution', fontsize=14, fontweight='bold')
+        ax1.set_xticks(x)
+        ax1.set_xticklabels(agents_present, rotation=45, ha='right')
+        ax1.legend(loc='upper right')
+        ax1.grid(axis='y', alpha=0.3)
+
+        for bars in [bars1, bars2, bars3]:
+            for bar in bars:
+                height = bar.get_height()
+                if height > 0.01:
+                    ax1.text(bar.get_x() + bar.get_width() / 2., height + 0.01,
+                             f'{height:.3f}', ha='center', va='bottom', fontsize=8, rotation=90)
+
+        # Right: Stacked percentage
+        totals = [n + h + s for n, h, s in zip(nothing_vals, hare_vals, stag_vals)]
+        nothing_pct = [n / t * 100 if t > 0 else 0 for n, t in zip(nothing_vals, totals)]
+        hare_pct = [h / t * 100 if t > 0 else 0 for h, t in zip(hare_vals, totals)]
+        stag_pct = [s / t * 100 if t > 0 else 0 for s, t in zip(stag_vals, totals)]
+
+        ax2.bar(agents_present, nothing_pct, label='Nothing', color=colors[0], alpha=0.8)
+        ax2.bar(agents_present, hare_pct, bottom=nothing_pct, label='Hare', color=colors[1], alpha=0.8)
+        ax2.bar(agents_present, stag_pct, bottom=[n + h for n, h in zip(nothing_pct, hare_pct)],
+                label='Stag', color=colors[2], alpha=0.8)
+
+        ax2.set_xlabel('Agent Type', fontsize=12, fontweight='bold')
+        ax2.set_ylabel('Percentage of Actions', fontsize=12, fontweight='bold')
+        ax2.set_title(f'{scenario} - {game_type}: Action Distribution (%)', fontsize=14, fontweight='bold')
+        ax2.set_xticks(range(len(agents_present)))
+        ax2.set_xticklabels(agents_present, rotation=45, ha='right')
+        ax2.legend(loc='upper right')
+        ax2.grid(axis='y', alpha=0.3)
+        ax2.set_ylim(0, 100)
+
+        plt.suptitle(f'{scenario} - {game_type} Games: Agent Comparison', fontsize=16, fontweight='bold')
+        plt.tight_layout()
+        plt.savefig(f'{save_dir_game}/{scenario}_reward_distribution.png', dpi=150, bbox_inches='tight')
+        plt.close()
+
+        print(f"Created {scenario} {game_type} reward distribution comparison")
+
+
+def create_scenario_hare_intent(results, game_type, save_dir="graphs/scenario_comparison/hare_intent/"):
+    """
+    For each scenario type, compare hare hunting intent across all agent groups
+    """
+    save_dir_game = os.path.join(save_dir, game_type)
+    os.makedirs(save_dir_game, exist_ok=True)
+
+    agent_groups = get_all_agent_groups(results)
+    all_scenarios = sorted(set(extract_scenario_category(name) for name in results.keys()))
+
+    # Generate consistent colors for agent groups
+    agent_colors = {}
+    color_map = plt.cm.tab10(np.linspace(0, 1, len(agent_groups)))
+    for i, agent in enumerate(agent_groups):
+        agent_colors[agent] = color_map[i]
+
+    for scenario in all_scenarios:
+        scenario_hare_data = {}
+
+        for scenario_name, data in results.items():
+            if extract_scenario_category(scenario_name) == scenario:
+                agent_display = get_agent_display_name(scenario_name)
+                hare_intent = data.get('hare_intent_percent_total', 0)
+
+                if hare_intent < 1:
+                    hare_intent = hare_intent * 100
+
+                scenario_hare_data[agent_display] = hare_intent
+
+        if not scenario_hare_data:
+            continue
+
+        fig, ax = plt.subplots(figsize=(12, 7))
+
+        agents_present = sorted(scenario_hare_data.keys())
+        hare_vals = [scenario_hare_data[agent] for agent in agents_present]
+
+        bar_colors = [agent_colors[agent] for agent in agents_present]
+        bars = ax.bar(agents_present, hare_vals, color=bar_colors, alpha=0.8, edgecolor='black')
+
+        ax.set_xlabel('Agent Type', fontsize=12, fontweight='bold')
+        ax.set_ylabel('Hare Intent (%)', fontsize=12, fontweight='bold')
+        ax.set_title(f'{scenario} - {game_type}: Hare Hunting Intent by Agent', fontsize=14, fontweight='bold')
+        ax.set_xticks(range(len(agents_present)))
+        ax.set_xticklabels(agents_present, rotation=45, ha='right')
+        ax.grid(axis='y', alpha=0.3)
+
+        for bar, value in zip(bars, hare_vals):
+            height = bar.get_height()
+            ax.text(bar.get_x() + bar.get_width() / 2., height + 1,
+                    f'{value:.1f}%', ha='center', va='bottom', fontsize=10, fontweight='bold')
+
+        ax.axhline(y=50, color='black', linestyle='--', alpha=0.3, linewidth=1)
+        ax.text(len(agents_present) - 0.5, 52, 'More hare hunting →', ha='right', fontsize=9, style='italic', alpha=0.7)
+        ax.text(len(agents_present) - 0.5, 48, '← Less hare hunting', ha='right', fontsize=9, style='italic', alpha=0.7)
+
+        plt.tight_layout()
+        plt.savefig(f'{save_dir_game}/{scenario}_hare_intent.png', dpi=150, bbox_inches='tight')
+        plt.close()
+
+        print(f"Created {scenario} {game_type} hare intent comparison")
+
+
+def create_scenario_popularity(results, game_type, save_dir="graphs/scenario_comparison/popularity/"):
+    """
+    For each scenario type, compare popularity across all agent groups
+    """
+    save_dir_game = os.path.join(save_dir, game_type)
+    os.makedirs(save_dir_game, exist_ok=True)
+
+    agent_groups = get_all_agent_groups(results)
+    all_scenarios = sorted(set(extract_scenario_category(name) for name in results.keys()))
+
+    for scenario in all_scenarios:
+        # Skip SelfPlay - always 100% test agents
+        if 'SelfPlay' in scenario:
+            continue
+
+        scenario_pop_data = {}
+
+        for scenario_name, data in results.items():
+            if extract_scenario_category(scenario_name) == scenario:
+                agent_display = get_agent_display_name(scenario_name)
+                popularity = data.get('popularity_over_time', [])
+
+                if popularity and len(popularity) >= 3:
+                    total = sum(popularity) if sum(popularity) > 0 else 1
+
+                    if any(x in scenario for x in ['1']):
+                        test_pop = (popularity[0] + popularity[1]) / total * 100
+                        opp_pop = popularity[2] / total * 100
+                    else:  # '2' scenarios
+                        test_pop = popularity[0] / total * 100
+                        opp_pop = (popularity[1] + popularity[2]) / total * 100
+
+                    scenario_pop_data[agent_display] = {
+                        'test_pop': test_pop,
+                        'opp_pop': opp_pop
+                    }
+
+        if not scenario_pop_data:
+            continue
+
+        fig, ax = plt.subplots(figsize=(12, 7))
+
+        agents_present = sorted(scenario_pop_data.keys())
+        x = np.arange(len(agents_present))
+        width = 0.35
+
+        test_vals = [scenario_pop_data[agent]['test_pop'] for agent in agents_present]
+        opp_vals = [scenario_pop_data[agent]['opp_pop'] for agent in agents_present]
+
+        bars1 = ax.bar(x - width / 2, test_vals, width, label='Test Agents',
+                       color='#2ecc71', alpha=0.8, edgecolor='black')
+        bars2 = ax.bar(x + width / 2, opp_vals, width, label='Opponent Agents',
+                       color='#e74c3c', alpha=0.8, edgecolor='black')
+
+        ax.set_xlabel('Agent Type', fontsize=12, fontweight='bold')
+        ax.set_ylabel('Average Popularity (%)', fontsize=12, fontweight='bold')
+        ax.set_title(f'{scenario} - {game_type}: Agent Popularity Comparison', fontsize=14, fontweight='bold')
+        ax.set_xticks(x)
+        ax.set_xticklabels(agents_present, rotation=45, ha='right')
+        ax.legend(loc='upper right')
+        ax.grid(axis='y', alpha=0.3)
+        ax.set_ylim(0, 105)
+        ax.axhline(y=50, color='black', linestyle='--', alpha=0.3, linewidth=1)
+
+        for bar in bars1:
+            height = bar.get_height()
+            if height > 0:
+                ax.text(bar.get_x() + bar.get_width() / 2., min(height + 2, 102),
+                        f'{height:.1f}%', ha='center', va='bottom', fontsize=9, fontweight='bold')
+
+        for bar in bars2:
+            height = bar.get_height()
+            if height > 0:
+                ax.text(bar.get_x() + bar.get_width() / 2., min(height + 2, 102),
+                        f'{height:.1f}%', ha='center', va='bottom', fontsize=9, fontweight='bold')
+
+        plt.tight_layout()
+        plt.savefig(f'{save_dir_game}/{scenario}_popularity.png', dpi=150, bbox_inches='tight')
+        plt.close()
+
+        print(f"Created {scenario} {game_type} popularity comparison")
+
+
+def create_scenario_stag_hunting(results, game_type, save_dir="graphs/scenario_comparison/stag_hunting/"):
+    """
+    Overview stag hunting comparison across all scenarios and agents
+    """
+    save_dir_game = os.path.join(save_dir, game_type)
+    os.makedirs(save_dir_game, exist_ok=True)
+
+    agent_groups = get_all_agent_groups(results)
+    all_scenarios = sorted(set(extract_scenario_category(name) for name in results.keys()))
+
+    agent_colors = {}
+    color_map = plt.cm.tab10(np.linspace(0, 1, len(agent_groups)))
+    for i, agent in enumerate(agent_groups):
+        agent_colors[agent] = color_map[i]
+
+    fig, ax = plt.subplots(figsize=(12, 7))
+
+    x = np.arange(len(all_scenarios))
+    width = 0.8 / len(agent_groups)
+
+    for i, agent_display in enumerate(agent_groups):
+        stag_scores = []
+        for scenario in all_scenarios:
+            score_found = 0
+            for scenario_name, data in results.items():
+                if get_agent_display_name(scenario_name) == agent_display and \
+                        extract_scenario_category(scenario_name) == scenario:
+                    scores = data.get('score_per_player', [])
+                    if scores and isinstance(scores[0], list):
+                        filtered_scores = filter_relevant_scores(scenario_name, scores)
+                        score_found = np.mean([player[2] for player in filtered_scores])
+                    break
+            stag_scores.append(score_found)
+
+        offset = (i - (len(agent_groups) - 1) / 2) * width
+        bars = ax.bar(x + offset, stag_scores, width, label=agent_display,
+                      color=agent_colors[agent_display], alpha=0.8)
+
+        for bar in bars:
+            height = bar.get_height()
+            if height > 0.01:
+                ax.text(bar.get_x() + bar.get_width() / 2., height + 0.01,
+                        f'{height:.3f}', ha='center', va='bottom', fontsize=7, rotation=90)
+
+    ax.set_xlabel('Scenario Type', fontsize=12, fontweight='bold')
+    ax.set_ylabel('Average Stag Score (Cooperation)', fontsize=12, fontweight='bold')
+    ax.set_title(f'{game_type} Games: Stag Hunting by Scenario', fontsize=14, fontweight='bold')
+    ax.set_xticks(x)
+    ax.set_xticklabels(all_scenarios, rotation=45, ha='right')
+    ax.legend(loc='upper right')
+    ax.grid(axis='y', alpha=0.3)
+    ax.set_ylim(0, 1)
+
+    plt.tight_layout()
+    plt.savefig(f'{save_dir_game}/stag_hunting_by_scenario.png', dpi=150, bbox_inches='tight')
+    plt.close()
+
+    print(f"Created {game_type} scenario stag hunting overview")
+
 # ==================== MAIN EXECUTION ====================
 if __name__ == "__main__":
     all_results = load_all_results()
@@ -559,6 +860,17 @@ if __name__ == "__main__":
     print("=" * 60)
     create_hare_intent_graphs(all_results['Round'], 'Round')
     create_hare_intent_graphs(all_results['Step'], 'Step')
+
+    # SCENARIO COMPARISON GRAPHS (Column View)
+    print("\n" + "=" * 60)
+    print("CREATING SCENARIO COMPARISON GRAPHS (Column View)")
+    print("=" * 60)
+    for game_type in ['Round', 'Step']:
+        results = all_results[game_type]
+        create_scenario_reward_distribution(results, game_type)
+        create_scenario_hare_intent(results, game_type)
+        create_scenario_popularity(results, game_type)
+        create_scenario_stag_hunting(results, game_type)
 
     print("\n" + "=" * 60)
     print("✅ ALL GRAPHS GENERATED SUCCESSFULLY!")

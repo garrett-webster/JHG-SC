@@ -22,6 +22,9 @@ from stagHare.loggingStuff.stagHareLogger import stagHareLogger, informationObje
 from stagHare.visualziationTools.gameLogger import GameLogger
 from stagHare.visualziationTools.inviduvalRoundGrapher import IndividualRoundGrapher
 
+# just gets rid of the stupid SKELARN warning for allegatr. I'm not touching that.
+import warnings
+warnings.filterwarnings("ignore", category=UserWarning, module="sklearn")
 
 def run_trial_graphing(stag_hare, current_round_grapher, current_game_logger):
     intents = [] # I want to return this now. this sucks.
@@ -33,7 +36,7 @@ def run_trial_graphing(stag_hare, current_round_grapher, current_game_logger):
         agent_positions.append(stag_hare.state.agent_positions.copy())
         # have this generate right off the bat
         # current_round_grapher.create_round_graph(stag_hare)
-        rewards = [0] * 5 # 3 hunters, 2 other peeps
+        rewards = [0] * 5 # 3 hunters, 2 other peepsdd
         # this is a reminder to check the action map to make sure that we are hunting what we think we are.
 
         round_rewards = stag_hare.transition()
