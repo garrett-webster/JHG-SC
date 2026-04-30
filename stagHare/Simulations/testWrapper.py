@@ -54,12 +54,14 @@ RandomAgents = True
 forced_random = False
 num_attempts = 1000
 
-base_agents = ["SCab", "HCab", "ECab"]
-# base_agents = ["SCab"]
+# base_agents = ["SCab", "HCab", "ECab99", "ECab199", "Allegatr"]
+base_agents = ["Allegatr"]
 base_to_csv = {
     "SCab": "16x16round4.csv",
     "HCab": "gen_z.csv",
-    "ECab": "gen_199.csv",
+    "ECab99": "gen_99.csv",
+    "ECab199": "gen_199.csv",
+    "Allegatr": "Allegatr",
 }
 game_type_to_name = {
     run_trial_step: "Step",
@@ -102,27 +104,3 @@ if __name__ == "__main__":
                 new_batch_logger = run_test(curr_agent_name, scenario_type, game_type, height, width, RandomAgents, forced_random, GamesPerRound=10)
                 write_batch_results_to_file(new_batch_logger, scenario_type)
 
-
-
-        # curr_test = data["tests"][test]
-        # scenario_type = curr_test["scenario_type"]
-        # curr_agent_name = curr_test["curr_agent_name"]
-        # GamesPerRound = curr_test["GamesPerRound"]
-        # statuses = curr_test["Status"]
-        #
-        # # separate status for Round and Step, check both
-        # for status in statuses:
-        #     if statuses[status] == True: # skip already done statuses.
-        #         continue
-        #     else:
-        #         if status == "Round":
-        #             game_type = run_trial_round
-        #         elif status == "Step":
-        #             game_type = run_trial_step
-        #         else:
-        #             game_type = None
-        #             print(f"Here is the status {status}")
-        #             break
-        #
-        #         new_batch_logger = run_test(curr_agent_name, scenario_type, game_type, height, width, RandomAgents, forced_random, GamesPerRound)
-        #         write_batch_results_to_file(new_batch_logger, scenario_type)

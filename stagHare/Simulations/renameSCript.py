@@ -51,8 +51,39 @@ def update_json_scenario_names(directory_path="results/", old_prefix="ECab", new
     print(f"JSON files updated: {updated_count}")
 
 
-if __name__ == "__main__":
-    # Rename files from ECab -> ECab99
-    rename_ecab_files("results/", "ECab", "ECab99")
+import os
 
-    print("\nDone! Files renamed successfully.")
+
+def undo_double_rename(directory_path="results/"):
+    """
+    Fix files that were accidentally renamed twice
+    Example: ECab9999SelfPlayRound.json -> ECab99SelfPlayRound.json
+    """
+    fixed_count = 0
+
+    for file in os.listdir(directory_path):
+        if file.startswith("ECab9999") and file.endswith('.json'):
+            old_path = os.path.join(directory_path, file)
+
+            # Remove one "99" from the name
+            new_file = file.replace("ECab9999", "ECab99", 1)
+            new_path = os.path.join(directory_path, new_file)
+
+            os.rename(old_path, new_path)
+            fixed_count += 1
+            print(f"Fixed: {file} -> {new_file}")
+
+    print(f"\nTotal files fixed: {fixed_count}")
+    return fixed_count
+
+
+# if __name__ == "__main__":
+#     undo_double_rename("results/")
+#     print("\nDone! Files restored to ECab99 prefix.")
+#
+#
+# # if __name__ == "__main__":
+# #     # Rename files from ECab -> ECab99
+# #     # rename_ecab_files("results/", "ECab", "ECab99")
+# #     #
+# #     # print("\nDone! Files renamed successfully.")
