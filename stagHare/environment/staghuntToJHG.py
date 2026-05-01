@@ -31,7 +31,7 @@ def staghunt_to_jhg(state, action_map, old_agent_positions, old_state, hare_capt
         allocations_dict[name] = new_allocation
 
     allocations = np.array(allocations)
-    print("Here are the allocations ", allocations)
+    # print("Here are the allocations ", allocations)
     row_sums = allocations.sum(axis=1, keepdims=True)
     normalized = allocations / row_sums
     allocations = list(normalized)

@@ -28,13 +28,15 @@ if __name__ == '__main__':
     random_agents = True  # better for human distribution
 
     # no round list unfortunately, doesn't work that way
-    num_attempts = 10  # don't worry about this
+    num_attempts = 100  # don't worry about this
     num_rounds_per_game = 10
     # keep agent names as a list, will make literally EVERYTHING easier.
     # 6x6round3.csv
     # agent_names = [["GHare", "GHare", "GHare"]]
     # agent_names = [["6x6round3.csv", "6x6round3.csv", "6x6round3.csv"]]
-    agent_names = [["16x16round4.csv", "16x16round4.csv", "16x16round4.csv"]]
+    # agent_names = [["16x16round4.csv", "16x16round4.csv", "16x16round4.csv"]]
+    agent_names = [["gen_Z.csv", "gen_Z.csv", "gen_Z.csv"]]
+
     scenario_types = ["HCAB_self_play"]
     # agent_names = ["homoJHGSelfPlay.csv"]
 
@@ -42,6 +44,7 @@ if __name__ == '__main__':
     type="round_based"
     height, width = 16, 16  # lets start there, not too big but there.
     print("height, wdith ", height, " ", width)
+
 
     for i, scenario_type in enumerate(scenario_types):
         curr_agent_name = agent_names[i] # get just the curr agent names.

@@ -32,15 +32,19 @@ if __name__ == '__main__':
     # no round list unfortunately, doesn't work that way
 
     # for testing purposes right off the bat, lets work with social welfare. that wi
-    num_attempts = 1  # don't worry about this
+    num_attempts = 100  # don't worry about this
     # don't add cats yet, we will worry about that later.
     # agent_name = "mixedJHGSelfPlay.csv"
     # agent_names = [["6x6round3.csv", "6x6round3.csv", "6x6round3.csv"]]
-    agent_names = [["GHare", "GHare", "GHare"]]
+    # agent_names = [["GHare", "GHare", "GHare"]]
     scenario_types = ["HCAB_self_play"]
+    agent_names = [["gen_Z.csv", "gen_Z.csv", "gen_Z.csv"]]
+    # agent_names = [["16x16round4.csv", "16x16round4.csv", "16x16round4.csv"]]
+
 
     height, width = 16, 16  # lets start there, not too big but there.
     type = "step_based"
+    games_per_round = None # this doesn't matter, but for homogenity we need it.
 
     for i, scenario_type in enumerate(scenario_types):
         print("Scenario: " + scenario_type)
@@ -55,7 +59,7 @@ if __name__ == '__main__':
         with ProcessPoolExecutor(max_workers=max_workers) as executor:
             futures = []
             for attempt in range(num_attempts):
-                futures.append(executor.submit(run_trial_step, curr_agent_names, height, width, random_agents, forced_random, scenario_type))
+                futures.append(executor.submit(run_trial_step, curr_agent_names, height, width, random_agents, forced_random, scenario_type, games_per_round))
 
             for future in tqdm(as_completed(futures), desc="Submitting Results", total=num_attempts):
                 results.append(future.result())
@@ -64,9 +68,9 @@ if __name__ == '__main__':
         for result in results:
             game_logger = information_object_to_game_logger(result)
             # we should be able to do all of this
-            game_grapher = GameGrapher(result.popularity_over_time, 3, curr_agent_names, scenario_type)
+            # game_grapher = GameGrapher(result.popularity_over_time, 3, curr_agent_names, scenario_type)
             # game_grapher.create_game_graph(game_logger)
-            game_grapher.playback_game(game_logger)
+            # game_grapher.playback_game(game_logger)
             current_batch_logger.add_game(result)  # this SHOULD be the actual information object.
 
         current_batch_logger.get_batch_results()  # just do this once per scenario

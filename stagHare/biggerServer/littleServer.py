@@ -59,27 +59,54 @@ class gameInstance():
 
 
     # yeah this one is kind of a mess. We could probably have done this better as well.
+
+
     def set_situation(self, situation):
-        situation = situation[0]
+        # I hate that this is put here like this. we shall see.
+        agent_name_dict = {
+            "GHare": 1,
+            "GStag": 2,
+            "Allegatr": 3,
+        }
+
         self.situation = situation
+
+        situation = situation[0]
         agent_types = []
-        if situation == "A":
-            agent_types = [1,1] # two hare greedy
-        if situation == "B":
-            agent_types = [] # empty
-        if situation == "C":
-            agent_types = [2] # one stag greedy
-        if situation == "D":
-            agent_types = [2,2]
-        if situation == "PH": # Hare Greedy again
-            agent_types = [1,1]
-        if situation == "PS": # Stag Greedy again
-            agent_types = [2,2]
-        if situation == "CAB":
-            agent_types = [3,3]
-        if situation == "GA":
-            agent_types = [4,4]
-        return agent_types
+        num_agents = int(situation[-1])
+        agent_type = situation[:-1]
+        # self play one off -- I hate this lol
+        if agent_type == "SelfPlay":
+            agent_types = [] # empty thingy.
+            return agent_types
+        # literally everything else.
+        else:
+            agent_index = agent_name_dict[agent_type]
+            agent_types = [agent_index for _ in range(num_agents)]
+            return agent_types
+
+
+    # def set_situation(self, situation):
+    #     situation = situation[0]
+    #     self.situation = situation
+    #     agent_types = []
+    #     if situation == "A":
+    #         agent_types = [1,1] # two hare greedy
+    #     if situation == "B":
+    #         agent_types = [] # empty
+    #     if situation == "C":
+    #         agent_types = [2] # one stag greedy
+    #     if situation == "D":
+    #         agent_types = [2,2]
+    #     if situation == "PH": # Hare Greedy again
+    #         agent_types = [1,1]
+    #     if situation == "PS": # Stag Greedy again
+    #         agent_types = [2,2]
+    #     if situation == "CAB":
+    #         agent_types = [3,3]
+    #     if situation == "GA":
+    #         agent_types = [4,4]
+    #     return agent_types
 
     # where da magic happens.
     def collect_inputs(self, current_time, timer):

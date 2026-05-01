@@ -69,6 +69,7 @@ class StagHare:
         # first, lets run the JHG to staghunt portion
         action_map, hunting_hare_map, old_allocations = jhg_to_staghunt(self.agents, self.state, rewards,
                                                                         round_num)  # this does contain the hare and stag.
+
         self.action_map = action_map
         old_agent_positions = self.state.agent_positions.copy()  # make a copy of this, trust me.
         old_state = deepcopy(self.state)  # this SHOULD work?

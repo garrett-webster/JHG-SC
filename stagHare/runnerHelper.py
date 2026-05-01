@@ -159,7 +159,7 @@ def run_trial_test(agents):
             # passes by value. thanks python.
             return create_new_score(stag_hare)  # should return the new score array.
 
-def run_trial_round(agent_names, height, width, random_agents, forced_random, scenario_type, num_rounds_per_game):
+def run_trial_round(agent_names, height, width, random_agents, forced_random, scenario_type, num_rounds_per_game, graphing):
 
     scores = []
     intents = []
@@ -169,6 +169,9 @@ def run_trial_round(agent_names, height, width, random_agents, forced_random, sc
     # num_rounds_per_game = 10 # lets start here.
     current_logger = stagHareLogger()
 
+    if graphing:
+        current_game_logger = GameLogger(height, width, agent_names, scenario_type)
+        current_round_grapher = IndividualRoundGrapher()
 
     hunters = create_hunters_with_list(random_agents, forced_random, agent_names)
 
@@ -183,8 +186,13 @@ def run_trial_round(agent_names, height, width, random_agents, forced_random, sc
         stag_hare.state.hunting_hare_map = {"R" + str(i): 2 for i in
                                             range(3)}  # value that it can never be, sort of a NAN.
 
-        # just run the fetcher.
-        new_score, new_intents, new_positions, popularity_over_time, hunters = run_trial_sim_no_graphing(stag_hare)
+        if graphing:
+            new_score, new_intents, new_positions, popularity_over_time, hunters = run_trial_graphing(stag_hare,
+                                                                                                      current_round_grapher,
+                                                                                                      current_game_logger)
+        else: # no graphing , no sims.
+            # just run the fetcher.
+            new_score, new_intents, new_positions, popularity_over_time, hunters = run_trial_sim_no_graphing(stag_hare)
 
         # just set up a new state that doesn't break immediatel.y
         while True:
@@ -455,6 +463,7 @@ def create_hunters_with_list(random_agents:bool , forced_random:bool, agent_list
 
         if cab_agent:
             new_hunters.append(CabAgent(i, new_name, random_agents, forced_random, gene="", agent_name=agent_name))
+            # confirmed that forcedRandom works as anticipated.
 
         else: # we have 3 options rught now: G_hare, G_stag, and Allegatr.
             if agent_name == "GHare":
@@ -578,7 +587,7 @@ def process_scores(scores):
 
     cooperation_score = sum([2, 2, 2] == score for score in scores) / len(scores)
 
-    # I should be doing this in a json logger thing but I don't care.
+    # # I should be doing this in a json logger thing but I don't care.
     # print("here was the cooperation score \n", cooperation_score)
     # print("here was the scores per player \n", scores_per_player)
     # print("here were the total scores \n", total_sum_per_player)
