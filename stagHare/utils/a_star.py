@@ -78,7 +78,7 @@ class AStar(object):
             # Find node with smallest F score
             curr_node, idx, min_score = None, 0, np.inf
 
-            for i, node in enumerate(open_list):
+            for i, node in enumerate(open_list): # HUGE performance hit here. Use something other than just a list (such as a heap)
                 if node.f < min_score:
                     curr_node, idx, min_score = node, i, node.f
 
@@ -103,14 +103,14 @@ class AStar(object):
             # Visit the children and update their g, h, and f values
             for child in children:
                 if child in closed_nodes:
-                    continue
+                    continue # this might be wrong? I'm not sure what he's trying to do here.
 
                 new_g, new_h = curr_node.g + 1, state.n_movements(child.row, child.col, end_node.row, end_node.col)
                 child.update_values(new_g, new_h)
 
                 for node in open_list:
                     if child == node and child.g > node.g:
-                        continue
+                        continue # this means that we still add the child regardless?
 
                 open_list.append(child)
 

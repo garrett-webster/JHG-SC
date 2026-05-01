@@ -19,8 +19,8 @@ hunters = []
 MAX_ROUNDS = 2
 round = 1
 
+# start a game session if we have enough players.
 def maybe_start_game():
-    """Start a game session if we have enough players."""
     if len(connected_clients) == HUMAN_PLAYERS:
         new_player_list = copy.copy(connected_clients)
         GameServer(new_player_list, client_id_dict, client_usernames)

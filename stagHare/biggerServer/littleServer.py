@@ -10,7 +10,12 @@ import time # tit for tat pausing?
 from stagHare.agents.generator import GreedyHareGen
 from stagHare.agents.greedy import Greedy
 from stagHare.agents.cabAgentThing import CabAgent
-from stagHare.runnerHelper import run_trial, run_trial_test
+from stagHare.runnerHelper import run_trial_step, run_trial_test
+
+from stagHare.agents.hareAgent import HareAgent
+from stagHare.agents.stagAgent import StagAgent
+from stagHare.agents.alegaatr import AlegAATr # litmus test
+
 
 PAUSE_TIME = 5
 HEIGHT = 16
@@ -51,7 +56,6 @@ class gameInstance():
         self.player_points_initialization()
         self.stag_hare = stag_hare  # just to have that down.
         self.main_game_loop()
-        # run_trial_test(agents=self.hunters)
 
 
     # yeah this one is kind of a mess. We could probably have done this better as well.
@@ -326,26 +330,12 @@ class gameInstance():
             agent_type = self.agentType[index]
             # different types of agents can go here, might be work making a different functioun
             if agent_type == 1:
-                new_hunters.append(GreedyHareGen(new_name))
+                new_hunters.append(HareAgent(i, name=new_name))
             if agent_type == 2:
-                new_hunters.append(Greedy(new_name, "stag"))
+                new_hunters.append(StagAgent(i, name=new_name))
             if agent_type == 3:
-                agent_name = "homoJHGSelfPlay.csv" # I DON"T Feel like adding a bunch of support for this. start small.
-                new_hunters.append(CabAgent(i, new_name, agent_name))
-            if agent_type == 4:
-                agent_name = "16x16Round1.csv"
-                new_hunters.append(CabAgent(i, new_name, self.random_agents, self.forced_random, gene="", agent_name=agent_name))
+                new_hunters.append(AlegAATr(name=new_name, lmbda=0.0, ml_model_type='knn', enhanced=True))
 
-
-
-            # if self.agentType == 2:
-            #     new_hunters.append(AlegAATr(name=new_name, lmbda=0.0, ml_model_type='knn', enhanced=True))
-            # if self.agentType == 3:
-            #     new_hunters.append(QAlegAATr(name=new_name, enhanced=True))
-            # if self.agentType == 4:
-            #     new_hunters.append(SMAlegAATr(name=new_name))
-            # if self.agentType == 5:
-            #     new_hunters.append(RawO(name=new_name, enhanced=True))
             index += 1 # go through the list bc we are expecting it to be an array now.
 
 
