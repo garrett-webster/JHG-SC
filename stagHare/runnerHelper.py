@@ -27,51 +27,6 @@ from stagHare.visualziationTools.inviduvalRoundGrapher import IndividualRoundGra
 import warnings
 warnings.filterwarnings("ignore", category=UserWarning, module="sklearn")
 
-def run_trial_graphing(stag_hare, current_round_grapher, current_game_logger):
-    intents = [] # I want to return this now. this sucks.
-    agent_positions = []
-    while True: # the way this gets run is VERY VERY weird.
-
-        current_game_logger.add_round(stag_hare.state)
-        intents.append(create_intents_list(stag_hare.state.hunting_hare_map)) # Might need to custom cast this to integers.
-        agent_positions.append(stag_hare.state.agent_positions.copy())
-        # have this generate right off the bat
-        # current_round_grapher.create_round_graph(stag_hare)
-        rewards = [0] * 5 # 3 hunters, 2 other peepsdd
-        # this is a reminder to check the action map to make sure that we are hunting what we think we are.
-
-        round_rewards = stag_hare.transition()
-        for i, reward in enumerate(round_rewards):
-            rewards[i] += reward
-
-        if stag_hare.is_over():
-            agent_positions.append(stag_hare.state.agent_positions)
-            current_game_logger.add_round(stag_hare.state)
-            intents.append(create_intents_list(stag_hare.state.hunting_hare_map))
-            # current_round_grapher.create_round_graph(stag_hare)
-            # passes by value. thanks python.
-            return create_new_score(stag_hare), intents, agent_positions, stag_hare.popularity_over_time, stag_hare.hunters
-
-# for homogenity, we need to freakin have the current grapher and current logger, but we don't actually use them. Ignore them.
-def run_trial_sim_no_graphing(stag_hare, current_grapher, current_logger):
-    intents = [] # THIs is not elegant, but it does work.
-    agent_positions = []
-    while True:
-        intents.append(create_intents_list(stag_hare.state.hunting_hare_map)) # Might need to custom cast this to integers.
-        agent_positions.append(stag_hare.state.agent_positions.copy())
-        rewards = [0] * 5 # 3 hunters, 2 other peeps
-
-        round_rewards = stag_hare.transition()
-        for i, reward in enumerate(round_rewards):
-            rewards[i] += reward
-
-        if stag_hare.is_over():
-            intents.append(create_intents_list(stag_hare.state.hunting_hare_map))
-            agent_positions.append(stag_hare.state.agent_positions)
-            # print(f"here are the agent positions, {agent_positions}")
-            return create_new_score(stag_hare), intents, agent_positions, stag_hare.popularity_over_time, stag_hare.hunters # that should do the trick.
-
-
 def create_intents_list(current_intents: dict) -> list:
     new_list = []
     for key, value in current_intents.items():
@@ -81,28 +36,16 @@ def create_intents_list(current_intents: dict) -> list:
 
 # takes in a list of list of lists, then returns both the total defect percent and defect by agent.
 def process_intents(current_intents: list) -> tuple[int, list]:
-
     # this gets rid of the 2,2,2, which is easier to do when we are still thinking of them as a list of games of rounds of intents.
     filtered_and_flattened = [round_list for game_list in current_intents for round_list in game_list if round_list != [2,2,2]] # good lord what is happening in there.
-
     # this just then gets me the raw score.
-
     transposed = list(zip(*filtered_and_flattened))
-
     new_sum = np.sum(transposed, axis=1)
-
     num_rounds = len(filtered_and_flattened)
-    # num_columns = len(transposed)
-
     column_percentages = new_sum / num_rounds
-    # total_percentage = sum(new_sum) / (num_rounds * num_columns)
-
-    # print("Bad intents sum ", new_sum, " and the total bad intents ", sum(new_sum))
-    # print("percentages defect ", column_percentages, " and total ", total_percentage)
-
-    # return total_percentage, column_percentages
     return column_percentages # we ONLY want the column ones. for reasons.
 
+# this is worth keeping around because it has to return specific stuff for the genetic algorithm.
 def run_trial_genetic(hunters, height, width):
 
     # create the instance simulator
@@ -127,38 +70,6 @@ def run_trial_genetic(hunters, height, width):
         if stag_hare.is_over():
             return create_new_score(stag_hare)
 
-def run_trial_test(agents):
-    height = 6
-    width = 6
-
-    hunters = agents
-
-    while True:
-        stag_hare = StagHare(height, width, hunters)
-        if not stag_hare.is_over():
-            break  # no reason to start in a finished configuration.
-
-    while True:  # the way this gets run is VERY VERY weird.
-
-        # current_game_logger.add_round(stag_hare.state)
-        # have this generate right off the bat
-        # current_round_grapher.create_round_graph(stag_hare)
-        rewards = [0] * 5  # 3 hunters, 2 other peeps
-        # this is a reminder to check the action map to make sure that we are hunting what we think we are.
-
-        round_rewards = stag_hare.transition()
-        for i, reward in enumerate(round_rewards):
-            rewards[i] += reward
-
-        if stag_hare.is_over():
-            # if stag_hare.state.hare_captured():
-            #     print("hare dead")
-            # else:
-            #     print('stag dead')
-
-            # current_game_logger.add_round(stag_hare.state)
-            # passes by value. thanks python.
-            return create_new_score(stag_hare)  # should return the new score array.
 
 def get_graphing_stuff(graphing, height, width, agent_names, scenario_type):
     if graphing == True:
@@ -227,181 +138,6 @@ def run_trial_all(agent_names, height, width, random_agents, forced_random, scen
     game_information = GameInformationObject(scenario_type, cooperation_score, scores_per_player, agent_names, hare_intent_percent_player, agent_positions, end_popularities, hunters, height, width, intents)
     return game_information
 
-
-
-
-def run_trial_round(agent_names, height, width, random_agents, forced_random, scenario_type, num_rounds_per_game, graphing):
-
-    scores = []
-    intents = []
-    agent_positions = []
-    popularity_over_time = []
-
-    # num_rounds_per_game = 10 # lets start here.
-    # current_logger = stagHareLogger()
-
-    current_game_logger = GameLogger(height, width, agent_names, scenario_type)
-    current_round_grapher = IndividualRoundGrapher()
-
-    hunters = create_hunters_with_list(random_agents, forced_random, agent_names)
-
-
-    while True:
-        stag_hare = StagHare(height, width, hunters)
-        if not stag_hare.is_over():
-            break
-
-    for i in range(num_rounds_per_game):
-        # does this suck? possibly.
-        stag_hare.state.hunting_hare_map = {"R" + str(i): 2 for i in
-                                            range(3)}  # value that it can never be, sort of a NAN.
-
-        if graphing:
-            new_score, new_intents, new_positions, popularity_over_time, hunters = run_trial_sim_no_graphing(stag_hare,
-                                                                                                      current_round_grapher,
-                                                                                                      current_game_logger)
-        else: # no graphing , no sims.
-            # just run the fetcher.
-            new_score, new_intents, new_positions, popularity_over_time, hunters = run_trial_sim_no_graphing(stag_hare, current_round_grapher, current_game_logger)
-
-        # just set up a new state that doesn't break immediatel.y
-        while True:
-            stag_hare.state.reset_positions()  # maybe this will work?
-            if not stag_hare.is_over():
-                break
-
-        scores.append(new_score)
-        intents.append(new_intents)
-        agent_positions.append(new_positions)
-
-    cooperation_score, scores_per_player = process_scores(scores)
-    hare_intent_percent_player = process_intents(intents)
-    game_information = GameInformationObject(scenario_type, cooperation_score, scores_per_player, agent_names, hare_intent_percent_player, agent_positions, popularity_over_time, hunters, height, width, intents)
-    return game_information
-
-
-
-
-# def run_trial_step(agent_type, agent_name, height, width, random_agents, forced_random):
-#     try:
-#         # changed on 3/17 to allow height and width to be passed in instead of specified here.
-#         new_scores = []
-#         new_intents = []
-#         # want to monitor how things work.
-#         hunters = create_hunters(agent_type, random_agents, forced_random, agent_name, agent_scenario=0)
-#         round = 0
-#         num_per_batch = 5
-#
-#         while True:
-#             stag_hare = StagHare(height, width, hunters)
-#             if not stag_hare.is_over():
-#                 break # no reason to start in a finished configuration.
-#
-#         i = 0
-#         while True: # the way this gets run is VERY VERY weird.
-#             new_intents.append(create_intents_list(stag_hare.state.hunting_hare_map))  # Might need to custom cast this to integers.
-#             new_scores.append(create_new_score(stag_hare))
-#             round += 1
-#             rewards = [0] * 5 # 3 hunters, 2 other peeps
-#
-#             round_rewards = stag_hare.transition()
-#             for i, reward in enumerate(round_rewards):
-#                 rewards[i] += reward
-#
-#
-#
-#             if stag_hare.is_over():
-#                 new_scores.append(create_new_score(stag_hare))
-#                 i += 1
-#                 if i == num_per_batch: # gotta get out here at some point.
-#                     break
-#
-#                 while True:
-#                     stag_hare.state.reset_positions()  # maybe this will work?
-#                     if not stag_hare.is_over():
-#                         break
-#
-#         return process_scores(new_scores), process_intents(new_intents) # should return the new score array.
-#     except Exception as e:
-#         print("FUTURE CRASHED: ", e)
-#         traceback.print_exc()
-
-
-def run_trial_step(agent_names, height, width, random_agents, forced_random, scenario_type, games_per_round, graphing):
-    try:
-        start = time.time()
-        # changed on 3/17 to allow height and width to be passed in instead of specified here.
-
-        # want to monitor how things work.
-        hunters = create_hunters_with_list(random_agents, forced_random, agent_names)
-        current_game_logger = GameLogger(height, width, agent_names, scenario_type)
-        current_round_grapher = IndividualRoundGrapher()
-
-        while True:
-            stag_hare = StagHare(height, width, hunters) # np
-            if not stag_hare.is_over():
-                break # no reason to start in a finished configuration.
-
-        # it will break if you get rid of this. you know, as a heads up.
-        stag_hare.state.hunting_hare_map = {"R" + str(i): 2 for i in
-                                            range(3)}  # value that it can never be, sort of a NAN.
-
-        # print(f"this si the fetcher for {stag_hare.state.agent_positions}")
-
-        # new_score, new_intents, new_positions, popularity_over_time, hunters = run_trial_sim_no_graphing(stag_hare)
-        new_score, new_intents, new_positions, popularity_over_time, hunters = run_trial_graphing(stag_hare, current_round_grapher, current_game_logger)
-
-        scores, intents, agent_positions, popularity_over_time = [new_score], [new_intents], [new_positions], popularity_over_time
-
-        cooperation_score, scores_per_player = process_scores(scores)
-        hare_intent_percent_player = process_intents(intents)
-        game_information = GameInformationObject(scenario_type, cooperation_score, scores_per_player, agent_names,
-                                                 hare_intent_percent_player, agent_positions,
-                                                 popularity_over_time[-1], hunters, height, width, intents)
-        return game_information
-
-
-        # while True: # the way this gets run is VERY VERY weird.
-        #     # print("do we get here")
-        #     round += 1
-        #     # current_game_logger.add_round(stag_hare.state)
-        #     # have this generate right off the bat
-        #     # current_round_grapher.create_round_graph(stag_hare)
-        #     rewards = [0] * 5 # 3 hunters, 2 other peeps
-        #     # this is a reminder to check the action map to make sure that we are hunting what we think we are.
-        #
-        #     round_rewards = stag_hare.transition()
-        #     for i, reward in enumerate(round_rewards):
-        #         rewards[i] += reward
-        #
-        #     if round > 100:
-        #         print("l9onger than 100 rounds")
-        #     if round > 500:
-        #         print("longer than 500 rounds")
-        #     if round > 1000:
-        #         print("longer than 1000 rounds")
-        #
-        #     elapsed = time.time() - start
-        #     if elapsed > 10.0:
-        #         print("AYO WE GOT A STRAGLER HERE, num rounds ", str(round))
-        #     if stag_hare.is_over():
-        #         # if stag_hare.state.hare_captured():
-        #         #     print("hare dead")
-        #         # else:
-        #         #     print('stag dead')
-        #
-        #         # current_game_logger.add_round(stag_hare.state)
-        #         # passes by value. thanks python.
-        #         return create_new_score(stag_hare) # should return the new score array.
-
-
-
-    except Exception as e:
-        print("FUTURE CRASHED: ", e)
-        traceback.print_exc()
-
-
-
 def create_new_score(stag_hare):
     # optional last round printing thing... I think.
     # current_round_grapher.create_round_graph(stag_hare)
@@ -458,6 +194,7 @@ def get_possible_agent_captures(hare_x, hare_y, board_size):
 
     return neighboring_moves
 
+# also used specifically under the genetic algorithm. Leave him alone, he mad wierd.
 def create_hunters_with_genes(genes, random_agents, forced_random):
     new_hunters = []
     agent_name = "gen_199.csv"
@@ -495,18 +232,6 @@ def create_hunters_with_genes(genes, random_agents, forced_random):
 
     return new_hunters
 
-
-def create_hunters_scenario(agent_name, agent_scenario):
-    new_hunters = []
-    random_agents = True
-    forced_random = False
-
-    if agent_scenario == 1:
-        for i in range(3):
-            new_name = "R" + str(i)
-            new_hunters.append(CabAgent(i, new_name, random_agents, forced_random, gene="", agent_name=agent_name))
-
-    # start of the ecab v experts portion.
 
 # aight here's the plan
 # I need a much simpler and more effective way to be able to specify agents all in one go
@@ -549,100 +274,6 @@ def create_hunters_with_list(random_agents:bool , forced_random:bool, agent_list
 
     return new_hunters  # just make sure to get those new guys in somewhere.
 
-
-
-def create_hunters(agent_type, random_agents, forced_random, agent_name="", agent_scenario=0):
-
-    new_hunters = []
-
-    if agent_scenario == 2:
-        for i in range(2):
-            new_name = "R" + str(i)
-
-            if agent_type == -1:
-                new_hunters.append(AlegAATr(name=new_name, lmbda=0.0, ml_model_type='knn', enhanced=True))
-
-            if agent_type == 0:
-                new_hunters.append(Random(name=new_name))
-
-            if agent_type == 1:
-                new_hunters.append(HareAgent(i, name=new_name))
-
-            if agent_type == 2:
-                new_hunters.append(StagAgent(i, name=new_name))
-
-            if agent_type == 3:
-                new_hunters.append(CabAgent(i, new_name, random_agents, forced_random, gene="", agent_name=agent_name))
-
-
-        # this guy doesn't need an agent name or anything.
-        new_name = "R2"
-        new_hunters.append(FetcherBot(2, new_name))
-
-    elif agent_scenario == 3: # put one cab agent in with a bunch of guys.
-        new_name = "R0"
-        new_hunters.append(CabAgent(0, new_name, agent_name))
-        new_name = "R1"
-        new_hunters.append(StagAgent(1, name=new_name))
-        new_name = "R2"
-        new_hunters.append(StagAgent(2, name=new_name))
-
-    elif agent_scenario == 5:
-        new_name = "R0"
-        new_hunters.append(CabAgent(0, new_name, agent_name))
-        new_name = "R1"
-        new_hunters.append(CabAgent(1, new_name, agent_name))
-        new_name = "R2"
-        new_hunters.append(StagAgent(2, name=new_name))
-
-
-    elif agent_scenario == 4: # put one cab agent in with a bunch of guys.
-        new_name = "R0"
-        new_hunters.append(CabAgent(0, new_name, agent_name))
-        new_name = "R1"
-        new_hunters.append(HareAgent(1, name=new_name))
-        new_name = "R2"
-        new_hunters.append(HareAgent(2, name=new_name))
-
-    elif agent_scenario == 6:
-        new_name = "R0"
-        new_hunters.append(CabAgent(0, new_name, agent_name))
-        new_name = "R1"
-        new_hunters.append(CabAgent(1, new_name, agent_name))
-        new_name = "R2"
-        new_hunters.append(HareAgent(2, name=new_name))
-
-
-
-    else:
-        for i in range(3):
-            new_name = "R" + str(i)
-
-            if agent_type == -1:
-                new_hunters.append(AlegAATr(name=new_name, lmbda=0.0, ml_model_type='knn', enhanced=True))
-
-            if agent_type == 0:
-                new_hunters.append(Random(name=new_name))
-
-            if agent_type == 1:
-                new_hunters.append(HareAgent(i, name=new_name))
-
-            if agent_type == 2:
-                new_hunters.append(StagAgent(i, name=new_name))
-
-            if agent_type == 3:
-                new_hunters.append(CabAgent(i, new_name, random_agents, forced_random, gene="", agent_name=agent_name))
-
-
-            # if agent_type == 4:
-            #     new_hunters.append(QAlegAATr(name=new_name, enhanced=True))
-
-
-
-        # print("this shoudl fire")
-
-
-    return new_hunters # just make sure to get those new guys in somewhere.
 
 
 def process_scores(scores):

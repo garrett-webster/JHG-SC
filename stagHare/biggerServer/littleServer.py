@@ -10,7 +10,6 @@ import time # tit for tat pausing?
 from stagHare.agents.generator import GreedyHareGen
 from stagHare.agents.greedy import Greedy
 from stagHare.agents.cabAgentThing import CabAgent
-from stagHare.runnerHelper import run_trial_step, run_trial_test
 
 from stagHare.agents.hareAgent import HareAgent
 from stagHare.agents.stagAgent import StagAgent
