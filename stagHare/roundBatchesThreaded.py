@@ -3,7 +3,7 @@
 import os
 from tqdm import tqdm
 
-from stagHare.loggingStuff.stagHareLogger import BigBatchLogger
+from stagHare.loggingStuff.stagHareLogger import GameInformationResultsCompiler
 from stagHare.visualziationTools.batchLogger import BatchLogger
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from stagHare.runnerHelper import * # this SHOULD be all we need.
@@ -50,7 +50,7 @@ if __name__ == '__main__':
         curr_agent_name = agent_names[i] # get just the curr agent names.
         print("Scenario: " + scenario_type)
         scenario_type += f"_{type}_{num_attempts}"
-        current_batch_logger = BigBatchLogger(height, width, curr_agent_name, scenario_type)
+        current_batch_logger = GameInformationResultsCompiler(height, width, curr_agent_name, scenario_type)
         # unless we want randomize it, then that could a problem.
         # actually yeah thats a problem.
         results = []

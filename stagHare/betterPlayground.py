@@ -2,15 +2,15 @@ import json
 import os
 from tqdm import tqdm
 
-from stagHare.loggingStuff.stagHareLogger import BigBatchLogger
+from stagHare.loggingStuff.stagHareLogger import GameInformationResultsCompiler
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from stagHare.runnerHelper import *  # this SHOULD be all we need.
 
-def run_test(curr_agent_name, scenario_type, run_function, height, width, random_agents, forced_random, GamesPerRound, graphing):
+def run_test(curr_agent_name, scenario_type, height, width, random_agents, forced_random, GamesPerRound, graphing):
 
     # how many resources can we actually devote to this??
     max_workers = max(1, os.cpu_count() - 2)  # save just a few for other processes, plz don't crash.
-    current_batch_logger = BigBatchLogger(height, width, curr_agent_name, scenario_type)
+    current_batch_logger = GameInformationResultsCompiler(height, width, curr_agent_name, scenario_type)
 
     # max_workers = 1 # just... just do this for rn. makes debugging a little easier.
 
@@ -19,7 +19,7 @@ def run_test(curr_agent_name, scenario_type, run_function, height, width, random
         futures = []
         for attempt in range(num_attempts):
             futures.append(
-                executor.submit(run_function, curr_agent_name, height, width, random_agents, forced_random,
+                executor.submit(run_trial_all, curr_agent_name, height, width, random_agents, forced_random,
                                 scenario_type, GamesPerRound, graphing))
 
         for future in as_completed(futures):
@@ -43,12 +43,7 @@ def write_batch_results_to_file(current_batch_logger, scenario_type):
     with open(directory_path + f"{scenario_type}.json", "w") as f:
         json.dump(new_dict, f, indent=2)
 
-# some global variables
-height = 16
-width = 16
-RandomAgents = True
-forced_random = False
-num_attempts = 1000
+
 
 # base_agents = ["SCab", "HCab", "ECab99", "ECab199", "Allegatr"]
 base_agents = ["Allegatr"]
@@ -89,17 +84,32 @@ def get_agents(agent, scenario):
 
     return new_list
 
+# some global variables
+height = 16
+width = 16
+RandomAgents = True
+forced_random = False
+num_attempts = 1
+
+
 # removing Json implementatino because that was dumb and bad. back to pure script based.
 if __name__ == "__main__":
     height, width, RandomAgents, forced_random, num_attempts = height, width, RandomAgents, forced_random, num_attempts
 
+    agents = ["HCab"]
+    curr_agents = agents[0] # just get the first entry
+    scenario = "SelfPlay"
+    game_type = "Round"
+    graphing = False
+    num_games_per_round = 10
+    print_results_to_console = True
 
-    for agent in tqdm(base_agents):
-        for scenario in scenarios:
-            for game_type in game_types:
-                scenario_type = str(agent) + str(scenario) + str(game_type_to_name[game_type])
+    scenario_type = str(curr_agents) + str(scenario) + str(game_type)
 
-                curr_agent_name = get_agents(agent, scenario)
-                new_batch_logger = run_test(curr_agent_name, scenario_type, game_type, height, width, RandomAgents, forced_random, GamesPerRound=10)
-                write_batch_results_to_file(new_batch_logger, scenario_type)
+    curr_agent_name = get_agents(curr_agents, scenario)
+    new_batch_logger = run_test(curr_agent_name, scenario_type, height, width, RandomAgents, forced_random, 10, graphing)
+    new_batch_logger.get_batch_results(print_results_to_console)
+    # write_batch_results_to_file(new_batch_logger, scenario_type)
+
+
 

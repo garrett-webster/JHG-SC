@@ -3,7 +3,7 @@ import os
 from tqdm import tqdm
 from win32cryptcon import szOID_COMMON_NAME
 
-from stagHare.loggingStuff.stagHareLogger import BigBatchLogger
+from stagHare.loggingStuff.stagHareLogger import GameInformationResultsCompiler
 from stagHare.visualziationTools.batchLogger import BatchLogger
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from stagHare.runnerHelper import *  # this SHOULD be all we need.
@@ -14,7 +14,7 @@ def run_test(curr_agent_name, scenario_type, run_function, height, width, random
 
     # how many resources can we actually devote to this??
     max_workers = max(1, os.cpu_count() - 2)  # save just a few for other processes, plz don't crash.
-    current_batch_logger = BigBatchLogger(height, width, curr_agent_name, scenario_type)
+    current_batch_logger = GameInformationResultsCompiler(height, width, curr_agent_name, scenario_type)
 
     # max_workers = 1 # just... just do this for rn. makes debugging a little easier.
 

@@ -18,7 +18,7 @@ from stagHare.agents.alegaatr import AlegAATr # litmus test
 import numpy as np
 import time
 
-from stagHare.loggingStuff.stagHareLogger import stagHareLogger, informationObject
+from stagHare.loggingStuff.stagHareLogger import GameInformationObject
 from stagHare.visualziationTools.gameLogger import GameLogger
 from stagHare.visualziationTools.inviduvalRoundGrapher import IndividualRoundGrapher
 
@@ -52,7 +52,8 @@ def run_trial_graphing(stag_hare, current_round_grapher, current_game_logger):
             # passes by value. thanks python.
             return create_new_score(stag_hare), intents, agent_positions, stag_hare.popularity_over_time, stag_hare.hunters
 
-def run_trial_sim_no_graphing(stag_hare):
+# for homogenity, we need to freakin have the current grapher and current logger, but we don't actually use them. Ignore them.
+def run_trial_sim_no_graphing(stag_hare, current_grapher, current_logger):
     intents = [] # THIs is not elegant, but it does work.
     agent_positions = []
     while True:
@@ -91,16 +92,16 @@ def process_intents(current_intents: list) -> tuple[int, list]:
     new_sum = np.sum(transposed, axis=1)
 
     num_rounds = len(filtered_and_flattened)
-    num_columns = len(transposed)
+    # num_columns = len(transposed)
 
     column_percentages = new_sum / num_rounds
-    total_percentage = sum(new_sum) / (num_rounds * num_columns)
+    # total_percentage = sum(new_sum) / (num_rounds * num_columns)
 
     # print("Bad intents sum ", new_sum, " and the total bad intents ", sum(new_sum))
     # print("percentages defect ", column_percentages, " and total ", total_percentage)
 
-    return total_percentage, column_percentages
-
+    # return total_percentage, column_percentages
+    return column_percentages # we ONLY want the column ones. for reasons.
 
 def run_trial_genetic(hunters, height, width):
 
@@ -159,6 +160,76 @@ def run_trial_test(agents):
             # passes by value. thanks python.
             return create_new_score(stag_hare)  # should return the new score array.
 
+def get_graphing_stuff(graphing, height, width, agent_names, scenario_type):
+    if graphing == True:
+        run_trial_function = run_trial_graphing
+        current_game_logger = GameLogger(height, width, agent_names, scenario_type)
+        current_round_grapher = IndividualRoundGrapher()
+    else: # we need to make the game logger and round grapher have something, so they have None.
+        run_trial_function = run_trial_sim_no_graphing
+        current_game_logger = None
+        current_round_grapher = None
+    return run_trial_function, current_game_logger, current_round_grapher
+
+def get_stag_hare(height, width, hunters):
+    while True: # get stag hare.
+        stag_hare = StagHare(height, width, hunters)
+        if not stag_hare.is_over():
+            break
+
+    return stag_hare
+
+def reset_stag_hare(stag_hare):
+    while True:
+        stag_hare.state.reset_positions()  # maybe this will work?
+        if not stag_hare.is_over():
+            break
+
+    return stag_hare
+
+def run_trial_all(agent_names, height, width, random_agents, forced_random, scenario_type, num_rounds_per_game, graphing):
+
+
+    run_trial_function, current_game_logger, current_round_grapher = get_graphing_stuff(graphing, height, width, agent_names, scenario_type)
+
+    # if there is an imputted value, use that. If none, run it only once.
+    run_amount = num_rounds_per_game if num_rounds_per_game is not None else 1
+
+    hunters = create_hunters_with_list(random_agents, forced_random, agent_names)
+
+    scores = []
+    intents = []
+    agent_positions = []
+    # this gets tracked in the fetching simulator. that was a terrible idea. what if we don't do that.
+    end_popularities = []
+
+    stag_hare = get_stag_hare(height, width, hunters)
+
+    for i in range(run_amount): # if we only do 1 game, we only do this once.
+        # does this suck? possibly.
+        stag_hare.state.hunting_hare_map = {"R" + str(i): 2 for i in range(3)}  # Fill with NULL value
+
+                                                                            # function pointer depending on whether graphing is enabled or not.
+        new_score, new_intents, new_positions, popularity_over_time, hunters = run_trial_function(stag_hare, current_round_grapher, current_game_logger)
+
+        # make sure to add everything to its appropriate lists.
+        scores.append(new_score)
+        intents.append(new_intents)
+        agent_positions.append(new_positions)
+        end_popularities.append(popularity_over_time[-1])
+
+        # just set up a new state that doesn't break immediately
+        stag_hare = reset_stag_hare(stag_hare)
+
+    cooperation_score, scores_per_player = process_scores(scores)
+    hare_intent_percent_player = process_intents(intents)
+    # end_popularities = end_popularities[::-1] # don't need to do that now.
+    game_information = GameInformationObject(scenario_type, cooperation_score, scores_per_player, agent_names, hare_intent_percent_player, agent_positions, end_popularities, hunters, height, width, intents)
+    return game_information
+
+
+
+
 def run_trial_round(agent_names, height, width, random_agents, forced_random, scenario_type, num_rounds_per_game, graphing):
 
     scores = []
@@ -167,11 +238,10 @@ def run_trial_round(agent_names, height, width, random_agents, forced_random, sc
     popularity_over_time = []
 
     # num_rounds_per_game = 10 # lets start here.
-    current_logger = stagHareLogger()
+    # current_logger = stagHareLogger()
 
-    if graphing:
-        current_game_logger = GameLogger(height, width, agent_names, scenario_type)
-        current_round_grapher = IndividualRoundGrapher()
+    current_game_logger = GameLogger(height, width, agent_names, scenario_type)
+    current_round_grapher = IndividualRoundGrapher()
 
     hunters = create_hunters_with_list(random_agents, forced_random, agent_names)
 
@@ -187,12 +257,12 @@ def run_trial_round(agent_names, height, width, random_agents, forced_random, sc
                                             range(3)}  # value that it can never be, sort of a NAN.
 
         if graphing:
-            new_score, new_intents, new_positions, popularity_over_time, hunters = run_trial_graphing(stag_hare,
+            new_score, new_intents, new_positions, popularity_over_time, hunters = run_trial_sim_no_graphing(stag_hare,
                                                                                                       current_round_grapher,
                                                                                                       current_game_logger)
         else: # no graphing , no sims.
             # just run the fetcher.
-            new_score, new_intents, new_positions, popularity_over_time, hunters = run_trial_sim_no_graphing(stag_hare)
+            new_score, new_intents, new_positions, popularity_over_time, hunters = run_trial_sim_no_graphing(stag_hare, current_round_grapher, current_game_logger)
 
         # just set up a new state that doesn't break immediatel.y
         while True:
@@ -205,8 +275,8 @@ def run_trial_round(agent_names, height, width, random_agents, forced_random, sc
         agent_positions.append(new_positions)
 
     cooperation_score, scores_per_player = process_scores(scores)
-    hare_intent_percent_total, hare_intent_percent_player = process_intents(intents)
-    game_information = informationObject(scenario_type, cooperation_score, scores_per_player, agent_names, hare_intent_percent_total, hare_intent_percent_player, agent_positions, popularity_over_time, hunters, height, width, intents)
+    hare_intent_percent_player = process_intents(intents)
+    game_information = GameInformationObject(scenario_type, cooperation_score, scores_per_player, agent_names, hare_intent_percent_player, agent_positions, popularity_over_time, hunters, height, width, intents)
     return game_information
 
 
@@ -257,7 +327,7 @@ def run_trial_round(agent_names, height, width, random_agents, forced_random, sc
 #         traceback.print_exc()
 
 
-def run_trial_step(agent_names, height, width, random_agents, forced_random, scenario_type, games_per_round):
+def run_trial_step(agent_names, height, width, random_agents, forced_random, scenario_type, games_per_round, graphing):
     try:
         start = time.time()
         # changed on 3/17 to allow height and width to be passed in instead of specified here.
@@ -281,13 +351,13 @@ def run_trial_step(agent_names, height, width, random_agents, forced_random, sce
         # new_score, new_intents, new_positions, popularity_over_time, hunters = run_trial_sim_no_graphing(stag_hare)
         new_score, new_intents, new_positions, popularity_over_time, hunters = run_trial_graphing(stag_hare, current_round_grapher, current_game_logger)
 
-        scores, intents, agent_positions, popularity_over_time = [new_score], [new_intents], new_positions, popularity_over_time
+        scores, intents, agent_positions, popularity_over_time = [new_score], [new_intents], [new_positions], popularity_over_time
 
         cooperation_score, scores_per_player = process_scores(scores)
-        hare_intent_percent_total, hare_intent_percent_player = process_intents(intents)
-        game_information = informationObject(scenario_type, cooperation_score, scores_per_player, agent_names,
-                                             hare_intent_percent_total, hare_intent_percent_player, agent_positions,
-                                             popularity_over_time, hunters, height, width, intents)
+        hare_intent_percent_player = process_intents(intents)
+        game_information = GameInformationObject(scenario_type, cooperation_score, scores_per_player, agent_names,
+                                                 hare_intent_percent_player, agent_positions,
+                                                 popularity_over_time[-1], hunters, height, width, intents)
         return game_information
 
 
