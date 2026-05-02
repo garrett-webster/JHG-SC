@@ -10,10 +10,8 @@ def run_test(curr_agent_name, scenario_type, height, width, random_agents, force
 
     # how many resources can we actually devote to this??
     max_workers = max(1, os.cpu_count() - 2)  # save just a few for other processes, plz don't crash.
+    # max_workers = 1 # spawns only a single thread, simplifying debugging.
     current_batch_logger = GameInformationResultsCompiler(height, width, curr_agent_name, scenario_type)
-
-    # max_workers = 1 # just... just do this for rn. makes debugging a little easier.
-
     results = []
     with ProcessPoolExecutor(max_workers=max_workers) as executor:
         futures = []
@@ -26,8 +24,6 @@ def run_test(curr_agent_name, scenario_type, height, width, random_agents, force
             results.append(future.result())
 
         for result in results:
-            pass
-
             current_batch_logger.add_game(result)  # this SHOULD be the actual information object.
 
     return current_batch_logger  # just do this once per scenario.
@@ -43,8 +39,6 @@ def write_batch_results_to_file(current_batch_logger, scenario_type):
     with open(directory_path + f"{scenario_type}.json", "w") as f:
         json.dump(new_dict, f, indent=2)
 
-
-
 # base_agents = ["SCab", "HCab", "ECab99", "ECab199", "Allegatr"]
 base_agents = ["Allegatr"]
 base_to_csv = {
@@ -54,13 +48,8 @@ base_to_csv = {
     "ECab199": "gen_199.csv",
     "Allegatr": "Allegatr",
 }
-game_type_to_name = {
-    run_trial_step: "Step",
-    run_trial_round: "Round",
-}
 
 games_per_round = 10
-game_types = [run_trial_round, run_trial_step]
 scenarios = ["SelfPlay", "VGHare1", "VGHare2", "VGStag1", "VGStag2", "Allegatr1", "Allegatr2"]
 # scenarios = ["Allegatr1", "Allegatr2"]
 

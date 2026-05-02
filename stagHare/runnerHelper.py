@@ -70,17 +70,44 @@ def run_trial_genetic(hunters, height, width):
         if stag_hare.is_over():
             return create_new_score(stag_hare)
 
+def run_trial_engine(stag_hare, graphing, current_round_grapher, current_game_logger):
+    intents = [] # I want to return this now. this sucks.
+    agent_positions = []
+    while True: # the way this gets run is VERY VERY weird.
+
+        intents.append(create_intents_list(stag_hare.state.hunting_hare_map)) # Might need to custom cast this to integers.
+        agent_positions.append(stag_hare.state.agent_positions.copy())
+
+        if graphing:
+            current_game_logger.add_round(stag_hare.state)
+            current_round_grapher.create_round_graph(stag_hare)
+        rewards = [0] * 5 # 3 hunters, 2 other peepsdd
+        # this is a reminder to check the action map to make sure that we are hunting what we think we are.
+
+        round_rewards = stag_hare.transition()
+        for i, reward in enumerate(round_rewards):
+            rewards[i] += reward
+
+        if stag_hare.is_over():
+            agent_positions.append(stag_hare.state.agent_positions)
+            if graphing:
+                current_game_logger.add_round(stag_hare.state)
+                current_round_grapher.create_round_graph(stag_hare)
+            intents.append(create_intents_list(stag_hare.state.hunting_hare_map))
+            # passes by value. thanks python.
+            return create_new_score(stag_hare), intents, agent_positions, stag_hare.popularity_over_time, stag_hare.hunters
+
+
+
 
 def get_graphing_stuff(graphing, height, width, agent_names, scenario_type):
     if graphing == True:
-        run_trial_function = run_trial_graphing
         current_game_logger = GameLogger(height, width, agent_names, scenario_type)
         current_round_grapher = IndividualRoundGrapher()
     else: # we need to make the game logger and round grapher have something, so they have None.
-        run_trial_function = run_trial_sim_no_graphing
         current_game_logger = None
         current_round_grapher = None
-    return run_trial_function, current_game_logger, current_round_grapher
+    return current_game_logger, current_round_grapher
 
 def get_stag_hare(height, width, hunters):
     while True: # get stag hare.
@@ -99,9 +126,7 @@ def reset_stag_hare(stag_hare):
     return stag_hare
 
 def run_trial_all(agent_names, height, width, random_agents, forced_random, scenario_type, num_rounds_per_game, graphing):
-
-
-    run_trial_function, current_game_logger, current_round_grapher = get_graphing_stuff(graphing, height, width, agent_names, scenario_type)
+    current_game_logger, current_round_grapher = get_graphing_stuff(graphing, height, width, agent_names, scenario_type)
 
     # if there is an imputted value, use that. If none, run it only once.
     run_amount = num_rounds_per_game if num_rounds_per_game is not None else 1
@@ -121,7 +146,7 @@ def run_trial_all(agent_names, height, width, random_agents, forced_random, scen
         stag_hare.state.hunting_hare_map = {"R" + str(i): 2 for i in range(3)}  # Fill with NULL value
 
                                                                             # function pointer depending on whether graphing is enabled or not.
-        new_score, new_intents, new_positions, popularity_over_time, hunters = run_trial_function(stag_hare, current_round_grapher, current_game_logger)
+        new_score, new_intents, new_positions, popularity_over_time, hunters = run_trial_engine(stag_hare, graphing, current_round_grapher, current_game_logger)
 
         # make sure to add everything to its appropriate lists.
         scores.append(new_score)
