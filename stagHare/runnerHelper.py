@@ -73,7 +73,7 @@ def run_trial_genetic(hunters, height, width):
         if stag_hare.is_over():
             return create_new_score(stag_hare)
 
-def run_trial_engine(stag_hare, graphing, current_round_grapher, current_game_logger):
+def run_trial_engine(stag_hare, graphing, current_round_grapher, current_game_logger, noisy=True):
     intents = [] # I want to return this now. this sucks.
     agent_positions = []
     while True: # the way this gets run is VERY VERY weird.
@@ -87,7 +87,11 @@ def run_trial_engine(stag_hare, graphing, current_round_grapher, current_game_lo
         rewards = [0] * 5 # 3 hunters, 2 other peepsdd
         # this is a reminder to check the action map to make sure that we are hunting what we think we are.
 
-        round_rewards = stag_hare.transition_noisy()
+        # user specified version of the transition function based on noise requests.
+        if noisy:
+            round_rewards = stag_hare.transition_noisy()
+        else:
+            round_rewards = stag_hare.transition()
         for i, reward in enumerate(round_rewards):
             rewards[i] += reward
 
@@ -157,7 +161,7 @@ def reset_stag_hare(stag_hare):
 
     return stag_hare
 
-def run_trial_all(agent_names, height, width, random_agents, forced_random, scenario_type, num_rounds_per_game, graphing):
+def run_trial_all(agent_names, height, width, random_agents, forced_random, scenario_type, num_rounds_per_game, graphing, noisy):
     current_game_logger, current_round_grapher = get_graphing_stuff(graphing, height, width, agent_names, scenario_type)
 
     # if there is an imputted value, use that. If none, run it only once.
@@ -180,7 +184,8 @@ def run_trial_all(agent_names, height, width, random_agents, forced_random, scen
         stag_hare.state.hunting_hare_map = {"R" + str(i): 2 for i in range(3)}  # Fill with NULL value
 
                                                                             # consolidated this into one super function, tests are in the test suite.
-        new_score, new_intents, new_positions, popularity_over_time, hunters = run_trial_engine(stag_hare, graphing, current_round_grapher, current_game_logger)
+        new_score, new_intents, new_positions, popularity_over_time, hunters = run_trial_engine(stag_hare, graphing,
+                                                                                                current_round_grapher, current_game_logger)
 
         # make sure to add everything to its appropriate lists.
         scores.append(new_score)

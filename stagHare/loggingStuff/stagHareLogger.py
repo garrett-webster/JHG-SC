@@ -2,28 +2,6 @@ import numpy as np
 
 from legacy.outDated.jhg_tools import popularity_over_time
 
-
-# class stagHareLogger:
-#     def __init__(self):
-#         self.game_information = []
-#         # self.batch_information = []
-#
-#     def add_information_game(self, agent_scenario, cooperation_score, scores_per_player, agent_name,
-#                              hare_intent_percent_player, positions_list,
-#                              popularity_over_time, hunters, height, width, intents):
-#
-#         new_information_object = GameInformationObject(agent_scenario, cooperation_score, scores_per_player, agent_name,
-#                                                        hare_intent_percent_player, positions_list,
-#                                                        popularity_over_time, hunters, height, width, intents)
-#         self.game_information.append(new_information_object)
-#
-#     def get_game_information(self):
-#         return self.game_information
-#
-#     # def add_batch_information(self, batch_information):
-#     #     self.batch_information.append(batch_information)
-
-
 class GameInformationObject():
 
     # scenario_type, cooperation_score, scores_per_player, agent_names, hare_intent_percent_player, agent_positions, popularity_over_time, hunters, height, width, intents)

@@ -10,7 +10,8 @@ from stagHare.runnerHelper import *  # this SHOULD be all we need.
 from stagHare.visualziationTools.gameGrapher import GameGrapher
 from stagHare.visualziationTools.gameLogger import information_object_to_game_logger
 
-def run_test(curr_agent_name, scenario_type, height, width, random_agents, forced_random, GamesPerRound, graphing):
+def run_test(curr_agent_name, scenario_type, height, width, random_agents, forced_random,
+             GamesPerRound, graphing):
 
     # how many resources can we actually devote to this??
     max_workers = max(1, os.cpu_count() - 2)  # save just a few for other processes, plz don't crash.
@@ -64,10 +65,8 @@ base_to_csv = {
 }
 game_types = ["Round", "Step"]
 
-games_per_round = 10
-# scenarios = ["SelfPlay", "VGHare1", "VGHare2", "VGStag1", "VGStag2", "Allegatr1", "Allegatr2"]
-scenarios = ["SelfPlay"]
-# scenarios = ["Allegatr1", "Allegatr2"]
+scenarios = ["SelfPlay", "VGHare1", "VGHare2", "VGStag1", "VGStag2", "Allegatr1", "Allegatr2"]
+# scenarios = ["SelfPlay"]
 
 def get_agents(agent, scenario):
     if scenario == "SelfPlay":
@@ -101,6 +100,7 @@ if __name__ == "__main__":
                 scenario_type = str(agent) + str(scenario) + str(game_type)
 
                 curr_agent_name = get_agents(agent, scenario)
-                new_batch_logger = run_test(curr_agent_name, scenario_type, height, width, RandomAgents, forced_random, games_per_round, graphing)
+                new_batch_logger = run_test(curr_agent_name, scenario_type, height, width, RandomAgents,
+                                            forced_random, games_per_round, graphing)
                 write_batch_results_to_file(new_batch_logger, scenario_type)
 
