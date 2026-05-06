@@ -172,9 +172,11 @@ def run_trial_all(agent_names, height, width, random_agents, forced_random, scen
     end_popularities = []
 
     stag_hare = get_stag_hare(height, width, hunters)
+    popularity_over_time = []
 
     for i in range(run_amount): # if we only do 1 game, we only do this once.
         # does this suck? possibly.
+
         stag_hare.state.hunting_hare_map = {"R" + str(i): 2 for i in range(3)}  # Fill with NULL value
 
                                                                             # consolidated this into one super function, tests are in the test suite.
@@ -185,6 +187,7 @@ def run_trial_all(agent_names, height, width, random_agents, forced_random, scen
         intents.append(new_intents)
         agent_positions.append(new_positions)
         end_popularities.append(popularity_over_time[-1])
+        popularity_over_time = popularity_over_time
 
         # just set up a new state that doesn't break immediately
         stag_hare = reset_stag_hare(stag_hare)
@@ -192,7 +195,9 @@ def run_trial_all(agent_names, height, width, random_agents, forced_random, scen
     cooperation_score, scores_per_player = process_scores(scores)
     hare_intent_percent_player = process_intents(intents)
     # end_popularities = end_popularities[::-1] # don't need to do that now.
-    game_information = GameInformationObject(scenario_type, cooperation_score, scores_per_player, agent_names, hare_intent_percent_player, agent_positions, end_popularities, hunters, height, width, intents)
+    game_information = GameInformationObject(scenario_type, cooperation_score, scores_per_player, agent_names,
+                                             hare_intent_percent_player, agent_positions, end_popularities, hunters,
+                                             height, width, intents, popularity_over_time)
     return game_information
 
 def run_trial_all_debugging(agent_names, height, width, random_agents, forced_random, scenario_type, num_rounds_per_game, graphing):
@@ -344,6 +349,7 @@ def create_hunters_with_list(random_agents:bool , forced_random:bool, agent_list
 
         if cab_agent:
             new_hunters.append(CabAgent(i, new_name, random_agents, forced_random, gene="", agent_name=agent_name))
+            # print("Here is the new gene ", new_hunters[-1].agent.genes_long)
             # confirmed that forcedRandom works as anticipated.
 
         else: # we have 3 options rught now: G_hare, G_stag, and Allegatr.

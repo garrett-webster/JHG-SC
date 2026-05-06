@@ -28,7 +28,8 @@ class GameInformationObject():
 
     # scenario_type, cooperation_score, scores_per_player, agent_names, hare_intent_percent_player, agent_positions, popularity_over_time, hunters, height, width, intents)
 
-    def __init__(self, scenario_type, coop_score, scores_per_player, agent_names, hare_intent_percent_player, agent_positions, ending_popularity, hunters, height, width, intents):
+    def __init__(self, scenario_type, coop_score, scores_per_player, agent_names, hare_intent_percent_player,
+                 agent_positions, ending_popularity, hunters, height, width, intents, popularity_during_game):
         self.scenario_type = scenario_type
         self.coop_score = coop_score
         self.scores_per_player = scores_per_player
@@ -40,6 +41,7 @@ class GameInformationObject():
         self.height = height
         self.width = width
         self.hare_hunting_history = intents
+        self.popularity_during_game = popularity_during_game
 
     def __str__(self):
         return (f"informationObject(scenario_type={self.scenario_type}, "

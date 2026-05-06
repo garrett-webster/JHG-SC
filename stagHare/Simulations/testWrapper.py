@@ -49,10 +49,12 @@ height = 16
 width = 16
 RandomAgents = True
 forced_random = False
-num_attempts = 1000
+num_attempts = 100
 
 # base_agents = ["SCab", "HCab", "ECab99", "ECab199", "Allegatr"]
-base_agents = ["HCab", "ECab99", "ECab199"]
+# base_agents = ["HCab", "ECab99", "ECab199"]
+base_agents = ["HCab", "ECab199"]
+
 base_to_csv = {
     "SCab": "16x16round4.csv",
     "HCab": "gen_z.csv",

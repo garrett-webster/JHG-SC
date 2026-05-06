@@ -127,6 +127,32 @@ def run_jhg_stuff_allocations(jhg_engine, curr_round, agents, num_players):
 
     return transactions # return da influence matrix, the change in popularitry, and the new popularities.
 
+
+def run_jhg_stuff_popularities(jhg_engine, curr_round, agents, num_players):
+    transactions = [0 for _ in range(num_players)]  # so this is how I replilcate it in python.
+    T_prev = jhg_engine.get_transaction()
+
+    current_indexes = list(range(num_players))
+    np.random.shuffle(current_indexes) # randomize them.
+
+    for i in current_indexes:
+        transactions[i] = agents[i].play_round(
+            i,
+            curr_round,
+            T_prev[:,i],
+            jhg_engine.get_popularity().tolist(),
+            jhg_engine.get_influence(),
+            jhg_engine.get_extra_data(i),
+            # False
+        )
+    jhg_engine.play_round(transactions)  # thanks references
+
+    # ok so now I have to return
+    # the change in popularities,
+    # return sc_sim.current_results, sc_sim.results_sums, new_influence  # so we have the change in utility and overall utility
+    # print("round ", curr_round, " transactions ", transactions)
+    return jhg_engine.get_popularity().tolist() # return da influence matrix, the change in popularitry, and the new popularities.
+
 # should be 0 for the pure SC environment, and 1 for the pure JHG environment. anythign in the middle is mixed.
 def generate_peeps(total_order, popularity_array, sc_sim, peep_constant):
     total = sum(popularity_array) # use her here

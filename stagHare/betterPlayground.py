@@ -90,8 +90,8 @@ num_attempts = 100
 if __name__ == "__main__":
     height, width, RandomAgents, forced_random, num_attempts = height, width, RandomAgents, forced_random, num_attempts
 
-    # agents = ["HCab"]
-    agents = ["ECab199"]
+    agents = ["HCab"]
+    # agents = ["ECab199"]
     # agents = ["HCab", "ECab199"]
     # agents = ["GHare"]
     # curr_agents = agents[0] # just get the first entry

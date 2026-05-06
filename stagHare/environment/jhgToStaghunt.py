@@ -28,6 +28,7 @@ def jhg_to_staghunt(agents, state, rewards, round_num, engine):
     new_moves = {}
     new_allocations = {}
     new_intents = {}
+    allocations = [[] for _ in range(3)]
     indices = list(range(len(agents)))
     np.random.shuffle(indices)
     hunting_hare_map = {}
@@ -59,6 +60,9 @@ def jhg_to_staghunt(agents, state, rewards, round_num, engine):
     new_allocations = dict(sorted(new_allocations.items(), key=lambda item: item[0]))
     # print("The initial allocations are as follows : ", new_allocations)
     # need TO PASS IT IN to account for discrepancies.
+
+    # print("Round ", round_num, " thing ", new_allocations.items())
+
     hunting_hare_map = create_map_from_intents(new_intents, hunting_hare_map)
     print_hare_hunting_map(hunting_hare_map)
     return new_moves, hunting_hare_map, new_allocations # then just give the moves back.
