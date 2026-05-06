@@ -469,9 +469,8 @@ def create_popularity_graphs(results, game_type, save_dir="graphs/popularity/"):
         print(f"Created {agent_display} {game_type} popularity graph")
 
 
-# ==================== HARE INTENT GRAPHS ====================
 def create_hare_intent_graphs(results, game_type, save_dir="graphs/hare_intent/"):
-    """HARE INTENT FOLDER: Show percentage of time agents attempt to hunt hares"""
+    """HARE INTENT FOLDER: Show percentage of time each agent attempts to hunt hares"""
     save_dir_game = os.path.join(save_dir, game_type)
     os.makedirs(save_dir_game, exist_ok=True)
 
@@ -484,41 +483,137 @@ def create_hare_intent_graphs(results, game_type, save_dir="graphs/hare_intent/"
         if not agent_results:
             continue
 
-        fig, ax = plt.subplots(figsize=(14, 8))
-
+        # Prepare data - now storing per-agent breakdown
         scenarios = []
-        hare_intent_values = []
+        agent1_values = []  # First test agent
+        agent2_values = []  # Second test agent (if exists)
+        agent3_values = []  # Third test agent (if exists, for SelfPlay)
+        avg_values = []  # Average across test agents
 
         for scenario_name, data in agent_results.items():
             category = extract_scenario_category(scenario_name)
             hare_intent = data.get('hare_intent_percent_total', 0)
 
-            scenarios.append(category)
-            if hare_intent < 1:
-                hare_intent_values.append(hare_intent * 100)
+            # Handle both old format (single value) and new format (list)
+            if isinstance(hare_intent, list):
+                scenarios.append(category)
+
+                # Convert to percentages if needed
+                intent_list = [v * 100 if v < 1 else v for v in hare_intent]
+
+                # Filter to only test agents
+                filtered_intent = filter_relevant_scores(scenario_name, intent_list)
+
+                # Store individual agent values
+                if len(filtered_intent) >= 1:
+                    agent1_values.append(filtered_intent[0])
+                else:
+                    agent1_values.append(0)
+
+                if len(filtered_intent) >= 2:
+                    agent2_values.append(filtered_intent[1])
+                else:
+                    agent2_values.append(None)  # Will be skipped in plotting
+
+                if len(filtered_intent) >= 3:
+                    agent3_values.append(filtered_intent[2])
+                else:
+                    agent3_values.append(None)
+
+                # Store average
+                avg_values.append(np.mean([v for v in filtered_intent if v is not None]))
+
             else:
-                hare_intent_values.append(hare_intent)
+                # Old format fallback
+                scenarios.append(category)
+                if hare_intent < 1:
+                    hare_intent = hare_intent * 100
+                agent1_values.append(hare_intent)
+                agent2_values.append(None)
+                agent3_values.append(None)
+                avg_values.append(hare_intent)
 
-        colors = plt.cm.RdYlGn_r(np.linspace(0.2, 0.8, len(scenarios)))
-        bars = ax.bar(scenarios, hare_intent_values, color=colors, alpha=0.8, edgecolor='black')
+        if not scenarios:
+            continue
 
-        ax.set_xlabel('Scenario Type', fontsize=12, fontweight='bold')
-        ax.set_ylabel('Hare Intent (%)', fontsize=12, fontweight='bold')
-        ax.set_title(f'{agent_display} - {game_type}: Hare Hunting Intent Percentage',
-                     fontsize=14, fontweight='bold')
-        ax.set_xticks(range(len(scenarios)))
-        ax.set_xticklabels(scenarios, rotation=45, ha='right')
-        ax.grid(axis='y', alpha=0.3)
+        # Create grouped bar chart
+        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(18, 7))
 
-        for bar, value in zip(bars, hare_intent_values):
+        x = np.arange(len(scenarios))
+
+        # Determine how many agent bars to show
+        has_agent2 = any(v is not None for v in agent2_values)
+        has_agent3 = any(v is not None for v in agent3_values)
+
+        if has_agent3:
+            # SelfPlay: 3 agents
+            width = 0.25
+            bars1 = ax1.bar(x - width, agent1_values, width, label=f'{agent_display} 1',
+                            color='#3498db', alpha=0.8)
+            bars2 = ax1.bar(x, agent2_values, width, label=f'{agent_display} 2',
+                            color='#2ecc71', alpha=0.8)
+            bars3 = ax1.bar(x + width, agent3_values, width, label=f'{agent_display} 3',
+                            color='#e74c3c', alpha=0.8)
+            all_bars = [bars1, bars2, bars3]
+        elif has_agent2:
+            # 2 test agents
+            width = 0.3
+            bars1 = ax1.bar(x - width / 2, agent1_values, width, label=f'{agent_display} 1',
+                            color='#3498db', alpha=0.8)
+            bars2 = ax1.bar(x + width / 2, agent2_values, width, label=f'{agent_display} 2',
+                            color='#2ecc71', alpha=0.8)
+            all_bars = [bars1, bars2]
+        else:
+            # Single agent (shouldn't happen, but fallback)
+            width = 0.5
+            bars1 = ax1.bar(x, agent1_values, width, label=agent_display,
+                            color='#3498db', alpha=0.8)
+            all_bars = [bars1]
+
+        ax1.set_xlabel('Scenario Type', fontsize=12, fontweight='bold')
+        ax1.set_ylabel('Hare Intent (%)', fontsize=12, fontweight='bold')
+        ax1.set_title(f'{agent_display} - {game_type}: Hare Intent by Agent',
+                      fontsize=14, fontweight='bold')
+        ax1.set_xticks(x)
+        ax1.set_xticklabels(scenarios, rotation=45, ha='right')
+        ax1.legend(loc='upper right')
+        ax1.grid(axis='y', alpha=0.3)
+
+        # Add value labels
+        for bars in all_bars:
+            for bar in bars:
+                height = bar.get_height()
+                if height > 0:
+                    ax1.text(bar.get_x() + bar.get_width() / 2., height + 0.5,
+                             f'{height:.1f}%', ha='center', va='bottom',
+                             fontsize=7, fontweight='bold')
+
+        # Right plot: Average hare intent (for quick comparison)
+        colors_avg = plt.cm.RdYlGn_r(np.linspace(0.2, 0.8, len(scenarios)))
+        bars_avg = ax2.bar(scenarios, avg_values, color=colors_avg, alpha=0.8, edgecolor='black')
+
+        ax2.set_xlabel('Scenario Type', fontsize=12, fontweight='bold')
+        ax2.set_ylabel('Average Hare Intent (%)', fontsize=12, fontweight='bold')
+        ax2.set_title(f'{agent_display} - {game_type}: Average Hare Intent',
+                      fontsize=14, fontweight='bold')
+        ax2.set_xticks(range(len(scenarios)))
+        ax2.set_xticklabels(scenarios, rotation=45, ha='right')
+        ax2.grid(axis='y', alpha=0.3)
+
+        for bar, value in zip(bars_avg, avg_values):
             height = bar.get_height()
-            ax.text(bar.get_x() + bar.get_width() / 2., height + 1,
-                    f'{value:.1f}%', ha='center', va='bottom', fontsize=10, fontweight='bold')
+            ax2.text(bar.get_x() + bar.get_width() / 2., height + 0.5,
+                     f'{value:.1f}%', ha='center', va='bottom',
+                     fontsize=10, fontweight='bold')
 
-        ax.axhline(y=50, color='black', linestyle='--', alpha=0.3, linewidth=1)
-        ax.text(len(scenarios) - 0.5, 52, 'More hare hunting →', ha='right', fontsize=9, style='italic', alpha=0.7)
-        ax.text(len(scenarios) - 0.5, 48, '← Less hare hunting', ha='right', fontsize=9, style='italic', alpha=0.7)
+        ax2.axhline(y=50, color='black', linestyle='--', alpha=0.3, linewidth=1)
+        ax2.text(len(scenarios) - 0.5, 52, 'More hare hunting →', ha='right',
+                 fontsize=9, style='italic', alpha=0.7)
+        ax2.text(len(scenarios) - 0.5, 48, '← Less hare hunting', ha='right',
+                 fontsize=9, style='italic', alpha=0.7)
 
+        plt.suptitle(f'{agent_display} - {game_type} Games: Hare Intent Analysis',
+                     fontsize=16, fontweight='bold')
         plt.tight_layout()
         plt.savefig(f'{save_dir_game}/{agent_display}_hare_intent.png', dpi=150, bbox_inches='tight')
         plt.close()
@@ -640,7 +735,15 @@ def create_scenario_hare_intent(results, game_type, save_dir="graphs/scenario_co
                 agent_display = get_agent_display_name(scenario_name)
                 hare_intent = data.get('hare_intent_percent_total', 0)
 
-                if hare_intent < 1:
+                # Handle new list format - average across test agents
+                if isinstance(hare_intent, list):
+                    # Filter to only relevant test agents
+                    filtered_intent = filter_relevant_scores(scenario_name, hare_intent)
+                    # Convert to percentages
+                    filtered_intent = [v * 100 if v < 1 else v for v in filtered_intent]
+                    # Average across test agents
+                    hare_intent = np.mean(filtered_intent)
+                elif hare_intent < 1:
                     hare_intent = hare_intent * 100
 
                 scenario_hare_data[agent_display] = hare_intent
@@ -657,7 +760,7 @@ def create_scenario_hare_intent(results, game_type, save_dir="graphs/scenario_co
         bars = ax.bar(agents_present, hare_vals, color=bar_colors, alpha=0.8, edgecolor='black')
 
         ax.set_xlabel('Agent Type', fontsize=12, fontweight='bold')
-        ax.set_ylabel('Hare Intent (%)', fontsize=12, fontweight='bold')
+        ax.set_ylabel('Average Hare Intent (%)', fontsize=12, fontweight='bold')
         ax.set_title(f'{scenario} - {game_type}: Hare Hunting Intent by Agent', fontsize=14, fontweight='bold')
         ax.set_xticks(range(len(agents_present)))
         ax.set_xticklabels(agents_present, rotation=45, ha='right')
@@ -677,7 +780,6 @@ def create_scenario_hare_intent(results, game_type, save_dir="graphs/scenario_co
         plt.close()
 
         print(f"Created {scenario} {game_type} hare intent comparison")
-
 
 def create_scenario_popularity(results, game_type, save_dir="graphs/scenario_comparison/popularity/"):
     """

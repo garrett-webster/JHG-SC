@@ -29,7 +29,7 @@ def run_trial_graphing(agents, sc_sim: "Social_Choice_Sim", jhg_sim, round_list,
             influence_matrix = run_jhg_stuff(jhg_sim, curr_round, agents, len(agents), current_jhg_sim)
             played_jhg = True
             pops.append(jhg_sim.get_popularity())
-            print("influence for round ", curr_round, " is \n", influence_matrix)
+            # print("influence for round ", curr_round, " is \n", influence_matrix)
 
 
 
@@ -63,8 +63,8 @@ if __name__ == "__main__":
     np.random.seed(SEED)  # NumPy’s RNG
 
     # various batch scenarios I keep on hand for reference.
-    jhg_games_per_sc_round = [4, 3, 3, 3]
-    # jhg_games_per_sc_round = ["J", 30]
+    # jhg_games_per_sc_round = [4, 3, 3, 3]
+    jhg_games_per_sc_round = ["J", 30]
     # jhg_games_per_sc_round = ["S", 30]
     forcedRandom = True # TRUE uses the list, so thats cool.
     enforce_majority = True # what we used in the other fetcher.
@@ -79,8 +79,8 @@ if __name__ == "__main__":
     num_humans = 0
     tokens_per_player = 2
     utility_per_player = 3
-    create_round_graphs_bool = True
-    create_game_graphs_bool = True
+    create_round_graphs_bool = False
+    create_game_graphs_bool = False
     create_influence = True
     chromosomes_directory = "testChromosome"
     group = ""
@@ -122,8 +122,8 @@ if __name__ == "__main__":
     # file_name = os.path.join(file_name, "homoNewCats.csv")
     # agent_name = "mixedJHGSelfPlay.csv"
     # agent_name = "homoSCSelfPlay.csv"
-    agent_name = "6x6Round1.csv" # use this as sort of the default, for now.
-
+    # agent_name = "6x6Round1.csv" # use this as sort of the default, for now.
+    agent_name = "gen_199.csv"
     # bunch of stuff for print statements
     utility_to_log = []
     popularity_to_log = []

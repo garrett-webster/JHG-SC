@@ -9,6 +9,7 @@ from packaging.utils import canonicalize_name
 
 from stagHare.agents.cabAgentThing import CabAgent
 from stagHare.agents.fetcherBot import FetcherBot
+from stagHare.environment.jhgToStaghunt import create_map_from_intents
 from stagHare.environment.state import State
 from stagHare.environment.world import StagHare
 from stagHare.agents.random_agent import Random
@@ -28,10 +29,12 @@ import warnings
 warnings.filterwarnings("ignore", category=UserWarning, module="sklearn")
 
 def create_intents_list(current_intents: dict) -> list:
-    new_list = []
+    new_list = [-1 for _ in range(3)] # yeah that might blow up. whatever.
     for key, value in current_intents.items():
         if not key == "stag" and not key == "hare":
-            new_list.append(int(value))
+            # new_list.append(int(value))
+            # R2 --> 2, etc. This WON'T work for human players. Whatever. I'll figure it out later.
+            new_list[int(key[-1])] = int(value)
     return new_list
 
 # takes in a list of list of lists, then returns both the total defect percent and defect by agent.
@@ -84,7 +87,7 @@ def run_trial_engine(stag_hare, graphing, current_round_grapher, current_game_lo
         rewards = [0] * 5 # 3 hunters, 2 other peepsdd
         # this is a reminder to check the action map to make sure that we are hunting what we think we are.
 
-        round_rewards = stag_hare.transition()
+        round_rewards = stag_hare.transition_noisy()
         for i, reward in enumerate(round_rewards):
             rewards[i] += reward
 
@@ -97,6 +100,35 @@ def run_trial_engine(stag_hare, graphing, current_round_grapher, current_game_lo
             # passes by value. thanks python.
             return create_new_score(stag_hare), intents, agent_positions, stag_hare.popularity_over_time, stag_hare.hunters
 
+def run_trial_debugging(stag_hare, graphing, current_round_grapher, current_game_logger):
+    pre_intents = []
+    post_intents = []
+    post_intents.append([2, 2, 2])
+    while True: # the way this gets run is VERY VERY weird.
+
+        pre_intents.append(create_intents_list(stag_hare.state.hunting_hare_map)) # Might need to custom cast this to integers.
+
+
+        if graphing:
+            current_game_logger.add_round(stag_hare.state)
+            current_round_grapher.create_round_graph(stag_hare)
+        rewards = [0] * 5 # 3 hunters, 2 other peepsdd
+        # this is a reminder to check the action map to make sure that we are hunting what we think we are.
+
+        round_rewards, new_intents = stag_hare.transition_sean_debug()
+        post_intents.append(new_intents)
+
+        for i, reward in enumerate(round_rewards):
+            rewards[i] += reward
+
+        if stag_hare.is_over():
+            if graphing:
+                current_game_logger.add_round(stag_hare.state)
+                current_round_grapher.create_round_graph(stag_hare)
+            pre_intents.append(create_intents_list(stag_hare.state.hunting_hare_map))
+            # post_intents.append(create_intents_list(stag_hare.state.hunting_hare_map)) # maybe???
+            # passes by value. thanks python.
+            return pre_intents, post_intents
 
 
 
@@ -145,7 +177,7 @@ def run_trial_all(agent_names, height, width, random_agents, forced_random, scen
         # does this suck? possibly.
         stag_hare.state.hunting_hare_map = {"R" + str(i): 2 for i in range(3)}  # Fill with NULL value
 
-                                                                            # function pointer depending on whether graphing is enabled or not.
+                                                                            # consolidated this into one super function, tests are in the test suite.
         new_score, new_intents, new_positions, popularity_over_time, hunters = run_trial_engine(stag_hare, graphing, current_round_grapher, current_game_logger)
 
         # make sure to add everything to its appropriate lists.
@@ -162,6 +194,35 @@ def run_trial_all(agent_names, height, width, random_agents, forced_random, scen
     # end_popularities = end_popularities[::-1] # don't need to do that now.
     game_information = GameInformationObject(scenario_type, cooperation_score, scores_per_player, agent_names, hare_intent_percent_player, agent_positions, end_popularities, hunters, height, width, intents)
     return game_information
+
+def run_trial_all_debugging(agent_names, height, width, random_agents, forced_random, scenario_type, num_rounds_per_game, graphing):
+    current_game_logger, current_round_grapher = get_graphing_stuff(graphing, height, width, agent_names, scenario_type)
+
+    # if there is an imputted value, use that. If none, run it only once.
+    run_amount = num_rounds_per_game if num_rounds_per_game is not None else 1
+
+    hunters = create_hunters_with_list(random_agents, forced_random, agent_names)
+
+    pre_intents = []
+    post_intents = []
+    stag_hare = get_stag_hare(height, width, hunters)
+
+    for i in range(run_amount): # if we only do 1 game, we only do this once.
+        # does this suck? possibly.
+        stag_hare.state.hunting_hare_map = {"R" + str(i): 2 for i in range(3)}  # Fill with NULL value
+
+                                                                            # consolidated this into one super function, tests are in the test suite.
+        new_pre_intents, new_post_intents = run_trial_debugging(stag_hare, graphing, current_round_grapher, current_game_logger)
+
+        # make sure to add everything to its appropriate lists.
+        pre_intents.append(new_pre_intents)
+        post_intents.append(new_post_intents)
+
+        # just set up a new state that doesn't break immediately
+        stag_hare = reset_stag_hare(stag_hare)
+
+    # end_popularities = end_popularities[::-1] # don't need to do that now.
+    return pre_intents, post_intents
 
 def create_new_score(stag_hare):
     # optional last round printing thing... I think.

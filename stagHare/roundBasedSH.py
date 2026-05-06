@@ -4,7 +4,6 @@ from offlineSimStuff.runningTools.runnerHelper import create_jhg_sim, create_tot
 from stagHare.agents.cabAgentThing import CabAgent
 from stagHare.agents.fetcherBot import FetcherBot
 from stagHare.environment.world import StagHare
-from stagHare.environment.allocationTranslator import allocation_to_movement, movement_to_allocation
 from stagHare.loggingStuff.stagHareLogger import stagHareLogger
 from stagHare.visualziationTools.batchLogger import BatchLogger
 from stagHare.visualziationTools.inviduvalRoundGrapher import IndividualRoundGrapher

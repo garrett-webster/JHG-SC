@@ -22,7 +22,7 @@ from stagHare.utils.pathfindingTime import findPathGreedy, findPathTeamAware # m
 # what I need is
 
 # take in an allocation, and then return a tuple, which is the new movement.
-def jhg_to_staghunt(agents, state, rewards, round_num):
+def jhg_to_staghunt(agents, state, rewards, round_num, engine):
 
     # first, lets grab all the allocations and separate the wheat from the chaff
     new_moves = {}
@@ -38,6 +38,7 @@ def jhg_to_staghunt(agents, state, rewards, round_num):
             new_moves[agent.name] = agent.act(state, reward, round_num) # should be noted that these are just prey moves. they are essentialy random.
             hunting_hare_map[agent.name] = agent.is_hunting_hare()
         else:
+            # print("This is the id we are dealing with ", int(agent.name[-1]))
             allocation = agent.act(state, reward, round_num)
             new_allocations[agent.name] = allocation
 
@@ -46,7 +47,10 @@ def jhg_to_staghunt(agents, state, rewards, round_num):
     # print("here are hte new allocations ", new_allocations)
 
     for key in keys:
-        id = int(key[-1])
+        id = int(key[-1]) # might be a desync here?
+        # if id == 0:
+        #     print("here is teh allocation ", new_allocations[key])
+        # print(f"Raw allocation for {key}: {new_allocations[key]}, sum={sum(new_allocations[key])}")
         new_row, new_col, movement_type = allocation_to_movement(new_allocations[key], id, state)
         new_move = [new_row, new_col]
         new_moves[key] = new_move # bars??
@@ -86,6 +90,43 @@ def create_map_from_intents(intents, hunting_hare_map):
 
 
 # old allcation to movement. needs work. tank needs fuel.
+# this returns just the intent -- used primarily for debugging.
+def allocation_to_intent(new_allocation, id, num_players):
+    hare_move = np.zeros(num_players)
+    hare_move.fill(0)
+    hare_move[id] = 6
+
+    # trying to take the hare
+    hare_take = np.zeros(num_players)
+    hare_take.fill(-2)
+    hare_take[id] = 2
+
+    stag_move = np.zeros(num_players)
+    stag_move.fill(1.5)
+    stag_move[id] = 3
+
+    stag_take = np.zeros(num_players)
+    stag_take.fill(2)
+
+    new_current_options_matrix = [stag_move, stag_take, hare_move, hare_take]
+    normalized = [row / np.sum(np.abs(row)) for row in new_current_options_matrix]
+
+    new_allocation = [element / np.sum(np.abs(new_allocation)) for element in new_allocation]
+    # return this so we have a means with which we can specify the bots current eating desire.
+
+    # so maybe normalizing this will help us out.
+    new_index = translateVecToIndexStagHare(new_allocation, normalized, id)
+
+
+    if new_index == 0 or new_index == 1:
+        return 1 # hare
+    elif new_index == 2 or new_index == 3:
+        return 0 # stag
+    else:
+        return None
+
+
+
 def allocation_to_movement(new_allocation, id, state):
     pass
     # hare = [-2, -2, 2] # just for simplicity sake. # This is just as easy as it gets.
@@ -112,11 +153,11 @@ def allocation_to_movement(new_allocation, id, state):
     # id += 1
     # 1 is hare move, 2 is hare take, 3 is stag move, 4 is stag take
     new_current_options_matrix = [hare_move, hare_take, stag_move, stag_take]
-    normalized = [row / sum(row) for row in new_current_options_matrix]
-    # return this so we have a means with which we can specify the bots current eating desire.
-
-    # so maybe normalizing this will help us out.
-    new_index = translateVecToIndexStagHare(new_allocation, normalized, False)
+    # make sure to use the ABS when you are summing! otherwise negative breaks everything!
+    new_allocation = [element / np.sum(np.abs(new_allocation)) for element in new_allocation]
+    normalized_current_options_matrix = [row / np.sum(np.abs(row)) for row in new_current_options_matrix]
+    # then translate that new allocation into the closest possible option and return that movement.
+    new_index = translateVecToIndexStagHare(new_allocation, normalized_current_options_matrix, id)
     new_movement = generate_movement(state, id, new_index)
 
     if new_index == 0 or new_index == 1:
@@ -124,8 +165,9 @@ def allocation_to_movement(new_allocation, id, state):
     elif new_index == 2 or new_index == 3:
         type = "stag"
 
-
     # print('this is the new movement ', new_movement)
+    #  print(f"Agent {id}, alloc={new_allocation}, index={new_index}")
+
     return new_movement[0], new_movement[1], new_index # pull out the raw index we will do stuff with him.
 
 def generate_movement(state, id, new_index):

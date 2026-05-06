@@ -19,6 +19,7 @@ from Server.Engine.completeBots.CantisFirst import CantisFirst
 # from Server.SC_Bots.optimalHuman import OptimalHuman
 from Server.Engine.completeBots.randomagent import RandomAgent
 
+
 ## TODO: remove the "total_order" from this call. should already be under the SC sim, if that makes sense.
 def run_sc_stuff(sc_sim, jhg_sim_popularity, total_order, influence_matrix, curr_round, num_cycles, peep_constant):
     # sc_sim.set_rounds(curr_round) # don't set that here methinks, let it ride.
@@ -98,6 +99,33 @@ def run_jhg_stuff(jhg_engine, curr_round, agents, num_players, current_jhg_sim):
     # return sc_sim.current_results, sc_sim.results_sums, new_influence  # so we have the change in utility and overall utility
 
     return jhg_engine.get_influence()  # return da influence matrix, the change in popularitry, and the new popularities.
+
+
+
+def run_jhg_stuff_allocations(jhg_engine, curr_round, agents, num_players):
+    transactions = [0 for _ in range(num_players)]  # so this is how I replilcate it in python.
+    T_prev = jhg_engine.get_transaction()
+
+    current_indexes = list(range(num_players))
+    np.random.shuffle(current_indexes) # randomize them.
+
+    for i in current_indexes:
+        transactions[i] = agents[i].play_round(
+            i,
+            curr_round,
+            T_prev[:,i],
+            jhg_engine.get_popularity().tolist(),
+            jhg_engine.get_influence(),
+            jhg_engine.get_extra_data(i),
+            # False
+        )
+    jhg_engine.play_round(transactions)  # thanks references
+
+    # ok so now I have to return
+    # the change in popularities,
+    # return sc_sim.current_results, sc_sim.results_sums, new_influence  # so we have the change in utility and overall utility
+
+    return transactions # return da influence matrix, the change in popularitry, and the new popularities.
 
 # should be 0 for the pure SC environment, and 1 for the pure JHG environment. anythign in the middle is mixed.
 def generate_peeps(total_order, popularity_array, sc_sim, peep_constant):
@@ -277,6 +305,53 @@ def create_sc_agents(num_players, agent_name):
 
     return new_bots
 
+def create_genetic_agents(num_players, new_list, agent_name, forcedRandom, random_agents):
+    popSize = 60
+    num_gene_pools = 1
+
+    theGenePools = loadPopulationFromFile(popSize, num_gene_pools, agent_name)
+    initial_pops = [100 for _ in range(num_players)]
+    plyrs = []
+
+
+    if random_agents:  # for the HCABs mostly.
+        plyr_idxs = np.random.choice(np.arange(popSize), size=num_players, replace=False)
+
+    else:
+        plyr_idxs = np.arange(num_players)
+
+    for i in range(0, num_players - len(new_list)):
+        plyrs.append(theGenePools[plyr_idxs[i]])  # just add the first guys and go form there
+
+    agents = np.array(plyrs)
+    players = [*agents]
+
+    alpha_min, alpha_max = 0.20, 0.20
+    beta_min, beta_max = 0.5, 1.0
+    keep_min, keep_max = 0.95, 0.95
+    give_min, give_max = 1.30, 1.30
+    steal_min, steal_max = 1.6, 1.60
+
+    num_players = len(players)
+
+    poverty_line = 0
+
+    game_params = {
+        "num_players": num_players,
+        "alpha": alpha_min,  # np.random.uniform(alpha_min, alpha_max),
+        "beta": beta_min,  # np.random.uniform(beta_min, beta_max),
+        "keep": keep_min,  # np.random.uniform(keep_min, keep_max),
+        "give": give_min,  # np.random.uniform(give_min, give_max),
+        "steal": steal_min,  # np.random.uniform(steal_min, steal_max),
+        "poverty_line": poverty_line,
+        "base_popularity": np.array(initial_pops)
+
+    }
+
+    for a in agents:
+        a.setGameParams(game_params, forcedRandom)
+
+    return agents
 
 
 def create_agents(num_players, new_list, agent_name, forcedRandom, random_agents):
@@ -375,6 +450,10 @@ def get_file_names(agent_directory):
     return files
 
 
+def run_trial_jhg_pure(jhg_sim, num_rounds, agents):
+    for curr_round in range(num_rounds):
+        influence_matrix = run_jhg_stuff(jhg_sim.engine, curr_round, agents, len(agents), jhg_sim)
+    return jhg_sim
 
 # most stripped down version of run trial. Just plays the thing, returns the new sims, and then what was played. simple as.
 def run_trial(agents, sc_sim, jhg_sim, round_list, num_cycles, total_order, current_jhg_sim, peep_constant):

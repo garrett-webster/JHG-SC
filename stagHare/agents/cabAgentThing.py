@@ -43,14 +43,18 @@ class CabAgent(Agent):
 
     # this however, this is gonna be a fetcher.
     def act(self, state: State, reward: float, round_num: int) -> Tuple[int, int]:
-
+        # print("this is what that agent thinks its self id is ", self.id, "\n")
         extra_data = {
             i: {
                 j: None for j in range(len(list(state.agent_positions.keys())))
             } for i in range(len(list(state.agent_positions.keys())))
         }
 
+        # print("This is the id ", self.id, " this is the round num ", round_num, "\n this is the received \n ", self.received,
+        #       "\n this is the popularities \n", self.popularities, " and this is the influence \n", self.influence, " and this is the extra data ", extra_data)
+
         new_allocation = self.agent.play_round(self.id, round_num, self.received, self.popularities, self.influence, extra_data)
+        # print("this is the self.influence ", self.influence)
         return new_allocation
 
         # so let me remember whats going on here

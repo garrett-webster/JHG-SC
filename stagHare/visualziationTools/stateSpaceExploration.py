@@ -29,41 +29,41 @@ def generate_random(numPlayers, player_idx):
     return transaction_vector
 
 # copied very closely from jhgToStaghunt
-def allocation_to_movement(new_allocation, id):
-    pass
-    # hare = [-2, -2, 2] # just for simplicity sake. # This is just as easy as it gets.
-    # stag = [2, 2, 2]
-
-    # this SHOULD be better.
-    # this was the old version want
-    hare_move = np.zeros(3)
-    hare_move.fill(-2)
-    hare_move[id] = 2
-
-    # way less altruistic version we got going on here.
-    hare = np.zeros(3)
-    hare.fill(0)
-    hare[id] = 6
-
-
-    stag = np.zeros(3)
-    stag.fill(2)
-
-    # print("we are working with id ", id)
-    # print("this is the new allocation ", new_allocation)
-    # print("this is the corresponding hare thing ", hare)
-    # nothing should be created automatically.
-    new_current_options_matrix = [hare, stag, hare_move]
-    # return this so we have a means with which we can specify the bots current eating desire.
-    new_index = translateVecToIndexStagHare(new_allocation, new_current_options_matrix, False)
-
-    type = "Stag"
-    if new_index == 0:
-        type = "Hare"
-    # print("Here is teh agent ", id, " and here is the movement type ", type)
-
-    # print('this is the new movement ', new_movement)
-    return new_index # pull out the raw index we will do stuff with him.
+# def allocation_to_movement(new_allocation, id):
+#     pass
+#     # hare = [-2, -2, 2] # just for simplicity sake. # This is just as easy as it gets.
+#     # stag = [2, 2, 2]
+#
+#     # this SHOULD be better.
+#     # this was the old version want
+#     hare_move = np.zeros(3)
+#     hare_move.fill(-2)
+#     hare_move[id] = 2
+#
+#     # way less altruistic version we got going on here.
+#     hare = np.zeros(3)
+#     hare.fill(0)
+#     hare[id] = 6
+#
+#
+#     stag = np.zeros(3)
+#     stag.fill(2)
+#
+#     # print("we are working with id ", id)
+#     # print("this is the new allocation ", new_allocation)
+#     # print("this is the corresponding hare thing ", hare)
+#     # nothing should be created automatically.
+#     new_current_options_matrix = [hare, stag, hare_move]
+#     # return this so we have a means with which we can specify the bots current eating desire.
+#     new_index = translateVecToIndexStagHare(new_allocation, new_current_options_matrix, False)
+#
+#     type = "Stag"
+#     if new_index == 0:
+#         type = "Hare"
+#     # print("Here is teh agent ", id, " and here is the movement type ", type)
+#
+#     # print('this is the new movement ', new_movement)
+#     return new_index # pull out the raw index we will do stuff with him.
 
 
 def translateVecToIndexStagHare(transVec, currentOptionsMatrix, enforce_majority):

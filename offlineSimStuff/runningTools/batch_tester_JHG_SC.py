@@ -268,7 +268,8 @@ if __name__ == "__main__":
     # np.random.seed(SEED)  # NumPy’s RNG
 
     # jhg_games_per_sc_round = [4,3,3,3,3]  # what we trained the sleepy assasain bots on.
-    jhg_games_per_sc_round = ["S", 30]
+    # jhg_games_per_sc_round = ["S", 30]
+    jhg_games_per_sc_round = ["J", 30]
 
 
     round_list = determine_rounds(jhg_games_per_sc_round)
@@ -280,13 +281,13 @@ if __name__ == "__main__":
     tokens_per_player = 2
     utility_per_player = 3
     create_round_graphs_bool = False
-    create_game_graphs_bool = True
+    create_game_graphs_bool = False
     create_influence = False
     group = ""
     # these paths are relative to the file location, so as long as you don't move the file it can and will run from anywhere.
     jhg_bot_type = 0 # 0 is gene bots, 2 is social welfare and 3 is random. 4 is the new social welfare that I am developing that is just a hair smarter.
 
-    num_attempts = 1 # number of batches to do.
+    num_attempts = 100 # number of batches to do.
     num_rounds = sum(jhg_games_per_sc_round) if len(jhg_games_per_sc_round) > 2 else jhg_games_per_sc_round[-1] # if its a list, len of list. else, grab the second identifier
 
     file_name = os.path.join("../..", "Server", "Engine", "scenarios", "workingDirectory")
@@ -327,8 +328,8 @@ if __name__ == "__main__":
         offset = num_rounds * attempt # for logging purposes, lets us know the relationship between the logger round and current round
         current_jhg_sim = create_jhg_sim(num_humans, num_players, total_order, tokens_per_player, jhg_bot_type, addAgents)
         current_sc_sim = create_sim(num_players, total_order)
-        current_sc_sim.create_bots(chromosome, addAgents)
-        # current_sc_sim.bot_ovveride(current_jhg_sim.players) # tells the SC sim to make sure that it is using the same bots as the JHG by passing htem as a reference to both voting and allocation slots.
+        # current_sc_sim.create_bots(chromosome, addAgents)
+        current_sc_sim.bot_ovveride(current_jhg_sim.players) # tells the SC sim to make sure that it is using the same bots as the JHG by passing htem as a reference to both voting and allocation slots.
         round_logger.reset_up(current_jhg_sim, current_sc_sim)
         game_logger.resetup(current_jhg_sim, current_sc_sim)
 

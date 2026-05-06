@@ -82,10 +82,11 @@ class GameInformationResultsCompiler():
         return coop_scores, score_per_player, hare_intent_percent_player, popularity_over_time # I think thats a good baseline.
 
     def get_popularity_over_time_ranking(self):
-        flattened_popularity = self.popularity_over_time[0] # take it OUT of the list.
         list = [0 for _ in range(len(self.agent_names))]
-        for entry in flattened_popularity:
-            list[np.argmax(entry)] += 1
+        for i in range(len(self.popularity_over_time)):
+            flattened_popularity = self.popularity_over_time[i] # take it OUT of the list.
+            for entry in flattened_popularity:
+                list[np.argmax(entry)] += 1
 
         return list
 

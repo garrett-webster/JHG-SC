@@ -13,6 +13,7 @@ def run_test(curr_agent_name, scenario_type, height, width, random_agents, force
     # max_workers = 1 # spawns only a single thread, simplifying debugging.
     current_batch_logger = GameInformationResultsCompiler(height, width, curr_agent_name, scenario_type)
     results = []
+
     with ProcessPoolExecutor(max_workers=max_workers) as executor:
         futures = []
         for attempt in range(num_attempts):
@@ -55,7 +56,10 @@ scenarios = ["SelfPlay", "VGHare1", "VGHare2", "VGStag1", "VGStag2", "Allegatr1"
 
 def get_agents(agent, scenario):
     if scenario == "SelfPlay":
-        new_list = [base_to_csv[agent] for _ in range(3)]
+        if agent in base_to_csv:
+            new_list = [base_to_csv[agent] for _ in range(3)]
+        else:
+            new_list = ["GStag" for _ in range(3)]
     else:
         if "Allegatr" in scenario:
             opponent_type = scenario[0:-1]  # "Allegatr"
@@ -78,27 +82,34 @@ height = 16
 width = 16
 RandomAgents = True
 forced_random = False
-num_attempts = 1
+num_attempts = 100
+
 
 
 # removing Json implementatino because that was dumb and bad. back to pure script based.
 if __name__ == "__main__":
     height, width, RandomAgents, forced_random, num_attempts = height, width, RandomAgents, forced_random, num_attempts
 
-    agents = ["HCab"]
-    curr_agents = agents[0] # just get the first entry
+    # agents = ["HCab"]
+    agents = ["ECab199"]
+    # agents = ["HCab", "ECab199"]
+    # agents = ["GHare"]
+    # curr_agents = agents[0] # just get the first entry
     scenario = "SelfPlay"
     game_type = "Round"
     graphing = False
     num_games_per_round = 10
     print_results_to_console = True
 
-    scenario_type = str(curr_agents) + str(scenario) + str(game_type)
+    for curr_agents in agents:
+        print("Current Agent: ", curr_agents)
 
-    curr_agent_name = get_agents(curr_agents, scenario)
-    new_batch_logger = run_test(curr_agent_name, scenario_type, height, width, RandomAgents, forced_random, 10, graphing)
-    new_batch_logger.get_batch_results(print_results_to_console)
-    # write_batch_results_to_file(new_batch_logger, scenario_type)
+        scenario_type = str(curr_agents) + str(scenario) + str(game_type)
+
+        curr_agent_name = get_agents(curr_agents, scenario)
+        new_batch_logger = run_test(curr_agent_name, scenario_type, height, width, RandomAgents, forced_random, num_games_per_round, graphing)
+        new_batch_logger.get_batch_results(print_results_to_console)
+        # write_batch_results_to_file(new_batch_logger, scenario_type)
 
 
 

@@ -8,7 +8,7 @@ from stagHare.utils.pathfindingTime import findPathGreedy, findPathTeamAware
 
 
 def staghunt_to_jhg(state, action_map, old_agent_positions, old_state, hare_captured):
-    allocations = []
+    allocations = [[] for _ in range(3)] # we will make this dynamic later.
     allocations_dict = {}
 
     for name, action in action_map.items():
@@ -16,9 +16,12 @@ def staghunt_to_jhg(state, action_map, old_agent_positions, old_state, hare_capt
         if name == "stag" or name == "hare":
             continue # we don't actually care about these guys
 
+        id = int(name[-1]) # rip the number of the back.
         # [hare_move, hare_take, stag_move, stag_take]
-        allocations_list = create_allocations(name) # take just the number off of this thing.
+        allocations_list = create_allocations(id) # take just the number off of this thing.
 
+        # print("This is the id ", id)
+        # print("This is the new allocations \n", allocations_list)
 
         new_allocation = interpret_uncertain_move_to_allocation(state, action_map, old_agent_positions, old_state, action,
                                                                         state.agent_positions["hare"], state.agent_positions["stag"], name,
@@ -26,18 +29,18 @@ def staghunt_to_jhg(state, action_map, old_agent_positions, old_state, hare_capt
 
         # if name == "H1":
         #     print("this was the human allocation ", new_allocation)
-        new_allocation = new_allocation / sum(new_allocation)
-        allocations.append(new_allocation)
+        # print(f"Before norm: {new_allocation}, sum={sum(new_allocation)}")
+
+        # normalize it again!
+        new_allocation = [element / sum(abs(new_allocation)) for element in new_allocation]
+        # print(f"After norm: {new_allocation}")
+
+        # ... so I think this was getting scrambled and that was part of the problem.
+        allocations[id] = new_allocation # this should add it to the list without the need for a dict.
         allocations_dict[name] = new_allocation
 
-    allocations = np.array(allocations)
-    # print("Here are the allocations ", allocations)
-    row_sums = allocations.sum(axis=1, keepdims=True)
-    normalized = allocations / row_sums
-    allocations = list(normalized)
-    allocations_dict = dict(sorted(allocations_dict.items()))
-    # print("Here are the allocations they are returning ", allocations_dict)
-    # print("            ")
+    # this should now be good to go.
+
     return allocations
 
 
@@ -133,9 +136,9 @@ def weight(stag_weight, hare_weight, allocations_list): # new allocation that si
     new_array = (stag_weight * allocations_list[2]) + (hare_weight * allocations_list[0])
     return new_array
 
-def create_allocations(name):
-    id = int(name[-1])
-    id -= 1
+def create_allocations(id):
+    # id = int(name[-1])
+    # # id -= 1 # what. what. what. what. what.
 
     hare_move = np.zeros(3)
     hare_move[id] = 6

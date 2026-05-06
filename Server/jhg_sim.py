@@ -28,6 +28,7 @@ class JHG_simulator():
         self.players = None
         # went ahead and gave this a default. the currently trained agents have this baked into them that they need to have 2 tokens per player, curious in expanding that.
         if start_game:
+            print("Does this EVER go off ???")
             self.start_game(num_human_players, num_players, tokens_per_player, bot_type, agent_config)
         else:
             self.create_sim(num_human_players)
@@ -367,7 +368,7 @@ def loadPopulationFromFile(popSize, generationFolder, startIndex, num_gene_pools
         file_name = os.path.join("Engine", "botGenerations") # creates standard file path. we then append to this.
 
         # file_name = os.path.join(file_name, "assassins_gen_175")  # trying to be better and mroe aggressive on group forming
-        file_name = os.path.join(file_name, "6x6Round1.csv") # JHG cab agents as used in the study
+        file_name = os.path.join(file_name, "gen_199.csv") # JHG cab agents as used in the study
         # file_name = os.path.join(file_name, "longerConvex2.csv")
         # file_name = os.path.join(file_name, "sc_jhg_gen_299.csv") # the smartest vanilla agents
         # file_name = os.path.join(file_name, "w_kitties_gen_256.csv") # attempting to overcome cats
