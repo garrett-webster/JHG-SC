@@ -38,7 +38,7 @@ def translateVecToIndexStagHare(transVec, currentOptionsMatrix, id):
     transVec = np.array(transVec)
 
     for column in new_options_matrix:
-        distance = np.linalg.norm(transVec - np.array(column))
+        distance = np.linalg.norm(transVec - np.array(column), ord=1)
         total_distances.append(distance)
 
     index_to_return = total_distances.index(min(total_distances))

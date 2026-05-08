@@ -9,8 +9,8 @@ from stagHare.runnerHelper import *  # this SHOULD be all we need.
 def run_test(curr_agent_name, scenario_type, height, width, random_agents, forced_random, GamesPerRound, graphing):
 
     # how many resources can we actually devote to this??
-    max_workers = max(1, os.cpu_count() - 2)  # save just a few for other processes, plz don't crash.
-    # max_workers = 1 # spawns only a single thread, simplifying debugging.
+    # max_workers = max(1, os.cpu_count() - 2)  # save just a few for other processes, plz don't crash.
+    max_workers = 1 # spawns only a single thread, simplifying debugging.
     current_batch_logger = GameInformationResultsCompiler(height, width, curr_agent_name, scenario_type)
     results = []
 
@@ -40,19 +40,6 @@ def write_batch_results_to_file(current_batch_logger, scenario_type):
     with open(directory_path + f"{scenario_type}.json", "w") as f:
         json.dump(new_dict, f, indent=2)
 
-# base_agents = ["SCab", "HCab", "ECab99", "ECab199", "Allegatr"]
-base_agents = ["Allegatr"]
-base_to_csv = {
-    "SCab": "16x16round4.csv",
-    "HCab": "gen_z.csv",
-    "ECab99": "gen_99.csv",
-    "ECab199": "gen_199.csv",
-    "Allegatr": "Allegatr",
-}
-
-games_per_round = 10
-scenarios = ["SelfPlay", "VGHare1", "VGHare2", "VGStag1", "VGStag2", "Allegatr1", "Allegatr2"]
-# scenarios = ["Allegatr1", "Allegatr2"]
 
 def get_agents(agent, scenario):
     if scenario == "SelfPlay":
@@ -85,19 +72,38 @@ forced_random = False
 num_attempts = 100
 
 
+# base_agents = ["SCab", "HCab", "ECab99", "ECab199", "Allegatr"]
+base_agents = ["Allegatr"]
+
+base_to_csv = {
+    "SCab": "16x16round4.csv",
+    "HCab": "gen_z.csv",
+    "HSCab": "homoSCabs.csv",
+    "ECab99": "gen_99.csv",
+    "ECab199": "gen_199.csv",
+    "Allegatr": "Allegatr",
+    "HardHomo": "HardHomo.csv",
+}
+
+games_per_round = 10
+scenarios = ["SelfPlay", "VGHare1", "VGHare2", "VGStag1", "VGStag2", "Allegatr1", "Allegatr2"]
+# scenarios = ["Allegatr1", "Allegatr2"]
+
+
 
 # removing Json implementatino because that was dumb and bad. back to pure script based.
 if __name__ == "__main__":
     height, width, RandomAgents, forced_random, num_attempts = height, width, RandomAgents, forced_random, num_attempts
 
-    agents = ["HCab"]
+    # agents = ["HCab"]
     # agents = ["ECab199"]
     # agents = ["HCab", "ECab199"]
-    # agents = ["GHare"]
+    # agents = ["GStag"]
+    agents = ["HardHomo"]
     # curr_agents = agents[0] # just get the first entry
     scenario = "SelfPlay"
     game_type = "Round"
-    graphing = False
+    graphing = True
     num_games_per_round = 10
     print_results_to_console = True
 

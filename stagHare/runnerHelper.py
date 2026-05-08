@@ -73,6 +73,31 @@ def run_trial_genetic(hunters, height, width):
         if stag_hare.is_over():
             return create_new_score(stag_hare)
 
+
+def run_trial_engine_stripped(stag_hare, noisy=True):
+    allocations_list = []
+    old_allocations_list = []
+    while True: # the way this gets run is VERY VERY weird.
+        rewards = [0] * 5 # 3 hunters, 2 other peepsdd
+        # this is a reminder to check the action map to make sure that we are hunting what we think we are.
+
+        # user specified version of the transition function based on noise requests.
+        if noisy:
+            round_rewards, old_allocations, allocations  = stag_hare.transition_noisy_return_allocations()
+            old_allocations_list.append(list(old_allocations.values()))
+            allocations_list.append(allocations)
+        else:
+            round_rewards, old_allocations = stag_hare.transition_return_allocations()
+            old_allocations_list.append(list(old_allocations.values()))
+            allocations_list.append(None)
+        for i, reward in enumerate(round_rewards):
+            rewards[i] += reward
+
+        if stag_hare.is_over():
+            return old_allocations_list, allocations_list
+
+
+
 def run_trial_engine(stag_hare, graphing, current_round_grapher, current_game_logger, noisy=True):
     intents = [] # I want to return this now. this sucks.
     agent_positions = []
@@ -104,7 +129,7 @@ def run_trial_engine(stag_hare, graphing, current_round_grapher, current_game_lo
             # passes by value. thanks python.
             return create_new_score(stag_hare), intents, agent_positions, stag_hare.popularity_over_time, stag_hare.hunters
 
-def run_trial_debugging(stag_hare, graphing, current_round_grapher, current_game_logger):
+def run_trial_debugging(stag_hare, graphing, current_round_grapher, current_game_logger, noisy):
     pre_intents = []
     post_intents = []
     post_intents.append([2, 2, 2])
@@ -119,8 +144,11 @@ def run_trial_debugging(stag_hare, graphing, current_round_grapher, current_game
         rewards = [0] * 5 # 3 hunters, 2 other peepsdd
         # this is a reminder to check the action map to make sure that we are hunting what we think we are.
 
-        round_rewards, new_intents = stag_hare.transition_sean_debug()
-        post_intents.append(new_intents)
+        if noisy == True:
+            round_rewards, new_intents = stag_hare.transition_sean_debug()
+        if noisy == False:
+
+            post_intents.append(new_intents)
 
         for i, reward in enumerate(round_rewards):
             rewards[i] += reward
@@ -161,7 +189,7 @@ def reset_stag_hare(stag_hare):
 
     return stag_hare
 
-def run_trial_all(agent_names, height, width, random_agents, forced_random, scenario_type, num_rounds_per_game, graphing, noisy):
+def run_trial_all(agent_names, height, width, random_agents, forced_random, scenario_type, num_rounds_per_game, graphing):
     current_game_logger, current_round_grapher = get_graphing_stuff(graphing, height, width, agent_names, scenario_type)
 
     # if there is an imputted value, use that. If none, run it only once.
@@ -295,7 +323,7 @@ def create_hunters_with_genes(genes, random_agents, forced_random):
     new_hunters = []
     agent_name = "gen_199.csv"
 
-
+    # forced random and random agents don't actually matter here, because we are passing a gene down.
     for i in range(3):
         new_name = "R" + str(i)
         new_hunters.append(CabAgent(i, new_name, random_agents, forced_random, gene=genes[i], agent_name=agent_name))

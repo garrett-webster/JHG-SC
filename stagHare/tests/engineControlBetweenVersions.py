@@ -69,7 +69,7 @@ def run_test(curr_agent_name, scenario_type, height, width, random_agents, force
     return popularities
 
 
-def run_test_with_agents(hunters):
+def run_test_with_agents(hunters, noisy):
 
     run_amount = 1
     graphing = False
@@ -78,6 +78,7 @@ def run_test_with_agents(hunters):
 
     stag_hare = get_stag_hare(height, width, hunters)
     popularity_over_time = []
+    intents = []
 
     for i in range(run_amount):  # if we only do 1 game, we only do this once.
         # does this suck? possibly.
@@ -87,9 +88,11 @@ def run_test_with_agents(hunters):
         # consolidated this into one super function, tests are in the test suite.
         new_score, new_intents, new_positions, popularity_over_time, _ = run_trial_engine(stag_hare, graphing,
                                                                                                 current_round_grapher,
-                                                                                                current_game_logger)
+                                                                                                current_game_logger,
+                                                                                                noisy)
 
         popularity_over_time = popularity_over_time
+        intents = new_intents
 
         # just set up a new state that doesn't break immediately
         stag_hare = reset_stag_hare(stag_hare)
@@ -99,7 +102,7 @@ def run_test_with_agents(hunters):
 
 def create_agents_and_hunters(agent_name):
 
-    agents = create_genetic_agents(3, [], "gen_Z.csv", forced_random, random_agents)
+    agents = create_genetic_agents(3, [], agent_name, forced_random, random_agents)
 
     gene_dict = []
     for agent in agents:
@@ -137,22 +140,22 @@ if __name__ == "__main__":
     graphing = False
     num_games_per_round = 10
     print_results_to_console = True
-    agent_name = "gen_Z.csv"
-
+    agent_name = "hardHomo.csv"
+    noisy = False # THIS IS CRUCIAL HOLY MOLY WE NEED THIS
     # need this to be the same agents...
     agents, hunters = create_agents_and_hunters(agent_name)
 
 
     # FIRST THE STAGHARE THINGY.
     np.random.seed(42)
-    popularities_during_game, intents = run_test_with_agents(hunters)
+    popularities_during_game, intents = run_test_with_agents(hunters, noisy)
     num_rounds = len(popularities_during_game)
 
-    # FIRST, just plug it into the engine.
+    # THEN, just plug it into the engine.
     current_jhg_sim = create_jhg_engine(3) # just create a nice lil engine.
     total_pops = [[100 for _ in range(3)]]
     np.random.seed(42)
-    for i in range(num_rounds):
+    for i in range(num_rounds-1):
         new_pops = run_jhg_stuff_popularities(current_jhg_sim, i, agents, 3)
         total_pops.append(new_pops)
     total_pops = np.array(total_pops)
@@ -160,3 +163,8 @@ if __name__ == "__main__":
 
     for i in range(num_rounds):
         assert np.allclose(popularities_during_game[i], total_pops[i])
+
+    # what is the coop score here??
+    total_count = 0
+    raw_coop = [total_count + 1 if intent == [2,2,2] else 0 for intent in intents]
+    coop_score = sum(raw_coop) / len(raw_coop)

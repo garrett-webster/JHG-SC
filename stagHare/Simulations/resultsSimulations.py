@@ -41,6 +41,8 @@ def extract_agent_info(scenario_name):
     - Allegtr -> ('Allegtr', None)
     """
     # Handle SCab and HCab (no gene versions)
+    if scenario_name.startswith('HSCab'):
+        return "HSCab", None
     if scenario_name.startswith('SCab'):
         return 'SCab', None
     if scenario_name.startswith('HCab'):

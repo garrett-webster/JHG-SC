@@ -93,6 +93,7 @@ def run_jhg_stuff(jhg_engine, curr_round, agents, num_players, current_jhg_sim):
     avg_pop = sum(new_popularity) / current_jhg_sim.num_players
     current_jhg_sim.avg_pop_per_round.append(avg_pop)
     current_jhg_sim.game_popularities.append(new_popularity)
+    print("Here are the transactions \n", transactions)
 
     # ok so now I have to return
     # the change in popularities,
@@ -151,6 +152,7 @@ def run_jhg_stuff_popularities(jhg_engine, curr_round, agents, num_players):
     # the change in popularities,
     # return sc_sim.current_results, sc_sim.results_sums, new_influence  # so we have the change in utility and overall utility
     # print("round ", curr_round, " transactions ", transactions)
+    # print("These are the transactions ", transactions)
     return jhg_engine.get_popularity().tolist() # return da influence matrix, the change in popularitry, and the new popularities.
 
 # should be 0 for the pure SC environment, and 1 for the pure JHG environment. anythign in the middle is mixed.

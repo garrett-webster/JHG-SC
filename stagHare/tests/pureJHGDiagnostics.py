@@ -14,8 +14,9 @@ from Server.Engine.simulator import GameSimulator
 from stagHare.environment.jhgToStaghunt import allocation_to_movement, allocation_to_intent
 
 if __name__ == "__main__":
-    bots = ["gen_Z.csv", "gen_199.csv"]
+    # bots = ["gen_Z.csv", "gen_199.csv"]
     # bots = ["16x16round4.csv"]
+    bots = ["hardHomo.csv"]
     forcedRandom = True
     enforce_majority = True
     random_agents = True

@@ -72,7 +72,7 @@ if __name__ == "__main__":
 
     round_list = determine_rounds(jhg_games_per_sc_round)
     num_cycles = 3
-    num_players = 10
+    num_players = 3
     peep_constant = 0 # relates to the balance of which we us
 
 
@@ -80,7 +80,7 @@ if __name__ == "__main__":
     tokens_per_player = 2
     utility_per_player = 3
     create_round_graphs_bool = False
-    create_game_graphs_bool = False
+    create_game_graphs_bool = True
     create_influence = True
     chromosomes_directory = "testChromosome"
     group = ""
@@ -123,7 +123,7 @@ if __name__ == "__main__":
     # agent_name = "mixedJHGSelfPlay.csv"
     # agent_name = "homoSCSelfPlay.csv"
     # agent_name = "6x6Round1.csv" # use this as sort of the default, for now.
-    agent_name = "gen_199.csv"
+    agent_name = "hardHomo.csv"
     # bunch of stuff for print statements
     utility_to_log = []
     popularity_to_log = []

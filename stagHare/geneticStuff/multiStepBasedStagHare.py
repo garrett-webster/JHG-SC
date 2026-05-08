@@ -63,7 +63,7 @@ def write_generational_results(theGenePools, popSize, gen, folder):
     script_dir = os.path.dirname(os.path.abspath(__file__))
     # Construct the full output directory path
     if folder == "":
-        output_dir = os.path.join(script_dir, "16x16round4", "theGenerations") # just to give it somewhere to go
+        output_dir = os.path.join(script_dir, "16x16round5", "theGenerations") # just to give it somewhere to go
     else:
         output_dir = os.path.join(script_dir, folder) # just to give it somewhere to go
     # Ensure output directory exists
@@ -433,7 +433,7 @@ if __name__ == "__main__":
     popSize = 60
     numGeneCopies = 1
     startIndex = 0
-    numGens = 100
+    numGens = 200
     gamesPerGen = 20
     agentsPerGame = 3 # we can only fit 3 hunters in there at at time...
     roundsPerGame = 30

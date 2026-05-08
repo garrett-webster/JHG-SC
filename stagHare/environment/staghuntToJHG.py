@@ -2,12 +2,12 @@
 from stagHare.transVecTranslatorStagHare import translateVecToIndexStagHare
 import numpy as np
 from stagHare.utils.a_star import AStar
-
+from stagHare.utils.create_options_matrix import create_options_matrix
 
 from stagHare.utils.pathfindingTime import findPathGreedy, findPathTeamAware
 
 
-def staghunt_to_jhg(state, action_map, old_agent_positions, old_state, hare_captured):
+def staghunt_to_jhg(state, action_map, old_agent_positions, old_state):
     allocations = [[] for _ in range(3)] # we will make this dynamic later.
     allocations_dict = {}
 
@@ -18,11 +18,12 @@ def staghunt_to_jhg(state, action_map, old_agent_positions, old_state, hare_capt
 
         id = int(name[-1]) # rip the number of the back.
         # [hare_move, hare_take, stag_move, stag_take]
-        allocations_list = create_allocations(id) # take just the number off of this thing.
+        allocations_list = create_options_matrix(id) # take just the number off of this thing.
 
         # print("This is the id ", id)
         # print("This is the new allocations \n", allocations_list)
 
+        # this is returned pre normalized you don't gotta do nothing.
         new_allocation = interpret_uncertain_move_to_allocation(state, action_map, old_agent_positions, old_state, action,
                                                                         state.agent_positions["hare"], state.agent_positions["stag"], name,
                                                                         allocations_list)
@@ -30,9 +31,6 @@ def staghunt_to_jhg(state, action_map, old_agent_positions, old_state, hare_capt
         # if name == "H1":
         #     print("this was the human allocation ", new_allocation)
         # print(f"Before norm: {new_allocation}, sum={sum(new_allocation)}")
-
-        # normalize it again!
-        new_allocation = [element / sum(abs(new_allocation)) for element in new_allocation]
         # print(f"After norm: {new_allocation}")
 
         # ... so I think this was getting scrambled and that was part of the problem.
@@ -127,7 +125,10 @@ def interpret_uncertain_move_to_allocation(state, action_map, old_agent_position
     # print("Weight allocation ", weighted_allocation)
     return_allocation = new_allocation + weighted_allocation
 
-    return return_allocation
+    new_allocation = [element / np.sum(np.abs(new_allocation)) for element in new_allocation]
+    print("This is the normalized return location")
+
+    return new_allocation
 
 
 def weight(stag_weight, hare_weight, allocations_list): # new allocation that sits right in the middle of the fetcher.
@@ -136,23 +137,3 @@ def weight(stag_weight, hare_weight, allocations_list): # new allocation that si
     new_array = (stag_weight * allocations_list[2]) + (hare_weight * allocations_list[0])
     return new_array
 
-def create_allocations(id):
-    # id = int(name[-1])
-    # # id -= 1 # what. what. what. what. what.
-
-    hare_move = np.zeros(3)
-    hare_move[id] = 6
-
-    hare_take = np.zeros(3)
-    hare_take.fill(-2)
-    hare_take[id] = 2
-
-    stag_move = np.zeros(3)
-    stag_move.fill(1.5)
-    stag_move[id] = 3
-
-    stag_take = np.zeros(3)
-    stag_take.fill(2)
-
-
-    return [hare_move, hare_take, stag_move, stag_take]

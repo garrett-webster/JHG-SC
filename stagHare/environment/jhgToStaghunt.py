@@ -12,6 +12,7 @@ import numpy as np
 from stagHare.utils.a_star import AStar
 import random
 
+from stagHare.utils.create_options_matrix import create_options_matrix
 from stagHare.utils.pathfindingTime import findPathGreedy, findPathTeamAware # maybe
 
 
@@ -21,57 +22,29 @@ from stagHare.utils.pathfindingTime import findPathGreedy, findPathTeamAware # m
 # so at a high level
 # what I need is
 
-# take in an allocation, and then return a tuple, which is the new movement.
-def jhg_to_staghunt(agents, state, rewards, round_num, engine):
 
-    # first, lets grab all the allocations and separate the wheat from the chaff
+# TODO: separate this into get allocations and get hare hunting map -- two functions. a function pointer might be necesary.
+
+
+
+
+# TODO: separate this into get moves and hunting hare mmaps
+def get_movements_from_allocations(new_allocations, hunting_hare_map, state):
+    # lets get some dictionaries set up to put stuff in
     new_moves = {}
-    new_allocations = {}
-    new_intents = {}
-    allocations = [[] for _ in range(3)]
-    indices = list(range(len(agents)))
-    np.random.shuffle(indices)
-    hunting_hare_map = {}
-    for i in indices:
-        agent = agents[i]
-        reward = 0 if (i == 0 or i == 1) else rewards[i]
-        if not isinstance(agent, CabAgent) and not isinstance(agent, FetcherBot) and not isinstance(agent, HareAgent) and not isinstance(agent, StagAgent) and not isinstance(agent, HumanAgent):
-            new_moves[agent.name] = agent.act(state, reward, round_num) # should be noted that these are just prey moves. they are essentialy random.
-            hunting_hare_map[agent.name] = agent.is_hunting_hare()
-        else:
-            # print("This is the id we are dealing with ", int(agent.name[-1]))
-            allocation = agent.act(state, reward, round_num)
-            new_allocations[agent.name] = allocation
-
-    # allocation to generators (for which we have the translator)
     keys = new_allocations.keys()
-    # print("here are hte new allocations ", new_allocations)
-
     for key in keys:
-        id = int(key[-1]) # might be a desync here?
-        # if id == 0:
-        #     print("here is teh allocation ", new_allocations[key])
-        # print(f"Raw allocation for {key}: {new_allocations[key]}, sum={sum(new_allocations[key])}")
+        id = int(key[-1])  # might be a desync here?
         new_row, new_col, movement_type = allocation_to_movement(new_allocations[key], id, state)
         new_move = [new_row, new_col]
-        new_moves[key] = new_move # bars??
-        new_intents[key] = movement_type
+        new_moves[key] = new_move  # bars??
 
     new_allocations = dict(sorted(new_allocations.items(), key=lambda item: item[0]))
-    # print("The initial allocations are as follows : ", new_allocations)
-    # need TO PASS IT IN to account for discrepancies.
 
-    # print("Round ", round_num, " thing ", new_allocations.items())
+    print("Here are the allocatinos \n ", new_allocations)
+    return new_moves
 
-    hunting_hare_map = create_map_from_intents(new_intents, hunting_hare_map)
-    print_hare_hunting_map(hunting_hare_map)
-    return new_moves, hunting_hare_map, new_allocations # then just give the moves back.
-    # note that these are in a dictionary, I'll have to do weird things to randomize the order that this happens in.
 
-    # I really should preseve the dictionary aspect of this huh
-    # that way I cna do things ot keep track and randomize things and keep track of who moved where.
-
-# new_current_options_matrix = [hare, stag, hare_move]
 def create_map_from_intents(intents, hunting_hare_map):
     for name, intent in intents.items():
         if intent == 0 or intent == 1: # hare move, hare take
@@ -96,24 +69,8 @@ def create_map_from_intents(intents, hunting_hare_map):
 # old allcation to movement. needs work. tank needs fuel.
 # this returns just the intent -- used primarily for debugging.
 def allocation_to_intent(new_allocation, id, num_players):
-    hare_move = np.zeros(num_players)
-    hare_move.fill(0)
-    hare_move[id] = 6
 
-    # trying to take the hare
-    hare_take = np.zeros(num_players)
-    hare_take.fill(-2)
-    hare_take[id] = 2
-
-    stag_move = np.zeros(num_players)
-    stag_move.fill(1.5)
-    stag_move[id] = 3
-
-    stag_take = np.zeros(num_players)
-    stag_take.fill(2)
-
-    new_current_options_matrix = [stag_move, stag_take, hare_move, hare_take]
-    normalized = [row / np.sum(np.abs(row)) for row in new_current_options_matrix]
+    normalized = create_options_matrix(id)
 
     new_allocation = [element / np.sum(np.abs(new_allocation)) for element in new_allocation]
     # return this so we have a means with which we can specify the bots current eating desire.
@@ -132,31 +89,7 @@ def allocation_to_intent(new_allocation, id, num_players):
 
 
 def allocation_to_movement(new_allocation, id, state):
-    pass
-    # hare = [-2, -2, 2] # just for simplicity sake. # This is just as easy as it gets.
-    # stag = [2, 2, 2]
-    # id -= 1 # WHY DID I HAVE THIS I REMEMBER THIS BEING IMPORTANT WHY IS IT HERE>
-    # hare move represents moving towards the hare
-    hare_move = np.zeros(3)
-    hare_move.fill(0)
-    hare_move[id] = 6
-
-    # trying to take the hare
-    hare_take = np.zeros(3)
-    hare_take.fill(-2)
-    hare_take[id] = 2
-
-
-    stag_move = np.zeros(3)
-    stag_move.fill(1.5)
-    stag_move[id] = 3
-
-    stag_take = np.zeros(3)
-    stag_take.fill(2)
-
-    # id += 1
-    # 1 is hare move, 2 is hare take, 3 is stag move, 4 is stag take
-    new_current_options_matrix = [hare_move, hare_take, stag_move, stag_take]
+    new_current_options_matrix = create_options_matrix(id)
     # make sure to use the ABS when you are summing! otherwise negative breaks everything!
     new_allocation = [element / np.sum(np.abs(new_allocation)) for element in new_allocation]
     normalized_current_options_matrix = [row / np.sum(np.abs(row)) for row in new_current_options_matrix]

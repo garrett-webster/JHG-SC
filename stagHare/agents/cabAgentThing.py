@@ -53,6 +53,7 @@ class CabAgent(Agent):
         # print("This is the id ", self.id, " this is the round num ", round_num, "\n this is the received \n ", self.received,
         #       "\n this is the popularities \n", self.popularities, " and this is the influence \n", self.influence, " and this is the extra data ", extra_data)
 
+        # print("These are the genes ", self.agent.genes_long)
         new_allocation = self.agent.play_round(self.id, round_num, self.received, self.popularities, self.influence, extra_data)
         # print("this is the self.influence ", self.influence)
         return new_allocation
