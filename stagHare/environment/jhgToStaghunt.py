@@ -1,7 +1,11 @@
 # from Server.SC_Bots.transVecTranslator import translateVecToIndex
 from operator import itemgetter
 
+from rfc3987_syntax import is_valid_syntax_isegment_nz
+
 from Server.Engine.completeBots.humanagent import HumanAgent
+from stagHare.agents import agent
+from stagHare.agents.alegaatr import AlegAATr
 from stagHare.agents.cabAgentThing import CabAgent
 from stagHare.agents.fetcherBot import FetcherBot
 from stagHare.agents.human import humanAgent
@@ -29,21 +33,6 @@ from stagHare.utils.pathfindingTime import findPathGreedy, findPathTeamAware # m
 
 
 # TODO: separate this into get moves and hunting hare mmaps
-def get_movements_from_allocations(new_allocations, hunting_hare_map, state):
-    # lets get some dictionaries set up to put stuff in
-    new_moves = {}
-    keys = new_allocations.keys()
-    for key in keys:
-        id = int(key[-1])  # might be a desync here?
-        new_row, new_col, movement_type = allocation_to_movement(new_allocations[key], id, state)
-        new_move = [new_row, new_col]
-        new_moves[key] = new_move  # bars??
-
-    new_allocations = dict(sorted(new_allocations.items(), key=lambda item: item[0]))
-
-    print("Here are the allocatinos \n ", new_allocations)
-    return new_moves
-
 
 def create_map_from_intents(intents, hunting_hare_map):
     for name, intent in intents.items():
@@ -52,16 +41,6 @@ def create_map_from_intents(intents, hunting_hare_map):
         else:
             hunting_hare_map[name] = False # stag move, stag take.
     return hunting_hare_map
-
-
-
-
-
-
-        # htis is sort of a p --> np problem, as this direction is pretty easy.
-
-    # then we return a move from the generators, taking the most likely one
-    # then we return the move.
 
 
 
@@ -92,20 +71,10 @@ def allocation_to_movement(new_allocation, id, state):
     new_current_options_matrix = create_options_matrix(id)
     # make sure to use the ABS when you are summing! otherwise negative breaks everything!
     new_allocation = [element / np.sum(np.abs(new_allocation)) for element in new_allocation]
-    normalized_current_options_matrix = [row / np.sum(np.abs(row)) for row in new_current_options_matrix]
-    # then translate that new allocation into the closest possible option and return that movement.
-    new_index = translateVecToIndexStagHare(new_allocation, normalized_current_options_matrix, id)
+    new_index = translateVecToIndexStagHare(new_allocation, id)
     new_movement = generate_movement(state, id, new_index)
 
-    if new_index == 0 or new_index == 1:
-        type = "hare"
-    elif new_index == 2 or new_index == 3:
-        type = "stag"
-
-    # print('this is the new movement ', new_movement)
-    #  print(f"Agent {id}, alloc={new_allocation}, index={new_index}")
-
-    return new_movement[0], new_movement[1], new_index # pull out the raw index we will do stuff with him.
+    return new_movement, new_index # pull out the raw index we will do stuff with him.
 
 def generate_movement(state, id, new_index):
     player_name = "R" + str(id) # zero index, then 2 agetns in front of them.
@@ -130,10 +99,11 @@ def generate_movement(state, id, new_index):
 
 
     else:
+        print("IF THIS FIRES SOMETHING IS TERRIBLY WRONG")
         return curr_row, curr_col
 
 
-    return path
+    return list(path) # just go ahead and turn that into a list.
 
 
 
@@ -145,3 +115,109 @@ def print_hare_hunting_map(hunting_hare_map):
         new_hunting_map.append([key, hunting_hare_map[key]])
     new_hunting_map.sort(key=itemgetter(0))
     # print("This is the new hunting hare map ", new_hunting_map)
+
+
+def create_agent_indicies(agents):
+    new_agent_indicies = list(range(len(agents)))
+    np.random.shuffle(new_agent_indicies)
+    return new_agent_indicies
+
+
+def get_allocations_from_agents(agents, state, round_num, agent_indicies):
+    allocation_dict = {}
+    for agent_index in agent_indicies:
+        agent = agents[agent_index]
+        if not (agent.name == 'stag' or agent.name == 'hare' or isinstance(agent, AlegAATr)):
+            allocation_dict[agent.name] = agent.act(state, None, round_num)
+
+    return allocation_dict
+
+def get_hunting_hare_map_from_agents(agents, allocation_dict, agent_indicies):
+    hunting_hare_map = {}
+    for index in agent_indicies:
+        agent = agents[index]
+        # TODO: please make this a list.
+        if agent.name == "stag" or agent.name == "hare" or isinstance(agent, AlegAATr):
+            hunting_hare_map[agent.name] = agent.is_hunting_hare()
+
+        else:
+            id = int(agent.name[-1])
+            intent = translateVecToIndexStagHare(allocation_dict[agent.name], id)
+            # stag are 2 and 3 and that leads to an input of 0. Hare if anything else.
+            hunting_hare_map[agent.name] = 0 if intent == 2 or intent == 3 else 1
+
+    return hunting_hare_map
+
+def get_action_map_from_agents(agents, state, rewards, round_num, allocations_dict, agent_indicies):
+    new_moves_dict = {}
+    for index in agent_indicies:
+        agent = agents[index]
+        # TODO: create a list that maps types to function types for this.
+        if agent.name == "stag" or agent.name == "hare" or isinstance(agent, AlegAATr):
+            new_moves_dict[agent.name] = agent.act(state, rewards[index], round_num)
+        else:
+            id = int(agent.name[-1])
+            new_moves_dict[agent.name], new_index = allocation_to_movement(allocations_dict[agent.name], id, state)
+
+    return new_moves_dict
+
+
+
+
+
+def set_jhg_agents_params(agents, engine):
+    # set up the bots for the engine.
+    for agent in agents:
+        if isinstance(agent, CabAgent):
+            agent.set_helpers(engine)  # sets all the JHG engine stuff.
+
+# TODO: REMOVE THIS WHEN DONE TESTING
+def jhg_to_staghunt(agents, state, rewards, round_num, engine):
+
+    # first, lets grab all the allocations and separate the wheat from the chaff
+    new_moves = {}
+    new_allocations = {}
+    new_intents = {}
+    allocations = [[] for _ in range(3)]
+    indices = list(range(len(agents)))
+    # np.random.shuffle(indices)
+    hunting_hare_map = {}
+    for i in indices:
+        agent = agents[i]
+        reward = 0 if (i == 0 or i == 1) else rewards[i]
+        if not isinstance(agent, CabAgent) and not isinstance(agent, FetcherBot) and not isinstance(agent, HareAgent) and not isinstance(agent, StagAgent) and not isinstance(agent, HumanAgent):
+            new_moves[agent.name] = agent.act(state, reward, round_num) # should be noted that these are just prey moves. they are essentialy random.
+            hunting_hare_map[agent.name] = agent.is_hunting_hare()
+        else:
+            # print("This is the id we are dealing with ", int(agent.name[-1]))
+            allocation = agent.act(state, reward, round_num)
+            new_allocations[agent.name] = allocation
+
+    # allocation to generators (for which we have the translator)
+    keys = new_allocations.keys()
+    # print("hare are the initial allocations dict ", new_allocations)
+    # print("here are hte new allocations ", new_allocations)
+
+    for key in keys:
+        id = int(key[-1]) # might be a desync here?
+        # if id == 0:
+        #     print("here is teh allocation ", new_allocations[key])
+        # print(f"Raw allocation for {key}: {new_allocations[key]}, sum={sum(new_allocations[key])}")
+        (new_row, new_col), movement_type = allocation_to_movement(new_allocations[key], id, state)
+        new_move = [new_row, new_col]
+        new_moves[key] = new_move # bars??
+        new_intents[key] = movement_type
+
+    new_allocations = dict(sorted(new_allocations.items(), key=lambda item: item[0]))
+    # print("The initial allocations are as follows : ", new_allocations)
+    # need TO PASS IT IN to account for discrepancies.
+
+    # print("Round ", round_num, " thing ", new_allocations.items())
+
+    hunting_hare_map = create_map_from_intents(new_intents, hunting_hare_map)
+    print_hare_hunting_map(hunting_hare_map)
+    return new_moves, hunting_hare_map, new_allocations # then just give the moves back.
+    # note that these are in a dictionary, I'll have to do weird things to randomize the order that this happens in.
+
+    # I really should preseve the dictionary aspect of this huh
+    # that way I cna do things ot keep track and randomize things and keep track of who moved where.

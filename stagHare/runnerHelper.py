@@ -3,25 +3,20 @@
 # it all in one spot. That way, as I modify and upgrade it, we can make all the changes IN THIS FILE
 # so all the functions are on the same level.
 # yes we have had problems with it before. Don't worry about it.
-import traceback
 
-from packaging.utils import canonicalize_name
+from copy import deepcopy
 
-from stagHare.agents.cabAgentThing import CabAgent
-from stagHare.agents.fetcherBot import FetcherBot
-from stagHare.environment.jhgToStaghunt import create_map_from_intents
-from stagHare.environment.state import State
+from stagHare.environment.jhgToStaghunt import *
 from stagHare.environment.world import StagHare
 from stagHare.agents.random_agent import Random
 from stagHare.agents.hareAgent import HareAgent
 from stagHare.agents.stagAgent import StagAgent
 from stagHare.agents.alegaatr import AlegAATr # litmus test
-import numpy as np
-import time
 
 from stagHare.loggingStuff.stagHareLogger import GameInformationObject
 from stagHare.visualziationTools.gameLogger import GameLogger
 from stagHare.visualziationTools.inviduvalRoundGrapher import IndividualRoundGrapher
+from stagHare.environment.staghuntToJHG import * # get those fetchers out of here.
 
 
 # just gets rid of the stupid SKELARN warning for allegatr. I'm not touching that.
@@ -77,30 +72,38 @@ def run_trial_genetic(hunters, height, width):
 def run_trial_engine_stripped(stag_hare, noisy=True):
     allocations_list = []
     old_allocations_list = []
+    old_agent_positions_list = []
     while True: # the way this gets run is VERY VERY weird.
         rewards = [0] * 5 # 3 hunters, 2 other peepsdd
         # this is a reminder to check the action map to make sure that we are hunting what we think we are.
 
         # user specified version of the transition function based on noise requests.
         if noisy:
-            round_rewards, old_allocations, allocations  = stag_hare.transition_noisy_return_allocations()
-            old_allocations_list.append(list(old_allocations.values()))
-            allocations_list.append(allocations)
+            round_rewards, old_allocations, old_positions  = stag_hare.transition_noisy()
+            old_allocations_list.append(list(old_allocations))
+            allocations_list.append(old_allocations)
+            old_agent_positions_list.append(old_positions)
         else:
-            round_rewards, old_allocations = stag_hare.transition_return_allocations()
-            old_allocations_list.append(list(old_allocations.values()))
-            allocations_list.append(None)
+            round_rewards, old_allocations, old_positions = stag_hare.transition()
+            old_allocations_list.append(old_allocations)
+            old_agent_positions_list.append(old_positions)
         for i, reward in enumerate(round_rewards):
             rewards[i] += reward
 
         if stag_hare.is_over():
-            return old_allocations_list, allocations_list
+            return old_allocations_list, allocations_list, old_agent_positions_list
 
-
+# TODO: this breaks when considering human players. Add a total order parameter.
+# SORT THIS BASED ON THE LAST NUMBER, that should always be 0 1 or 2. might have to rework some server stuff
+# but humans should always be first, and then we should have H0, R1, R2 or H0, H1, R2 or H0, H1, H2 (or all bots).
+def allocations_dict_to_list(allocations_dict):
+    new_allocations = [v for k, v in sorted(allocations_dict.items(), key=lambda x: int(x[0][1:]))]
+    return new_allocations # IDK if this works all the way, I'll have to debug it. Grr.
 
 def run_trial_engine(stag_hare, graphing, current_round_grapher, current_game_logger, noisy=True):
     intents = [] # I want to return this now. this sucks.
     agent_positions = []
+    all_allocations = []
     while True: # the way this gets run is VERY VERY weird.
 
         intents.append(create_intents_list(stag_hare.state.hunting_hare_map)) # Might need to custom cast this to integers.
@@ -109,25 +112,48 @@ def run_trial_engine(stag_hare, graphing, current_round_grapher, current_game_lo
         if graphing:
             current_game_logger.add_round(stag_hare.state)
             current_round_grapher.create_round_graph(stag_hare)
-        rewards = [0] * 5 # 3 hunters, 2 other peepsdd
-        # this is a reminder to check the action map to make sure that we are hunting what we think we are.
 
-        # user specified version of the transition function based on noise requests.
-        if noisy:
-            round_rewards = stag_hare.transition_noisy()
+        rewards = [0] * 5 # 3 hunters, 2 other peepsdd
+
+
+        old_agent_positions = stag_hare.state.agent_positions.copy() # make a copy of this otherwise it updates.
+        old_state = deepcopy(stag_hare.state) # ditto.
+        # JHG TO STAGHARE SECTION
+        set_jhg_agents_params(stag_hare.agents, stag_hare.engine)
+        agent_order_indicies = create_agent_indicies(stag_hare.agents)
+        # agent_indicies = [0, 1, 2, 3, 4] # hard coded for non scramble for tests.
+
+        allocations_dict = get_allocations_from_agents(stag_hare.agents, stag_hare.state, stag_hare.state.round_num, agent_order_indicies)
+        action_map = get_action_map_from_agents(stag_hare.agents, stag_hare.state, rewards, stag_hare.state.round_num, allocations_dict, agent_order_indicies)
+        hunting_hare_map = get_hunting_hare_map_from_agents(stag_hare.agents, allocations_dict, agent_order_indicies)
+
+        round_rewards = stag_hare.update_intents_and_get_rewards(action_map, hunting_hare_map)
+
+        # STAGHARE to JHG SECTION
+        if noisy: # means that we need to translate the allocations from movements, as opposed to passing them straight through.
+            allocations_dict = get_allocations_from_movements(stag_hare.state, action_map, old_agent_positions, old_state)
+
+        allocations_list = allocations_dict_to_list(allocations_dict)
+
+
+        if allocations_list != []: # can't update the engine w/ pure allegatrs.
+            stag_hare.update_engine(allocations_list, stag_hare.state.round_num)
         else:
-            round_rewards = stag_hare.transition()
+            allocations_list = [None, None, None] # defualt for test purposes.
+
+        all_allocations.append(allocations_list)
+
         for i, reward in enumerate(round_rewards):
             rewards[i] += reward
 
         if stag_hare.is_over():
-            agent_positions.append(stag_hare.state.agent_positions)
+            # agent_positions.append(stag_hare.state.agent_positions)
             if graphing:
                 current_game_logger.add_round(stag_hare.state)
                 current_round_grapher.create_round_graph(stag_hare)
             intents.append(create_intents_list(stag_hare.state.hunting_hare_map))
             # passes by value. thanks python.
-            return create_new_score(stag_hare), intents, agent_positions, stag_hare.popularity_over_time, stag_hare.hunters
+            return create_new_score(stag_hare), intents, agent_positions, stag_hare.popularity_over_time, stag_hare.hunters, all_allocations
 
 def run_trial_debugging(stag_hare, graphing, current_round_grapher, current_game_logger, noisy):
     pre_intents = []

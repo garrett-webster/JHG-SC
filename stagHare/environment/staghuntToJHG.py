@@ -6,8 +6,28 @@ from stagHare.utils.create_options_matrix import create_options_matrix
 
 from stagHare.utils.pathfindingTime import findPathGreedy, findPathTeamAware
 
+# this function
+# takes in the state, the action map, the old agent
+def get_allocations_from_movements(state, action_map, old_agent_positions, old_state):
+    allocations = [[] for _ in range(3)] # we will make this dynamic later.
+    allocations_dict = {}
+    for name, action in action_map.items():
+        if name == "stag" or name == "hare":
+            continue # action is irrelevant; not part of the JHG paradigm.
 
-def staghunt_to_jhg(state, action_map, old_agent_positions, old_state):
+        id = int(name[-1]) # rip the number of the back.
+        allocations_list = create_options_matrix(id) # take just the number off of this thing.
+
+        new_allocation = interpret_uncertain_move_to_allocation(state, old_agent_positions, old_state, action,
+                                                                        state.agent_positions["hare"], state.agent_positions["stag"], name,
+                                                                        allocations_list)
+        allocations[id] = new_allocation # this should add it to the list without the need for a dict.
+        allocations_dict[name] = new_allocation
+
+    return allocations_dict
+
+
+def staghunt_to_jhg(state, action_map, old_agent_positions, old_state, hare_captured):
     allocations = [[] for _ in range(3)] # we will make this dynamic later.
     allocations_dict = {}
 
@@ -23,26 +43,21 @@ def staghunt_to_jhg(state, action_map, old_agent_positions, old_state):
         # print("This is the id ", id)
         # print("This is the new allocations \n", allocations_list)
 
-        # this is returned pre normalized you don't gotta do nothing.
-        new_allocation = interpret_uncertain_move_to_allocation(state, action_map, old_agent_positions, old_state, action,
+        new_allocation = interpret_uncertain_move_to_allocation(state, old_agent_positions, old_state, action,
                                                                         state.agent_positions["hare"], state.agent_positions["stag"], name,
                                                                         allocations_list)
-
-        # if name == "H1":
-        #     print("this was the human allocation ", new_allocation)
-        # print(f"Before norm: {new_allocation}, sum={sum(new_allocation)}")
-        # print(f"After norm: {new_allocation}")
 
         # ... so I think this was getting scrambled and that was part of the problem.
         allocations[id] = new_allocation # this should add it to the list without the need for a dict.
         allocations_dict[name] = new_allocation
 
+
     # this should now be good to go.
 
-    return allocations
+    return allocations_dict
 
 
-def interpret_uncertain_move_to_allocation(state, action_map, old_agent_positions, old_state,
+def interpret_uncertain_move_to_allocation(state, old_agent_positions, old_state,
                                            action, hare_position, stag_position, name, allocations_list):
 
     # GAME OVER CHECK, EASY CHECKS.
@@ -123,10 +138,12 @@ def interpret_uncertain_move_to_allocation(state, action_map, old_agent_position
                                                                             # right next to them? very high.
     # print("New allocation: ", new_allocation)
     # print("Weight allocation ", weighted_allocation)
+
     return_allocation = new_allocation + weighted_allocation
 
-    new_allocation = [element / np.sum(np.abs(new_allocation)) for element in new_allocation]
-    print("This is the normalized return location")
+    new_allocation = np.array(new_allocation)
+
+    new_allocation = [element / sum(abs(new_allocation)) for element in new_allocation]
 
     return new_allocation
 

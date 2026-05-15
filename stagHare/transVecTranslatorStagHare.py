@@ -2,6 +2,9 @@
 import numpy as np
 import copy
 
+from stagHare.utils.create_options_matrix import create_options_matrix
+
+
 # def translateVecToIndexStagHare(transVec, currentOptionsMatrix, enforce_majority):
 #     total_distances = []
 #
@@ -30,10 +33,10 @@ import copy
 
 # ID doesn't ever actually get used, but I want it here for debugging purposes.
 # assume that transVec and currentOptionsMatrix are already normalized.
-def translateVecToIndexStagHare(transVec, currentOptionsMatrix, id):
+def translateVecToIndexStagHare(transVec, id):
+    current_option_matrix = create_options_matrix(id)
     total_distances = []
-    # Add abstention as a new row (all zeros)
-    new_options_matrix = copy.deepcopy(currentOptionsMatrix)
+    new_options_matrix = copy.deepcopy(current_option_matrix)
 
     transVec = np.array(transVec)
 
@@ -42,5 +45,4 @@ def translateVecToIndexStagHare(transVec, currentOptionsMatrix, id):
         total_distances.append(distance)
 
     index_to_return = total_distances.index(min(total_distances))
-    #  print("this be the index we are returning ", index_to_return)
-    return index_to_return # account for abstention as an option.
+    return index_to_return

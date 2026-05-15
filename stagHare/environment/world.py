@@ -1,13 +1,18 @@
+from Server.Engine.completeBots.humanagent import HumanAgent
 from offlineSimStuff.runningTools.runnerHelper import create_jhg_engine
 from stagHare.agents.agent import Agent
 from stagHare.agents.cabAgentThing import CabAgent
+from stagHare.agents.fetcherBot import FetcherBot
+from stagHare.agents.hareAgent import HareAgent
 from stagHare.agents.prey import Prey
+from stagHare.agents.stagAgent import StagAgent
 from stagHare.environment.state import State
 import numpy as np
 from typing import List
+
 from stagHare.utils.utils import HARE_NAME, N_HUNTERS, STAG_NAME
-from stagHare.environment.jhgToStaghunt import jhg_to_staghunt
-from stagHare.environment.staghuntToJHG import staghunt_to_jhg
+from stagHare.environment.jhgToStaghunt import *
+from stagHare.environment.staghuntToJHG import *
 from copy import deepcopy
 
 class StagHare:
@@ -60,16 +65,148 @@ class StagHare:
 
         return rewards  # PLEASE PLEASE PLEASE.
 
-    def transition_sean_debug(self):
+    # def transition_sean_debug(self):
+    #     round_num = self.state.round_num
+    #     rewards = [0] * len(self.agent_names)
+    #     for agent in self.agents:
+    #         if isinstance(agent, CabAgent):
+    #             agent.set_helpers(self.engine)  # sets all the JHG engine stuff.
+    #
+    #     # first, lets run the JHG to staghunt portion
+    #     action_map, hunting_hare_map, old_allocations = jhg_to_staghunt(self.agents, self.state, rewards,
+    #                                                                     round_num)  # this does contain the hare and stag.
+    #
+    #     self.action_map = action_map
+    #     old_agent_positions = self.state.agent_positions.copy()  # make a copy of this, trust me.
+    #     old_state = deepcopy(self.state)  # this SHOULD work?
+    #     # process the actions IG
+    #
+    #     if not self.is_over():
+    #         self.state.update_intent(hunting_hare_map)
+    #         self.rewards = self.state.process_actions(action_map)
+    #
+    #     # turn this into something that the JHG engine can understand and slam that through. or something like that.
+    #     hare_captured = self.state.hare_captured  # we use this for the differing hare allocation upon capture. Not sure if it really matters.
+    #     allocations = staghunt_to_jhg(self.state, action_map, old_agent_positions, old_state,
+    #                                   hare_captured)  # need the action map to do things.
+    #
+    #     new_intents = [-1 for _ in range(len(self.hunters))]
+    #     for i, allocation in enumerate(allocations):
+    #         # this returns 0 - 3
+    #         new_intents[i] = (allocation_to_intent(allocation, i, len(self.hunters)))
+    #
+    #     self.update_engine(allocations, round_num)
+    #
+    #     return self.rewards, new_intents  # return the rewards.
+
+    # this is the version that just passes everything straight through.
+    # def transition(self):
+    #     round_num = self.state.round_num
+    #     rewards = [0] * len(self.agent_names)
+    #     for agent in self.agents:
+    #         if isinstance(agent, CabAgent):
+    #             agent.set_helpers(self.engine)
+    #
+    #     # jhg_to_staghunt returns moves, hunting_hare_map, and the raw allocations (dict)
+    #     action_map, hunting_hare_map, raw_allocations = jhg_to_staghunt(
+    #         self.agents, self.state, rewards, round_num, self.engine
+    #     )
+    #
+    #     self.action_map = action_map
+    #     old_agent_positions = self.state.agent_positions.copy()
+    #     old_state = deepcopy(self.state)
+    #
+    #     if not self.is_over():
+    #         self.state.update_intent(hunting_hare_map)
+    #         self.rewards = self.state.process_actions(action_map)
+    #
+    #     # --- REPLACE the staghunt_to_jhg call with direct raw allocation passing ---
+    #     # raw_allocations is a dict like {"H0": vec, "H1": vec, "H2": vec}
+    #     # Build an ordered list that the engine expects (player 0, player 1, player 2)
+    #     allocation_list = [None, None, None]
+    #     for agent_name, alloc_vector in raw_allocations.items():
+    #         idx = int(agent_name[-1])  # "H0" -> 0, "H1" -> 1, "H2" -> 2
+    #         allocation_list[idx] = alloc_vector
+    #
+    #     # (Optional) Normalise if needed – but the pure JHG code does NOT normalise before
+    #     # play_round(), so leaving the raw vector exactly as is should be fine.
+    #     # If you find the engine behaves oddly, uncomment the next two lines:
+    #     # for i, alloc in enumerate(allocation_list):
+    #     #     allocation_list[i] = [x / sum(abs(alloc)) for x in alloc]
+    #
+    #     # Send the exact same allocations the agents intended directly to the engine
+    #     self.update_engine(allocation_list, round_num)
+    #     # ---------------------------------------------------------------------------
+    #     # print("Here is the current influence ", self.engine.engine.get_influence())
+    #     return self.rewards
+
+
+
+
+    # def transition_return_allocations(self):
+    #     round_num = self.state.round_num
+    #     rewards = [0] * len(self.agent_names)
+    #     for agent in self.agents:
+    #         if isinstance(agent, CabAgent):
+    #             agent.set_helpers(self.engine)
+    #
+    #     # jhg_to_staghunt returns moves, hunting_hare_map, and the raw allocations (dict)
+    #     action_map, hunting_hare_map, raw_allocations = jhg_to_staghunt(
+    #         self.agents, self.state, rewards, round_num, self.engine
+    #     )
+    #
+    #     self.action_map = action_map
+    #     old_agent_positions = self.state.agent_positions.copy()
+    #     old_state = deepcopy(self.state)
+    #
+    #     if not self.is_over():
+    #         self.state.update_intent(hunting_hare_map)
+    #         self.rewards = self.state.process_actions(action_map)
+    #
+    #     # --- REPLACE the staghunt_to_jhg call with direct raw allocation passing ---
+    #     # raw_allocations is a dict like {"H0": vec, "H1": vec, "H2": vec}
+    #     # Build an ordered list that the engine expects (player 0, player 1, player 2)
+    #     allocation_list = [None, None, None]
+    #     for agent_name, alloc_vector in raw_allocations.items():
+    #         idx = int(agent_name[-1])  # "H0" -> 0, "H1" -> 1, "H2" -> 2
+    #         allocation_list[idx] = alloc_vector
+    #
+    #     # (Optional) Normalise if needed – but the pure JHG code does NOT normalise before
+    #     # play_round(), so leaving the raw vector exactly as is should be fine.
+    #     # If you find the engine behaves oddly, uncomment the next two lines:
+    #     # for i, alloc in enumerate(allocation_list):
+    #     #     allocation_list[i] = [x / sum(abs(alloc)) for x in alloc]
+    #
+    #     # Send the exact same allocations the agents intended directly to the engine
+    #     self.update_engine(allocation_list, round_num)
+    #     # ---------------------------------------------------------------------------
+    #     # print("Here is the current influence ", self.engine.engine.get_influence())
+    #     return self.rewards, allocation_list
+
+
+
+    # this is better -- it still has a bad code smell tho. Might want to separate this out.
+    def update_intents_and_get_rewards(self, action_map, hunting_hare_map):
+        if not self.is_over():
+            self.state.update_intent(hunting_hare_map)
+            self.rewards = self.state.process_actions(action_map)
+
+        return self.rewards  # return the rewards.
+
+
+    # the reality of this is, this supports both already. not a good reason to not just have it all route through here.
+    # this si the version with uncertainty.
+    def transition_noisy(self):
         round_num = self.state.round_num
         rewards = [0] * len(self.agent_names)
+        # there has GOT to be a more elegant way to do this. I swear.
         for agent in self.agents:
             if isinstance(agent, CabAgent):
-                agent.set_helpers(self.engine)  # sets all the JHG engine stuff.
+                agent.set_helpers(self.engine) # sets all the JHG engine stuff.
 
         # first, lets run the JHG to staghunt portion
         action_map, hunting_hare_map, old_allocations = jhg_to_staghunt(self.agents, self.state, rewards,
-                                                                        round_num)  # this does contain the hare and stag.
+                                                                        round_num, self.engine)  # this does contain the hare and stag.
 
         self.action_map = action_map
         old_agent_positions = self.state.agent_positions.copy()  # make a copy of this, trust me.
@@ -82,19 +219,17 @@ class StagHare:
 
         # turn this into something that the JHG engine can understand and slam that through. or something like that.
         hare_captured = self.state.hare_captured  # we use this for the differing hare allocation upon capture. Not sure if it really matters.
-        allocations = staghunt_to_jhg(self.state, action_map, old_agent_positions, old_state,
+        allocations_dict = staghunt_to_jhg(self.state, action_map, old_agent_positions, old_state,
                                       hare_captured)  # need the action map to do things.
-
-        new_intents = [-1 for _ in range(len(self.hunters))]
-        for i, allocation in enumerate(allocations):
-            # this returns 0 - 3
-            new_intents[i] = (allocation_to_intent(allocation, i, len(self.hunters)))
+        allocations = allocations_dict_to_list(allocations_dict)
 
         self.update_engine(allocations, round_num)
+        # print("Here is the current influence ", self.engine.engine.get_influence())
 
-        return self.rewards, new_intents  # return the rewards.
+        # round_rewards, old_allocations, old_positions
+        return self.rewards, allocations, old_agent_positions  # return the rewards.
 
-    # this is the version that just passes everything straight through.
+
     def transition(self):
         round_num = self.state.round_num
         rewards = [0] * len(self.agent_names)
@@ -130,191 +265,13 @@ class StagHare:
         #     allocation_list[i] = [x / sum(abs(alloc)) for x in alloc]
 
         # Send the exact same allocations the agents intended directly to the engine
-        self.update_engine(allocation_list, round_num)
+        if allocation_list != [None, None, None]: # make sure that the agents actually made allocations.
+            # this won't handle mixes well but I don't care!
+            self.update_engine(allocation_list, round_num)
         # ---------------------------------------------------------------------------
         # print("Here is the current influence ", self.engine.engine.get_influence())
-        return self.rewards
+        return self.rewards, allocation_list, old_agent_positions
 
-
-
-
-    def transition_return_allocations(self):
-        round_num = self.state.round_num
-        rewards = [0] * len(self.agent_names)
-        for agent in self.agents:
-            if isinstance(agent, CabAgent):
-                agent.set_helpers(self.engine)
-
-        # jhg_to_staghunt returns moves, hunting_hare_map, and the raw allocations (dict)
-        action_map, hunting_hare_map, raw_allocations = jhg_to_staghunt(
-            self.agents, self.state, rewards, round_num, self.engine
-        )
-
-        self.action_map = action_map
-        old_agent_positions = self.state.agent_positions.copy()
-        old_state = deepcopy(self.state)
-
-        if not self.is_over():
-            self.state.update_intent(hunting_hare_map)
-            self.rewards = self.state.process_actions(action_map)
-
-        # --- REPLACE the staghunt_to_jhg call with direct raw allocation passing ---
-        # raw_allocations is a dict like {"H0": vec, "H1": vec, "H2": vec}
-        # Build an ordered list that the engine expects (player 0, player 1, player 2)
-        allocation_list = [None, None, None]
-        for agent_name, alloc_vector in raw_allocations.items():
-            idx = int(agent_name[-1])  # "H0" -> 0, "H1" -> 1, "H2" -> 2
-            allocation_list[idx] = alloc_vector
-
-        # (Optional) Normalise if needed – but the pure JHG code does NOT normalise before
-        # play_round(), so leaving the raw vector exactly as is should be fine.
-        # If you find the engine behaves oddly, uncomment the next two lines:
-        # for i, alloc in enumerate(allocation_list):
-        #     allocation_list[i] = [x / sum(abs(alloc)) for x in alloc]
-
-        # Send the exact same allocations the agents intended directly to the engine
-        self.update_engine(allocation_list, round_num)
-        # ---------------------------------------------------------------------------
-        # print("Here is the current influence ", self.engine.engine.get_influence())
-        return self.rewards, allocation_list
-
-    def is_over_check(self, hunting_hare_map, action_map):
-        if not self.is_over():
-            self.state.update_intent(hunting_hare_map)
-            self.rewards = self.state.process_actions(action_map)
-        return
-
-    def prepare_jhg_agents(self, agents, engine):
-        # set up the bots for the engine.
-        for agent in agents:
-            if isinstance(agent, CabAgent):
-                agent.set_helpers(engine)  # sets all the JHG engine stuff.
-
-    def get_allocations(self, state, agents, rewards, round_num):
-        # first, lets grab all the allocations and separate the wheat from the chaff
-        new_moves = {}
-        new_allocations = {}
-        new_intents = {}
-        indices = list(range(len(agents)))
-        np.random.shuffle(indices)
-        hunting_hare_map = {}
-        for i in indices:
-            agent = agents[i]
-            reward = 0 if (i == 0 or i == 1) else rewards[i]
-            if not isinstance(agent, CabAgent) and not isinstance(agent, FetcherBot) and not isinstance(agent,
-                                                                                                        HareAgent) and not isinstance(
-                    agent, StagAgent) and not isinstance(agent, HumanAgent):
-                new_moves[agent.name] = agent.act(state, reward,
-                                                  round_num)  # should be noted that these are just prey moves. they are essentialy random.
-                hunting_hare_map[agent.name] = agent.is_hunting_hare()
-            else:
-                # print("This is the id we are dealing with ", int(agent.name[-1]))
-                allocation = agent.act(state, reward, round_num)
-                new_allocations[agent.name] = allocation
-
-        return new_allocations, hunting_hare_map
-
-    # start of refactor
-
-    # what does thsi function do
-
-    # First take the allocations
-
-    # takes in agents, and state, modifies state based on acgent actions, returns the new rewards for the allegatr Agents.
-
-
-    def transition_noisy(self):
-        round_num = self.state.round_num
-        rewards = [0] * len(self.agent_names)
-        # first, lets run the JHG to staghunt portion
-
-        self.prepare_jhg_agents(self.agents, self.engine)
-
-        # JHG to STAGHARE portion
-        get_allocations(state, agents, rewards, round_num)
-        self.action_map = get_movements_from_allocations(new_allocations, hunting_hare_map, state)
-
-        # STAGHARE to JHG portion
-
-        self.is_over_check(hunting_hare_map, self.action_map)
-        # turn this into something that the JHG engine can understand and slam that through. or something like that.
-        allocations = staghunt_to_jhg(self.state, self.action_map, self.state.agent_positions.copy(), deepcopy(self.state) )  # need the action map to do things.
-        self.update_engine(allocations, round_num)
-
-
-        return self.rewards  # return the rewards.
-
-
-
-
-
-    # # the reality of this is, this supports both already. not a good reason to not just have it all route through here.
-    # # this si the version with uncertainty.
-    # def transition_noisy(self):
-    #     round_num = self.state.round_num
-    #     rewards = [0] * len(self.agent_names)
-    #     # there has GOT to be a more elegant way to do this. I swear.
-    #     for agent in self.agents:
-    #         if isinstance(agent, CabAgent):
-    #             agent.set_helpers(self.engine) # sets all the JHG engine stuff.
-    #
-    #     # first, lets run the JHG to staghunt portion
-    #     action_map, hunting_hare_map, old_allocations = jhg_to_staghunt(self.agents, self.state, rewards,
-    #                                                                     round_num, self.engine)  # this does contain the hare and stag.
-    #
-    #     self.action_map = action_map
-    #     old_agent_positions = self.state.agent_positions.copy()  # make a copy of this, trust me.
-    #     old_state = deepcopy(self.state)  # this SHOULD work?
-    #     # process the actions IG
-    #
-    #     if not self.is_over():
-    #         self.state.update_intent(hunting_hare_map)
-    #         self.rewards = self.state.process_actions(action_map)
-    #
-    #     # turn this into something that the JHG engine can understand and slam that through. or something like that.
-    #     hare_captured = self.state.hare_captured  # we use this for the differing hare allocation upon capture. Not sure if it really matters.
-    #     allocations = staghunt_to_jhg(self.state, action_map, old_agent_positions, old_state,
-    #                                   hare_captured)  # need the action map to do things.
-    #
-    #
-    #     self.update_engine(allocations, round_num)
-    #     # print("Here is the current influence ", self.engine.engine.get_influence())
-    #
-    #     return self.rewards  # return the rewards.
-
-
-    def transition_noisy_return_allocations(self):
-
-        round_num = self.state.round_num
-        rewards = [0] * len(self.agent_names)
-        # there has GOT to be a more elegant way to do this. I swear.
-        for agent in self.agents:
-            if isinstance(agent, CabAgent):
-                agent.set_helpers(self.engine) # sets all the JHG engine stuff.
-
-        # first, lets run the JHG to staghunt portion
-        action_map, hunting_hare_map, old_allocations = jhg_to_staghunt(self.agents, self.state, rewards,
-                                                                        round_num, self.engine)  # this does contain the hare and stag.
-
-        self.action_map = action_map
-        old_agent_positions = self.state.agent_positions.copy()  # make a copy of this, trust me.
-        old_state = deepcopy(self.state)  # this SHOULD work?
-        # process the actions IG
-
-        if not self.is_over():
-            self.state.update_intent(hunting_hare_map)
-            self.rewards = self.state.process_actions(action_map)
-
-        # turn this into something that the JHG engine can understand and slam that through. or something like that.
-        hare_captured = self.state.hare_captured  # we use this for the differing hare allocation upon capture. Not sure if it really matters.
-        allocations = staghunt_to_jhg(self.state, action_map, old_agent_positions, old_state,
-                                      hare_captured)  # need the action map to do things.
-
-
-        self.update_engine(allocations, round_num)
-        # print("Here is the current influence ", self.engine.engine.get_influence())
-
-        return self.rewards, old_allocations, allocations  # return the rewards.
 
     def update_action_map(self, action_map) -> dict:
         pass
@@ -363,3 +320,8 @@ class StagHare:
 
     def return_state(self):
         return self.state
+
+
+def allocations_dict_to_list(allocations_dict):
+    new_allocations = [v for k, v in sorted(allocations_dict.items(), key=lambda x: int(x[0][1:]))]
+    return new_allocations # IDK if this works all the way, I'll have to debug it. Grr.

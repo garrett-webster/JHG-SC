@@ -41,7 +41,7 @@ class CabAgent(Agent):
     def set_id(self, id):
         self.id = id # just throw this in there for the genetic algorithm.
 
-    # this however, this is gonna be a fetcher.
+    # reward never gets used here, but does get used under other agent types.
     def act(self, state: State, reward: float, round_num: int) -> Tuple[int, int]:
         # print("this is what that agent thinks its self id is ", self.id, "\n")
         extra_data = {
@@ -57,14 +57,6 @@ class CabAgent(Agent):
         new_allocation = self.agent.play_round(self.id, round_num, self.received, self.popularities, self.influence, extra_data)
         # print("this is the self.influence ", self.influence)
         return new_allocation
-
-        # so let me remember whats going on here
-        # however, building the influence matrix, now THAT is goign to be a fetcher.
-        # we need to grab the influence matrix, as well as the current state
-        # we can ignore the reward
-        # from there, we need to interpret the current allocation
-        # just ask if its hare or stag oriented
-        # then return that action
 
 
     def set_helpers(self, engine):
