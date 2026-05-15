@@ -251,6 +251,7 @@ def playGame(theGenes, game, random_agents, forced_random, height, width):
 
     # get dat new score. (this is a nifty little run function that just takes in some pre-established hunters
     # and then sets up a staghare simulator and goes from there.
+    # I don't like this, there's gotta be a better way to do it, but I digress.
     new_scores = run_trial_genetic(hunters, height, width)
 
     # we shall rework this in a second methinks.

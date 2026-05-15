@@ -44,6 +44,7 @@ def process_intents(current_intents: list) -> tuple[int, list]:
     return column_percentages # we ONLY want the column ones. for reasons.
 
 # this is worth keeping around because it has to return specific stuff for the genetic algorithm.
+# TODO: Fold this all into one.
 def run_trial_genetic(hunters, height, width):
 
     # create the instance simulator
@@ -69,30 +70,6 @@ def run_trial_genetic(hunters, height, width):
             return create_new_score(stag_hare)
 
 
-def run_trial_engine_stripped(stag_hare, noisy=True):
-    allocations_list = []
-    old_allocations_list = []
-    old_agent_positions_list = []
-    while True: # the way this gets run is VERY VERY weird.
-        rewards = [0] * 5 # 3 hunters, 2 other peepsdd
-        # this is a reminder to check the action map to make sure that we are hunting what we think we are.
-
-        # user specified version of the transition function based on noise requests.
-        if noisy:
-            round_rewards, old_allocations, old_positions  = stag_hare.transition_noisy()
-            old_allocations_list.append(list(old_allocations))
-            allocations_list.append(old_allocations)
-            old_agent_positions_list.append(old_positions)
-        else:
-            round_rewards, old_allocations, old_positions = stag_hare.transition()
-            old_allocations_list.append(old_allocations)
-            old_agent_positions_list.append(old_positions)
-        for i, reward in enumerate(round_rewards):
-            rewards[i] += reward
-
-        if stag_hare.is_over():
-            return old_allocations_list, allocations_list, old_agent_positions_list
-
 # TODO: this breaks when considering human players. Add a total order parameter.
 # SORT THIS BASED ON THE LAST NUMBER, that should always be 0 1 or 2. might have to rework some server stuff
 # but humans should always be first, and then we should have H0, R1, R2 or H0, H1, R2 or H0, H1, H2 (or all bots).
@@ -100,7 +77,8 @@ def allocations_dict_to_list(allocations_dict):
     new_allocations = [v for k, v in sorted(allocations_dict.items(), key=lambda x: int(x[0][1:]))]
     return new_allocations # IDK if this works all the way, I'll have to debug it. Grr.
 
-def run_trial_engine(stag_hare, graphing, current_round_grapher, current_game_logger, noisy=True):
+# this takes in a simulator object, and runs the simulator until completion, with an optional noisy parameter.
+def run_trials_given_simulator(stag_hare, graphing, current_round_grapher, current_game_logger, noisy=True):
     intents = [] # I want to return this now. this sucks.
     agent_positions = []
     all_allocations = []
@@ -155,40 +133,6 @@ def run_trial_engine(stag_hare, graphing, current_round_grapher, current_game_lo
             # passes by value. thanks python.
             return create_new_score(stag_hare), intents, agent_positions, stag_hare.popularity_over_time, stag_hare.hunters, all_allocations
 
-def run_trial_debugging(stag_hare, graphing, current_round_grapher, current_game_logger, noisy):
-    pre_intents = []
-    post_intents = []
-    post_intents.append([2, 2, 2])
-    while True: # the way this gets run is VERY VERY weird.
-
-        pre_intents.append(create_intents_list(stag_hare.state.hunting_hare_map)) # Might need to custom cast this to integers.
-
-
-        if graphing:
-            current_game_logger.add_round(stag_hare.state)
-            current_round_grapher.create_round_graph(stag_hare)
-        rewards = [0] * 5 # 3 hunters, 2 other peepsdd
-        # this is a reminder to check the action map to make sure that we are hunting what we think we are.
-
-        if noisy == True:
-            round_rewards, new_intents = stag_hare.transition_sean_debug()
-        if noisy == False:
-
-            post_intents.append(new_intents)
-
-        for i, reward in enumerate(round_rewards):
-            rewards[i] += reward
-
-        if stag_hare.is_over():
-            if graphing:
-                current_game_logger.add_round(stag_hare.state)
-                current_round_grapher.create_round_graph(stag_hare)
-            pre_intents.append(create_intents_list(stag_hare.state.hunting_hare_map))
-            # post_intents.append(create_intents_list(stag_hare.state.hunting_hare_map)) # maybe???
-            # passes by value. thanks python.
-            return pre_intents, post_intents
-
-
 
 def get_graphing_stuff(graphing, height, width, agent_names, scenario_type):
     if graphing == True:
@@ -238,8 +182,8 @@ def run_trial_all(agent_names, height, width, random_agents, forced_random, scen
         stag_hare.state.hunting_hare_map = {"R" + str(i): 2 for i in range(3)}  # Fill with NULL value
 
                                                                             # consolidated this into one super function, tests are in the test suite.
-        new_score, new_intents, new_positions, popularity_over_time, hunters = run_trial_engine(stag_hare, graphing,
-                                                                                                current_round_grapher, current_game_logger)
+        new_score, new_intents, new_positions, popularity_over_time, hunters = run_trials_given_simulator(stag_hare, graphing,
+                                                                                                          current_round_grapher, current_game_logger)
 
         # make sure to add everything to its appropriate lists.
         scores.append(new_score)

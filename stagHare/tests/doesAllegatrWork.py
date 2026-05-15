@@ -111,7 +111,7 @@ def run_other_test(stag_hare, noisy):
         stag_hare.state.hunting_hare_map = {"R" + str(i): 2 for i in range(3)}  # Fill with NULL value
 
         # consolidated this into one super function, tests are in the test suite.
-        new_score, intents, agent_positions, popularity_over_time, stag_hare.hunters, allocations = run_trial_engine(stag_hare, False, None, None, noisy)
+        new_score, intents, agent_positions, popularity_over_time, stag_hare.hunters, allocations = run_trials_given_simulator(stag_hare, False, None, None, noisy)
 
         allocations_list.append(allocations)
         agent_positions_list.append(agent_positions)

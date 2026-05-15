@@ -86,10 +86,10 @@ def run_test_with_agents(hunters, noisy):
         stag_hare.state.hunting_hare_map = {"R" + str(i): 2 for i in range(3)}  # Fill with NULL value
 
         # consolidated this into one super function, tests are in the test suite.
-        new_score, new_intents, new_positions, popularity_over_time, _ = run_trial_engine(stag_hare, graphing,
-                                                                                                current_round_grapher,
-                                                                                                current_game_logger,
-                                                                                                noisy)
+        new_score, new_intents, new_positions, popularity_over_time, _ = run_trials_given_simulator(stag_hare, graphing,
+                                                                                                    current_round_grapher,
+                                                                                                    current_game_logger,
+                                                                                                    noisy)
 
         popularity_over_time = popularity_over_time
         intents = new_intents
