@@ -144,7 +144,7 @@ def get_hunting_hare_map_from_agents(agents, allocation_dict, agent_indicies):
             id = int(agent.name[-1])
             intent = translateVecToIndexStagHare(allocation_dict[agent.name], id)
             # stag are 2 and 3 and that leads to an input of 0. Hare if anything else.
-            hunting_hare_map[agent.name] = 0 if intent == 2 or intent == 3 else 1
+            hunting_hare_map[agent.name] = True if intent == 2 or intent == 3 else False
 
     return hunting_hare_map
 

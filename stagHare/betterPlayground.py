@@ -65,11 +65,11 @@ def get_agents(agent, scenario):
     return new_list
 
 # some global variables
-height = 16
-width = 16
+height = 6 # should be 16 but I want to speed it up sire.
+width = 6
 RandomAgents = True
 forced_random = False
-num_attempts = 100
+num_attempts = 1
 
 
 # base_agents = ["SCab", "HCab", "ECab99", "ECab199", "Allegatr"]
@@ -85,7 +85,7 @@ base_to_csv = {
     "HardHomo": "HardHomo.csv",
 }
 
-games_per_round = 10
+games_per_round = 2
 scenarios = ["SelfPlay", "VGHare1", "VGHare2", "VGStag1", "VGStag2", "Allegatr1", "Allegatr2"]
 # scenarios = ["Allegatr1", "Allegatr2"]
 
@@ -98,13 +98,13 @@ if __name__ == "__main__":
     # agents = ["HCab"]
     # agents = ["ECab199"]
     # agents = ["HCab", "ECab199"]
-    # agents = ["GStag"]
-    agents = ["HardHomo"]
+    agents = ["GStag"]
+    # agents = ["HardHomo"]
     # curr_agents = agents[0] # just get the first entry
     scenario = "SelfPlay"
     game_type = "Round"
-    graphing = True
-    num_games_per_round = 10
+    graphing = False
+    num_games_per_round = 2
     print_results_to_console = True
 
     for curr_agents in agents:

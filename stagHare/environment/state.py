@@ -320,6 +320,8 @@ class State:
 
         return n_hunter_neighbors >= N_REQUIRED_TO_CAPTURE_STAG
 
+
+
     agents_to_objects_dict = {
         "hare": 0,  # np.zeros is our blank backround
         "stag": 1,

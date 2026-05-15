@@ -1,4 +1,5 @@
 from Server.Engine.completeBots.humanagent import HumanAgent
+from legacy.outDated.jhg_tools import popularity_over_time
 from offlineSimStuff.runningTools.runnerHelper import create_jhg_engine
 from stagHare.agents.agent import Agent
 from stagHare.agents.cabAgentThing import CabAgent
@@ -10,6 +11,7 @@ from stagHare.environment.state import State
 import numpy as np
 from typing import List
 
+from stagHare.loggingStuff.stagHareLogger import GameInformationObject
 from stagHare.utils.utils import HARE_NAME, N_HUNTERS, STAG_NAME
 from stagHare.environment.jhgToStaghunt import *
 from stagHare.environment.staghuntToJHG import *
@@ -17,6 +19,11 @@ from copy import deepcopy
 
 class StagHare:
     def __init__(self, height: int, width: int, hunters: List[Agent]) -> None:
+
+        self.height = height
+        self.width = width
+        # I don't really want to keep track of the actual hunter objects, there's gotta be a better way to do that.
+
         # Make sure we can set the grid up properly
         n_hunters = len(hunters)
 
@@ -42,194 +49,57 @@ class StagHare:
         # infrastructure in place.
         self.engine = create_jhg_engine(3) # its always 3 players.
         self.popularity_over_time = [[100 for _ in range(len(self.hunters))]] # bars??
-        # self.popularity_over_time = [] # bars??
+
+        self.coop_success_list = []
+        self.agent_positions_list = []
+        self.intent_list = [] # we can get the hare intent percent per player from this actually.
+        self.hunting_hare_map = {} # this is gonna be a dict, just wait around for it.
+        self.scores = []
 
 
+    def create_intents_from_hunting_hare_map(self, hunting_hare_map):
+        intents = [[] for _ in range(3)]
+        for key in hunting_hare_map:
+            if key not in ("stag", "hare"):
+                index = int(key[-1])
+                intents[index] = 0 if False else 1
 
-
-
-
-    def transition_debug(self):
-        # we need to split this into an init and 2 stages
-        # if ethan_bool: # or isinstance(self.agents[4], QAlegAATr):
-        #     rewards = self.transition_ethan()
-        # print("using ethans transition function")
-        # else:
-        # ok so
-        # I think the way to make this work is as follows:
-        # this is for anything that has to do with the cab agents.
-        # if you want it NOT to od that, use hte other code.
-        # else:
-        # print("using seans transition function")
-        rewards = self.transition_sean_debug()
-
-        return rewards  # PLEASE PLEASE PLEASE.
-
-    # def transition_sean_debug(self):
-    #     round_num = self.state.round_num
-    #     rewards = [0] * len(self.agent_names)
-    #     for agent in self.agents:
-    #         if isinstance(agent, CabAgent):
-    #             agent.set_helpers(self.engine)  # sets all the JHG engine stuff.
-    #
-    #     # first, lets run the JHG to staghunt portion
-    #     action_map, hunting_hare_map, old_allocations = jhg_to_staghunt(self.agents, self.state, rewards,
-    #                                                                     round_num)  # this does contain the hare and stag.
-    #
-    #     self.action_map = action_map
-    #     old_agent_positions = self.state.agent_positions.copy()  # make a copy of this, trust me.
-    #     old_state = deepcopy(self.state)  # this SHOULD work?
-    #     # process the actions IG
-    #
-    #     if not self.is_over():
-    #         self.state.update_intent(hunting_hare_map)
-    #         self.rewards = self.state.process_actions(action_map)
-    #
-    #     # turn this into something that the JHG engine can understand and slam that through. or something like that.
-    #     hare_captured = self.state.hare_captured  # we use this for the differing hare allocation upon capture. Not sure if it really matters.
-    #     allocations = staghunt_to_jhg(self.state, action_map, old_agent_positions, old_state,
-    #                                   hare_captured)  # need the action map to do things.
-    #
-    #     new_intents = [-1 for _ in range(len(self.hunters))]
-    #     for i, allocation in enumerate(allocations):
-    #         # this returns 0 - 3
-    #         new_intents[i] = (allocation_to_intent(allocation, i, len(self.hunters)))
-    #
-    #     self.update_engine(allocations, round_num)
-    #
-    #     return self.rewards, new_intents  # return the rewards.
-
-    # this is the version that just passes everything straight through.
-    # def transition(self):
-    #     round_num = self.state.round_num
-    #     rewards = [0] * len(self.agent_names)
-    #     for agent in self.agents:
-    #         if isinstance(agent, CabAgent):
-    #             agent.set_helpers(self.engine)
-    #
-    #     # jhg_to_staghunt returns moves, hunting_hare_map, and the raw allocations (dict)
-    #     action_map, hunting_hare_map, raw_allocations = jhg_to_staghunt(
-    #         self.agents, self.state, rewards, round_num, self.engine
-    #     )
-    #
-    #     self.action_map = action_map
-    #     old_agent_positions = self.state.agent_positions.copy()
-    #     old_state = deepcopy(self.state)
-    #
-    #     if not self.is_over():
-    #         self.state.update_intent(hunting_hare_map)
-    #         self.rewards = self.state.process_actions(action_map)
-    #
-    #     # --- REPLACE the staghunt_to_jhg call with direct raw allocation passing ---
-    #     # raw_allocations is a dict like {"H0": vec, "H1": vec, "H2": vec}
-    #     # Build an ordered list that the engine expects (player 0, player 1, player 2)
-    #     allocation_list = [None, None, None]
-    #     for agent_name, alloc_vector in raw_allocations.items():
-    #         idx = int(agent_name[-1])  # "H0" -> 0, "H1" -> 1, "H2" -> 2
-    #         allocation_list[idx] = alloc_vector
-    #
-    #     # (Optional) Normalise if needed – but the pure JHG code does NOT normalise before
-    #     # play_round(), so leaving the raw vector exactly as is should be fine.
-    #     # If you find the engine behaves oddly, uncomment the next two lines:
-    #     # for i, alloc in enumerate(allocation_list):
-    #     #     allocation_list[i] = [x / sum(abs(alloc)) for x in alloc]
-    #
-    #     # Send the exact same allocations the agents intended directly to the engine
-    #     self.update_engine(allocation_list, round_num)
-    #     # ---------------------------------------------------------------------------
-    #     # print("Here is the current influence ", self.engine.engine.get_influence())
-    #     return self.rewards
-
-
-
-
-    # def transition_return_allocations(self):
-    #     round_num = self.state.round_num
-    #     rewards = [0] * len(self.agent_names)
-    #     for agent in self.agents:
-    #         if isinstance(agent, CabAgent):
-    #             agent.set_helpers(self.engine)
-    #
-    #     # jhg_to_staghunt returns moves, hunting_hare_map, and the raw allocations (dict)
-    #     action_map, hunting_hare_map, raw_allocations = jhg_to_staghunt(
-    #         self.agents, self.state, rewards, round_num, self.engine
-    #     )
-    #
-    #     self.action_map = action_map
-    #     old_agent_positions = self.state.agent_positions.copy()
-    #     old_state = deepcopy(self.state)
-    #
-    #     if not self.is_over():
-    #         self.state.update_intent(hunting_hare_map)
-    #         self.rewards = self.state.process_actions(action_map)
-    #
-    #     # --- REPLACE the staghunt_to_jhg call with direct raw allocation passing ---
-    #     # raw_allocations is a dict like {"H0": vec, "H1": vec, "H2": vec}
-    #     # Build an ordered list that the engine expects (player 0, player 1, player 2)
-    #     allocation_list = [None, None, None]
-    #     for agent_name, alloc_vector in raw_allocations.items():
-    #         idx = int(agent_name[-1])  # "H0" -> 0, "H1" -> 1, "H2" -> 2
-    #         allocation_list[idx] = alloc_vector
-    #
-    #     # (Optional) Normalise if needed – but the pure JHG code does NOT normalise before
-    #     # play_round(), so leaving the raw vector exactly as is should be fine.
-    #     # If you find the engine behaves oddly, uncomment the next two lines:
-    #     # for i, alloc in enumerate(allocation_list):
-    #     #     allocation_list[i] = [x / sum(abs(alloc)) for x in alloc]
-    #
-    #     # Send the exact same allocations the agents intended directly to the engine
-    #     self.update_engine(allocation_list, round_num)
-    #     # ---------------------------------------------------------------------------
-    #     # print("Here is the current influence ", self.engine.engine.get_influence())
-    #     return self.rewards, allocation_list
-
-
+        return intents
 
     # this is better -- it still has a bad code smell tho. Might want to separate this out.
     def update_intents_and_get_rewards(self, action_map, hunting_hare_map):
         if not self.is_over():
-            self.state.update_intent(hunting_hare_map)
+            self.state.update_intent(hunting_hare_map) # make sure it can understand who killed what.
             self.rewards = self.state.process_actions(action_map)
+            self.hunting_hare_map = hunting_hare_map
+            intents = []
+            self.intent_list.append(self.create_intents_from_hunting_hare_map(hunting_hare_map))
+            self.popularity_over_time.append(self.engine.get_popularity())
 
         return self.rewards  # return the rewards.
 
 
+    # TODO: make sure this gets thrown in the actual functino somewhere before I forget.
+    def update_agent_positions(self, agent_positions):
+        # update intents
+        # go ahead and ask the engine for the current popularity
+        self.agent_positions_list.append(agent_positions)
+
+
+
     # the reality of this is, this supports both already. not a good reason to not just have it all route through here.
     # this si the version with uncertainty.
-    def transition_noisy(self):
-        round_num = self.state.round_num
-        rewards = [0] * len(self.agent_names)
-        # there has GOT to be a more elegant way to do this. I swear.
-        for agent in self.agents:
-            if isinstance(agent, CabAgent):
-                agent.set_helpers(self.engine) # sets all the JHG engine stuff.
 
-        # first, lets run the JHG to staghunt portion
-        action_map, hunting_hare_map, old_allocations = jhg_to_staghunt(self.agents, self.state, rewards,
-                                                                        round_num, self.engine)  # this does contain the hare and stag.
+    def set_final_variables(self) -> None:
+        if self.state.hare_captured():
+            # capturing the hare means no cooperation
+            self.coop_success_list.append(0)
+        else:
+            # capturing the stag means cooperation.
+            self.coop_success_list.append(1)
+        self.scores.append(self.create_new_score())
 
-        self.action_map = action_map
-        old_agent_positions = self.state.agent_positions.copy()  # make a copy of this, trust me.
-        old_state = deepcopy(self.state)  # this SHOULD work?
-        # process the actions IG
-
-        if not self.is_over():
-            self.state.update_intent(hunting_hare_map)
-            self.rewards = self.state.process_actions(action_map)
-
-        # turn this into something that the JHG engine can understand and slam that through. or something like that.
-        hare_captured = self.state.hare_captured  # we use this for the differing hare allocation upon capture. Not sure if it really matters.
-        allocations_dict = staghunt_to_jhg(self.state, action_map, old_agent_positions, old_state,
-                                      hare_captured)  # need the action map to do things.
-        allocations = allocations_dict_to_list(allocations_dict)
-
-        self.update_engine(allocations, round_num)
-        # print("Here is the current influence ", self.engine.engine.get_influence())
-
-        # round_rewards, old_allocations, old_positions
-        return self.rewards, allocations, old_agent_positions  # return the rewards.
-
-
+    # transition function that has been retrofitted to also do JHG stuff.
     def transition(self):
         round_num = self.state.round_num
         rewards = [0] * len(self.agent_names)
@@ -273,13 +143,17 @@ class StagHare:
         return self.rewards, allocation_list, old_agent_positions
 
 
-    def update_action_map(self, action_map) -> dict:
-        pass
-
     def update_engine(self, allocations, round_num):
+        self.iterate_engine(allocations, round_num, self.hunters, 3)
 
-        influence_matrix = self.iterate_engine(allocations, round_num, self.hunters, 3)
-        self.popularity_over_time.append(self.engine.get_popularity())
+        # need:
+        # scneario type (under the init actually) and agent names and hunters (kind of? I shouldn't need the actual hunter object, just the names) height, width
+        # coop score is now a list of successes vs non successes
+        # scores per player is a different fucntion
+        # hare intent percent player is here
+        # agent positions needs to be kept track of on every frame
+        # end popularities is weird, we do need to keep track of the popularity over time
+        # intents. BOOM.
 
 
     def get_action_map(self):
@@ -313,13 +187,121 @@ class StagHare:
         return influence # this is all we need for now.
 
 
-
     def is_over(self) -> bool:
         # As soon as one of the prey agents is captured, we're done
         return self.state.hare_captured() or self.state.stag_captured()
 
     def return_state(self):
         return self.state
+
+    def get_cooperation_score(self):
+        coop_score = sum(self.coop_success_list) / len(self.coop_success_list)
+        return coop_score
+
+    def create_new_score(self):
+        # optional last round printing thing... I think.
+        # current_round_grapher.create_round_graph(stag_hare)
+
+        if self.state.stag_captured():
+            return [2, 2, 2]  # stag score
+
+        else:
+            # current_game_logger.add_round(stag_hare.state)
+
+            new_score = [0 for _ in range(3)]  # only ever have 3 playuers.
+            # gotta figure out WHO did it.
+            hare_x, hare_y = self.state.agent_positions["hare"]
+            # possible_hare_captures = stag_hare.state.neighboring_positions(hare_x, hare_y)
+            possible_hare_captures = self.get_possible_agent_captures(hare_x, hare_y,
+                                                                 self.state.height)  # if its not square kill me
+            for agent in self.state.agent_positions:
+                if agent == "hare" or agent == "stag":
+                    pass
+                else:
+                    agent_position = self.state.agent_positions[agent]
+                    if list(agent_position) in possible_hare_captures:
+                        id = int(agent[-1])
+                        new_score[id] = 1  # add a rabbit to that thing.
+
+            return new_score
+
+    def get_possible_agent_captures(self, hare_x, hare_y, board_size):
+        # possible_moves_col = [[0, -1], [0, 1]]
+        # possible_moves_row = [[-1, 0], [1, 0]]
+
+        # all possible move combinations
+        # col moves        # row moves
+        deltas = [[0, -1], [0, 1], [-1, 0], [1, 0]]
+
+        neighboring_moves = []
+
+        for delta in deltas:
+            new_x, new_y = hare_x + delta[0], hare_y + delta[1]
+
+            if new_x < 0:
+                new_x = board_size - 1
+            elif new_x == board_size:
+                new_x = 0
+
+            if new_y < 0:
+                new_y = board_size - 1
+            elif new_y == board_size:
+                new_y = 0
+
+            neighboring_moves.append([new_x, new_y])
+
+        return neighboring_moves
+
+    def process_scores(self, scores):
+
+        score_per_player = list(zip(*scores))
+
+        scores_per_player = []  # empty list, will hold tuples.
+        for i, player in enumerate(score_per_player):
+            new_score = [0 for _ in range(3)]  # three different types of animals
+            for entry in player:
+                new_score[entry] += 1
+            scores_per_player.append(new_score)
+
+        # cooperation_score = sum([2, 2, 2] == score for score in scores) / len(scores)
+
+        # # I should be doing this in a json logger thing but I don't care.
+        # print("here was the cooperation score \n", cooperation_score)
+        # print("here was the scores per player \n", scores_per_player)
+        # print("here were the total scores \n", total_sum_per_player)
+
+        return scores_per_player # ignore the cooperation score
+
+
+
+    def get_hare_intent_percent_per_player(self) -> tuple[int, list]:
+        current_intents = [self.intent_list] # GOSH I really hope this works.
+        # this gets rid of the 2,2,2, which is easier to do when we are still thinking of them as a list of games of rounds of intents.
+        filtered_and_flattened = [round_list for game_list in current_intents for round_list in game_list if round_list != [2, 2, 2]]  # https://klipy.com/gifs/steamed-hams-aurora-borealis--k01KRPQ1FRHG7YGM0DP1D247NG5
+        # this just then gets me the raw score.
+        transposed = list(zip(*filtered_and_flattened))
+        new_sum = np.sum(transposed, axis=1)
+        num_rounds = len(filtered_and_flattened)
+        column_percentages = new_sum / num_rounds
+        return column_percentages  # we ONLY want the column ones. for reasons.
+
+    def get_game_information(self):
+        scenario_type = "TODO: FINISH THIS"
+        cooperation_score = self.get_cooperation_score()
+        scores_per_player = self.process_scores(self.scores) # I THINK?? that works?
+        agent_names = ["", "", ""] # TODO: add this
+        hare_intent_percent_player = self.get_hare_intent_percent_per_player()
+        agent_positions = self.agent_positions_list.copy()
+        end_popularities = self.popularity_over_time[-1].copy() # I think thats how that works.
+        hunters = [] # I DON"T WANNA.
+
+
+        game_information = GameInformationObject(scenario_type, cooperation_score, scores_per_player, agent_names,
+                                                 hare_intent_percent_player, agent_positions, end_popularities, hunters,
+                                                 self.height, self.width, self.intent_list, self.popularity_over_time)
+
+        return game_information
+
 
 
 def allocations_dict_to_list(allocations_dict):

@@ -104,6 +104,7 @@ def run_trials_given_simulator(stag_hare, graphing, current_round_grapher, curre
         allocations_dict = get_allocations_from_agents(stag_hare.agents, stag_hare.state, stag_hare.state.round_num, agent_order_indicies)
         action_map = get_action_map_from_agents(stag_hare.agents, stag_hare.state, rewards, stag_hare.state.round_num, allocations_dict, agent_order_indicies)
         hunting_hare_map = get_hunting_hare_map_from_agents(stag_hare.agents, allocations_dict, agent_order_indicies)
+        print("this here be the hunting hare map ", hunting_hare_map)
 
         round_rewards = stag_hare.update_intents_and_get_rewards(action_map, hunting_hare_map)
 
@@ -125,13 +126,14 @@ def run_trials_given_simulator(stag_hare, graphing, current_round_grapher, curre
             rewards[i] += reward
 
         if stag_hare.is_over():
+            stag_hare.set_final_variables()
             # agent_positions.append(stag_hare.state.agent_positions)
             if graphing:
                 current_game_logger.add_round(stag_hare.state)
                 current_round_grapher.create_round_graph(stag_hare)
             intents.append(create_intents_list(stag_hare.state.hunting_hare_map))
             # passes by value. thanks python.
-            return create_new_score(stag_hare), intents, agent_positions, stag_hare.popularity_over_time, stag_hare.hunters, all_allocations
+            return stag_hare
 
 
 def get_graphing_stuff(graphing, height, width, agent_names, scenario_type):
@@ -177,60 +179,56 @@ def run_trial_all(agent_names, height, width, random_agents, forced_random, scen
     popularity_over_time = []
 
     for i in range(run_amount): # if we only do 1 game, we only do this once.
+        if i != 0: # if its the first run don't reset it but after that reset it at the beginning.
+            stag_hare = reset_stag_hare(stag_hare)
         # does this suck? possibly.
 
         stag_hare.state.hunting_hare_map = {"R" + str(i): 2 for i in range(3)}  # Fill with NULL value
 
                                                                             # consolidated this into one super function, tests are in the test suite.
-        new_score, new_intents, new_positions, popularity_over_time, hunters = run_trials_given_simulator(stag_hare, graphing,
-                                                                                                          current_round_grapher, current_game_logger)
-
-        # make sure to add everything to its appropriate lists.
-        scores.append(new_score)
-        intents.append(new_intents)
-        agent_positions.append(new_positions)
-        end_popularities.append(popularity_over_time[-1])
-        popularity_over_time = popularity_over_time
+        stag_hare = run_trials_given_simulator(stag_hare, graphing, current_round_grapher, current_game_logger)
 
         # just set up a new state that doesn't break immediately
-        stag_hare = reset_stag_hare(stag_hare)
 
-    cooperation_score, scores_per_player = process_scores(scores)
-    hare_intent_percent_player = process_intents(intents)
-    # end_popularities = end_popularities[::-1] # don't need to do that now.
-    game_information = GameInformationObject(scenario_type, cooperation_score, scores_per_player, agent_names,
-                                             hare_intent_percent_player, agent_positions, end_popularities, hunters,
-                                             height, width, intents, popularity_over_time)
+
+    # cooperation_score, scores_per_player = process_scores(scores)
+    # hare_intent_percent_player = process_intents(intents)
+    # # end_popularities = end_popularities[::-1] # don't need to do that now.
+    # game_information = GameInformationObject(scenario_type, cooperation_score, scores_per_player, agent_names,
+    #                                          hare_intent_percent_player, agent_positions, end_popularities, hunters,
+    #                                          height, width, intents, popularity_over_time)
+
+    game_information = stag_hare.get_game_information()
     return game_information
 
-def run_trial_all_debugging(agent_names, height, width, random_agents, forced_random, scenario_type, num_rounds_per_game, graphing):
-    current_game_logger, current_round_grapher = get_graphing_stuff(graphing, height, width, agent_names, scenario_type)
-
-    # if there is an imputted value, use that. If none, run it only once.
-    run_amount = num_rounds_per_game if num_rounds_per_game is not None else 1
-
-    hunters = create_hunters_with_list(random_agents, forced_random, agent_names)
-
-    pre_intents = []
-    post_intents = []
-    stag_hare = get_stag_hare(height, width, hunters)
-
-    for i in range(run_amount): # if we only do 1 game, we only do this once.
-        # does this suck? possibly.
-        stag_hare.state.hunting_hare_map = {"R" + str(i): 2 for i in range(3)}  # Fill with NULL value
-
-                                                                            # consolidated this into one super function, tests are in the test suite.
-        new_pre_intents, new_post_intents = run_trial_debugging(stag_hare, graphing, current_round_grapher, current_game_logger)
-
-        # make sure to add everything to its appropriate lists.
-        pre_intents.append(new_pre_intents)
-        post_intents.append(new_post_intents)
-
-        # just set up a new state that doesn't break immediately
-        stag_hare = reset_stag_hare(stag_hare)
-
-    # end_popularities = end_popularities[::-1] # don't need to do that now.
-    return pre_intents, post_intents
+# def run_trial_all_debugging(agent_names, height, width, random_agents, forced_random, scenario_type, num_rounds_per_game, graphing):
+#     current_game_logger, current_round_grapher = get_graphing_stuff(graphing, height, width, agent_names, scenario_type)
+#
+#     # if there is an imputted value, use that. If none, run it only once.
+#     run_amount = num_rounds_per_game if num_rounds_per_game is not None else 1
+#
+#     hunters = create_hunters_with_list(random_agents, forced_random, agent_names)
+#
+#     pre_intents = []
+#     post_intents = []
+#     stag_hare = get_stag_hare(height, width, hunters)
+#
+#     for i in range(run_amount): # if we only do 1 game, we only do this once.
+#         # does this suck? possibly.
+#         stag_hare.state.hunting_hare_map = {"R" + str(i): 2 for i in range(3)}  # Fill with NULL value
+#
+#                                                                             # consolidated this into one super function, tests are in the test suite.
+#         new_pre_intents, new_post_intents = run_trial_debugging(stag_hare, graphing, current_round_grapher, current_game_logger)
+#
+#         # make sure to add everything to its appropriate lists.
+#         pre_intents.append(new_pre_intents)
+#         post_intents.append(new_post_intents)
+#
+#         # just set up a new state that doesn't break immediately
+#         stag_hare = reset_stag_hare(stag_hare)
+#
+#     # end_popularities = end_popularities[::-1] # don't need to do that now.
+#     return pre_intents, post_intents
 
 def create_new_score(stag_hare):
     # optional last round printing thing... I think.
