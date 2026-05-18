@@ -104,8 +104,9 @@ def run_trials_given_simulator(stag_hare, graphing, current_round_grapher, curre
         allocations_dict = get_allocations_from_agents(stag_hare.agents, stag_hare.state, stag_hare.state.round_num, agent_order_indicies)
         action_map = get_action_map_from_agents(stag_hare.agents, stag_hare.state, rewards, stag_hare.state.round_num, allocations_dict, agent_order_indicies)
         hunting_hare_map = get_hunting_hare_map_from_agents(stag_hare.agents, allocations_dict, agent_order_indicies)
-        print("this here be the hunting hare map ", hunting_hare_map)
+        # print("this here be the hunting hare map ", hunting_hare_map)
 
+        stag_hare.state.hunting_hare_map = hunting_hare_map
         round_rewards = stag_hare.update_intents_and_get_rewards(action_map, hunting_hare_map)
 
         # STAGHARE to JHG SECTION
@@ -163,29 +164,17 @@ def reset_stag_hare(stag_hare):
 
 def run_trial_all(agent_names, height, width, random_agents, forced_random, scenario_type, num_rounds_per_game, graphing):
     current_game_logger, current_round_grapher = get_graphing_stuff(graphing, height, width, agent_names, scenario_type)
-
-    # if there is an imputted value, use that. If none, run it only once.
     run_amount = num_rounds_per_game if num_rounds_per_game is not None else 1
-
     hunters = create_hunters_with_list(random_agents, forced_random, agent_names)
-
-    scores = []
-    intents = []
-    agent_positions = []
-    # this gets tracked in the fetching simulator. that was a terrible idea. what if we don't do that.
-    end_popularities = []
-
     stag_hare = get_stag_hare(height, width, hunters)
-    popularity_over_time = []
 
     for i in range(run_amount): # if we only do 1 game, we only do this once.
-        if i != 0: # if its the first run don't reset it but after that reset it at the beginning.
+        if i != 0: # first run shenanigans.
             stag_hare = reset_stag_hare(stag_hare)
-        # does this suck? possibly.
 
         stag_hare.state.hunting_hare_map = {"R" + str(i): 2 for i in range(3)}  # Fill with NULL value
 
-                                                                            # consolidated this into one super function, tests are in the test suite.
+        # consolidated into one super function to make sure everything runs the way that I want it to.
         stag_hare = run_trials_given_simulator(stag_hare, graphing, current_round_grapher, current_game_logger)
 
         # just set up a new state that doesn't break immediately

@@ -137,7 +137,9 @@ def get_hunting_hare_map_from_agents(agents, allocation_dict, agent_indicies):
     for index in agent_indicies:
         agent = agents[index]
         # TODO: please make this a list.
-        if agent.name == "stag" or agent.name == "hare" or isinstance(agent, AlegAATr):
+        if agent.name == "stag" or agent.name == "hare":
+            continue
+        elif isinstance(agent, AlegAATr):
             hunting_hare_map[agent.name] = agent.is_hunting_hare()
 
         else:

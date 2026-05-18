@@ -6,7 +6,7 @@ from stagHare.loggingStuff.stagHareLogger import GameInformationResultsCompiler
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from stagHare.runnerHelper import *  # this SHOULD be all we need.
 
-def run_test(curr_agent_name, scenario_type, height, width, random_agents, forced_random, GamesPerRound, graphing):
+def run_test(curr_agent_name, scenario_type, height, width, random_agents, forced_random, GamesPerRound, graphing, num_attempts):
 
     # how many resources can we actually devote to this??
     # max_workers = max(1, os.cpu_count() - 2)  # save just a few for other processes, plz don't crash.
@@ -16,7 +16,7 @@ def run_test(curr_agent_name, scenario_type, height, width, random_agents, force
 
     with ProcessPoolExecutor(max_workers=max_workers) as executor:
         futures = []
-        for attempt in range(num_attempts):
+        for attempt in tqdm(range(num_attempts)):
             futures.append(
                 executor.submit(run_trial_all, curr_agent_name, height, width, random_agents, forced_random,
                                 scenario_type, GamesPerRound, graphing))
@@ -64,12 +64,7 @@ def get_agents(agent, scenario):
 
     return new_list
 
-# some global variables
-height = 6 # should be 16 but I want to speed it up sire.
-width = 6
-RandomAgents = True
-forced_random = False
-num_attempts = 1
+
 
 
 # base_agents = ["SCab", "HCab", "ECab99", "ECab199", "Allegatr"]
@@ -88,7 +83,12 @@ base_to_csv = {
 games_per_round = 2
 scenarios = ["SelfPlay", "VGHare1", "VGHare2", "VGStag1", "VGStag2", "Allegatr1", "Allegatr2"]
 # scenarios = ["Allegatr1", "Allegatr2"]
-
+# some global variables
+height = 6 # should be 16 but I want to speed it up sire.
+width = 6
+RandomAgents = True
+forced_random = False
+num_attempts = 1
 
 
 # removing Json implementatino because that was dumb and bad. back to pure script based.
@@ -103,8 +103,8 @@ if __name__ == "__main__":
     # curr_agents = agents[0] # just get the first entry
     scenario = "SelfPlay"
     game_type = "Round"
-    graphing = False
-    num_games_per_round = 2
+    graphing = True
+    num_games_per_round = 10
     print_results_to_console = True
 
     for curr_agents in agents:
@@ -113,7 +113,7 @@ if __name__ == "__main__":
         scenario_type = str(curr_agents) + str(scenario) + str(game_type)
 
         curr_agent_name = get_agents(curr_agents, scenario)
-        new_batch_logger = run_test(curr_agent_name, scenario_type, height, width, RandomAgents, forced_random, num_games_per_round, graphing)
+        new_batch_logger = run_test(curr_agent_name, scenario_type, height, width, RandomAgents, forced_random, num_games_per_round, graphing, num_attempts)
         new_batch_logger.get_batch_results(print_results_to_console)
         # write_batch_results_to_file(new_batch_logger, scenario_type)
 
