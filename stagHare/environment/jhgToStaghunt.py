@@ -155,6 +155,8 @@ def get_action_map_from_agents(agents, state, rewards, round_num, allocations_di
             new_moves_dict[agent.name] = agent.act(state, rewards[index], round_num)
         else:
             id = int(agent.name[-1])
+            # we never actually do anything with the new index, so there's that.
+            # we shoudl get rid of him but I have a hard time trying to care.
             new_moves_dict[agent.name], new_index = allocation_to_movement(allocations_dict[agent.name], id, state)
 
     return new_moves_dict

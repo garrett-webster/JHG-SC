@@ -83,7 +83,7 @@ base_to_csv = {
     "HardHomo": "HardHomo.csv",
 }
 
-games_per_round = 2
+games_per_round = 1
 scenarios = ["SelfPlay", "VGHare1", "VGHare2", "VGStag1", "VGStag2", "Allegatr1", "Allegatr2"]
 # scenarios = ["Allegatr1", "Allegatr2"]
 # some global variables
@@ -98,14 +98,17 @@ import matplotlib.pyplot as plt
 # removing Json implementatino because that was dumb and bad. back to pure script based.
 if __name__ == "__main__":
 
+    # np.random.seed(40) # freeze the seed my man. consistent resutls!
     agent_list = ["gen_Z.csv", "gen_Z.csv", "gen_Z.csv"]
     hunters = create_hunters_with_list(True, False, agent_list)
     stag_hare = get_stag_hare(height, width, hunters)
-    noisy = True
-    track_allocations = True
     graphing = False
+    current_game_logger, current_round_grapher = get_graphing_stuff(graphing, height, width, agent_list)
+    noisy = False
+    track_allocations = True
 
-    new_stag_hare = run_trials_given_simulator(stag_hare, graphing, None, None, noisy, track_allocations)
+
+    new_stag_hare = run_trials_given_simulator(stag_hare, graphing, current_round_grapher, current_game_logger, noisy, track_allocations)
 
     allocations = stag_hare.allocations
 

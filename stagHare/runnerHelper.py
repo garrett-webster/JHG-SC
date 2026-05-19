@@ -142,7 +142,7 @@ def run_trials_given_simulator(stag_hare, graphing, current_round_grapher, curre
             return stag_hare
 
 
-def get_graphing_stuff(graphing, height, width, agent_names, scenario_type):
+def get_graphing_stuff(graphing, height, width, agent_names, scenario_type="SelfPlay"):
     if graphing == True:
         current_game_logger = GameLogger(height, width, agent_names, scenario_type)
         current_round_grapher = IndividualRoundGrapher()
