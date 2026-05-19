@@ -28,7 +28,6 @@ def graph_allocations(valid_allocations):
     for i, allocation in enumerate(valid_allocations):
         intent_index = translateVecToIndexStagHare(
             allocation.tolist(),
-            current_options_matrix,
             0
         )
 

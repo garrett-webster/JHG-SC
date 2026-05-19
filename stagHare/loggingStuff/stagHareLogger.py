@@ -64,9 +64,7 @@ class GameInformationResultsCompiler():
     def get_popularity_over_time_ranking(self):
         list = [0 for _ in range(len(self.agent_names))]
         for i in range(len(self.popularity_over_time)):
-            flattened_popularity = self.popularity_over_time[i] # take it OUT of the list.
-            for entry in flattened_popularity:
-                list[np.argmax(entry)] += 1
+                list[np.argmax(self.popularity_over_time[i])] += 1
 
         return list
 

@@ -5,6 +5,9 @@ from tqdm import tqdm
 from stagHare.loggingStuff.stagHareLogger import GameInformationResultsCompiler
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from stagHare.runnerHelper import *  # this SHOULD be all we need.
+from stagHare.visualziationTools.intentMeshCreator import create_intent_mesh, process_allocations_for_intent_graphing, \
+    create_player_tracking_mesh
+
 
 def run_test(curr_agent_name, scenario_type, height, width, random_agents, forced_random, GamesPerRound, graphing, num_attempts, noisy=True):
 
@@ -16,12 +19,12 @@ def run_test(curr_agent_name, scenario_type, height, width, random_agents, force
 
     with ProcessPoolExecutor(max_workers=max_workers) as executor:
         futures = []
-        for attempt in range(num_attempts):
+        for attempt in tqdm(range(num_attempts)):
             futures.append(
                 executor.submit(run_trial_all, curr_agent_name, height, width, random_agents, forced_random,
                                 scenario_type, GamesPerRound, graphing, noisy))
 
-        for future in tqdm(as_completed(futures)):
+        for future in as_completed(futures):
             results.append(future.result())
 
         for result in results:
@@ -46,15 +49,7 @@ def get_agents(agent, scenario):
         if agent in base_to_csv:
             new_list = [base_to_csv[agent] for _ in range(3)]
         else:
-            if agent == "GHare":
-                new_list = ["GHare" for _ in range(3)]
-
-            elif agent == "GStag":
-                new_list = ["GStag" for _ in range(3)]
-
-            else:
-                print("Borked! Try a different agent name")
-                return
+            new_list = ["GStag" for _ in range(3)]
     else:
         if "Allegatr" in scenario:
             opponent_type = scenario[0:-1]  # "Allegatr"
@@ -88,37 +83,44 @@ base_to_csv = {
     "HardHomo": "HardHomo.csv",
 }
 
+games_per_round = 2
 scenarios = ["SelfPlay", "VGHare1", "VGHare2", "VGStag1", "VGStag2", "Allegatr1", "Allegatr2"]
 # scenarios = ["Allegatr1", "Allegatr2"]
 # some global variables
-height = 6 # should be 16 but I want to speed it up sire.
-width = 6
+height = 16 # should be 16 but I want to speed it up sire.
+width = 16
 RandomAgents = True
 forced_random = False
-num_attempts = 100
+num_attempts = 1
 
+import matplotlib.pyplot as plt
 
 # removing Json implementatino because that was dumb and bad. back to pure script based.
 if __name__ == "__main__":
-    height, width, RandomAgents, forced_random, num_attempts = height, width, RandomAgents, forced_random, num_attempts
-    agents = ["HCab"]
-    # agents = ["GStag"]
-    scenario = "SelfPlay"
-    game_type = "Round"
-    graphing = False
-    num_games_per_round = 10 # no reason to super scale it rn.
-    print_results_to_console = True
+
+    agent_list = ["gen_Z.csv", "gen_Z.csv", "gen_Z.csv"]
+    hunters = create_hunters_with_list(True, False, agent_list)
+    stag_hare = get_stag_hare(height, width, hunters)
     noisy = True
+    track_allocations = True
+    graphing = False
 
-    for curr_agents in agents:
-        print("Current Agent: ", curr_agents)
+    new_stag_hare = run_trials_given_simulator(stag_hare, graphing, None, None, noisy, track_allocations)
 
-        scenario_type = str(curr_agents) + str(scenario) + str(game_type)
+    allocations = stag_hare.allocations
 
-        curr_agent_name = get_agents(curr_agents, scenario)
-        new_batch_logger = run_test(curr_agent_name, scenario_type, height, width, RandomAgents, forced_random, num_games_per_round, graphing, num_attempts, noisy)
-        new_batch_logger.get_batch_results(print_results_to_console)
-        # write_batch_results_to_file(new_batch_logger, scenario_type)
+    player_allocations = process_allocations_for_intent_graphing(allocations)
+
+    # Option 1: Create individual figures for each player
+    for player_id in range(0, 3):  # Players 1, 2, 3
+        if player_id in player_allocations:
+            fig, ax = create_player_tracking_mesh(
+                player_id,
+                player_allocations[player_id]
+            )
+            plt.figure(fig.number)
+            plt.show()
+
 
 
 

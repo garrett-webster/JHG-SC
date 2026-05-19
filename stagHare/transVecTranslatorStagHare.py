@@ -34,14 +34,15 @@ from stagHare.utils.create_options_matrix import create_options_matrix
 # ID doesn't ever actually get used, but I want it here for debugging purposes.
 # assume that transVec and currentOptionsMatrix are already normalized.
 def translateVecToIndexStagHare(transVec, id):
+    transVec = np.array(transVec.copy())
+    normalizedTransVec = [element / sum(abs(transVec)) for element in transVec]
+
     current_option_matrix = create_options_matrix(id)
     total_distances = []
     new_options_matrix = copy.deepcopy(current_option_matrix)
 
-    transVec = np.array(transVec)
-
     for column in new_options_matrix:
-        distance = np.linalg.norm(transVec - np.array(column), ord=1)
+        distance = np.linalg.norm(normalizedTransVec - np.array(column), ord=1)
         total_distances.append(distance)
 
     index_to_return = total_distances.index(min(total_distances))

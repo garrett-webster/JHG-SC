@@ -139,10 +139,11 @@ def interpret_uncertain_move_to_allocation(state, old_agent_positions, old_state
     # print("New allocation: ", new_allocation)
     # print("Weight allocation ", weighted_allocation)
 
+    # TODO: reimplement this weighting system.
     return_allocation = new_allocation + weighted_allocation
 
+    # why are we normalizing upon return?
     new_allocation = np.array(new_allocation)
-
     new_allocation = [element / sum(abs(new_allocation)) for element in new_allocation]
 
     return new_allocation

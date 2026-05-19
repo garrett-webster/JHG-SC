@@ -78,10 +78,13 @@ def allocations_dict_to_list(allocations_dict):
     return new_allocations # IDK if this works all the way, I'll have to debug it. Grr.
 
 # this takes in a simulator object, and runs the simulator until completion, with an optional noisy parameter.
-def run_trials_given_simulator(stag_hare, graphing, current_round_grapher, current_game_logger, noisy=True):
+def run_trials_given_simulator(stag_hare, graphing, current_round_grapher, current_game_logger, noisy=True, track_allocations=False):
     intents = [] # I want to return this now. this sucks.
     agent_positions = []
     all_allocations = []
+    # print("This is noisy at the bottom layer ", noisy)
+    stag_hare.state.hunting_hare_map = {"R" + str(i): 2 for i in range(3)}  # Fill with NULL value # just go ahead and do this here.
+
     while True: # the way this gets run is VERY VERY weird.
 
         intents.append(create_intents_list(stag_hare.state.hunting_hare_map)) # Might need to custom cast this to integers.
@@ -114,6 +117,8 @@ def run_trials_given_simulator(stag_hare, graphing, current_round_grapher, curre
             allocations_dict = get_allocations_from_movements(stag_hare.state, action_map, old_agent_positions, old_state)
 
         allocations_list = allocations_dict_to_list(allocations_dict)
+        if track_allocations:
+            stag_hare.allocations.append(allocations_list)
 
 
         if allocations_list != []: # can't update the engine w/ pure allegatrs.
@@ -162,7 +167,7 @@ def reset_stag_hare(stag_hare):
 
     return stag_hare
 
-def run_trial_all(agent_names, height, width, random_agents, forced_random, scenario_type, num_rounds_per_game, graphing):
+def run_trial_all(agent_names, height, width, random_agents, forced_random, scenario_type, num_rounds_per_game, graphing, noisy=True):
     current_game_logger, current_round_grapher = get_graphing_stuff(graphing, height, width, agent_names, scenario_type)
     run_amount = num_rounds_per_game if num_rounds_per_game is not None else 1
     hunters = create_hunters_with_list(random_agents, forced_random, agent_names)
@@ -172,10 +177,8 @@ def run_trial_all(agent_names, height, width, random_agents, forced_random, scen
         if i != 0: # first run shenanigans.
             stag_hare = reset_stag_hare(stag_hare)
 
-        stag_hare.state.hunting_hare_map = {"R" + str(i): 2 for i in range(3)}  # Fill with NULL value
-
         # consolidated into one super function to make sure everything runs the way that I want it to.
-        stag_hare = run_trials_given_simulator(stag_hare, graphing, current_round_grapher, current_game_logger)
+        stag_hare = run_trials_given_simulator(stag_hare, graphing, current_round_grapher, current_game_logger, noisy)
 
         # just set up a new state that doesn't break immediately
 
@@ -376,4 +379,66 @@ def process_scores(scores):
     # print("here were the total scores \n", total_sum_per_player)
 
     return cooperation_score, scores_per_player
+
+base_to_csv = {
+    "SCab": "16x16round4.csv",
+    "HCab": "gen_z.csv",
+    "HSCab": "homoSCabs.csv",
+    "ECab99": "gen_99.csv",
+    "ECab199": "gen_199.csv",
+    "Allegatr": "Allegatr",
+    "HardHomo": "HardHomo.csv",
+}
+
+
+def get_agents(agent, scenario):
+    if scenario == "SelfPlay":
+        if agent in base_to_csv:
+            new_list = [base_to_csv[agent] for _ in range(3)]
+        else:
+            if agent == "GHare":
+                new_list = ["GHare" for _ in range(3)]
+
+            elif agent == "GStag":
+                new_list = ["GStag" for _ in range(3)]
+
+            else:
+                print("Borked! Try a different agent name")
+                return
+    else:
+        if "Allegatr" in scenario:
+            opponent_type = scenario[0:-1]  # "Allegatr"
+        else:
+            opponent_type = scenario[1:6]  # "GHare" or "GStag"
+
+        num_opponents = int(scenario[-1])
+        num_test_agents = 3 - num_opponents
+
+        test_agents = [base_to_csv[agent] for _ in range(num_test_agents)]
+        opponents = [opponent_type for _ in range(num_opponents)]
+
+        new_list = test_agents + opponents
+
+
+    return new_list
+
+
+# def process_allocations_for_intent_graphing(allocations):
+#     # used entirely for debugging, leave him alone.
+#     # old_allocations = deepcopy(allocations)
+#
+#     # transposes it and gives me a player by player allocation list by round.
+#     player_1_allocations, player_2_allocations, player_3_allocations = zip(*allocations)
+#
+#     # this does nothing but helps me mentally
+#     player_1_allocations = player_1_allocations
+#
+#     # swap the first and second index inner elements of hte lists.
+#     for sublist in player_2_allocations: sublist[0], sublist[1] = sublist[1], sublist[0]
+#
+#     # make the order 3, 1, 2 rather than 1, 2, 3. Yes its ugly!
+#     for sublist in player_3_allocations: sublist[0], sublist[1], sublist[2] = sublist[2], sublist[0], sublist[1]
+#
+#
+#     return player_1_allocations, player_2_allocations, player_3_allocations
 

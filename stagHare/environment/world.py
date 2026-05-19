@@ -55,6 +55,8 @@ class StagHare:
         self.intent_list = [] # we can get the hare intent percent per player from this actually.
         self.hunting_hare_map = {} # this is gonna be a dict, just wait around for it.
         self.scores = []
+        self.allocations = [] # I will need some sort of var that controls when this gets activated, becuase this is a lot of information to store otherwise.
+
 
 
     def create_intents_from_hunting_hare_map(self, hunting_hare_map):
@@ -62,7 +64,7 @@ class StagHare:
         for key in hunting_hare_map:
             if key not in ("stag", "hare"):
                 index = int(key[-1])
-                intents[index] = 0 if False else 1
+                intents[index] = 0 if hunting_hare_map[key] == False else 1
 
         return intents
 
@@ -72,7 +74,6 @@ class StagHare:
             self.state.update_intent(hunting_hare_map) # make sure it can understand who killed what.
             self.rewards = self.state.process_actions(action_map)
             self.hunting_hare_map = hunting_hare_map
-            intents = []
             self.intent_list.append(self.create_intents_from_hunting_hare_map(hunting_hare_map))
             self.popularity_over_time.append(self.engine.get_popularity())
 
@@ -189,6 +190,8 @@ class StagHare:
 
     def is_over(self) -> bool:
         # As soon as one of the prey agents is captured, we're done
+        # if self.state.stag_captured():
+        #     print("STAG DEATH!! WHAT ")
         return self.state.hare_captured() or self.state.stag_captured()
 
     def return_state(self):

@@ -49,13 +49,10 @@ def create_map_from_intents(intents, hunting_hare_map):
 # this returns just the intent -- used primarily for debugging.
 def allocation_to_intent(new_allocation, id, num_players):
 
-    normalized = create_options_matrix(id)
 
-    new_allocation = [element / np.sum(np.abs(new_allocation)) for element in new_allocation]
-    # return this so we have a means with which we can specify the bots current eating desire.
 
-    # so maybe normalizing this will help us out.
-    new_index = translateVecToIndexStagHare(new_allocation, normalized, id)
+    # the current options matrix and allocaition are noramlized internally.
+    new_index = translateVecToIndexStagHare(new_allocation, id)
 
 
     if new_index == 0 or new_index == 1:
@@ -70,7 +67,8 @@ def allocation_to_intent(new_allocation, id, num_players):
 def allocation_to_movement(new_allocation, id, state):
     new_current_options_matrix = create_options_matrix(id)
     # make sure to use the ABS when you are summing! otherwise negative breaks everything!
-    new_allocation = [element / np.sum(np.abs(new_allocation)) for element in new_allocation]
+    # new_allocation = [element / np.sum(np.abs(new_allocation)) for element in new_allocation]
+    # new allocation is normalized within translateVecToIndexStagHare
     new_index = translateVecToIndexStagHare(new_allocation, id)
     new_movement = generate_movement(state, id, new_index)
 
@@ -137,16 +135,14 @@ def get_hunting_hare_map_from_agents(agents, allocation_dict, agent_indicies):
     for index in agent_indicies:
         agent = agents[index]
         # TODO: please make this a list.
-        if agent.name == "stag" or agent.name == "hare":
-            continue
-        elif isinstance(agent, AlegAATr):
+        if agent.name == "stag" or agent.name == "hare" or isinstance(agent, AlegAATr): #  or isinstance(agent, HareAgent) or isinstance(agent, StagAgent):
             hunting_hare_map[agent.name] = agent.is_hunting_hare()
 
         else:
             id = int(agent.name[-1])
             intent = translateVecToIndexStagHare(allocation_dict[agent.name], id)
             # stag are 2 and 3 and that leads to an input of 0. Hare if anything else.
-            hunting_hare_map[agent.name] = True if intent == 2 or intent == 3 else False
+            hunting_hare_map[agent.name] = False if intent == 2 or intent == 3 else True
 
     return hunting_hare_map
 
