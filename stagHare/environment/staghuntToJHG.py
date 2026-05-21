@@ -99,6 +99,8 @@ def interpret_uncertain_move_to_allocation(state, old_agent_positions, old_state
     round_num = state.round_num
 
     # TODO: maybe change this to 3? this might be higher than I intended.
+    # changing it to 3 takes it down maybe another percent for a flat 35 on 500 games. Not sure how significant it is.
+    # but I think the difference is somewhat neglible.
     round_modifier = (1 / ((height // 2))) * round_num
 
 

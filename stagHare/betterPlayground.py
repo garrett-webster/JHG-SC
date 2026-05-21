@@ -5,6 +5,7 @@ from tqdm import tqdm
 from stagHare.loggingStuff.stagHareLogger import GameInformationResultsCompiler
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from stagHare.runnerHelper import *  # this SHOULD be all we need.
+from stagHare.Simulations.sharedUtils import base_to_csv
 
 def run_test(curr_agent_name, scenario_type, height, width, random_agents, forced_random, GamesPerRound, graphing, num_attempts, noisy=True):
 
@@ -78,15 +79,7 @@ def get_agents(agent, scenario):
 # base_agents = ["SCab", "HCab", "ECab99", "ECab199", "Allegatr"]
 base_agents = ["Allegatr"]
 
-base_to_csv = {
-    "SCab": "16x16round4.csv",
-    "HCab": "gen_z.csv",
-    "HSCab": "homoSCabs.csv",
-    "ECab99": "gen_99.csv",
-    "ECab199": "gen_199.csv",
-    "Allegatr": "Allegatr",
-    "HardHomo": "HardHomo.csv",
-}
+
 
 scenarios = ["SelfPlay", "VGHare1", "VGHare2", "VGStag1", "VGStag2", "Allegatr1", "Allegatr2"]
 # scenarios = ["Allegatr1", "Allegatr2"]
@@ -102,14 +95,16 @@ num_attempts = 100
 if __name__ == "__main__":
     height, width, RandomAgents, forced_random, num_attempts = height, width, RandomAgents, forced_random, num_attempts
     # agents = ["HCab"]
-    agents = ["ECab199"]
+    # agents = ["ECab199"]
+    agents = ["HardHomo"]
+    # agents = ["ECab3"]
     # agents = ["GStag"]
     scenario = "SelfPlay"
     game_type = "Round"
     graphing = False
     num_games_per_round = 10 # no reason to super scale it rn.
     print_results_to_console = True
-    noisy = False
+    noisy = True
 
     for curr_agents in agents:
         print("Current Agent: ", curr_agents)

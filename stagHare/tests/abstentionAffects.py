@@ -49,13 +49,13 @@ def write_batch_results_to_file(current_batch_logger, scenario_type):
 
 # base_agents = ["SCab", "HCab", "ECab99", "ECab199", "Allegatr"]
 base_agents = ["Allegatr"]
-base_to_csv = {
-    "SCab": "16x16round4.csv",
-    "HCab": "gen_z.csv",
-    "ECab99": "gen_99.csv",
-    "ECab199": "gen_199.csv",
-    "Allegatr": "Allegatr",
-}
+# base_to_csv = {
+#     "SCab": "16x16round4.csv",
+#     "HCab": "gen_z.csv",
+#     "ECab99": "gen_99.csv",
+#     "ECab199": "gen_199.csv",
+#     "Allegatr": "Allegatr",
+# }
 
 games_per_round = 10
 scenarios = ["SelfPlay", "VGHare1", "VGHare2", "VGStag1", "VGStag2", "Allegatr1", "Allegatr2"]

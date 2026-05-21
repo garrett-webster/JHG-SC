@@ -11,6 +11,7 @@ import copy
 from Server.OptionGenerators.generators import generator_factory
 
 from Server.Engine.completeBots.geneagent3 import GeneAgent3
+from offlineSimStuff.jhg_sim_pure import Jhg_Sim_Pure
 from offlineSimStuff.variousGraphingTools.completeVersions.completeGrapher import CompleteGrapher
 from Server.Engine.completeBots.projectCat import ProjectCat
 from Server.Engine.completeBots.improvedJakeCate import ImprovedJakeCat
@@ -18,6 +19,7 @@ from Server.Engine.completeBots.CantisFirst import CantisFirst
 
 # from Server.SC_Bots.optimalHuman import OptimalHuman
 from Server.Engine.completeBots.randomagent import RandomAgent
+from stagHare.Simulations.sharedUtils import base_to_csv
 
 
 ## TODO: remove the "total_order" from this call. should already be under the SC sim, if that makes sense.
@@ -69,6 +71,27 @@ def reconcile_influence(jhg_influence, sc_influence):
     rescaled = combined * (jhg_norm / combined_norm)
     return rescaled
 
+def run_jhg_stuff_stripped(jhg_sim, curr_round):
+    jhg_engine = jhg_sim.engine # this will just make our life easier to deal with.
+
+    agents = jhg_sim.agents # just pull those out
+    num_players = len(agents)
+
+    transactions = [0 for _ in range(num_players)]  # so this is how I replilcate it in python.
+    T_prev = jhg_sim.engine.get_transaction()
+
+    for i in range(num_players):
+        transactions[i] = agents[i].play_round(
+            i,
+            curr_round,
+            T_prev[:, i],
+            jhg_engine.get_popularity().tolist(),
+            jhg_engine.get_influence(),
+            jhg_engine.get_extra_data(i),
+            # False
+        )
+
+    jhg_engine.play_round(transactions)
 
 def run_jhg_stuff(jhg_engine, curr_round, agents, num_players, current_jhg_sim):
     transactions = [0 for _ in range(num_players)]  # so this is how I replilcate it in python.
@@ -210,6 +233,10 @@ def create_jhg_sim(num_humans, num_players, total_order, jhg_bot_type, addAgents
     jhg_sim = JHG_simulator(num_humans, num_players, total_order, bot_type=jhg_bot_type, agent_config=addAgents, start_game=False)
     jhg_sim.override_everything(new_engine, new_agents)
     return jhg_sim
+
+def create_jhg_sim_stripped(agents):
+    jhg_sim_pure = Jhg_Sim_Pure(agents)
+    return jhg_sim_pure
 
 
 def create_jhg_engine(num_players):
@@ -380,6 +407,16 @@ def create_genetic_agents(num_players, new_list, agent_name, forcedRandom, rando
         a.setGameParams(game_params, forcedRandom)
 
     return agents
+
+def create_agents_with_list(agent_name_list):
+    agent_list = []
+    forced_random = False
+    random_agents = True
+    for agent in agent_name_list:
+        agent_csv_name = base_to_csv[agent]
+        agent_list.append(create_agents(1, [], agent_csv_name, forced_random, random_agents)[0])  # just start wiht something,
+
+    return agent_list
 
 
 def create_agents(num_players, new_list, agent_name, forcedRandom, random_agents):

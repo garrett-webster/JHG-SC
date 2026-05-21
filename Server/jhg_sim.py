@@ -21,7 +21,7 @@ import random
 np.set_printoptions(precision=2, suppress=True)
 
 class JHG_simulator():
-    def __init__(self, num_human_players, num_players, total_order, tokens_per_player=2, bot_type=0, start_game=True, agent_config=""):
+    def __init__(self, num_human_players, num_players, total_order, bot_type=0, start_game=True, agent_config=""):
         self.num_players = num_players
         self.total_order = total_order
         self.sim = None
@@ -29,7 +29,7 @@ class JHG_simulator():
         # went ahead and gave this a default. the currently trained agents have this baked into them that they need to have 2 tokens per player, curious in expanding that.
         if start_game:
             print("Does this EVER go off ???")
-            self.start_game(num_human_players, num_players, tokens_per_player, bot_type, agent_config)
+            self.start_game(num_human_players, num_players, bot_type, agent_config)
         else:
             self.create_sim(num_human_players)
         self.T = None
@@ -72,7 +72,7 @@ class JHG_simulator():
         self.sim = new_engine
         self.players = new_agnets
 
-    def start_game(self, num_human_players, num_players, tokens_per_player, bot_type, agent_config):
+    def start_game(self, num_human_players, num_players, bot_type, agent_config):
         init_pop = "equal"
 
         numAgents = num_players - num_human_players
@@ -103,7 +103,7 @@ class JHG_simulator():
 
 
         # should be formatted appropraitely?
-        theGenePools = self.create_pools(popSize, theFolder, theGen, num_gene_copies, tokens_per_player, bot_type)
+        theGenePools = self.create_pools(popSize, theFolder, theGen, num_gene_copies, bot_type)
 
         plyrs = []
         for i in range(0, len(player_idxs)): # so here's the thing - I have 0! clue on how this works. I'mma try somethihgn stupid ig.

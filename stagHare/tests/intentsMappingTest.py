@@ -24,13 +24,13 @@ def extractGene(gene_dict):
     return gene_str
 
 
-base_to_csv = {
-    "SCab": "16x16round4.csv",
-    "HCab": "gen_z.csv",
-    "ECab99": "gen_99.csv",
-    "ECab199": "gen_199.csv",
-    "Allegatr": "Allegatr",
-}
+# base_to_csv = {
+#     "SCab": "16x16round4.csv",
+#     "HCab": "gen_z.csv",
+#     "ECab99": "gen_99.csv",
+#     "ECab199": "gen_199.csv",
+#     "Allegatr": "Allegatr",
+# }
 
 
 def get_agents(agent, scenario):

@@ -17,6 +17,8 @@ from stagHare.loggingStuff.stagHareLogger import GameInformationObject
 from stagHare.visualziationTools.gameLogger import GameLogger
 from stagHare.visualziationTools.inviduvalRoundGrapher import IndividualRoundGrapher
 from stagHare.environment.staghuntToJHG import * # get those fetchers out of here.
+from stagHare.Simulations.sharedUtils import base_to_csv
+
 
 
 # just gets rid of the stupid SKELARN warning for allegatr. I'm not touching that.
@@ -171,15 +173,6 @@ def run_trial_all(agent_names, height, width, random_agents, forced_random, scen
         # consolidated into one super function to make sure everything runs the way that I want it to.
         stag_hare = run_trials_given_simulator(stag_hare, graphing, current_round_grapher, current_game_logger, noisy)
 
-        # just set up a new state that doesn't break immediately
-
-
-    # cooperation_score, scores_per_player = process_scores(scores)
-    # hare_intent_percent_player = process_intents(intents)
-    # # end_popularities = end_popularities[::-1] # don't need to do that now.
-    # game_information = GameInformationObject(scenario_type, cooperation_score, scores_per_player, agent_names,
-    #                                          hare_intent_percent_player, agent_positions, end_popularities, hunters,
-    #                                          height, width, intents, popularity_over_time)
 
     game_information = stag_hare.get_game_information()
     return game_information
@@ -371,15 +364,15 @@ def process_scores(scores):
 
     return cooperation_score, scores_per_player
 
-base_to_csv = {
-    "SCab": "16x16round4.csv",
-    "HCab": "gen_z.csv",
-    "HSCab": "homoSCabs.csv",
-    "ECab99": "gen_99.csv",
-    "ECab199": "gen_199.csv",
-    "Allegatr": "Allegatr",
-    "HardHomo": "HardHomo.csv",
-}
+# base_to_csv = {
+#     "SCab": "16x16round4.csv",
+#     "HCab": "gen_z.csv",
+#     "HSCab": "homoSCabs.csv",
+#     "ECab99": "gen_99.csv",
+#     "ECab199": "gen_199.csv",
+#     "Allegatr": "Allegatr",
+#     "HardHomo": "HardHomo.csv",
+# }
 
 
 def get_agents(agent, scenario):

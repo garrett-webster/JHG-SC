@@ -57,10 +57,12 @@ if __name__ == "__main__":
     import random
     # import numpy as np
     #
-    SEED = 42  # pick any constant
 
-    random.seed(SEED)  # Python’s stdlib RNG
-    np.random.seed(SEED)  # NumPy’s RNG
+    # # Uncomment this to freeze the seed for better comparison
+    # SEED = 42  # pick any constant
+    #
+    # random.seed(SEED)  # Python’s stdlib RNG
+    # np.random.seed(SEED)  # NumPy’s RNG
 
     # various batch scenarios I keep on hand for reference.
     # jhg_games_per_sc_round = [4, 3, 3, 3]
@@ -72,7 +74,7 @@ if __name__ == "__main__":
 
     round_list = determine_rounds(jhg_games_per_sc_round)
     num_cycles = 3
-    num_players = 3
+    num_players = 10
     peep_constant = 0 # relates to the balance of which we us
 
 
@@ -124,8 +126,8 @@ if __name__ == "__main__":
     # agent_name = "homoSCSelfPlay.csv"
     # agent_name = "6x6Round1.csv" # use this as sort of the default, for now.
     # agent_name = "hardHomo.csv"
-    agent_name = "3playerPure.csv"
     # agent_name = "3playerPure.csv"
+    agent_name = "HardHomo.csv"
     # bunch of stuff for print statements
     utility_to_log = []
     popularity_to_log = []

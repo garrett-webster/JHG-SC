@@ -50,22 +50,13 @@ height = 16
 width = 16
 RandomAgents = True
 forced_random = False
-num_attempts = 100
+num_attempts = 200
 
 # base_agents = ["SCab", "HCab", "ECab99", "ECab199", "Allegatr"]
 # base_agents = ["HCab", "ECab99", "ECab199"]
 # base_agents = ["HCab", "ECab199", "Allegatr"]
-base_agents = ["ECab3"]
-base_to_csv = {
-    "SCab": "16x16round5.csv",
-    "HSCab": "hardHomo.csv",
-    "SCab0.5": "6x6round3.csv",
-    "HCab": "gen_z.csv",
-    "ECab99": "gen_99.csv",
-    "ECab199": "gen_199.csv",
-    "ECab3": "3playerPure.csv",
-    "Allegatr": "Allegatr",
-}
+base_agents = ["HardHomo"]
+
 game_types = ["Round", "Step"]
 
 scenarios = ["SelfPlay", "VGHare1", "VGHare2", "VGStag1", "VGStag2", "Allegatr1", "Allegatr2"]

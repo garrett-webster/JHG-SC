@@ -8,6 +8,7 @@ class GameLogger():
         self.game_data = {}
         self.jhg_sim = None
         self.sc_sim = None
+        self.num_players = num_players
         self.create_header(num_players, bot_types, peep_constant, agent_name)
 
     def resetup(self, jhg_sim, sc_sim):
