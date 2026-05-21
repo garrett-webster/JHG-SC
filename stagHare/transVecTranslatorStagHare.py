@@ -37,13 +37,24 @@ def translateVecToIndexStagHare(transVec, id):
     transVec = np.array(transVec.copy())
     normalizedTransVec = [element / sum(abs(transVec)) for element in transVec]
 
-    current_option_matrix = create_options_matrix(id)
-    total_distances = []
-    new_options_matrix = copy.deepcopy(current_option_matrix)
+    # in case you want to make this as unreadable as possible, here you have it.
+    non_personal_allocations = np.delete(normalizedTransVec, id)
+    dist = np.sqrt(np.sum(np.square(non_personal_allocations)))
 
-    for column in new_options_matrix:
-        distance = np.linalg.norm(normalizedTransVec - np.array(column), ord=1)
-        total_distances.append(distance)
+    all_non_negative = np.all([x >= 0 for x in normalizedTransVec])
 
-    index_to_return = total_distances.index(min(total_distances))
+    if all_non_negative:
+        if dist >= 0.55:
+            index_to_return = 3
+        elif dist >= 0.25:
+            index_to_return = 2
+        else:
+            index_to_return = 0
+    else:
+        if dist < 0.25:
+            index_to_return = 0
+        else:
+            index_to_return = 1
+
+
     return index_to_return

@@ -194,3 +194,9 @@ legacy/outDated/sc_tools/individualRoundGraphs
 /legacy/outDated/individualRoundGraphs/
 /legacy/outDated/individualRoundGraphs/
 /legacy/outDated/individualRoundGraphs/
+# these are all the genetic chromosomes stuff, nobody needs these.
+/stagHare/geneticStuff/16x16round4/
+/stagHare/geneticStuff/16x16round5/
+/stagHare/geneticStuff/homo16x16round1/
+/stagHare/geneticStuff/homo16x16round2/
+/stagHare/geneticStuff/HomoCoopSCab/

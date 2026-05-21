@@ -45,7 +45,11 @@ def process_intents(current_intents: list) -> tuple[int, list]:
 
 # this is worth keeping around because it has to return specific stuff for the genetic algorithm.
 # TODO: Fold this all into one.
-def run_trial_genetic(hunters, height, width):
+def run_trial_genetic(theGenes, random_agents, forced_random, height, width):
+
+    # create the hunters here and just hope it works.
+    hunters = create_hunters_with_genes(theGenes, random_agents, forced_random)  # the assingment has been undererstood
+
 
     # create the instance simulator
     while True:
@@ -53,21 +57,8 @@ def run_trial_genetic(hunters, height, width):
         if not stag_hare.is_over():
             break
 
-    # IDK if this is necessary but I figure it can't hurt.
-    stag_hare.state.hunting_hare_map = {"R" + str(i): 2 for i in range(3)}  # value that it can never be, sort of a NAN.
-
-    while True: # the way this gets run is VERY VERY weird.
-
-        # this is importnat for reasons.
-        rewards = [0] * 5 # 3 hunters, 2 other peeps
-        # this is a reminder to check the action map to make sure that we are hunting what we think we are.
-
-        round_rewards = stag_hare.transition()
-        for i, reward in enumerate(round_rewards):
-            rewards[i] += reward
-
-        if stag_hare.is_over():
-            return create_new_score(stag_hare)
+    new_stag_hare = run_trials_given_simulator(stag_hare, False, None, None, True, False)
+    return create_new_score(new_stag_hare)
 
 
 # TODO: this breaks when considering human players. Add a total order parameter.

@@ -68,23 +68,23 @@ def interpret_uncertain_move_to_allocation(state, old_agent_positions, old_state
             new_allocation = allocations_list[3]
         return new_allocation
 
-    # less easy checks, game is still running.
+    # dynamic checks, a little sillier.
 
 
-    # grab the current number of steps
-    hare_x, hare_y = hare_position
-    stag_x, stag_y = stag_position
-
-    # if a step value is 0, it screws with the math. add a 1 to make sure its always positive.
-    num_steps_hare_new = state.n_movements(action[0], action[1], hare_x, hare_y) + 1
-    num_steps_stag_new = state.n_movements(action[0], action[1], stag_x, stag_y) + 1
-
-    old_action = old_agent_positions[name] # moving here WAS the old action.
-
-    # grab the old number of steps (in reference to the OLD positions)
+    # for step performance, look exclusively at their old positions. THis should help get rid of jitters. kind of.
     old_hare_x, old_hare_y = old_state.agent_positions["hare"][0], old_state.agent_positions["hare"][1]
     old_stag_x, old_stag_y = old_state.agent_positions["stag"][0], old_state.agent_positions["stag"][1]
 
+
+    # if a step value is 0, it screws with the math. add a 1 to make sure its always positive.
+    num_steps_hare_new = state.n_movements(action[0], action[1], old_hare_x, old_hare_y) + 1
+    num_steps_stag_new = state.n_movements(action[0], action[1], old_stag_x, old_stag_y) + 1
+
+    old_action = old_agent_positions[name] # moving here WAS the old action. # this is a copy object too
+
+
+
+    # eaiser to let the state handle wrap arounds and whatnot.
     num_steps_hare_old = state.n_movements(old_action[0], old_action[1], old_hare_x, old_hare_y) + 1
     num_steps_stag_old = state.n_movements(old_action[0], old_action[1], old_stag_x, old_stag_y) + 1
 
@@ -94,6 +94,13 @@ def interpret_uncertain_move_to_allocation(state, old_agent_positions, old_state
     # YES THESE NEED TO BE FLIPPED! If stag steps are low, then stag weight is high. simple as.
     stag_weight =  (num_steps_hare_new + 1) / total_steps
     hare_weight = (num_steps_stag_new + 1) / total_steps
+
+    height = len(state.grid) # yeah that should work
+    round_num = state.round_num
+
+    # TODO: maybe change this to 3? this might be higher than I intended.
+    round_modifier = (1 / ((height // 2))) * round_num
+
 
     # for the 3x3 grid that determines the correct weighting function.
     stag_move_neg = (num_steps_stag_new - num_steps_stag_old > 0) # make sure strict greater.
@@ -106,41 +113,44 @@ def interpret_uncertain_move_to_allocation(state, old_agent_positions, old_state
     stag_moves_zero = (num_steps_stag_new - num_steps_stag_old == 0)
 
     # column 1
+    # if they move toward the stag, hare options
     if stag_move_pos and hare_moves_pos:
-        new_allocation = weight(stag_weight, hare_weight, allocations_list)
+        new_allocation = weight(round_modifier, stag_weight, hare_weight, allocations_list)
     elif stag_move_pos and hare_moves_zero:
         new_allocation = allocations_list[2]
     elif stag_move_pos and hare_moves_neg:
         new_allocation = allocations_list[2]
 
     # column 2
+    # ambivalent towards the stag, hare options
     elif stag_moves_zero and hare_moves_pos:
         new_allocation = allocations_list[0]
     elif stag_moves_zero and hare_moves_zero:
-        new_allocation = weight(stag_weight, hare_weight, allocations_list)
+        new_allocation = weight(round_modifier, stag_weight, hare_weight, allocations_list)
     elif stag_moves_zero and hare_moves_neg:
         new_allocation = allocations_list[2]
 
     # column 3
+    # move away from stag, hare options.
     elif stag_move_neg and hare_moves_pos:
         new_allocation = allocations_list[0]
     elif stag_move_neg and hare_moves_zero:
         new_allocation = allocations_list[0]
     elif stag_move_neg and hare_moves_neg:
-        new_allocation = weight(stag_weight, hare_weight, allocations_list)
+        new_allocation = weight(round_modifier, stag_weight, hare_weight, allocations_list)
 
     else:
         print("SOMETHING SI VERTY VEYR WORNG SIRE")
         new_allocation = [9, 0, 0]
 
-    weighted_allocation = weight(stag_weight, hare_weight, allocations_list) * abs((stag_weight - hare_weight) * 2) # make it a number
+    # weighted_allocation = weight(stag_weight, hare_weight, allocations_list) * abs((stag_weight - hare_weight) * 2) # make it a number
                                                                             # in the middle? very low number
                                                                             # right next to them? very high.
     # print("New allocation: ", new_allocation)
     # print("Weight allocation ", weighted_allocation)
 
     # TODO: reimplement this weighting system.
-    return_allocation = new_allocation + weighted_allocation
+    # return_allocation = new_allocation + weighted_allocation
 
     # why are we normalizing upon return?
     new_allocation = np.array(new_allocation)
@@ -149,9 +159,16 @@ def interpret_uncertain_move_to_allocation(state, old_agent_positions, old_state
     return new_allocation
 
 
-def weight(stag_weight, hare_weight, allocations_list): # new allocation that sits right in the middle of the fetcher.
+def weight(round_modifier, stag_weight, hare_weight, allocations_list): # new allocation that sits right in the middle of the fetcher.
     # print("Doing a weighted allocation")
     # print("Here is the hare wieght ", hare_weight, " and here is the stag weight ", stag_weight)
-    new_array = (stag_weight * allocations_list[2]) + (hare_weight * allocations_list[0])
+    # so the plan is as follows: if we within teh first few rounds, we can ignore the ambiguitiy and go from there
+    # if we are no longer not, we assume position is now important. lets find out.
+    if round_modifier < 1:
+        # this gets us just barely over stag, not entirely sure where the best number is?
+        new_array = 2 * (allocations_list[2]) + allocations_list[0]
+    else:
+        new_array = (stag_weight * allocations_list[2]) + (hare_weight * allocations_list[0])
+
     return new_array
 

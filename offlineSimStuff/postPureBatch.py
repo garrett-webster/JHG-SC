@@ -66,9 +66,9 @@ if __name__ == "__main__":
     # jhg_games_per_sc_round = [4, 3, 3, 3]
     jhg_games_per_sc_round = ["J", 30]
     # jhg_games_per_sc_round = ["S", 30]
-    forcedRandom = True # TRUE uses the list, so thats cool.
+    forcedRandom = False # TRUE uses the list, so thats cool.
     enforce_majority = True # what we used in the other fetcher.
-    random_agents = False # this is what we typically do.
+    random_agents = True # HAVE THIS SET TO TRUE UNLESS YOU HAVE A REALLY GOOD REASON NOT TOO
 
     round_list = determine_rounds(jhg_games_per_sc_round)
     num_cycles = 3
@@ -123,7 +123,9 @@ if __name__ == "__main__":
     # agent_name = "mixedJHGSelfPlay.csv"
     # agent_name = "homoSCSelfPlay.csv"
     # agent_name = "6x6Round1.csv" # use this as sort of the default, for now.
-    agent_name = "hardHomo.csv"
+    # agent_name = "hardHomo.csv"
+    agent_name = "3playerPure.csv"
+    # agent_name = "3playerPure.csv"
     # bunch of stuff for print statements
     utility_to_log = []
     popularity_to_log = []

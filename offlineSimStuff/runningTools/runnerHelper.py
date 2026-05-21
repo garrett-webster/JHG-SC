@@ -93,7 +93,7 @@ def run_jhg_stuff(jhg_engine, curr_round, agents, num_players, current_jhg_sim):
     avg_pop = sum(new_popularity) / current_jhg_sim.num_players
     current_jhg_sim.avg_pop_per_round.append(avg_pop)
     current_jhg_sim.game_popularities.append(new_popularity)
-    print("Here are the transactions \n", transactions)
+    # print("Here are the transactions \n", transactions)
 
     # ok so now I have to return
     # the change in popularities,

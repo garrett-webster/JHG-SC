@@ -246,15 +246,9 @@ def set_game_params(agents):
 
 # this is exactly the same actually. nice.
 def playGame(theGenes, game, random_agents, forced_random, height, width):
-    # create some hunters with the given gene
-    hunters = create_hunters_with_genes(theGenes, random_agents, forced_random) # the assingment has been undererstood
+    # run a trial, get the scores. The genetic is just a better wrapper for the simulator.
+    new_scores = run_trial_genetic(theGenes, random_agents, forced_random, height, width)
 
-    # get dat new score. (this is a nifty little run function that just takes in some pre-established hunters
-    # and then sets up a staghare simulator and goes from there.
-    # I don't like this, there's gotta be a better way to do it, but I digress.
-    new_scores = run_trial_genetic(hunters, height, width)
-
-    # we shall rework this in a second methinks.
     pmetrics = getPmetrics(game, new_scores, 3)
     return pmetrics  # this is the only thing we actually care about from this game.
 

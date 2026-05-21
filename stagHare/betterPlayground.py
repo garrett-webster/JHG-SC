@@ -101,14 +101,15 @@ num_attempts = 100
 # removing Json implementatino because that was dumb and bad. back to pure script based.
 if __name__ == "__main__":
     height, width, RandomAgents, forced_random, num_attempts = height, width, RandomAgents, forced_random, num_attempts
-    agents = ["HCab"]
+    # agents = ["HCab"]
+    agents = ["ECab199"]
     # agents = ["GStag"]
     scenario = "SelfPlay"
     game_type = "Round"
     graphing = False
     num_games_per_round = 10 # no reason to super scale it rn.
     print_results_to_console = True
-    noisy = True
+    noisy = False
 
     for curr_agents in agents:
         print("Current Agent: ", curr_agents)

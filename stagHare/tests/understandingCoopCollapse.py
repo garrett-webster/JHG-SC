@@ -98,11 +98,12 @@ import matplotlib.pyplot as plt
 # removing Json implementatino because that was dumb and bad. back to pure script based.
 if __name__ == "__main__":
 
-    # np.random.seed(40) # freeze the seed my man. consistent resutls!
-    agent_list = ["gen_Z.csv", "gen_Z.csv", "gen_Z.csv"]
+    np.random.seed(50) # freeze the seed my man. consistent resutls!
+    # agent_list = ["gen_Z.csv", "gen_Z.csv", "gen_Z.csv"]
+    agent_list = ["gen_199.csv", "gen_99.csv", "gen_199.csv"]
     hunters = create_hunters_with_list(True, False, agent_list)
     stag_hare = get_stag_hare(height, width, hunters)
-    graphing = False
+    graphing = True
     current_game_logger, current_round_grapher = get_graphing_stuff(graphing, height, width, agent_list)
     noisy = False
     track_allocations = True
@@ -111,6 +112,9 @@ if __name__ == "__main__":
     new_stag_hare = run_trials_given_simulator(stag_hare, graphing, current_round_grapher, current_game_logger, noisy, track_allocations)
 
     allocations = stag_hare.allocations
+    allocations = np.round(allocations, 2)
+    for i, allocation in enumerate(allocations):
+        print(f"{i}: {allocation}")
 
     player_allocations = process_allocations_for_intent_graphing(allocations)
 
