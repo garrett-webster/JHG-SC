@@ -3,12 +3,12 @@ import numpy as np
 import random
 
 class Jhg_Sim_Pure():
-    def __init__(self, agents):
+    def __init__(self, agents, forced_random=True):
         pass
         self.agents = agents
         self.num_players = len(agents)
         self.engine = None
-        self.create_engine(self.num_players) # assume the agents represent all possible players.
+        self.create_engine(self.num_players, forced_random) # assume the agents represent all possible players.
         self.T = None
         # goal: take in a list of agents, create a simulator that lets us do things
         # and go from there.
@@ -54,7 +54,7 @@ class Jhg_Sim_Pure():
 
         return np.array(initial_pops)
 
-    def create_engine(self, num_players):
+    def create_engine(self, num_players, forced_random):
 
         poverty_line = 0
         init_pop = 100
@@ -83,6 +83,12 @@ class Jhg_Sim_Pure():
         self.engine = GameSimulator(
             game_params)  # sets up our sim object - might need to make this global so we can grab it wherever we need it.
         self.T = np.array([[0.0 for _ in range(num_players)] for _ in range(num_players)])
+
+        for a in self.agents:
+            a.setGameParams(game_params, forced_random)
+
+        jhg_engine = GameSimulator(game_params)
+        return jhg_engine, self.agents
 
 
     def get_influence(self):

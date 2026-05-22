@@ -1,26 +1,12 @@
-# this allows for me to run smaller scale test and debug everything there.
+# this script just lets me test drive various JHG Genes, becuase I can't seem to get them to make any sense.
 
 from tqdm import tqdm
 
 import matplotlib.pyplot as plt
-import matplotlib.patches as patches
-from matplotlib.patches import FancyArrowPatch
-import matplotlib.gridspec as gridspec
-from matplotlib.patches import Patch
-import os
-import numpy as np # for col sums
-
-from matplotlib.patches import Circle
-from itertools import combinations
-
 from Client.combinedLayout.ui_functions.StudyScripts.network import NodeNetwork # just for graphing the influence matrix node edges.
 from matplotlib.collections import LineCollection
 from matplotlib.colors import to_rgba
-from matplotlib.colors import LinearSegmentedColormap, Normalize
-
 from offlineSimStuff.runningTools.runnerHelper import * # get all the functions
-from offlineSimStuff.variousGraphingTools.individualLoggers.gameLogger import GameLogger
-from offlineSimStuff.variousGraphingTools.individualLoggers.roundLogger import RoundLogger
 
 
 # starts the sim, could make this take command line arguments
@@ -274,7 +260,7 @@ if __name__ == "__main__":
     # np.random.seed(SEED)  # NumPy’s RNG
     jhg_games_per_sc_round = ["J", 30]
     # jhg_games_per_sc_round = ["S", 30]
-    forcedRandom = False # TRUE uses the list, so thats cool.
+    forced_random = False # TRUE uses the list, so thats cool.
     enforce_majority = True # what we used in the other fetcher.
     random_agents = True # HAVE THIS SET TO TRUE UNLESS YOU HAVE A REALLY GOOD REASON NOT TOO
 
@@ -296,16 +282,11 @@ if __name__ == "__main__":
     bot_types = [jhg_bot_type for _ in range(num_vanilla_bots)]
 
     # for individual testing
-    # agent_name = "mixedJHGSelfPlay.csv"
-    # agent_name = "homoSCSelfPlay.csv"
-    # agent_name = "6x6Round1.csv" # use this as sort of the default, for now.
-    # agent_name = "hardHomo.csv"
-    # agent_name = "3playerPure.csv"
     agent_name = "HardHomo.csv"
     graphing = True
     num_rounds = 30
     # just start here.
-    agent_name_list = ["HardHomo", "HardHomo", "HardHomo"]
+    agent_name_list = ["HardHomo", "HardHomo", "HardHomo", "HardHomo", "HardHomo", "HardHomo", "HardHomo", "HardHomo", "HardHomo", "HardHomo"]
 
     agents = create_agents_with_list(agent_name_list)
 
@@ -314,7 +295,7 @@ if __name__ == "__main__":
         # all I want to do is as follows: pass in a list of agents, run it through a jhg sim, and return the pops one some level.
         new_pops = [] # this might be a bad way to do this.
 
-        new_simulator = create_jhg_sim_stripped(agents) # thats literally it.
+        new_simulator = create_jhg_sim_stripped(agents, forced_random) # thats literally it.
         run_jhg_graphing(new_simulator, graphing, num_rounds)
 
 

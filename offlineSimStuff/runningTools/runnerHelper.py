@@ -234,8 +234,8 @@ def create_jhg_sim(num_humans, num_players, total_order, jhg_bot_type, addAgents
     jhg_sim.override_everything(new_engine, new_agents)
     return jhg_sim
 
-def create_jhg_sim_stripped(agents):
-    jhg_sim_pure = Jhg_Sim_Pure(agents)
+def create_jhg_sim_stripped(agents, forced_random=True):
+    jhg_sim_pure = Jhg_Sim_Pure(agents, forced_random)
     return jhg_sim_pure
 
 

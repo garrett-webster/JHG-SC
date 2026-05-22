@@ -15,6 +15,9 @@ from collections import defaultdict # him... I remember him from the stag_hare p
 import itertools
 from tqdm import tqdm
 
+from offlineSimStuff.runningTools.runnerHelper import loadPopulationFromFile
+
+
 # class to hold the actual pop stuff for purposes of updating everything.
 class PopularityMetrics:
     def __init__(self, index, gene, avePop, endPop):
@@ -341,6 +344,7 @@ def evolve_homogenous_JHG(popSize, numGeneCopies, startIndex, numGens, gamesPerG
         for _ in range(popSize):
             theGenePools.append(GeneAgent3("", numGeneCopies))
 
+
     for gen in tqdm(range(numGens), desc="Homo", leave=False):
         # print(f"Starting generation {gen}")
 
@@ -401,11 +405,9 @@ if __name__ == "__main__":
     # random.seed(GLOBAL_SEED)
     # np.random.seed(GLOBAL_SEED)
 
-
-
-
     cpu_count = os.cpu_count() # gets the the number of logical cores that we possess.
-    max_workers = max(1, os.cpu_count() - 2) # save a couple of cores for other processes, don't want to overwhelm.
+    # max_workers = max(1, os.cpu_count() - 2) # save a couple of cores for other processes, don't want to overwhelm.
+    max_workers = 1 # just do 1 for now, makes debugging easier.
 
     popSize = 100
     numGeneCopies = 1

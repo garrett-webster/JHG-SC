@@ -263,14 +263,16 @@ def get_possible_agent_captures(hare_x, hare_y, board_size):
     return neighboring_moves
 
 # also used specifically under the genetic algorithm. Leave him alone, he mad wierd.
-def create_hunters_with_genes(genes, random_agents, forced_random):
+def create_hunters_with_genes(genes, random_agents, forced_random, num_agents=3):
     new_hunters = []
     agent_name = "gen_199.csv"
 
     # forced random and random agents don't actually matter here, because we are passing a gene down.
-    for i in range(3):
+    for i in range(num_agents):
         new_name = "R" + str(i)
-        new_hunters.append(CabAgent(i, new_name, random_agents, forced_random, gene=genes[i], agent_name=agent_name))
+        # get a random gene, pull that off the top.
+        # this could result in everything blowing up if I did this wrongl.
+        new_hunters.append(CabAgent(i, new_name, random_agents, forced_random, gene=genes[random.choice(range(genes))], agent_name=agent_name))
 
 
     alpha_min, alpha_max = 0.20, 0.20
