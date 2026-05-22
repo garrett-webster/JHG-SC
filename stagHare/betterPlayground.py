@@ -84,8 +84,8 @@ base_agents = ["Allegatr"]
 scenarios = ["SelfPlay", "VGHare1", "VGHare2", "VGStag1", "VGStag2", "Allegatr1", "Allegatr2"]
 # scenarios = ["Allegatr1", "Allegatr2"]
 # some global variables
-height = 6 # should be 16 but I want to speed it up sire.
-width = 6
+height = 16 # should be 16 but I want to speed it up sire.
+width = 16
 RandomAgents = True
 forced_random = False
 num_attempts = 100
@@ -96,7 +96,8 @@ if __name__ == "__main__":
     height, width, RandomAgents, forced_random, num_attempts = height, width, RandomAgents, forced_random, num_attempts
     # agents = ["HCab"]
     # agents = ["ECab199"]
-    agents = ["HardHomo"]
+    # agents = ["HardHomo"]
+    agents = ["ECabJHGTest"]
     # agents = ["ECab3"]
     # agents = ["GStag"]
     scenario = "SelfPlay"

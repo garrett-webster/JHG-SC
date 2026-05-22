@@ -253,14 +253,15 @@ if __name__ == "__main__":
     # import numpy as np
     #
 
-    # # Uncomment this to freeze the seed for better comparison
-    # SEED = 42  # pick any constant
-    #
-    # random.seed(SEED)  # Python’s stdlib RNG
-    # np.random.seed(SEED)  # NumPy’s RNG
+    # Uncomment this to freeze the seed for better comparison
+    SEED = 42  # pick any constant
+
+    random.seed(SEED)  # Python’s stdlib RNG
+    np.random.seed(SEED)  # NumPy’s RNG
+
     jhg_games_per_sc_round = ["J", 30]
     # jhg_games_per_sc_round = ["S", 30]
-    forced_random = False # TRUE uses the list, so thats cool.
+    forcedRandom = True # TRUE uses the list, so thats cool.
     enforce_majority = True # what we used in the other fetcher.
     random_agents = True # HAVE THIS SET TO TRUE UNLESS YOU HAVE A REALLY GOOD REASON NOT TOO
 
@@ -277,25 +278,29 @@ if __name__ == "__main__":
     # these paths are relative to the file location, so as long as you don't move the file it can and will run from anywhere.
     jhg_bot_type = 0 # 0 is gene bots, 2 is social welfare and 3 is random. 4 is the new social welfare that I am developing that is just a hair smarter.
 
-    num_attempts = 3 # number of batches to do.
+    num_attempts = 1 # number of batches to do.
     num_vanilla_bots = num_players - num_humans
     bot_types = [jhg_bot_type for _ in range(num_vanilla_bots)]
 
     # for individual testing
-    agent_name = "HardHomo.csv"
     graphing = True
     num_rounds = 30
     # just start here.
-    agent_name_list = ["HardHomo", "HardHomo", "HardHomo", "HardHomo", "HardHomo", "HardHomo", "HardHomo", "HardHomo", "HardHomo", "HardHomo"]
+    # agent_name_list = ["new3Gene", "new3Gene", "new3Gene", "new3Gene", "new3Gene", "new3Gene", "new3Gene", "new3Gene", "new3Gene", "new3Gene"]
+    # agent_name_list = ["new3Gene", "new3Gene", "new3Gene"]
+    agent_name_list = ["ECab199","ECab199","ECab199", "ECab199","ECab199","ECab199","ECab199","ECab199","ECab199","ECab199"]
+    # agent_name_list = ["HCab", "HCab", "HCab", "HCab", "HCab", "HCab", "HCab", "HCab", "HCab", "HCab"]
+    new_list = []
+    agent_name = "gen_199.csv"
 
-    agents = create_agents_with_list(agent_name_list)
+    agents = create_agents(num_players, new_list, agent_name, forcedRandom, random_agents)
 
     # I JUST want to run bots here. Don't worry about humans -- this rewrites a few assumptions.
     for attempt in tqdm(range(num_attempts)): # create a new sim for each attempt to prevent bleeding over.
         # all I want to do is as follows: pass in a list of agents, run it through a jhg sim, and return the pops one some level.
         new_pops = [] # this might be a bad way to do this.
 
-        new_simulator = create_jhg_sim_stripped(agents, forced_random) # thats literally it.
+        new_simulator = create_jhg_sim_stripped(agents, forcedRandom) # thats literally it.
         run_jhg_graphing(new_simulator, graphing, num_rounds)
 
 

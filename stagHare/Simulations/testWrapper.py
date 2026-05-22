@@ -55,7 +55,7 @@ num_attempts = 200
 # base_agents = ["SCab", "HCab", "ECab99", "ECab199", "Allegatr"]
 # base_agents = ["HCab", "ECab99", "ECab199"]
 # base_agents = ["HCab", "ECab199", "Allegatr"]
-base_agents = ["HardHomo"]
+base_agents = ["new3Gene"]
 
 game_types = ["Round", "Step"]
 

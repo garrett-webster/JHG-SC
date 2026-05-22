@@ -9,4 +9,4 @@ def fastchoices(options, weights=None, size=1):
     result = np.asarray(options)[
         np.argmax((vals < cumulative_weights[:, np.newaxis]).T, axis=1)
     ]
-    return result.reshape(size)[0] if size == 1 else result.reshape(size)
+    return result.reshape(size)  # always return array, even for size=1

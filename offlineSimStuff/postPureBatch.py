@@ -58,17 +58,17 @@ if __name__ == "__main__":
     # import numpy as np
     #
 
-    # # Uncomment this to freeze the seed for better comparison
-    # SEED = 42  # pick any constant
-    #
-    # random.seed(SEED)  # Python’s stdlib RNG
-    # np.random.seed(SEED)  # NumPy’s RNG
+    # Uncomment this to freeze the seed for better comparison
+    SEED = 42  # pick any constant
+
+    random.seed(SEED)  # Python’s stdlib RNG
+    np.random.seed(SEED)  # NumPy’s RNG
 
     # various batch scenarios I keep on hand for reference.
     # jhg_games_per_sc_round = [4, 3, 3, 3]
     jhg_games_per_sc_round = ["J", 30]
     # jhg_games_per_sc_round = ["S", 30]
-    forcedRandom = False # TRUE uses the list, so thats cool.
+    forcedRandom = True # TRUE uses the list, so thats cool.
     enforce_majority = True # what we used in the other fetcher.
     random_agents = True # HAVE THIS SET TO TRUE UNLESS YOU HAVE A REALLY GOOD REASON NOT TOO
 
@@ -79,12 +79,8 @@ if __name__ == "__main__":
 
 
     num_humans = 0
-    tokens_per_player = 2
-    utility_per_player = 3
     create_round_graphs_bool = False
     create_game_graphs_bool = True
-    create_influence = True
-    chromosomes_directory = "testChromosome"
     group = ""
     # cat_scenario = "2OldKitties"
     cat_scenario = "SelfPlay"
@@ -92,7 +88,7 @@ if __name__ == "__main__":
     # these paths are relative to the file location, so as long as you don't move the file it can and will run from anywhere.
     jhg_bot_type = 0 # 0 is gene bots, 2 is social welfare and 3 is random. 4 is the new social welfare that I am developing that is just a hair smarter.
 
-    num_attempts = 3 # number of batches to do.
+    num_attempts = 1 # number of batches to do.
     num_rounds = sum(jhg_games_per_sc_round) if len(jhg_games_per_sc_round) > 2 else jhg_games_per_sc_round[-1] # if its a list, len of list. else, grab the second identifier
 
     file_name = os.path.join("..", "Server", "Engine", "scenarios", cat_scenario)
@@ -127,7 +123,7 @@ if __name__ == "__main__":
     # agent_name = "6x6Round1.csv" # use this as sort of the default, for now.
     # agent_name = "hardHomo.csv"
     # agent_name = "3playerPure.csv"
-    agent_name = "HardHomo.csv"
+    agent_name = "gen_199.csv"
     # bunch of stuff for print statements
     utility_to_log = []
     popularity_to_log = []

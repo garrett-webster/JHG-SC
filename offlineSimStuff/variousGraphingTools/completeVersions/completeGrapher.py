@@ -614,7 +614,7 @@ class CompleteGrapher():
         return matrix / max_val
 
     def plot_influence_graph(self, ax, influence_matrix, popularity):
-        influence_matrix = normalize_matrix(np.array(influence_matrix)) # might want to get rid of this?
+        influence_matrix = self.normalize_matrix(np.array(influence_matrix)) # might want to get rid of this?
         # this section was trying to  help me understnad how clustered the fetcher was. I have since removed it, but you can stick it back in if you so desire.
         # node_clustering, global_clustering = OpsahlClustering(np.array(influence_matrix)) # leave the alpha at 0.5 rn
 

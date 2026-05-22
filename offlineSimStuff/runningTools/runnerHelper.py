@@ -20,6 +20,7 @@ from Server.Engine.completeBots.CantisFirst import CantisFirst
 # from Server.SC_Bots.optimalHuman import OptimalHuman
 from Server.Engine.completeBots.randomagent import RandomAgent
 from stagHare.Simulations.sharedUtils import base_to_csv
+from stagHare.utils.variousFunctions import fastchoices
 
 
 ## TODO: remove the "total_order" from this call. should already be under the SC sim, if that makes sense.
@@ -121,6 +122,8 @@ def run_jhg_stuff(jhg_engine, curr_round, agents, num_players, current_jhg_sim):
     # ok so now I have to return
     # the change in popularities,
     # return sc_sim.current_results, sc_sim.results_sums, new_influence  # so we have the change in utility and overall utility
+
+    print("here are the transatcions ", transactions)
 
     return jhg_engine.get_influence()  # return da influence matrix, the change in popularitry, and the new popularities.
 
@@ -370,7 +373,7 @@ def create_genetic_agents(num_players, new_list, agent_name, forcedRandom, rando
 
 
     if random_agents:  # for the HCABs mostly.
-        plyr_idxs = np.random.choice(np.arange(popSize), size=num_players, replace=False)
+        plyr_idxs = fastchoices(np.arange(popSize), size=num_players)
 
     else:
         plyr_idxs = np.arange(num_players)
@@ -408,15 +411,19 @@ def create_genetic_agents(num_players, new_list, agent_name, forcedRandom, rando
 
     return agents
 
-def create_agents_with_list(agent_name_list):
-    agent_list = []
-    forced_random = False
-    random_agents = True
-    for agent in agent_name_list:
-        agent_csv_name = base_to_csv[agent]
-        agent_list.append(create_agents(1, [], agent_csv_name, forced_random, random_agents)[0])  # just start wiht something,
+# so this works, but the selection appears to be finniky at best. gonna try and shake things up.
+# def create_agents_with_list(agent_name_list, forced_random, random_agents):
+#     agent_list = []
+#     for agent in agent_name_list:
+#         agent_csv_name = base_to_csv[agent]
+#         agent_list.append(create_agents(1, [], agent_csv_name, forced_random, random_agents)[0])  # just start wiht something,
+#
+#     return agent_list
 
-    return agent_list
+def create_agents_with_list(agent_name_list):
+    pass # dropping support for different names for now, she's acting up.
+    popSize = 60
+    new_agents = create_agents(len(agent_name_list), [], base_to_csv[agent_name_list[0]], forced_r)
 
 
 def create_agents(num_players, new_list, agent_name, forcedRandom, random_agents):
@@ -436,14 +443,14 @@ def create_agents(num_players, new_list, agent_name, forcedRandom, random_agents
 
 
     if random_agents: # for the HCABs mostly.
-        plyr_idxs = np.random.choice(np.arange(popSize), size=num_players, replace=False)
+        plyr_idxs = fastchoices(np.arange(popSize), size=num_players) # try this??
 
     else:
         plyr_idxs = np.arange(num_players)
 
 
     for i in range(0, num_players-len(new_list)):
-        plyrs.append(theGenePools[plyr_idxs[i]])  # just add the first guys and go form there
+        plyrs.append(theGenePools[int(plyr_idxs[i])])  # just add the first guys and go form there
 
     for i in new_list:
         if i == -1:

@@ -59,6 +59,7 @@ def write_generational_results(theGenePools, popSize, gen, folder):
             theGenePools[i].absolutePopularity = 0.0
 
     # Sort agents by fitness
+    # they are already sorted from low to high, but lets do high to low.
     sorted_agents = sorted(theGenePools, key=lambda agent: agent.absoluteFitness, reverse=True)
 
     # Get the absolute path to the directory containing this script
@@ -88,7 +89,7 @@ def write_generational_results(theGenePools, popSize, gen, folder):
             ])
     # force it to squeeze the scalar value out. not sure what the problem was.
     # avg_fitness = np.sum([float(np.squeeze(agent.absoluteFitness)) for agent in theGenePools]) / popSize
-    avg_popularity = np.sum([float(np.squeeze(agent.absolutePopularity)) for agent in theGenePools]) / popSize
+    avg_popularity = np.sum([float(np.squeeze(agent.absoluteFitness)) for agent in theGenePools]) / popSize
     # print(f"Average utility in generation {gen}: {float(avg_fitness):.4f} Average Popularity: {float(avg_popularity):.4f}")
     print(f"Average popularity in generation: {float(avg_popularity):.4f}")
 
@@ -511,12 +512,12 @@ if __name__ == "__main__":
     max_workers = max(1, os.cpu_count() - 2) # save some cores for the rest of us!
     # max_workers = 1 # I just want one thread please. we debugging rn sire.
 
-    popSize = 100
+    popSize = 60
     numGeneCopies = 1
-    startIndex = 1
-    numGens = 200
-    gamesPerGen = 20
-    agentsPerGame = 3 # we can only fit 3 hunters in there at at time...
+    startIndex = 1 # 0 is training from scratch, 1 is stability testing.
+    numGens = 10 # just iterate on it for 10 gens to see if its stable.
+    gamesPerGen = popSize  # this is in part what makes it homogenous. for mixed, use a discrete number
+    agentsPerGame = 3 # we shall try whipping it, sire.
     roundsPerGame = 30
     numCats = 0
     povertyLine = 0
