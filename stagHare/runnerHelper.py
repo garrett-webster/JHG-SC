@@ -59,6 +59,8 @@ def run_trial_genetic(theGenes, random_agents, forced_random, height, width):
         if not stag_hare.is_over():
             break
 
+
+
     new_stag_hare = run_trials_given_simulator(stag_hare, False, None, None, True, False)
     return create_new_score(new_stag_hare)
 
@@ -107,6 +109,7 @@ def run_trials_given_simulator(stag_hare, graphing, current_round_grapher, curre
 
         # STAGHARE to JHG SECTION
         if noisy: # means that we need to translate the allocations from movements, as opposed to passing them straight through.
+
             allocations_dict = get_allocations_from_movements(stag_hare.state, action_map, old_agent_positions, old_state)
 
         allocations_list = allocations_dict_to_list(allocations_dict)
@@ -267,12 +270,13 @@ def create_hunters_with_genes(genes, random_agents, forced_random, num_agents=3)
     new_hunters = []
     agent_name = "gen_199.csv"
 
+    # print("these are the genes ", genes)
     # forced random and random agents don't actually matter here, because we are passing a gene down.
     for i in range(num_agents):
         new_name = "R" + str(i)
         # get a random gene, pull that off the top.
         # this could result in everything blowing up if I did this wrongl.
-        new_hunters.append(CabAgent(i, new_name, random_agents, forced_random, gene=genes[random.choice(range(genes))], agent_name=agent_name))
+        new_hunters.append(CabAgent(i, new_name, random_agents, forced_random, gene=genes[0], agent_name=agent_name))
 
 
     alpha_min, alpha_max = 0.20, 0.20
@@ -366,15 +370,7 @@ def process_scores(scores):
 
     return cooperation_score, scores_per_player
 
-# base_to_csv = {
-#     "SCab": "16x16round4.csv",
-#     "HCab": "gen_z.csv",
-#     "HSCab": "homoSCabs.csv",
-#     "ECab99": "gen_99.csv",
-#     "ECab199": "gen_199.csv",
-#     "Allegatr": "Allegatr",
-#     "HardHomo": "HardHomo.csv",
-# }
+
 
 
 def get_agents(agent, scenario):

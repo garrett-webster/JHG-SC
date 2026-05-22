@@ -50,12 +50,12 @@ height = 16
 width = 16
 RandomAgents = True
 forced_random = False
-num_attempts = 200
+num_attempts = 20
 
 # base_agents = ["SCab", "HCab", "ECab99", "ECab199", "Allegatr"]
 # base_agents = ["HCab", "ECab99", "ECab199"]
 # base_agents = ["HCab", "ECab199", "Allegatr"]
-base_agents = ["new3Gene"]
+base_agents = ["HardHomo", "HardHomo2", "Allegatr", "HCab", "ECab199"]
 
 game_types = ["Round", "Step"]
 
@@ -85,13 +85,19 @@ def get_agents(agent, scenario):
 # removing Json implementatino because that was dumb and bad. back to pure script based.
 if __name__ == "__main__":
     height, width, RandomAgents, forced_random, num_attempts = height, width, RandomAgents, forced_random, num_attempts
-    games_per_round = 10
     graphing = False
 
     for agent in tqdm(base_agents):
         for scenario in scenarios:
             for game_type in game_types:
                 scenario_type = str(agent) + str(scenario) + str(game_type)
+
+                # HOLY FETCH HOW DID I FORGET THIS!!!
+                # uh we need to redo like a lot of stuff.
+                if game_type == "Round":
+                    games_per_round = 10
+                else:
+                    games_per_round = 1
 
                 curr_agent_name = get_agents(agent, scenario)
                 new_batch_logger = run_test(curr_agent_name, scenario_type, height, width, RandomAgents,

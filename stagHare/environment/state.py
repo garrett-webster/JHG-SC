@@ -20,7 +20,7 @@ class State:
 
         # Randomly assign starting positions for the hunters, hare, and stag
         for i, agent_name in enumerate(agent_names):
-            while True:
+            while True: # long story. we want it to be a list sometimes, but here we want an integer.
                 row_index = fastchoices(list(range(self.height)))
                 col_index = fastchoices(list(range(self.width)))
 

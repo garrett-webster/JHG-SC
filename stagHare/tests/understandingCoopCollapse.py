@@ -73,15 +73,6 @@ def get_agents(agent, scenario):
 # base_agents = ["SCab", "HCab", "ECab99", "ECab199", "Allegatr"]
 base_agents = ["Allegatr"]
 
-# base_to_csv = {
-#     "SCab": "16x16round4.csv",
-#     "HCab": "gen_z.csv",
-#     "HSCab": "homoSCabs.csv",
-#     "ECab99": "gen_99.csv",
-#     "ECab199": "gen_199.csv",
-#     "Allegatr": "Allegatr",
-#     "HardHomo": "HardHomo.csv",
-# }
 
 games_per_round = 1
 scenarios = ["SelfPlay", "VGHare1", "VGHare2", "VGStag1", "VGStag2", "Allegatr1", "Allegatr2"]

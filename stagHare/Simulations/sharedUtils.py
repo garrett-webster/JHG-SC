@@ -1,5 +1,6 @@
 base_to_csv = {
-    "HardHomo": "hardHomo.csv", # this was the one I programmed by hand.
+    "HardHomo": "hardHomo.csv", # STAGHUNT genetic algorithm.
+    "HardHomo2": "hardHomo.csv", # staghunt w/ tweaks.
     "new3Gene": "ECabJHGTest.csv",
     "HSCab": "homoSCabs.csv",
     "HCab": "gen_z.csv", # johnathon EPDM human like agents

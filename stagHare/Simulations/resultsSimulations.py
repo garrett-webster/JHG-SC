@@ -45,6 +45,8 @@ def extract_agent_info(scenario_name):
         return "HSCab", None
     if scenario_name.startswith('new3Gene'):
         return "new3Gene", None
+    if scenario_name.startswith("HardHomo2"):
+        return "HardHomo2", None
     if scenario_name.startswith("HardHomo"):
         return "HardHomo", None
     if scenario_name.startswith('SCab'):

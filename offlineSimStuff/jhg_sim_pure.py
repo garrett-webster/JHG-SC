@@ -160,5 +160,5 @@ class Jhg_Sim_Pure():
         avg_pop = sum(new_popularity) / self.num_players
         self.avg_pop_per_round.append(avg_pop)
         self.game_popularities.append(new_popularity)
-        print("here are the transatcions ", T)
+        # print("here are the transatcions ", T)
         # no need to return anything, just let her ride.

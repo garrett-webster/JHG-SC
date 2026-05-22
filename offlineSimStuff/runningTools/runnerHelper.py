@@ -123,7 +123,7 @@ def run_jhg_stuff(jhg_engine, curr_round, agents, num_players, current_jhg_sim):
     # the change in popularities,
     # return sc_sim.current_results, sc_sim.results_sums, new_influence  # so we have the change in utility and overall utility
 
-    print("here are the transatcions ", transactions)
+    # print("here are the transatcions ", transactions)
 
     return jhg_engine.get_influence()  # return da influence matrix, the change in popularitry, and the new popularities.
 
@@ -444,8 +444,11 @@ def create_agents_with_list(agent_name_list, forced_random, random_agents):
     all_agents_dict = {}
     for name in new_dict:
         num_players = new_dict[name]
-        agent_name = base_to_csv[name]
-        all_agents_dict[name] = create_agents(num_players, new_list, agent_name, forced_random, random_agents)
+        if name in base_to_csv: # cab agent type BEAT
+            agent_name = base_to_csv[name]
+            all_agents_dict[name] = create_agents(num_players, new_list, agent_name, forced_random, random_agents)
+        else: # No non CAB agents expected in a pure JHG scenario so we should be good to go.
+            print("AYO SOMETHING WRONG")
 
 
     # now we need to reorder this fetcher.
@@ -472,6 +475,8 @@ def create_agents(num_players, new_list, agent_name, forcedRandom, random_agents
 
     if random_agents: # for the HCABs mostly.
         plyr_idxs = fastchoices(np.arange(popSize), size=num_players) # try this??
+        if num_players == 1:
+            plyr_idxs = [plyr_idxs] # convert into a list. Long fetching story.
 
     else:
         plyr_idxs = np.arange(num_players)

@@ -96,14 +96,14 @@ if __name__ == "__main__":
     height, width, RandomAgents, forced_random, num_attempts = height, width, RandomAgents, forced_random, num_attempts
     # agents = ["HCab"]
     # agents = ["ECab199"]
-    # agents = ["HardHomo"]
-    agents = ["ECabJHGTest"]
+    agents = ["HardHomo", "ECab3"]
+    # agents = ["ECab3"]
     # agents = ["ECab3"]
     # agents = ["GStag"]
     scenario = "SelfPlay"
     game_type = "Round"
     graphing = False
-    num_games_per_round = 10 # no reason to super scale it rn.
+    num_games_per_round = 1 # no reason to super scale it rn.
     print_results_to_console = True
     noisy = True
 

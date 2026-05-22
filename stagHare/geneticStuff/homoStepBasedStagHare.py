@@ -63,7 +63,7 @@ def write_generational_results(theGenePools, popSize, gen, folder):
     script_dir = os.path.dirname(os.path.abspath(__file__))
     # Construct the full output directory path
     if folder == "":
-        output_dir = os.path.join(script_dir, "HomoCoopSCab", "theGenerations") # just to give it somewhere to go
+        output_dir = os.path.join(script_dir, "HHCABNB", "theGenerations") # just to give it somewhere to go
     else:
         output_dir = os.path.join(script_dir, folder) # just to give it somewhere to go
     # Ensure output directory exists
@@ -120,23 +120,17 @@ def mutateIt(value, mutation_rate=0.05, magnitude=1):
     return value
 
 
-def writeGenerationalResults(theGenePools, popSize, gen, agentsPerGame, folder):
-    # create a file here
-    for i in range(popSize):
-        # want the Gene, the Count, the Relative Fitness, the absoluteFitness, and the CVS formatted gene string
-        pass
-
 # lets breed these boys for cooperation.
 def evolvePopulationPairs(theGenePoolsOld, popSize, numGeneCopies):
     # sort by absolute fitness, assuming that higher absolute fitness is better.
     # change the attribute below for relativeFitness
     sorted_pools = sorted(theGenePoolsOld, key=lambda x: x.absoluteFitness, reverse=True)
 
-    # eelite size -- keep the top 10% untouched
+    # elite size -- keep the top 10% untouched
     num_elites = max(1, popSize // 10)
     elites = sorted_pools[:num_elites]
 
-    # bredding pool is now top 20%
+    # breeding pool is now top 20%
     breeding_pool = sorted_pools[: max(2, popSize // 5)]
 
     # start the new population with elites.

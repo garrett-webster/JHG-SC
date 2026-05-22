@@ -123,7 +123,7 @@ if __name__ == "__main__":
     # agent_name = "6x6Round1.csv" # use this as sort of the default, for now.
     # agent_name = "hardHomo.csv"
     # agent_name = "3playerPure.csv"
-    agent_name = "gen_199.csv"
+    agent_name = "gen_Z.csv"
     # bunch of stuff for print statements
     utility_to_log = []
     popularity_to_log = []

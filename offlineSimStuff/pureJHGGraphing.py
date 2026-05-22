@@ -254,10 +254,10 @@ if __name__ == "__main__":
     #
 
     # Uncomment this to freeze the seed for better comparison
-    SEED = 42  # pick any constant
-
-    random.seed(SEED)  # Python’s stdlib RNG
-    np.random.seed(SEED)  # NumPy’s RNG
+    # SEED = 42  # pick any constant
+    #
+    # random.seed(SEED)  # Python’s stdlib RNG
+    # np.random.seed(SEED)  # NumPy’s RNG
 
     jhg_games_per_sc_round = ["J", 30]
     # jhg_games_per_sc_round = ["S", 30]
@@ -288,8 +288,10 @@ if __name__ == "__main__":
     # just start here.
     # agent_name_list = ["new3Gene", "new3Gene", "new3Gene", "new3Gene", "new3Gene", "new3Gene", "new3Gene", "new3Gene", "new3Gene", "new3Gene"]
     # agent_name_list = ["new3Gene", "new3Gene", "new3Gene"]
-    agent_name_list = ["ECab199","ECab199","ECab199", "ECab199","ECab199","ECab199","ECab199","ECab199","ECab199","ECab199"]
+    # agent_name_list = ["ECab199","ECab199","ECab199", "ECab199","ECab199","ECab199","ECab199","ECab199","ECab199","ECab199"]
     # agent_name_list = ["HCab", "HCab", "HCab", "HCab", "HCab", "HCab", "HCab", "HCab", "HCab", "HCab"]
+    # agent_name_list = ["HCab","HCab","HCab","HCab","HCab","HCab","HCab","HCab","HCab","HCab",]
+    agent_name_list = ["ECab3","ECab3","ECab3"]
 
 
     agents = create_agents_with_list(agent_name_list, forcedRandom, random_agents)
