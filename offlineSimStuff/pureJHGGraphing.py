@@ -266,7 +266,7 @@ if __name__ == "__main__":
     random_agents = True # HAVE THIS SET TO TRUE UNLESS YOU HAVE A REALLY GOOD REASON NOT TOO
 
     round_list = determine_rounds(jhg_games_per_sc_round)
-    num_players = 10
+    num_players = 3
 
 
     num_humans = 0
@@ -290,10 +290,9 @@ if __name__ == "__main__":
     # agent_name_list = ["new3Gene", "new3Gene", "new3Gene"]
     agent_name_list = ["ECab199","ECab199","ECab199", "ECab199","ECab199","ECab199","ECab199","ECab199","ECab199","ECab199"]
     # agent_name_list = ["HCab", "HCab", "HCab", "HCab", "HCab", "HCab", "HCab", "HCab", "HCab", "HCab"]
-    new_list = []
-    agent_name = "gen_199.csv"
 
-    agents = create_agents(num_players, new_list, agent_name, forcedRandom, random_agents)
+
+    agents = create_agents_with_list(agent_name_list, forcedRandom, random_agents)
 
     # I JUST want to run bots here. Don't worry about humans -- this rewrites a few assumptions.
     for attempt in tqdm(range(num_attempts)): # create a new sim for each attempt to prevent bleeding over.

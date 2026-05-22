@@ -420,10 +420,38 @@ def create_genetic_agents(num_players, new_list, agent_name, forcedRandom, rando
 #
 #     return agent_list
 
-def create_agents_with_list(agent_name_list):
+def reorder_agents(all_agents, agent_name_list):
+    new_agents = [None for _ in range(len(agent_name_list))]
+    all_agents_copy = copy.deepcopy(all_agents)
+    for i, name in enumerate(agent_name_list):
+        # so I need to get an agent, put it in the list
+        new_agents[i] = all_agents_copy[name][0] # grab the fetcher
+        all_agents_copy[name] = np.delete(all_agents_copy[name], 0) # delete the fetcher off the stack.
+
+    return new_agents
+
+
+def create_agents_with_list(agent_name_list, forced_random, random_agents):
     pass # dropping support for different names for now, she's acting up.
-    popSize = 60
-    new_agents = create_agents(len(agent_name_list), [], base_to_csv[agent_name_list[0]], forced_r)
+    # create a dictionary / set thing that maps how many names are shared
+    # then do them all at once.
+    # I think that will most closely replicate the behavior that I want.
+    new_dict = {agent_name : 0 for agent_name in agent_name_list} # list comprehension is so cool
+    for name in agent_name_list:
+        new_dict[name] += 1
+    print("here is the new dict post update ", new_dict)
+    new_list = []
+    all_agents_dict = {}
+    for name in new_dict:
+        num_players = new_dict[name]
+        agent_name = base_to_csv[name]
+        all_agents_dict[name] = create_agents(num_players, new_list, agent_name, forced_random, random_agents)
+
+
+    # now we need to reorder this fetcher.
+    new_agents = reorder_agents(all_agents_dict, agent_name_list)
+
+    return new_agents
 
 
 def create_agents(num_players, new_list, agent_name, forcedRandom, random_agents):
