@@ -58,3 +58,35 @@ def translateVecToIndexStagHare(transVec, id):
 
 
     return index_to_return
+
+
+
+
+def noisifyJHGVectorsWithStagHareNoise(transVec, id):
+    transVec = np.array(transVec.copy())
+    normalizedTransVec = [element / sum(abs(transVec)) for element in transVec]
+
+    # in case you want to make this as unreadable as possible, here you have it.
+    non_personal_allocations = np.delete(normalizedTransVec, id)
+    dist = np.sqrt(np.sum(np.square(non_personal_allocations)))
+
+    all_non_negative = np.all([x >= 0 for x in normalizedTransVec])
+
+
+    options = create_options_matrix(id)
+
+    if all_non_negative:
+        if dist >= 0.55:
+            allocation_to_return = options[3]
+        elif dist >= 0.25:
+            allocation_to_return = options[2]
+        else:
+            allocation_to_return = options[0]
+    else:
+        if dist < 0.25:
+            allocation_to_return = options[0]
+        else:
+            allocation_to_return = options[1]
+
+
+    return allocation_to_return

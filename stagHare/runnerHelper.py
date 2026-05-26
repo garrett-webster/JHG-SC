@@ -47,22 +47,23 @@ def process_intents(current_intents: list) -> tuple[int, list]:
 
 # this is worth keeping around because it has to return specific stuff for the genetic algorithm.
 # TODO: Fold this all into one.
-def run_trial_genetic(theGenes, random_agents, forced_random, height, width):
+def run_trial_genetic(theGenes, random_agents, forced_random, height, width, rounds_per_game):
 
     # create the hunters here and just hope it works.
     hunters = create_hunters_with_genes(theGenes, random_agents, forced_random)  # the assingment has been undererstood
 
 
     # create the instance simulator
-    while True:
-        stag_hare = StagHare(height, width, hunters)
-        if not stag_hare.is_over():
-            break
+    stag_hare = get_stag_hare(height, width, hunters)
 
+    for i in range(rounds_per_game): # 1 game, do this once, flows it all into one.
+        if i != 0:
+            stag_hare = reset_stag_hare(stag_hare) # just puts the guys into new positions without overwriting existing data
 
+        stag_hare = run_trials_given_simulator(stag_hare, False, None, None, True, False)
 
-    new_stag_hare = run_trials_given_simulator(stag_hare, False, None, None, True, False)
-    return create_new_score(new_stag_hare)
+    # this does append, I triple checked.
+    return create_new_score(stag_hare)
 
 
 # TODO: this breaks when considering human players. Add a total order parameter.
@@ -113,6 +114,13 @@ def run_trials_given_simulator(stag_hare, graphing, current_round_grapher, curre
             allocations_dict = get_allocations_from_movements(stag_hare.state, action_map, old_agent_positions, old_state)
 
         allocations_list = allocations_dict_to_list(allocations_dict)
+
+        # printing stuff. don't worry about it.
+        allocations_to_print = allocations_list.copy()
+        if isinstance(allocations_list[0][0], np.float64):
+            allocations_to_print = [[float(x * 6) for x in row] for row in allocations_list]
+        # print("here is the allocations list ", allocations_to_print)
+
         if track_allocations:
             stag_hare.allocations.append(allocations_list)
 
@@ -167,6 +175,7 @@ def run_trial_all(agent_names, height, width, random_agents, forced_random, scen
     current_game_logger, current_round_grapher = get_graphing_stuff(graphing, height, width, agent_names, scenario_type)
     run_amount = num_rounds_per_game if num_rounds_per_game is not None else 1
     hunters = create_hunters_with_list(random_agents, forced_random, agent_names)
+    np.random.seed(42)
     stag_hare = get_stag_hare(height, width, hunters)
 
     for i in range(run_amount): # if we only do 1 game, we only do this once.

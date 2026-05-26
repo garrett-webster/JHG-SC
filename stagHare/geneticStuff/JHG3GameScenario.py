@@ -1,9 +1,15 @@
+# from Server.Engine.completeBots.jakecat import JakeCAT # this is the EXACT cat agent used in the OG_JHG_IJCAI paper. not sure if its the one melissa used...import
+from prompt_toolkit.utils import to_str
+
 from offlineSimStuff.pureJHGGraphing import run_jhg_graphing
 from offlineSimStuff.runningTools.runnerHelper import create_jhg_sim_stripped, loadPopulationFromFile
+from stagHare.agents.cabAgentThing import CabAgent # this is the cabAgent for STAGhare specifically.
+import random
+import numpy as np
 import os
 import csv  # used for writing to files
 
-from concurrent.futures import ProcessPoolExecutor # where the multiprocessing magic happens
+from concurrent.futures import ProcessPoolExecutor, as_completed # where the multiprocessing magic happens
 from collections import defaultdict # him... I remember him from the stag_hare project...
 import itertools
 from tqdm import tqdm
@@ -44,9 +50,13 @@ def write_generational_results(theGenePools, popSize, gen, folder):
         if theGenePools[i].count > 0:
             theGenePools[i].relativeFitness /= theGenePools[i].count
             theGenePools[i].absoluteFitness /= theGenePools[i].count
+            theGenePools[i].relativePopularity /= theGenePools[i].count
+            theGenePools[i].absolutePopularity /= theGenePools[i].count
         else:
             theGenePools[i].relativeFitness = 0.0
             theGenePools[i].absoluteFitness = 0.0
+            theGenePools[i].relativePopularity = 0.0
+            theGenePools[i].absolutePopularity = 0.0
 
     # Sort agents by fitness
     # they are already sorted from low to high, but lets do high to low.
@@ -56,7 +66,7 @@ def write_generational_results(theGenePools, popSize, gen, folder):
     script_dir = os.path.dirname(os.path.abspath(__file__))
     # Construct the full output directory path
     if folder == "":
-        output_dir = os.path.join(script_dir, "HomoCoopSCab", "StabilityTesting") # just to give it somewhere to go
+        output_dir = os.path.join(script_dir, "Curriculum", "attempt4") # just to give it somewhere to go
     else:
         output_dir = os.path.join(script_dir, folder) # just to give it somewhere to go
     # Ensure output directory exists
@@ -74,6 +84,8 @@ def write_generational_results(theGenePools, popSize, gen, folder):
                 agent.count,
                 np.round(agent.relativeFitness, 4),
                 np.round(agent.absoluteFitness, 4),
+                np.round(agent.relativePopularity, 4),
+                np.round(agent.absolutePopularity, 4),
             ])
     # force it to squeeze the scalar value out. not sure what the problem was.
     # avg_fitness = np.sum([float(np.squeeze(agent.absoluteFitness)) for agent in theGenePools]) / popSize
@@ -103,13 +115,20 @@ def selectByFitness(thePopulation, popSize, _rank):
     return popSize - 1  # return the last index.
 
 
-def mutateIt(value, mutation_rate=0.05, magnitude=1):
-    """
-    lower chance mutation rate thing.
-    """
-    if random.random() < mutation_rate:
-        return value + random.randint(-magnitude, magnitude)
-    return value
+def mutateIt(gene):  # expect gene to be an int. if its not there is going to be a problem.
+    v = random.randrange(100)
+    if v > 15:
+        return gene  # no mutation
+    elif v < 3:
+        return random.randrange(101)
+    else:
+        g = gene + random.randrange(11) - 5
+        if g < 0:  # need to cap values from 0, 100
+            g = 0
+        if g > 100:
+            g = 100
+    return g
+
 
 
 def writeGenerationalResults(theGenePools, popSize, gen, agentsPerGame, folder):
@@ -120,33 +139,54 @@ def writeGenerationalResults(theGenePools, popSize, gen, agentsPerGame, folder):
 
 # lets breed these boys for cooperation.
 def evolvePopulationPairs(theGenePoolsOld, popSize, numGeneCopies):
-    # sort by absolute fitness, assuming that higher absolute fitness is better.
-    # change the attribute below for relativeFitness
-    sorted_pools = sorted(theGenePoolsOld, key=lambda x: x.absoluteFitness, reverse=True)
+    theNewGenePools = []
+    num_genes = len(theGenePoolsOld[0].genes_long[0])
+    ind1 = -1
+    ind2 = -1
 
-    # eelite size -- keep the top 10% untouched
-    num_elites = max(1, popSize // 10)
-    elites = sorted_pools[:num_elites]
+    for i in range(popSize):
+        if i < popSize / 5.0:  # this is making the assumption that popSize is 100 people large.
+            ind1 = selectByFitness(theGenePoolsOld, popSize, True)
+            ind2 = selectByFitness(theGenePoolsOld, popSize, False)
+            while ind2 == ind1:  # prevent themselves from self breeding
+                ind2 = selectByFitness(theGenePoolsOld, popSize, False)
 
-    # bredding pool is now top 20%
-    breeding_pool = sorted_pools[: max(2, popSize // 5)]
+        else:
+            ind1 = selectByFitness(theGenePoolsOld, popSize, False)
+            ind2 = selectByFitness(theGenePoolsOld, popSize, False)
+            while ind2 == ind1:
+                ind2 = selectByFitness(theGenePoolsOld, popSize, False)
 
-    # start the new population with elites.
-    theNewGenePools = [GeneAgent3(extractGene(ind.genes_long[0]), numGeneCopies) for ind in elites]
+        if ind1 == -1 or ind2 == -1:
+            print("THAT WAS WRONG")
+            print("here is the pop size ", popSize)
 
-    # fill the rest with children
-    while len(theNewGenePools) < popSize:
-        # pick two parents from breeding pool (top 20%)
-        parent1 = random.choice(breeding_pool)
-        parent2 = random.choice(breeding_pool)
+        geneStr = "gene_"
 
-        while parent1 == parent2:
-            parent2 = random.choice(breeding_pool)
+        # ind1Genes = extractGene(theGenePoolsOld[ind1].genes_long[0]).split("_")[1:]
 
-        child_gene_str = crossover_and_mutate(parent1, parent2, numGeneCopies)
-        theNewGenePools.append(GeneAgent3(child_gene_str, numGeneCopies))
+        ind1Genes = extractGene(theGenePoolsOld[ind1].genes_long[0]).split("_")[
+                    1:]  # the "gene_" at the beginning for both.
+        ind2Genes = extractGene(theGenePoolsOld[ind2].genes_long[0]).split("_")[1:]
 
-    return theNewGenePools[:popSize] # just in case something blew up
+        for g in range(num_genes):
+            minKeepIndex = 12
+            if g == minKeepIndex:
+                geneStr += "0_"  # maybe??
+                continue  # we don't want to update this or anything, go back to the beginning.
+            if bool(random.getrandbits(1)):  # just a 50/50 shot
+                geneStr += str(mutateIt(int(ind1Genes[g])))
+                if g < num_genes - 1:
+                    geneStr += "_"
+
+            else:
+                geneStr += str(mutateIt(int(ind2Genes[g])))
+                if g < num_genes - 1:
+                    geneStr += "_"
+
+        theNewGenePools.append(GeneAgent3(geneStr, numGeneCopies))  # create a new agent
+
+    return theNewGenePools
 
 def crossover_and_mutate(parent1, parent2, numGeneCopies):
     ''' same crossover logic as before, but with mutation rate controlled'''
@@ -190,7 +230,7 @@ def runGame(agent_genes, numGeneCopies, agentsPerGame, roundsPerGame, gen, game_
     # should save us a lot of copying and passing aroudn overhead.
 
 
-    pmetrics = playGame(agent_genes, game_idx, random_agents, forced_random, height, width) # this should be all we need
+    pmetrics = playGame(agent_genes, game_idx, forced_random) # this should be all we need
 
 
     metrics = []
@@ -235,149 +275,47 @@ def set_game_params(agents):
 
     return agents
 
-
-# def create_agents(num_players, new_list, agent_name, forcedRandom, random_agents):
-#     popSize = 60
-#     num_gene_pools = 1
-#
-#     if ".csv" in agent_name:
-#         theGenePools = loadPopulationFromFile(popSize, num_gene_pools, agent_name)  # this gets us our fetcher
-#     else:
-#         theGenePools = create_sc_agents(popSize, agent_name)
-#
-#     initial_pops = [100 for _ in range(num_players)]
-#
-#     plyrs = []
-#
-#     # lets add some stochacisty to this
-#
-#
-#     if random_agents: # for the HCABs mostly.
-#         plyr_idxs = np.random.choice(np.arange(popSize), size=num_players, replace=False)
-#
-#     else:
-#         plyr_idxs = np.arange(num_players)
-#
-#
-#     for i in range(0, num_players-len(new_list)):
-#         plyrs.append(theGenePools[plyr_idxs[i]])  # just add the first guys and go form there
-#
-#
-#     agents = np.array(plyrs)
-#     players = [*agents]
-#
-#     alpha_min, alpha_max = 0.20, 0.20
-#     beta_min, beta_max = 0.5, 1.0
-#     keep_min, keep_max = 0.95, 0.95
-#     give_min, give_max = 1.30, 1.30
-#     steal_min, steal_max = 1.6, 1.60
-#
-#     num_players = len(players)
-#
-#     poverty_line = 0
-#
-#     game_params = {
-#         "num_players": num_players,
-#         "alpha": alpha_min,  # np.random.uniform(alpha_min, alpha_max),
-#         "beta": beta_min,  # np.random.uniform(beta_min, beta_max),
-#         "keep": keep_min,  # np.random.uniform(keep_min, keep_max),
-#         "give": give_min,  # np.random.uniform(give_min, give_max),
-#         "steal": steal_min,  # np.random.uniform(steal_min, steal_max),
-#         "poverty_line": poverty_line,
-#         "base_popularity": np.array(initial_pops)
-#
-#     }
-#
-#     for a in agents:
-#         a.setGameParams(game_params, forcedRandom)
-#
-#     return agents
-
-# # this is exactly the same actually. nice.
-# def playGame(theGenes, game, random_agents, forced_random, height, width):
-#     # run a trial, get the scores. The genetic is just a better wrapper for the simulator.
-#     new_scores = run_trial_genetic(theGenes, random_agents, forced_random, height, width)
-#
-#     pmetrics = getPmetrics(game, new_scores, 3)
-#     return pmetrics  # this is the only thing we actually care about from this game.
-# need to create a new version of this that instead uses JHG so I don't have to try to reinvent the fitness fucntions.
-
-# def create_agents_with_genes(num_players, new_list, agent_name, forcedRandom, random_agents):
-#     popSize = 60
-#     num_gene_pools = 1
-#
-#     theGenePools = loadPopulationFromFile(popSize, num_gene_pools, agent_name)  # this gets us our fetcher
-#
-#
-#     initial_pops = [100 for _ in range(num_players)]
-#
-#     plyrs = []
-#
-#     # lets add some stochacisty to this
-#
-#
-#     if random_agents: # for the HCABs mostly.
-#         plyr_idxs = np.random.choice(np.arange(popSize), size=num_players, replace=False)
-#
-#     else:
-#         plyr_idxs = np.arange(num_players)
-#
-#
-#     for i in range(0, num_players-len(new_list)):
-#         plyrs.append(theGenePools[plyr_idxs[i]])  # just add the first guys and go form there
-#
-#
-#     agents = np.array(plyrs)
-#     players = [*agents]
-#
-#     alpha_min, alpha_max = 0.20, 0.20
-#     beta_min, beta_max = 0.5, 1.0
-#     keep_min, keep_max = 0.95, 0.95
-#     give_min, give_max = 1.30, 1.30
-#     steal_min, steal_max = 1.6, 1.60
-#
-#     num_players = len(players)
-#
-#     poverty_line = 0
-#
-#     game_params = {
-#         "num_players": num_players,
-#         "alpha": alpha_min,  # np.random.uniform(alpha_min, alpha_max),
-#         "beta": beta_min,  # np.random.uniform(beta_min, beta_max),
-#         "keep": keep_min,  # np.random.uniform(keep_min, keep_max),
-#         "give": give_min,  # np.random.uniform(give_min, give_max),
-#         "steal": steal_min,  # np.random.uniform(steal_min, steal_max),
-#         "poverty_line": poverty_line,
-#         "base_popularity": np.array(initial_pops)
-#
-#     }
-#
-#     for a in agents:
-#         a.setGameParams(game_params, forcedRandom)
-#
-#     return agents
-
-
-
-
-def playGame(theGenes, game, random_agents, forced_random, height, width):
+# this is where the bulk of stuff is going to change.
+def playGame(theGenes, game, forced_random):
     # so this is the part I was kinda worried about, and there isn't a godo way to replicate it bc the flutter thing just works so differently
     # so we are going to addlib this portion.
     # create the sim
-    agents_per_game = 10 # I think ? I haven't actually decided.
+    pmetrics_list = [] # just to make my compiler stop yelling at me.
     numGeneCopies = 1 # we only need 1, long story.
-    # fun fact -- I did this like an absolute nincompoop. theGenes contains a bunch of copies of the same fetcher. So don't worry about it!
-    agents = [GeneAgent3(theGenes[0], numGeneCopies) for _ in range(agents_per_game)]
+    num_agents_list = [3, 5, 10] # I actually don't ever use 5, but I figure it couldn't hurt.
 
-    # this should adjsut the agents as well. maybe.
-    new_simulator = create_jhg_sim_stripped(agents, forced_random) # thats literally it.
-    num_rounds = 30 # just for fun, make this passable.
-    run_jhg_graphing(new_simulator, False, num_rounds)
-    # we can use the gen adn the game to write the results to a file if we really want to.
+    for num_agents in num_agents_list:
+        agents = [GeneAgent3(theGenes[0], numGeneCopies) for i in range(num_agents)]
 
-    pmetrics = getPmetrics(game, new_simulator.game_popularities[-1], agents_per_game)
-    return pmetrics  # this is the only thing we actually care about from this game.
+        # this should adjsut the agents as well. maybe.
+        new_simulator = create_jhg_sim_stripped(agents, forced_random) # thats literally it.
+        num_rounds = 30 # just for fun, make this passable.
+        run_jhg_graphing(new_simulator, False, num_rounds)
+        # we can use the gen adn the game to write the results to a file if we really want to.
 
+        pmetrics = getPmetrics(game, new_simulator.game_popularities[-1], num_agents)
+        pmetrics_list.append(pmetrics)
+
+    pmetrics = create_pmetrics_from_list(pmetrics_list, game)
+    return pmetrics # the only thing we actually care about
+
+def create_pmetrics_from_list(pmetrics_list, game):
+    total_tracking = len(pmetrics_list[0]) # how many agents were in the first game
+    new_pmetrics = [] # make it a list of metrics objects.
+    for agent in range(total_tracking): # this way we only pull up the useful agents.
+        new_total = 0
+        # TODO: Add a weighting system so we can adjust which game we believe to be the most important.
+        for list in pmetrics_list:
+            new_total += list[agent]["absoluteFitness"]
+        new_total /= len(pmetrics_list) # take an average. not sure if it matters, but we are doing it anyway.
+        metric = {
+            "idx" : game,
+            "absoluteFitness" : new_total,
+            "count" : 1,
+        }
+        new_pmetrics.append(metric)
+
+    return new_pmetrics
 
 
 def getPmetrics(game, new_scores, agentsPerGame):
@@ -412,7 +350,7 @@ def run_game_helper(args):
     return metrics
 
 
-def homo_based_SH(popSize, numGeneCopies, startIndex, numGens, gamesPerGen, agentsPerGame, roundsPerGame, povertyLine, folder,
+def homo_based_SH(popSize, numGeneCopies, startIndex, numGens, gamesPerGen, agentsPerGame, roundsPerGame, folder,
            max_workers, enforce_majority, random_agents, forced_random, height, width):
     theGenePools = []
     theGenePoolsOld = []
@@ -502,10 +440,10 @@ if __name__ == "__main__":
 
     popSize = 60
     numGeneCopies = 1
-    startIndex = 1 # 0 is training from scratch, 1 is stability testing.
-    numGens = 10 # just iterate on it for 10 gens to see if its stable.
+    startIndex = 0 # 0 is training from scratch, 1 is stability testing.
+    numGens = 100 # just iterate on it for 10 gens to see if its stable.
     gamesPerGen = popSize  # this is in part what makes it homogenous. for mixed, use a discrete number
-    agentsPerGame = 3 # we shall try whipping it, sire.
+
     roundsPerGame = 30
     numCats = 0
     povertyLine = 0
@@ -515,6 +453,10 @@ if __name__ == "__main__":
     forced_random = False
     height = 16
     width = 16
-    homo_based_SH(popSize, numGeneCopies, startIndex, numGens, gamesPerGen, agentsPerGame, roundsPerGame, povertyLine, folder,
+
+    AGENTS_PER_GAME = 3 # this should now never change -- used purely as a start point.
+
+
+    homo_based_SH(popSize, numGeneCopies, startIndex, numGens, gamesPerGen, AGENTS_PER_GAME, roundsPerGame, folder,
                     max_workers, enforce_majority, random_agents, forced_random, height, width)
     # we are running no fear, no chat

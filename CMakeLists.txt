@@ -1,0 +1,195 @@
+cmake_minimum_required(VERSION 4.2)
+project(JHG_SC)
+
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+include_directories(.venv/include)
+include_directories(.venv/include/site)
+include_directories(.venv/include/site/python3.12)
+include_directories(.venv/include/site/python3.12/pygame)
+include_directories(.venv/include/site/python3.12/pygame/include)
+include_directories(.venv/Lib/site-packages/cffi)
+include_directories(.venv/Lib/site-packages/debugpy/_vendored/pydevd/_pydevd_frame_eval)
+include_directories(.venv/Lib/site-packages/debugpy/_vendored/pydevd/pydevd_attach_to_process/common)
+include_directories(.venv/Lib/site-packages/debugpy/_vendored/pydevd/pydevd_attach_to_process/windows)
+include_directories(.venv/Lib/site-packages/numpy/_core/include)
+include_directories(.venv/Lib/site-packages/numpy/_core/include/numpy)
+include_directories(.venv/Lib/site-packages/numpy/_core/include/numpy/random)
+include_directories(.venv/Lib/site-packages/numpy/f2py/src)
+include_directories(.venv/Lib/site-packages/scipy)
+include_directories(.venv/Lib/site-packages/scipy/linalg)
+include_directories(.venv/Lib/site-packages/scipy/special)
+include_directories(.venv/Lib/site-packages/sklearn/svm/src/liblinear)
+include_directories(.venv/Lib/site-packages/sklearn/svm/src/libsvm)
+include_directories(.venv/Lib/site-packages/sklearn/svm/src/newrand)
+include_directories(.venv/Lib/site-packages/sklearn/utils/src)
+include_directories(.venv/Lib/site-packages/win32)
+include_directories(.venv/Lib/site-packages/win32/include)
+include_directories(.venv/Lib/site-packages/win32/test)
+include_directories(.venv/Lib/site-packages/win32/test/win32rcparser)
+include_directories(.venv/Lib/site-packages/win32com)
+include_directories(.venv/Lib/site-packages/win32com/include)
+include_directories(.venv/Lib/site-packages/zmq/backend/cffi)
+include_directories(.venv/Lib/site-packages/zmq/utils)
+include_directories(CPlusPlusTime/JHG/GeneSimulation_cpp)
+include_directories(CPlusPlusTime/StagHare)
+
+add_executable(JHG_SC
+        .venv/include/site/python3.12/pygame/include/_pygame.h
+        .venv/include/site/python3.12/pygame/include/bitmask.h
+        .venv/include/site/python3.12/pygame/include/pgcompat.h
+        .venv/include/site/python3.12/pygame/include/pgimport.h
+        .venv/include/site/python3.12/pygame/include/pgplatform.h
+        .venv/include/site/python3.12/pygame/include/pygame.h
+        .venv/include/site/python3.12/pygame/include/pygame_bufferproxy.h
+        .venv/include/site/python3.12/pygame/include/pygame_font.h
+        .venv/include/site/python3.12/pygame/include/pygame_freetype.h
+        .venv/include/site/python3.12/pygame/include/pygame_mask.h
+        .venv/include/site/python3.12/pygame/include/pygame_mixer.h
+        .venv/include/site/python3.12/pygame/include/sse2neon.h
+        .venv/include/site/python3.12/pygame/_blit_info.h
+        .venv/include/site/python3.12/pygame/_camera.h
+        .venv/include/site/python3.12/pygame/_pygame.h
+        .venv/include/site/python3.12/pygame/_surface.h
+        .venv/include/site/python3.12/pygame/camera.h
+        .venv/include/site/python3.12/pygame/font.h
+        .venv/include/site/python3.12/pygame/freetype.h
+        .venv/include/site/python3.12/pygame/mask.h
+        .venv/include/site/python3.12/pygame/mixer.h
+        .venv/include/site/python3.12/pygame/palette.h
+        .venv/include/site/python3.12/pygame/pgarrinter.h
+        .venv/include/site/python3.12/pygame/pgbufferproxy.h
+        .venv/include/site/python3.12/pygame/pgcompat.h
+        .venv/include/site/python3.12/pygame/pgopengl.h
+        .venv/include/site/python3.12/pygame/pgplatform.h
+        .venv/include/site/python3.12/pygame/pygame.h
+        .venv/include/site/python3.12/pygame/scrap.h
+        .venv/include/site/python3.12/pygame/simd_blitters.h
+        .venv/include/site/python3.12/pygame/surface.h
+        .venv/Lib/site-packages/cffi/_cffi_errors.h
+        .venv/Lib/site-packages/cffi/_cffi_include.h
+        .venv/Lib/site-packages/cffi/_embedding.h
+        .venv/Lib/site-packages/cffi/parse_c_type.h
+        .venv/Lib/site-packages/debugpy/_vendored/pydevd/_pydevd_bundle/pydevd_cython.c
+        .venv/Lib/site-packages/debugpy/_vendored/pydevd/_pydevd_frame_eval/pydevd_frame_evaluator.c
+        .venv/Lib/site-packages/debugpy/_vendored/pydevd/_pydevd_frame_eval/release_mem.h
+        .venv/Lib/site-packages/debugpy/_vendored/pydevd/_pydevd_sys_monitoring/_pydevd_sys_monitoring_cython.c
+        .venv/Lib/site-packages/debugpy/_vendored/pydevd/pydevd_attach_to_process/common/py_custom_pyeval_settrace.hpp
+        .venv/Lib/site-packages/debugpy/_vendored/pydevd/pydevd_attach_to_process/common/py_custom_pyeval_settrace_310.hpp
+        .venv/Lib/site-packages/debugpy/_vendored/pydevd/pydevd_attach_to_process/common/py_custom_pyeval_settrace_311.hpp
+        .venv/Lib/site-packages/debugpy/_vendored/pydevd/pydevd_attach_to_process/common/py_custom_pyeval_settrace_common.hpp
+        .venv/Lib/site-packages/debugpy/_vendored/pydevd/pydevd_attach_to_process/common/py_settrace.hpp
+        .venv/Lib/site-packages/debugpy/_vendored/pydevd/pydevd_attach_to_process/common/py_utils.hpp
+        .venv/Lib/site-packages/debugpy/_vendored/pydevd/pydevd_attach_to_process/common/py_version.hpp
+        .venv/Lib/site-packages/debugpy/_vendored/pydevd/pydevd_attach_to_process/common/python.h
+        .venv/Lib/site-packages/debugpy/_vendored/pydevd/pydevd_attach_to_process/common/ref_utils.hpp
+        .venv/Lib/site-packages/debugpy/_vendored/pydevd/pydevd_attach_to_process/linux_and_mac/attach.cpp
+        .venv/Lib/site-packages/debugpy/_vendored/pydevd/pydevd_attach_to_process/windows/attach.cpp
+        .venv/Lib/site-packages/debugpy/_vendored/pydevd/pydevd_attach_to_process/windows/attach.h
+        .venv/Lib/site-packages/debugpy/_vendored/pydevd/pydevd_attach_to_process/windows/inject_dll.cpp
+        .venv/Lib/site-packages/debugpy/_vendored/pydevd/pydevd_attach_to_process/windows/py_win_helpers.hpp
+        .venv/Lib/site-packages/debugpy/_vendored/pydevd/pydevd_attach_to_process/windows/run_code_in_memory.hpp
+        .venv/Lib/site-packages/debugpy/_vendored/pydevd/pydevd_attach_to_process/windows/run_code_on_dllmain.cpp
+        .venv/Lib/site-packages/debugpy/_vendored/pydevd/pydevd_attach_to_process/windows/stdafx.cpp
+        .venv/Lib/site-packages/debugpy/_vendored/pydevd/pydevd_attach_to_process/windows/stdafx.h
+        .venv/Lib/site-packages/debugpy/_vendored/pydevd/pydevd_attach_to_process/windows/targetver.h
+        .venv/Lib/site-packages/fontTools/cu2qu/cu2qu.c
+        .venv/Lib/site-packages/fontTools/feaLib/lexer.c
+        .venv/Lib/site-packages/fontTools/misc/bezierTools.c
+        .venv/Lib/site-packages/fontTools/pens/momentsPen.c
+        .venv/Lib/site-packages/fontTools/qu2cu/qu2cu.c
+        .venv/Lib/site-packages/fontTools/varLib/iup.c
+        .venv/Lib/site-packages/markupsafe/_speedups.c
+        .venv/Lib/site-packages/numpy/_core/include/numpy/random/bitgen.h
+        .venv/Lib/site-packages/numpy/_core/include/numpy/random/distributions.h
+        .venv/Lib/site-packages/numpy/_core/include/numpy/random/libdivide.h
+        .venv/Lib/site-packages/numpy/_core/include/numpy/__multiarray_api.c
+        .venv/Lib/site-packages/numpy/_core/include/numpy/__multiarray_api.h
+        .venv/Lib/site-packages/numpy/_core/include/numpy/__ufunc_api.c
+        .venv/Lib/site-packages/numpy/_core/include/numpy/__ufunc_api.h
+        .venv/Lib/site-packages/numpy/_core/include/numpy/_neighborhood_iterator_imp.h
+        .venv/Lib/site-packages/numpy/_core/include/numpy/_numpyconfig.h
+        .venv/Lib/site-packages/numpy/_core/include/numpy/_public_dtype_api_table.h
+        .venv/Lib/site-packages/numpy/_core/include/numpy/arrayobject.h
+        .venv/Lib/site-packages/numpy/_core/include/numpy/arrayscalars.h
+        .venv/Lib/site-packages/numpy/_core/include/numpy/dtype_api.h
+        .venv/Lib/site-packages/numpy/_core/include/numpy/halffloat.h
+        .venv/Lib/site-packages/numpy/_core/include/numpy/ndarrayobject.h
+        .venv/Lib/site-packages/numpy/_core/include/numpy/ndarraytypes.h
+        .venv/Lib/site-packages/numpy/_core/include/numpy/npy_2_compat.h
+        .venv/Lib/site-packages/numpy/_core/include/numpy/npy_2_complexcompat.h
+        .venv/Lib/site-packages/numpy/_core/include/numpy/npy_3kcompat.h
+        .venv/Lib/site-packages/numpy/_core/include/numpy/npy_common.h
+        .venv/Lib/site-packages/numpy/_core/include/numpy/npy_cpu.h
+        .venv/Lib/site-packages/numpy/_core/include/numpy/npy_endian.h
+        .venv/Lib/site-packages/numpy/_core/include/numpy/npy_math.h
+        .venv/Lib/site-packages/numpy/_core/include/numpy/npy_no_deprecated_api.h
+        .venv/Lib/site-packages/numpy/_core/include/numpy/npy_os.h
+        .venv/Lib/site-packages/numpy/_core/include/numpy/numpyconfig.h
+        .venv/Lib/site-packages/numpy/_core/include/numpy/ufuncobject.h
+        .venv/Lib/site-packages/numpy/_core/include/numpy/utils.h
+        .venv/Lib/site-packages/numpy/_core/tests/data/generate_umath_validation_data.cpp
+        .venv/Lib/site-packages/numpy/_core/tests/examples/limited_api/limited_api1.c
+        .venv/Lib/site-packages/numpy/_core/tests/examples/limited_api/limited_api_latest.c
+        .venv/Lib/site-packages/numpy/f2py/src/fortranobject.c
+        .venv/Lib/site-packages/numpy/f2py/src/fortranobject.h
+        .venv/Lib/site-packages/numpy/f2py/tests/src/array_from_pyobj/wrapmodule.c
+        .venv/Lib/site-packages/scipy/linalg/_blas_subroutines.h
+        .venv/Lib/site-packages/scipy/linalg/_lapack_subroutines.h
+        .venv/Lib/site-packages/scipy/special/_ufuncs_cxx_defs.h
+        .venv/Lib/site-packages/scipy/special/_ufuncs_defs.h
+        .venv/Lib/site-packages/sklearn/svm/src/liblinear/_cython_blas_helpers.h
+        .venv/Lib/site-packages/sklearn/svm/src/liblinear/liblinear_helper.c
+        .venv/Lib/site-packages/sklearn/svm/src/liblinear/linear.cpp
+        .venv/Lib/site-packages/sklearn/svm/src/liblinear/linear.h
+        .venv/Lib/site-packages/sklearn/svm/src/liblinear/tron.cpp
+        .venv/Lib/site-packages/sklearn/svm/src/liblinear/tron.h
+        .venv/Lib/site-packages/sklearn/svm/src/libsvm/_svm_cython_blas_helpers.h
+        .venv/Lib/site-packages/sklearn/svm/src/libsvm/libsvm_helper.c
+        .venv/Lib/site-packages/sklearn/svm/src/libsvm/libsvm_sparse_helper.c
+        .venv/Lib/site-packages/sklearn/svm/src/libsvm/libsvm_template.cpp
+        .venv/Lib/site-packages/sklearn/svm/src/libsvm/svm.cpp
+        .venv/Lib/site-packages/sklearn/svm/src/libsvm/svm.h
+        .venv/Lib/site-packages/sklearn/svm/src/newrand/newrand.h
+        .venv/Lib/site-packages/sklearn/utils/src/MurmurHash3.cpp
+        .venv/Lib/site-packages/sklearn/utils/src/MurmurHash3.h
+        .venv/Lib/site-packages/win32/include/PyWinTypes.h
+        .venv/Lib/site-packages/win32/test/win32rcparser/test.h
+        .venv/Lib/site-packages/win32com/include/PythonCOM.h
+        .venv/Lib/site-packages/win32com/include/PythonCOMRegister.h
+        .venv/Lib/site-packages/win32com/include/PythonCOMServer.h
+        .venv/Lib/site-packages/wrapt/_wrappers.c
+        .venv/Lib/site-packages/zmq/backend/cffi/_cdefs.h
+        .venv/Lib/site-packages/zmq/backend/cffi/_cffi_src.c
+        .venv/Lib/site-packages/zmq/utils/getpid_compat.h
+        .venv/Lib/site-packages/zmq/utils/ipcmaxlen.h
+        .venv/Lib/site-packages/zmq/utils/mutex.h
+        .venv/Lib/site-packages/zmq/utils/pyversion_compat.h
+        .venv/Lib/site-packages/zmq/utils/zmq_compat.h
+        CPlusPlusTime/JHG/GeneSimulation_cpp/ScenarioIndicator/assassins1Config.txt
+        CPlusPlusTime/JHG/GeneSimulation_cpp/ScenarioIndicator/assassins2Config.txt
+        CPlusPlusTime/JHG/GeneSimulation_cpp/ScenarioIndicator/assassins3Config.txt
+        CPlusPlusTime/JHG/GeneSimulation_cpp/ScenarioIndicator/basicConfig.txt
+        CPlusPlusTime/JHG/GeneSimulation_cpp/ScenarioIndicator/coOpConfig.txt
+        CPlusPlusTime/JHG/GeneSimulation_cpp/ScenarioIndicator/coOpHumanConfig.txt
+        CPlusPlusTime/JHG/GeneSimulation_cpp/ScenarioIndicator/human1Assassins1Config.txt
+        CPlusPlusTime/JHG/GeneSimulation_cpp/ScenarioIndicator/human1Assassins2Config.txt
+        CPlusPlusTime/JHG/GeneSimulation_cpp/ScenarioIndicator/humanConfig.txt
+        CPlusPlusTime/JHG/GeneSimulation_cpp/ScenarioIndicator/theTracked.txt
+        CPlusPlusTime/JHG/GeneSimulation_cpp/AbstractAgent.h
+        CPlusPlusTime/JHG/GeneSimulation_cpp/assassinAgent.h
+        CPlusPlusTime/JHG/GeneSimulation_cpp/CommunityEvaluation.h
+        CPlusPlusTime/JHG/GeneSimulation_cpp/CoOpAgent.h
+        CPlusPlusTime/JHG/GeneSimulation_cpp/createRandomNums.cpp
+        CPlusPlusTime/JHG/GeneSimulation_cpp/defs.h
+        CPlusPlusTime/JHG/GeneSimulation_cpp/GeneAgent.h
+        CPlusPlusTime/JHG/GeneSimulation_cpp/HumanAgent.h
+        CPlusPlusTime/JHG/GeneSimulation_cpp/JHGEngine.h
+        CPlusPlusTime/JHG/GeneSimulation_cpp/jhgsim.exe
+        CPlusPlusTime/JHG/GeneSimulation_cpp/main.cpp
+        CPlusPlusTime/JHG/GeneSimulation_cpp/README
+        CPlusPlusTime/StagHare/State.cpp
+        CPlusPlusTime/StagHare/State.h
+        CPlusPlusTime/StagHare/types.h
+        CPlusPlusTime/StagHare/utils.h)

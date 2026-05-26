@@ -50,17 +50,17 @@ height = 16
 width = 16
 RandomAgents = True
 forced_random = False
-num_attempts = 20
+num_attempts = 1000
 
 # base_agents = ["SCab", "HCab", "ECab99", "ECab199", "Allegatr"]
 # base_agents = ["HCab", "ECab99", "ECab199"]
 # base_agents = ["HCab", "ECab199", "Allegatr"]
-base_agents = ["HardHomo", "HardHomo2", "Allegatr", "HCab", "ECab199"]
+# base_agents = ["HardHomo", "HardHomo2", "Allegatr", "HCab", "ECab199"]
+base_agents = ["HardHomo", "HardHomo10", "HCab", "ECab199", "Allegatr", "CCab", "NCab"]
 
 game_types = ["Round", "Step"]
 
 scenarios = ["SelfPlay", "VGHare1", "VGHare2", "VGStag1", "VGStag2", "Allegatr1", "Allegatr2"]
-# scenarios = ["SelfPlay"]
 
 def get_agents(agent, scenario):
     if scenario == "SelfPlay":

@@ -63,7 +63,7 @@ def write_generational_results(theGenePools, popSize, gen, folder):
     script_dir = os.path.dirname(os.path.abspath(__file__))
     # Construct the full output directory path
     if folder == "":
-        output_dir = os.path.join(script_dir, "HHCABNB", "theGenerations") # just to give it somewhere to go
+        output_dir = os.path.join(script_dir, "HardHomo10games", "theGenerations") # just to give it somewhere to go
     else:
         output_dir = os.path.join(script_dir, folder) # just to give it somewhere to go
     # Ensure output directory exists
@@ -192,7 +192,7 @@ def runGame(agent_genes, numGeneCopies, agentsPerGame, roundsPerGame, gen, game_
     # should save us a lot of copying and passing aroudn overhead.
 
 
-    pmetrics = playGame(agent_genes, game_idx, random_agents, forced_random, height, width) # this should be all we need
+    pmetrics = playGame(agent_genes, game_idx, random_agents, forced_random, height, width, roundsPerGame) # this should be all we need
 
 
     metrics = []
@@ -239,9 +239,9 @@ def set_game_params(agents):
 
 
 # this is exactly the same actually. nice.
-def playGame(theGenes, game, random_agents, forced_random, height, width):
+def playGame(theGenes, game, random_agents, forced_random, height, width, rounds_per_game):
     # run a trial, get the scores. The genetic is just a better wrapper for the simulator.
-    new_scores = run_trial_genetic(theGenes, random_agents, forced_random, height, width)
+    new_scores = run_trial_genetic(theGenes, random_agents, forced_random, height, width, rounds_per_game)
 
     pmetrics = getPmetrics(game, new_scores, 3)
     return pmetrics  # this is the only thing we actually care about from this game.
@@ -369,7 +369,7 @@ if __name__ == "__main__":
     numGens = 200
     gamesPerGen = 20
     agentsPerGame = 3 # we can only fit 3 hunters in there at at time...
-    roundsPerGame = 30
+    rounds_per_game = 10
     numCats = 0
     povertyLine = 0
     folder = ""
@@ -378,6 +378,6 @@ if __name__ == "__main__":
     forced_random = False
     height = 16
     width = 16
-    homo_based_SH(popSize, numGeneCopies, startIndex, numGens, gamesPerGen, agentsPerGame, roundsPerGame, povertyLine, folder,
+    homo_based_SH(popSize, numGeneCopies, startIndex, numGens, gamesPerGen, agentsPerGame, rounds_per_game, povertyLine, folder,
                     max_workers, enforce_majority, random_agents, forced_random, height, width)
     # we are running no fear, no chat

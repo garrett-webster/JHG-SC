@@ -339,32 +339,3 @@ class State:
 
         return image
 
-
-    # def collective_distance(self) -> float:
-    #     collective_distance, (prey_row, prey_col) = 0, self.agent_positions[Utils.PREY_NAME]
-    #
-    #     for agent_name, (row, col) in self.agent_positions.items():
-    #         if agent_name == Utils.PREY_NAME:
-    #             continue
-    #
-    #         dist_from_prey = self.n_movements(row, col, prey_row, prey_col)
-    #         collective_distance += dist_from_prey
-    #
-    #     return collective_distance
-    #
-    # def agent_distance(self, name: str) -> float:
-    #     prey_row, prey_col = self.agent_positions[Utils.PREY_NAME]
-    #     row, col = self.agent_positions[name]
-    #
-    #     return self.n_movements(row, col, prey_row, prey_col)
-
-# def fastchoices(options, weights=None, size=1):
-#     if weights is None:
-#         weights = np.ones(len(options))
-#     cumulative_weights = np.cumsum(weights)
-#     count = np.prod(size)
-#     vals = np.random.uniform(0.0, np.sum(weights), size=count)
-#     result = np.asarray(options)[
-#         np.argmax((vals < cumulative_weights[:, np.newaxis]).T, axis=1)
-#     ]
-#     return result.reshape(size)

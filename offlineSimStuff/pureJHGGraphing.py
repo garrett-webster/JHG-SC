@@ -266,7 +266,6 @@ if __name__ == "__main__":
     random_agents = True # HAVE THIS SET TO TRUE UNLESS YOU HAVE A REALLY GOOD REASON NOT TOO
 
     round_list = determine_rounds(jhg_games_per_sc_round)
-    num_players = 3
 
 
     num_humans = 0
@@ -279,8 +278,8 @@ if __name__ == "__main__":
     jhg_bot_type = 0 # 0 is gene bots, 2 is social welfare and 3 is random. 4 is the new social welfare that I am developing that is just a hair smarter.
 
     num_attempts = 1 # number of batches to do.
-    num_vanilla_bots = num_players - num_humans
-    bot_types = [jhg_bot_type for _ in range(num_vanilla_bots)]
+    # num_vanilla_bots = num_players - num_humans
+    # bot_types = [jhg_bot_type for _ in range(num_vanilla_bots)]
 
     # for individual testing
     graphing = True
@@ -291,8 +290,13 @@ if __name__ == "__main__":
     # agent_name_list = ["ECab199","ECab199","ECab199", "ECab199","ECab199","ECab199","ECab199","ECab199","ECab199","ECab199"]
     # agent_name_list = ["HCab", "HCab", "HCab", "HCab", "HCab", "HCab", "HCab", "HCab", "HCab", "HCab"]
     # agent_name_list = ["HCab","HCab","HCab","HCab","HCab","HCab","HCab","HCab","HCab","HCab",]
-    agent_name_list = ["ECab3","ECab3","ECab3"]
-
+    # agent_name_list = ["ECab3","ECab3","ECab3"]
+    # agent_name_list = ["ECab3","ECab3","ECab3","ECab3","ECab3","ECab3","ECab3","ECab3","ECab3","ECab3"]
+    # agent_name_list = ["CCab","CCab","CCab","CCab","CCab","CCab","CCab","CCab","CCab","CCab"]
+    agent_name_list = ["HardHomo", "HardHomo", "HardHomo", "HardHomo", "HardHomo", "HardHomo", "HardHomo", "HardHomo", "HardHomo", "HardHomo"]
+    # agent_name_list = ["CCab","CCab","CCab"]
+    # agent_name_list = ["NCab", "NCab", "NCab", "NCab", "NCab", "NCab", "NCab", "NCab", "NCab", "NCab"]
+    # agent_name_list = ["NCab", "NCab", "NCab"]
 
     agents = create_agents_with_list(agent_name_list, forcedRandom, random_agents)
 

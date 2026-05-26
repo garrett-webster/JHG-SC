@@ -86,20 +86,34 @@ scenarios = ["SelfPlay", "VGHare1", "VGHare2", "VGStag1", "VGStag2", "Allegatr1"
 # some global variables
 height = 16 # should be 16 but I want to speed it up sire.
 width = 16
-RandomAgents = True
-forced_random = False
+
 num_attempts = 100
 
+def set_seed(freeze_seed, seed=0):
+    if freeze_seed:
+        np.random.seed(0)
+        random_agents = False
+        forced_random = True
+    else:
+        random_agents = True
+        forced_random = False
+
+    return random_agents, forced_random
 
 # removing Json implementatino because that was dumb and bad. back to pure script based.
 if __name__ == "__main__":
-    height, width, RandomAgents, forced_random, num_attempts = height, width, RandomAgents, forced_random, num_attempts
+    height, width, num_attempts = height, width, num_attempts
     # agents = ["HCab"]
     # agents = ["ECab199"]
-    agents = ["HardHomo", "ECab3"]
+    # agents = ["HardHomo", "ECab3"]
     # agents = ["ECab3"]
     # agents = ["ECab3"]
     # agents = ["GStag"]
+
+    freeze_seed = False
+    random_agents, forced_random = set_seed(freeze_seed)
+
+    agents = ["HardHomo"]
     scenario = "SelfPlay"
     game_type = "Round"
     graphing = False
@@ -113,7 +127,7 @@ if __name__ == "__main__":
         scenario_type = str(curr_agents) + str(scenario) + str(game_type)
 
         curr_agent_name = get_agents(curr_agents, scenario)
-        new_batch_logger = run_test(curr_agent_name, scenario_type, height, width, RandomAgents, forced_random, num_games_per_round, graphing, num_attempts, noisy)
+        new_batch_logger = run_test(curr_agent_name, scenario_type, height, width, random_agents, forced_random, num_games_per_round, graphing, num_attempts, noisy)
         new_batch_logger.get_batch_results(print_results_to_console)
         # write_batch_results_to_file(new_batch_logger, scenario_type)
 
