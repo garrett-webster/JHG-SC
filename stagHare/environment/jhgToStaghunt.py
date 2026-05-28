@@ -135,7 +135,7 @@ def get_hunting_hare_map_from_agents(agents, allocation_dict, agent_indicies):
     for index in agent_indicies:
         agent = agents[index]
         # TODO: please make this a list.
-        if agent.name == "stag" or agent.name == "hare" or isinstance(agent, AlegAATr): #  or isinstance(agent, HareAgent) or isinstance(agent, StagAgent):
+        if agent.name == "stag" or agent.name == "hare" or isinstance(agent, AlegAATr) or isinstance(agent, humanAgent): #  or isinstance(agent, HareAgent) or isinstance(agent, StagAgent):
             hunting_hare_map[agent.name] = agent.is_hunting_hare()
 
         else:
@@ -151,7 +151,7 @@ def get_action_map_from_agents(agents, state, rewards, round_num, allocations_di
     for index in agent_indicies:
         agent = agents[index]
         # TODO: create a list that maps types to function types for this.
-        if agent.name == "stag" or agent.name == "hare" or isinstance(agent, AlegAATr):
+        if agent.name == "stag" or agent.name == "hare" or isinstance(agent, AlegAATr) or isinstance(agent, humanAgent): # humans don't create allocations either!
             new_moves_dict[agent.name] = agent.act(state, rewards[index], round_num)
         else:
             id = int(agent.name[-1])

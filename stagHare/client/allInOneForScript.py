@@ -91,7 +91,8 @@ def start_client():
     global client_ID
     #host = '192.168.30.17'  # The server's IP address
     # host = '10.55.10.103'  # your local host address cause you're working from home.
-    host = "127.0.0.1"
+    host = '192.168.0.100'
+    # host = "127.0.0.1"
     port = 12345         # The port number to connect to
 
     # Create a TCP socket
@@ -231,7 +232,7 @@ def initalize(server_response):
 
     # add the human agnets and instantiate them correctly.
     for i in range(HUMAN_AGENTS):
-        new_name = "H" + str(i+1)  # have h start at one
+        new_name = "H" + str(i)  # have h start at one
         my_player = False
         if client_ID_list[i] == client_ID: # pretty sure there is an off by one error there.
             my_player = True
@@ -240,7 +241,7 @@ def initalize(server_response):
 
     # make the AI agents specifically.
     for i in range(AI_AGENTS):
-        new_name = "R" + str(i) # DON"T HAVE AQ PLUS ONE HERE PLEASE
+        new_name = "R" + str(i + HUMAN_AGENTS) # DON"T HAVE AQ PLUS ONE HERE PLEASE
         new_agent = Enemy(new_name, HEIGHT, WIDTH)
         agents.append(new_agent)
 
@@ -466,6 +467,8 @@ class Enemy(pygame.sprite.Sprite):
         elif name == "R0":
             self.original_surf = other_hunter
         elif name == "R1":
+            self.original_surf = other_hunter
+        elif name == "R2":
             self.original_surf = other_hunter
 
         if name[0] == "H":

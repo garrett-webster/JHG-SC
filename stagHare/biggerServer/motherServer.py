@@ -28,7 +28,7 @@ def maybe_start_game():
         client_id_dict.clear()
         client_usernames.clear()
 
-def start_server(host='127.0.0.1', port=12345):
+def start_server(host='192.168.0.100', port=12345):
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server_socket.bind((host, port))
     server_socket.listen(1)
@@ -39,12 +39,12 @@ def start_server(host='127.0.0.1', port=12345):
 
         client_socket, client_address = server_socket.accept()
         connected_clients[len(connected_clients)] = client_socket
-        client_id_dict[client_socket] = len(connected_clients)
+        client_id_dict[client_socket] = len(connected_clients) - 1 # we need this to start from 0
 
         data = client_socket.recv(1024)
         try:
             received_json = json.loads(data.decode())
-            client_usernames[len(connected_clients)] = received_json["USERNAME"]
+            client_usernames[len(connected_clients)-1] = received_json["USERNAME"]
 
             response = {
                 "message": "Hello from the server!",

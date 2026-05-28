@@ -144,6 +144,8 @@ class StagHare:
         return self.rewards, allocation_list, old_agent_positions
 
 
+
+
     def update_engine(self, allocations, round_num):
         self.iterate_engine(allocations, round_num, self.hunters, 3)
 

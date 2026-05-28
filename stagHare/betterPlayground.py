@@ -87,7 +87,7 @@ scenarios = ["SelfPlay", "VGHare1", "VGHare2", "VGStag1", "VGStag2", "Allegatr1"
 height = 16 # should be 16 but I want to speed it up sire.
 width = 16
 
-num_attempts = 100
+num_attempts = 1
 
 def set_seed(freeze_seed, seed=0):
     if freeze_seed:
@@ -114,7 +114,7 @@ if __name__ == "__main__":
     random_agents, forced_random = set_seed(freeze_seed)
 
     agents = ["HardHomo"]
-    scenario = "SelfPlay"
+    scenario = "VGhare1"
     game_type = "Round"
     graphing = False
     num_games_per_round = 1 # no reason to super scale it rn.

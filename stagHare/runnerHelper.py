@@ -115,10 +115,10 @@ def run_trials_given_simulator(stag_hare, graphing, current_round_grapher, curre
 
         allocations_list = allocations_dict_to_list(allocations_dict)
 
-        # printing stuff. don't worry about it.
-        allocations_to_print = allocations_list.copy()
-        if isinstance(allocations_list[0][0], np.float64):
-            allocations_to_print = [[float(x * 6) for x in row] for row in allocations_list]
+        # # printing stuff. don't worry about it.
+        # allocations_to_print = allocations_list.copy()
+        # if isinstance(allocations_list[0][0], np.float64):
+        #     allocations_to_print = [[float(x * 6) for x in row] for row in allocations_list]
         # print("here is the allocations list ", allocations_to_print)
 
         if track_allocations:
@@ -145,6 +145,48 @@ def run_trials_given_simulator(stag_hare, graphing, current_round_grapher, curre
             # passes by value. thanks python.
             return stag_hare
 
+
+def run_single_round_given_simulator(stag_hare, noisy=True):
+
+
+        rewards = [0] * 5 # 3 hunters, 2 other peepsdd
+
+
+        old_agent_positions = stag_hare.state.agent_positions.copy() # make a copy of this otherwise it updates.
+        old_state = deepcopy(stag_hare.state) # ditto.
+        # JHG TO STAGHARE SECTION
+        set_jhg_agents_params(stag_hare.agents, stag_hare.engine)
+        agent_order_indicies = create_agent_indicies(stag_hare.agents)
+        # agent_indicies = [0, 1, 2, 3, 4] # hard coded for non scramble for tests.
+
+        allocations_dict = get_allocations_from_agents(stag_hare.agents, stag_hare.state, stag_hare.state.round_num, agent_order_indicies)
+        action_map = get_action_map_from_agents(stag_hare.agents, stag_hare.state, rewards, stag_hare.state.round_num, allocations_dict, agent_order_indicies)
+        stag_hare.action_map = action_map # update the action map, trust.
+        hunting_hare_map = get_hunting_hare_map_from_agents(stag_hare.agents, allocations_dict, agent_order_indicies)
+        # print("this here be the hunting hare map ", hunting_hare_map)
+
+        stag_hare.state.hunting_hare_map = hunting_hare_map
+        round_rewards = stag_hare.update_intents_and_get_rewards(action_map, hunting_hare_map)
+
+        # STAGHARE to JHG SECTION
+        if noisy: # means that we need to translate the allocations from movements, as opposed to passing them straight through.
+
+            allocations_dict = get_allocations_from_movements(stag_hare.state, action_map, old_agent_positions, old_state)
+
+        allocations_list = allocations_dict_to_list(allocations_dict)
+
+
+        if allocations_list != []: # can't update the engine w/ pure allegatrs.
+            stag_hare.update_engine(allocations_list, stag_hare.state.round_num)
+        else:
+            allocations_list = [None, None, None] # defualt for test purposes.
+
+        for i, reward in enumerate(round_rewards):
+            rewards[i] += reward
+
+        print("This is the allocations list ", allocations_dict)
+
+        return rewards
 
 def get_graphing_stuff(graphing, height, width, agent_names, scenario_type="SelfPlay"):
     if graphing == True:
@@ -175,7 +217,7 @@ def run_trial_all(agent_names, height, width, random_agents, forced_random, scen
     current_game_logger, current_round_grapher = get_graphing_stuff(graphing, height, width, agent_names, scenario_type)
     run_amount = num_rounds_per_game if num_rounds_per_game is not None else 1
     hunters = create_hunters_with_list(random_agents, forced_random, agent_names)
-    np.random.seed(42)
+    # np.random.seed(42)
     stag_hare = get_stag_hare(height, width, hunters)
 
     for i in range(run_amount): # if we only do 1 game, we only do this once.

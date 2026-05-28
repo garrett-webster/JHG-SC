@@ -50,17 +50,18 @@ height = 16
 width = 16
 RandomAgents = True
 forced_random = False
-num_attempts = 1000
+num_attempts = 200
 
 # base_agents = ["SCab", "HCab", "ECab99", "ECab199", "Allegatr"]
 # base_agents = ["HCab", "ECab99", "ECab199"]
 # base_agents = ["HCab", "ECab199", "Allegatr"]
-# base_agents = ["HardHomo", "HardHomo2", "Allegatr", "HCab", "ECab199"]
-base_agents = ["HardHomo", "HardHomo10", "HCab", "ECab199", "Allegatr", "CCab", "NCab"]
+base_agents = ["HardHomo"]
+# base_agents = ["HardHomo", "HardHomo10", "HCab", "ECab199", "Allegatr", "CCab", "NCab"]
 
 game_types = ["Round", "Step"]
 
-scenarios = ["SelfPlay", "VGHare1", "VGHare2", "VGStag1", "VGStag2", "Allegatr1", "Allegatr2"]
+# scenarios = ["SelfPlay", "VGHare1", "VGHare2", "VGStag1", "VGStag2", "Allegatr1", "Allegatr2"]
+scenarios = ["SelfPlay", "VGHare1", "VGHare2"]
 
 def get_agents(agent, scenario):
     if scenario == "SelfPlay":
@@ -93,7 +94,7 @@ if __name__ == "__main__":
                 scenario_type = str(agent) + str(scenario) + str(game_type)
 
                 # HOLY FETCH HOW DID I FORGET THIS!!!
-                # uh we need to redo like a lot of stuff.
+                # uh we need to redo like a lot of stuff.w
                 if game_type == "Round":
                     games_per_round = 10
                 else:

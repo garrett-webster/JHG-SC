@@ -41,12 +41,12 @@ class GameServer():
         #     self.run_games(games_list, q, current_round)
         #     self.append_average_points(current_round)
 
-        for i in range(1, 11):
+        for i in range(1, 2): # run just a single round so I can check that its running 3 times.
             current_round = i
             # there's DEFINITELY a better way to do this. Like frfr.
             # well we really only need GHare, GStag, ALlegatr as human information will be limited up higher by connected clients in the room settings.
             players_indicies_round_1 = [[0]] # player indicies in each room
-            situations = [["GHare1"]] # sitation of each room.
+            situations = [["CABAgent1"]] # sitation of each room.
             games_list = self.create_game_processes(players_indicies_round_1, current_round, new_clients, q, situations)
             self.run_games(games_list, q, current_round)
             self.append_average_points(current_round)
@@ -116,6 +116,8 @@ class GameServer():
         new_points_1 = gameInstance(new_clients, self.client_id_dict, situations, current_round, save)  # need to somehow include an agent type
         new_dict = {}
         new_dict[new_points_1.situation] = new_points_1.player_points
+        print("here is the new points 1 ", new_points_1.player_points)
+        print("Here is the siatuaation ", new_points_1.situation)
         q.put(new_dict)
 
     def player_points_initialization(self):
@@ -123,7 +125,7 @@ class GameServer():
         self.points = player_points  # just so its the right kind of object.
         hunters = []
         for i in range(len(self.connected_clients)):
-            new_name = "H" + str(i+1)
+            new_name = "H" + str(i)
             hunters.append(new_name)
 
         for hunter in hunters:
@@ -155,9 +157,12 @@ class GameServer():
 
 
     def calc_avg_points(self, target_round):
+        print("this is the target round ", target_round)
+        print("here is the self.points ", self.points)
         new_list_to_send = [] # list of tuples, holds the clientID and then the number of points that they have accrued
         new_list_to_save = [] # this holds the serverSide playerID and then the number of points they ahve accrued.
         for key in self.points:
+            print("This is the curr key ", key)
             curr_points = 0
             for curr_round in self.points[key]:
                 if curr_round <= target_round: # calculate only up and to the current round. IDK if it will fix our problem but we shall see.
@@ -181,10 +186,13 @@ class GameServer():
 
         sorted_points = sorted(new_list_to_send, key=lambda x: x[1], reverse=True)
         sorted_save_tuples = sorted(new_list_to_save, key=lambda x: x[1], reverse=True)
+        print("here are hte sorted poitns and sorted save tuples ", sorted_points, sorted_save_tuples)
         return sorted_points, sorted_save_tuples
 
     # fairly straightforward. Takes in hte new points and sends them out.
     def send_leaderboard(self, new_points_dict):
+        print("Aight do we get in here first off ")
+        print("And if we do, what is the new points dict \n", new_points_dict)
         time.sleep(2)  # lets everyone see the leaderboard
         message = {
             "LEADERBOARD": new_points_dict,
@@ -215,7 +223,7 @@ class GameServer():
         # tells us which hunter has which name for the high level dict.
         self.hunter_names = {}
         for index, name in enumerate(self.client_usernames):
-            new_name = "H" + str(index + 1)
+            new_name = "H" + str(index)
             self.hunter_names[new_name] = self.client_usernames[name]
 
         with open(unique_file_path_1, "w") as f:

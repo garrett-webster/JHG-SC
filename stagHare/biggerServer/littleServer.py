@@ -14,7 +14,7 @@ from stagHare.agents.cabAgentThing import CabAgent
 from stagHare.agents.hareAgent import HareAgent
 from stagHare.agents.stagAgent import StagAgent
 from stagHare.agents.alegaatr import AlegAATr # litmus test
-
+from stagHare.runnerHelper import run_trials_given_simulator, run_single_round_given_simulator, reset_stag_hare
 
 PAUSE_TIME = 5
 HEIGHT = 16
@@ -38,14 +38,14 @@ class gameInstance():
         self.HUMAN_PLAYERS = len(connected_clients)
         self.AI_AGENTS = 3 - self.HUMAN_PLAYERS
         self.round = round # start with round 1, but I should probably make it an actual thinger so I can keep track of it better.
-        self.max_rounds = round
+        self.max_rounds = 3 # uhh this might fix it???
         self.kills = None
         self.client_time = 1 # start it off at 1 second.
         self.big_dict = {} # responsible for the second file upstream. Yeah its a lot.  # just have indexes instead of rounds as K.
         self.save = save
         client_id_list = []
         for client in self.connected_clients:
-            client_id_list.append(client+1)
+            client_id_list.append(client) # GET RID OF THE +1
         self.client_id_list = client_id_list
         # set up the stagHare game.
         while True:  # set up stag hunt and avoid weird edgecase
@@ -66,11 +66,15 @@ class gameInstance():
             "GHare": 1,
             "GStag": 2,
             "Allegatr": 3,
+            "CABAgent": 4,
         }
 
-        self.situation = situation
+        print("this is the situation we are dealign with ", situation)
+
+
 
         situation = situation[0]
+        self.situation = situation
         agent_types = []
         num_agents = int(situation[-1])
         agent_type = situation[:-1]
@@ -132,7 +136,10 @@ class gameInstance():
     # where the magic happens.
     def main_game_loop(self):
         index = 0
-        while True:
+        num_rounds = 3
+        curr_round = 0
+        while curr_round < num_rounds: # run for 3 rounds.
+            print("this is the curr round ", curr_round)
             current_time = time.time()
             timer = Timer(self.client_time)
 
@@ -150,7 +157,9 @@ class gameInstance():
             running = self.stag_hunt_game_loop(self.player_points, client_input, client_intent, index)
             index += 1
             if running == False:
-                break
+                curr_round += 1
+                reset_stag_hare(self.stag_hare) # that should do the trick? restart all the positions but keep everything else.
+
 
         new_points = self.adjust_points()
         new_dict = {}
@@ -160,6 +169,7 @@ class gameInstance():
         self.big_dict = big_dict_finalized
         if self.save:
             self.save_stuff_big(big_dict_finalized, self.round)
+        print("this is the new dict ", new_dict)
         return new_dict
 
         
@@ -178,7 +188,7 @@ class gameInstance():
                 "HEIGHT": HEIGHT,
                 "WIDTH": WIDTH,
             }
-            if (client+1) in client_input: # off by one error don't worry about it.
+            if (client) in client_input: # off by one error don't worry about it.
                 response["INPUT"] = True
             new_message = json.dumps(response).encode()
             self.connected_clients[client].send(new_message)
@@ -281,9 +291,9 @@ class gameInstance():
         # set up the dict for players and bots, dynamically.
 
         for i in range(len(self.connected_clients)):
-            new_name = "H" + str(i+1) # let H start at 1 i guess.
+            new_name = "H" + str(i) # let H start at 1 i guess.
             new_dict[new_name] = {}
-        bot_number = 0 # START THIS AT 0
+        bot_number = len(self.connected_clients) # populate this after humans.
         if len(self.connected_clients.keys()) > 0:
             for i in range(3-len(self.connected_clients), 4):
                 new_name = "R" + str(bot_number)
@@ -302,7 +312,8 @@ class gameInstance():
 
         # grabs the after positions and sets up the next actions for the server.
         for client_id in new_positions:
-            client_agent = "H" + str((self.client_id_list.index(client_id))+1) # once again, off by one error
+            # this might need to keep the +1
+            client_agent = "H" + str((self.client_id_list.index(client_id))) # once again, off by one error
             current_position = self.stag_hare.state.agent_positions[client_agent]
             new_tuple_row = new_positions[client_id][0] + current_position[0]
             new_tuple_col = new_positions[client_id][1] + current_position[1]
@@ -310,7 +321,8 @@ class gameInstance():
             self.hunters[self.client_id_list.index(client_id)].set_next_action(new_tuple_row, new_tuple_col) # change that up
             self.hunters[self.client_id_list.index(client_id)].set_hare_hunting(client_intent[client_id])
 
-        round_rewards = self.stag_hare.transition() # this is where I no longer understand what's going on. Iterates the simulator.
+        # round_rewards = self.stag_hare.transition() # this is where I no longer understand what's going on. Iterates the simulator.
+        round_rewards = run_single_round_given_simulator(self.stag_hare)
         # actually thats not entirely true, I understand whats happening back here for agents and normal bots but not for generators.
 
         for i, reward in enumerate(round_rewards): # increase the rewards for generator bots.
@@ -347,12 +359,12 @@ class gameInstance():
     def create_hunters(self):
         new_hunters = []
         for i in range(len(self.connected_clients)): # connected clients is only the clients who are supposed to be in the game
-            new_name = "H" + str(i+1)
+            new_name = "H" + str(i)
             new_hunters.append(humanAgent(name=new_name))
 
         for i in range(3 - len(self.connected_clients)): # bc they always need to add up to 3
             index = 0
-            new_name = "R" + str(i)
+            new_name = "R" + str(len(new_hunters))
             agent_type = self.agentType[index]
             # different types of agents can go here, might be work making a different functioun
             if agent_type == 1:
@@ -361,6 +373,8 @@ class gameInstance():
                 new_hunters.append(StagAgent(i, name=new_name))
             if agent_type == 3:
                 new_hunters.append(AlegAATr(name=new_name, lmbda=0.0, ml_model_type='knn', enhanced=True))
+            if agent_type == 4: # start w/ hard homo
+                new_hunters.append(CabAgent(i, new_name, True, False, gene="", agent_name="HardHomo2.csv"))
 
             index += 1 # go through the list bc we are expecting it to be an array now.
 
@@ -497,6 +511,7 @@ class gameInstance():
                     if self.player_points[key][(currRound)]["hare"] == True: # only replace it if they ACTUALLY killed the hare.
                         self.player_points[key][(currRound)]["hare"] = hareKillers
         # erase agents from final dict entirely after we finish updating it.
+        # this works becuase we should never have more than 2 bots per game, and if we have 3 humans there is nothing to erase.
         if "R0" in self.player_points:
             del self.player_points["R0"]
         if "R1" in self.player_points:
@@ -504,16 +519,17 @@ class gameInstance():
 
         new_points = {}
 
-
-        if "H1" in self.player_points:
+        print("this is what player points looks like on 522 \n", self.player_points)
+        # here it was! Switch these to 0 - 2. thats dumb.
+        if "H0" in self.player_points:
             new_name = "H" + str(self.client_id_list[0])
+            new_points[new_name] = self.player_points.pop("H0")
+        if "H1" in self.player_points:
+            new_name = "H" + str(self.client_id_list[1])
             new_points[new_name] = self.player_points.pop("H1")
         if "H2" in self.player_points:
-            new_name = "H" + str(self.client_id_list[1])
-            new_points[new_name] = self.player_points.pop("H2")
-        if "H3" in self.player_points:
             new_name = "H" + str(self.client_id_list[2])
-            new_points[new_name] = self.player_points.pop("H3")
+            new_points[new_name] = self.player_points.pop("H2")
 
         self.player_points = new_points # don't worry about it.
         return self.player_points
