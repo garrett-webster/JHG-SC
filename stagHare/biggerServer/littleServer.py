@@ -17,8 +17,8 @@ from stagHare.agents.alegaatr import AlegAATr # litmus test
 from stagHare.runnerHelper import run_trials_given_simulator, run_single_round_given_simulator, reset_stag_hare
 
 PAUSE_TIME = 5
-HEIGHT = 16
-WIDTH = 16
+HEIGHT = 6
+WIDTH = 6
 
 from stagHare.agents.human import *
 from stagHare.environment.world import StagHare
@@ -38,7 +38,7 @@ class gameInstance():
         self.HUMAN_PLAYERS = len(connected_clients)
         self.AI_AGENTS = 3 - self.HUMAN_PLAYERS
         self.round = round # start with round 1, but I should probably make it an actual thinger so I can keep track of it better.
-        self.max_rounds = 3 # uhh this might fix it???
+        self.max_rounds = 2 # uhh this might fix it???
         self.kills = None
         self.client_time = 1 # start it off at 1 second.
         self.big_dict = {} # responsible for the second file upstream. Yeah its a lot.  # just have indexes instead of rounds as K.
@@ -138,7 +138,7 @@ class gameInstance():
         index = 0
         num_rounds = 3
         curr_round = 0
-        while curr_round < num_rounds: # run for 3 rounds.
+        while True:
             print("this is the curr round ", curr_round)
             current_time = time.time()
             timer = Timer(self.client_time)
@@ -157,8 +157,7 @@ class gameInstance():
             running = self.stag_hunt_game_loop(self.player_points, client_input, client_intent, index)
             index += 1
             if running == False:
-                curr_round += 1
-                reset_stag_hare(self.stag_hare) # that should do the trick? restart all the positions but keep everything else.
+                break
 
 
         new_points = self.adjust_points()

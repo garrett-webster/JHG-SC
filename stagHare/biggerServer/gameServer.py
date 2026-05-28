@@ -51,6 +51,8 @@ class GameServer():
             self.run_games(games_list, q, current_round)
             self.append_average_points(current_round)
 
+        self.save_stuff_small() # this is where this is supposed to get used... I think.
+
 
         print("all done!")
 
