@@ -184,8 +184,6 @@ def run_single_round_given_simulator(stag_hare, noisy=True):
         for i, reward in enumerate(round_rewards):
             rewards[i] += reward
 
-        print("This is the allocations list ", allocations_dict)
-
         return rewards
 
 def get_graphing_stuff(graphing, height, width, agent_names, scenario_type="SelfPlay"):

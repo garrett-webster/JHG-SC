@@ -12,18 +12,18 @@ PAUSE_TIME = 3
 connected_clients = {}
 client_input = {}
 client_usernames = {}
-HEIGHT = 6
-WIDTH = 6
+HEIGHT = 3
+WIDTH = 3
 client_id_dict = {}
 hunters = []
-MAX_ROUNDS = 2
+NUM_ITERATIONS = 2
 round = 1
 
 # start a game session if we have enough players.
 def maybe_start_game():
     if len(connected_clients) == HUMAN_PLAYERS:
         new_player_list = copy.copy(connected_clients)
-        GameServer(new_player_list, client_id_dict, client_usernames)
+        GameServer(new_player_list, client_id_dict, client_usernames, NUM_ITERATIONS, HEIGHT, WIDTH)
         connected_clients.clear()
         client_id_dict.clear()
         client_usernames.clear()

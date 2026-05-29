@@ -19,15 +19,21 @@ HARE_POINTS = 10
 connected_clients = {}
 
 class GameServer():
-    def __init__(self, new_clients, client_id_dict, client_usernames):
+    def __init__(self, new_clients, client_id_dict, client_usernames, num_iterations, HEIGHT, WIDTH):
         self.connected_clients = new_clients
         self.client_id_dict = client_id_dict
         self.client_usernames = client_usernames
+        self.user_name_to_client_id_dict = {v: k for k, v in client_usernames.items()}
         self.points = self.player_points_initialization()
         self.current_round = 0
+        self.max_iterations = 2
         # this takes the stuff at a high level.
         self.high_level_dict = {}  # this stores the round and then situation break down.
+        self.num_iterations = num_iterations
+        self.height = HEIGHT
+        self.width = WIDTH
         self.scheduler(new_clients)
+
 
     # this is where the meat of the function happens.
     def scheduler(self, new_clients):
@@ -43,13 +49,37 @@ class GameServer():
 
         for i in range(1, 2): # run just a single round so I can check that its running 3 times.
             current_round = i
+             # TODO: Turn this into an actual parameter somewhere.
             # there's DEFINITELY a better way to do this. Like frfr.
             # well we really only need GHare, GStag, ALlegatr as human information will be limited up higher by connected clients in the room settings.
             players_indicies_round_1 = [[0]] # player indicies in each room
-            situations = [["CABAgent1"]] # sitation of each room.
-            games_list = self.create_game_processes(players_indicies_round_1, current_round, new_clients, q, situations)
+            situations = [["CABAgent1"], ["CABAgent1"]] # sitation of each room.
+            games_list = self.create_game_processes(players_indicies_round_1, current_round, new_clients, q, situations, self.num_iterations, self.height, self.width)
             self.run_games(games_list, q, current_round)
             self.append_average_points(current_round)
+
+        for i in range(2, 3): # run just a single round so I can check that its running 3 times.
+            current_round = i
+             # TODO: Turn this into an actual parameter somewhere.
+            # there's DEFINITELY a better way to do this. Like frfr.
+            # well we really only need GHare, GStag, ALlegatr as human information will be limited up higher by connected clients in the room settings.
+            players_indicies_round_1 = [[0]] # player indicies in each room
+            situations = [["CABAgent1"], ["CABAgent1"]] # sitation of each room.
+            games_list = self.create_game_processes(players_indicies_round_1, current_round, new_clients, q, situations, self.num_iterations, self.height, self.width)
+            self.run_games(games_list, q, current_round)
+            self.append_average_points(current_round)
+
+        # for i in range(3, 4): # run just a single round so I can check that its running 3 times.
+        #     current_round = i
+        #     max_rounds = 2 # TODO: Turn this into an actual parameter somewhere.
+        #     # there's DEFINITELY a better way to do this. Like frfr.
+        #     # well we really only need GHare, GStag, ALlegatr as human information will be limited up higher by connected clients in the room settings.
+        #     players_indicies_round_2 = [[0]] # player indicies in each room
+        #     situations = [["CABAgent1"]] # sitation of each room.
+        #     print("this is what we think the current round is ", current_round, " iterating up to ", current_round + (max_rounds - 1))
+        #     games_list = self.create_game_processes(players_indicies_round_2, current_round, new_clients, q, situations)
+        #     self.run_games(games_list, q, current_round + (max_rounds - 1))
+        #     self.append_average_points(current_round)
 
         self.save_stuff_small() # this is where this is supposed to get used... I think.
 
@@ -61,7 +91,7 @@ class GameServer():
 
 
     # this thing is a DOOZY
-    def create_game_processes(self, player_indices, current_round, new_clients, q, situations, save=True):
+    def create_game_processes(self, player_indices, current_round, new_clients, q, situations, num_iterations, height, width, save=True):
         games_list = [] # a lit of all the games we want to run (as delta functions)
 
         for i, indices in enumerate(player_indices): # every list in the list of lists of players that we need to treat separate.
@@ -70,7 +100,7 @@ class GameServer():
             game_process = Process(target=self.game_thread,
                                    args=(
                                    self.create_player_dict_pairs(indices, new_clients), q, current_round,
-                                   situations[i], save))
+                                   situations[i], num_iterations, height, width, save))
             games_list.append(game_process)
 
         return games_list
@@ -80,8 +110,11 @@ class GameServer():
         # modifies self.points more than anything else after the games conclude.
         self.start_and_join_games(games_list, q)
         points_to_send, points_to_save = self.calc_avg_points(current_round)
+        print("These are the points to save ", points_to_save)
         self.points_to_save = points_to_save
+        self.points_to_send = points_to_send # I don't want to calculate that by hand, that's dumb.
         self.send_leaderboard(points_to_send)  # sends out the updated leaderboard.
+
 
 
     def start_and_join_games(self, games_list, q):
@@ -114,82 +147,75 @@ class GameServer():
         return return_players
 
 
-    def game_thread(self, new_clients, q, current_round, situations, save):
-        new_points_1 = gameInstance(new_clients, self.client_id_dict, situations, current_round, save)  # need to somehow include an agent type
-        new_dict = {}
-        new_dict[new_points_1.situation] = new_points_1.player_points
-        print("here is the new points 1 ", new_points_1.player_points)
-        print("Here is the siatuaation ", new_points_1.situation)
-        q.put(new_dict)
+    def game_thread(self, new_clients, q, current_round, situations, num_iterations, height, width, save):
+        new_points_1 = gameInstance(new_clients, self.client_id_dict, situations, num_iterations, height, width, current_round, save)  # need to somehow include an agent type
+        for game_points_list in new_points_1.return_list:
+            q.put(game_points_list) # just throw the points lists onto q and we will go through them later.
 
     def player_points_initialization(self):
-        player_points = {} # have it like this for now see if that changes anything.
-        self.points = player_points  # just so its the right kind of object.
-        hunters = []
+        player_points = {}
         for i in range(len(self.connected_clients)):
-            new_name = "H" + str(i)
-            hunters.append(new_name)
+            player_points[i] = {}
 
-        for hunter in hunters:
-            if hunter not in player_points:
-                player_points[hunter] = {}  # Initialize an empty dictionary for each hunter (not a list)
         return player_points
 
 
     def merge_dicts(self, dicts_to_merge):
-        for situation in dicts_to_merge:
-            # For each dictionary, loop through its keys (e.g., 'H1', 'H10')
-            for key, dict_entry in situation.items(): # should cycle through the situations.
-                for key, updates in dict_entry.items():
-                    # Check if the key exists in the main_dict
-                    if key in self.points:
-                        # Now apply the updates to the main_dict for the current key (e.g., 'H1', 'H10')
-                        for index, update in updates.items(): # we actually need to check if this isn't empty.
-                            self.points[key][index] = update
+        for dict in dicts_to_merge:
+            curr_client = dict["Player"]
+            curr_points = dict["Games"]
+            curr_round = dict["Round"]
 
-        # I guess I don't use this anymore?
-        situation_player_dict = {}
-        for situation in dicts_to_merge:
-            situation_list = []
-            for key, dict_entry in situation.items():
-                for player_name, values in dict_entry.items():
-                    situation_list.append(player_name)
-                situation_player_dict[key] = situation_list
-        return situation_player_dict
+            self.points[curr_client][curr_round] = curr_points
+            print("These are the curr points ", curr_points)
+
+        return self.points
+
 
 
     def calc_avg_points(self, target_round):
-        print("this is the target round ", target_round)
         print("here is the self.points ", self.points)
         new_list_to_send = [] # list of tuples, holds the clientID and then the number of points that they have accrued
         new_list_to_save = [] # this holds the serverSide playerID and then the number of points they ahve accrued.
-        for key in self.points:
-            print("This is the curr key ", key)
+        for player in self.points:
+            new_points = [0 for _ in range(self.max_iterations)]
             curr_points = 0
-            for curr_round in self.points[key]:
-                if curr_round <= target_round: # calculate only up and to the current round. IDK if it will fix our problem but we shall see.
-                    if self.points[key][curr_round]['stag'] == True:
-                        curr_points += STAG_POINTS
-                    if self.points[key][curr_round]['hare'] != False:
-                        curr_points += HARE_POINTS / self.points[key][curr_round]['hare']
+            for curr_round in self.points[player]:
+                if curr_round <= target_round: # catastrophically stupid idea
+                    print("These are what the curr games look like ", self.points[player][curr_round])
+                    for curr_game in self.points[player][curr_round]:
+                        print("these are the entries that are causing it to crash \n", player, " ", curr_round, " ", curr_game, " ")
+                        print("and here is the key thats causing the brick ", self.points[player][curr_round][curr_game])
+                        if curr_game == "new_points" or curr_game == "avg_points":
+                            continue
+                        if self.points[player][curr_round][curr_game]["stag"] == True:
+                            curr_points += STAG_POINTS
+                            new_points[curr_game-1] = STAG_POINTS
+                        if self.points[player][curr_round][curr_game]["hare"] != False:
+                            curr_points += HARE_POINTS / self.points[player][curr_round][curr_game]["hare"]
+                            new_points[curr_game-1] = HARE_POINTS / self.points[player][curr_round][curr_game]["hare"]
                 else:
                     break
 
+            avg_points = 0
             if curr_points > 0:
-                curr_points = curr_points / target_round # just to get the average
-                curr_points = round(curr_points, 2)
+                avg_points = ( curr_points / target_round ) / self.max_iterations # need some nesting there lol.
+                avg_points = round(avg_points, 2) # round that fetcher to 2 decimals.
 
-            # lets grab the username while we are here
-            if int(key[1:]) in self.client_usernames: # should always fire but just to prevent null access.
-                new_tuple = (self.client_usernames[int(key[1])], curr_points)
-                new_list_to_send.append(new_tuple)
-                save_tuple = (key, curr_points)
-                new_list_to_save.append(save_tuple)
+            send_tuple = (self.client_usernames[int(player)], avg_points)
+            new_list_to_send.append(send_tuple)
+            save_tuple = (player, new_points) # this saves the play by play. maybe.
+            new_list_to_save.append(save_tuple)
 
         sorted_points = sorted(new_list_to_send, key=lambda x: x[1], reverse=True)
-        sorted_save_tuples = sorted(new_list_to_save, key=lambda x: x[1], reverse=True)
-        print("here are hte sorted poitns and sorted save tuples ", sorted_points, sorted_save_tuples)
-        return sorted_points, sorted_save_tuples
+        # don't bother sorting the new_list_to_save, that doesn't even make sense
+        print("here is self points post update 208 ", self.points)
+        return sorted_points, new_list_to_save
+
+        # so now we have the number of current points that they have, but we want to add a new points thing in here somewhere, and apparently it needs to be here. thats dookie.
+
+
+
 
     # fairly straightforward. Takes in hte new points and sends them out.
     def send_leaderboard(self, new_points_dict):
@@ -205,14 +231,16 @@ class GameServer():
         time.sleep(2)  # lets everyone see the leaderboard
 
     def append_average_points(self, current_round):
+        print("here are the points to send ", self.points_to_send, " and here are the points to save ", self.points_to_save)
+        for tuple in self.points_to_send:
+            client_id = self.user_name_to_client_id_dict[tuple[0]]
+            self.points[client_id][current_round]["avg_points"] = tuple[1]
         for tuple in self.points_to_save:
-            self.points[tuple[0]][current_round]["avg_points"] = tuple[1]
-            new_points = 0
-            if self.points[tuple[0]][current_round]["stag"] == True:
-                new_points += STAG_POINTS
-            if self.points[tuple[0]][current_round]["hare"] != False:
-                new_points += HARE_POINTS / self.points[tuple[0]][current_round]["hare"]
-            self.points[tuple[0]][current_round]["new_points"] = new_points
+            client_id = tuple[0]
+            games_list = tuple[1]
+            for i, game in enumerate(games_list): # i starts at 0, games start at 1. yeah its dumb...
+                self.points[client_id][current_round][i+1]["new_points"] = game
+
 
     def save_stuff_small(self):
         desktop_path = os.path.expanduser("~/Desktop")
@@ -225,7 +253,7 @@ class GameServer():
         # tells us which hunter has which name for the high level dict.
         self.hunter_names = {}
         for index, name in enumerate(self.client_usernames):
-            new_name = "H" + str(index)
+            new_name = str(index)
             self.hunter_names[new_name] = self.client_usernames[name]
 
         with open(unique_file_path_1, "w") as f:
