@@ -49,7 +49,7 @@ class GameServer():
 
         # lets make sure this more or less matcehs up
         for i in range(1, 10): # run just a single round so I can check that its running 3 times.
-            print("This is the round ", i)
+            # print("This is the round ", i)
             current_round = i
              # TODO: Turn this into an actual parameter somewhere.
             # there's DEFINITELY a better way to do this. Like frfr.
@@ -101,10 +101,6 @@ class GameServer():
 
 
         print("all done!")
-
-
-
-
 
     # this thing is a DOOZY
     def create_game_processes(self, player_indices, current_round, new_clients, q, situations, num_iterations, height, width, save=True):
@@ -160,12 +156,10 @@ class GameServer():
             player_1 = list(new_clients.items())[player]
             player_1_key, player_1_socket = player_1
             return_players[player_1_key] = player_1_socket
-        print("this is the reutrn players ", return_players)
         return return_players
 
 
     def game_thread(self, new_clients, q, current_round, situations, num_iterations, height, width, save):
-        print("new clients ", new_clients)
         new_points_1 = gameInstance(new_clients, self.client_id_dict, situations, num_iterations, height, width, current_round, save)  # need to somehow include an agent type
         for game_points_list in new_points_1.return_list:
             q.put(game_points_list) # just throw the points lists onto q and we will go through them later.

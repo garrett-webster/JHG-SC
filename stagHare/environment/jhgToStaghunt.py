@@ -69,7 +69,10 @@ def allocation_to_movement(new_allocation, id, state):
     # make sure to use the ABS when you are summing! otherwise negative breaks everything!
     # new_allocation = [element / np.sum(np.abs(new_allocation)) for element in new_allocation]
     # new allocation is normalized within translateVecToIndexStagHare
+    print("This is the new allocation ", new_allocation)
+    print("this is the new id ", id)
     new_index = translateVecToIndexStagHare(new_allocation, id)
+    print("This is the index we are returning ", new_index)
     new_movement = generate_movement(state, id, new_index)
 
     return new_movement, new_index # pull out the raw index we will do stuff with him.
@@ -125,7 +128,7 @@ def get_allocations_from_agents(agents, state, round_num, agent_indicies):
     allocation_dict = {}
     for agent_index in agent_indicies:
         agent = agents[agent_index]
-        if not (agent.name == 'stag' or agent.name == 'hare' or isinstance(agent, AlegAATr)):
+        if not (agent.name == 'stag' or agent.name == 'hare' or isinstance(agent, AlegAATr) or isinstance(agent, humanAgent)): # the humans don't GET an allocation sire.
             allocation_dict[agent.name] = agent.act(state, None, round_num)
 
     return allocation_dict

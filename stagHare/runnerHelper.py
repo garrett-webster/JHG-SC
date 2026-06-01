@@ -193,7 +193,7 @@ def run_single_round_given_simulator(stag_hare, noisy=True):
             allocations_dict = get_allocations_from_movements(stag_hare.state, action_map, old_agent_positions, old_state)
 
         allocations_list = allocations_dict_to_list(allocations_dict)
-        print("here is the allocations dict ", allocations_list)
+        print("here is the allocations dict post processing \n", allocations_list)
 
 
         if allocations_list != []: # can't update the engine w/ pure allegatrs.

@@ -43,6 +43,8 @@ def translateVecToIndexStagHare(transVec, id):
 
     all_non_negative = np.all([x >= 0 for x in normalizedTransVec])
 
+    # order should be
+    # hare move, hare take, stag move, stag take
     if all_non_negative:
         if dist >= 0.55:
             index_to_return = 3

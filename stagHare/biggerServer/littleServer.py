@@ -388,25 +388,24 @@ class gameInstance():
 
         index = 0 # PUT THIS OUTSIDE LOOP GOOD HEAVENS
         # has literally anything been running correctly???
-        print("Fetcher is ", 3 - len(self.client_id_dict))
         for i in range(3 - len(self.client_id_dict)): # bc they always need to add up to 3
             new_name = "R" + str(len(new_hunters))
-            print("This is the index ", index)
-            print("This is the agent type ", self.agentType)
+            print("this is they i value ", i)
             agent_type = self.agentType[index]
+            index_to_feed = int(len(new_hunters))
             # different types of agents can go here, might be work making a different functioun
             if agent_type == 1:
-                new_hunters.append(HareAgent(i, name=new_name))
+                new_hunters.append(HareAgent(index_to_feed, name=new_name))
             if agent_type == 2:
-                new_hunters.append(StagAgent(i, name=new_name))
+                new_hunters.append(StagAgent(index_to_feed, name=new_name))
             if agent_type == 3:
                 new_hunters.append(AlegAATr(name=new_name, lmbda=0.0, ml_model_type='knn', enhanced=True))
             if agent_type == 4: # start w/ hard homo
-                new_hunters.append(CabAgent(i, new_name, True, False, gene="", agent_name="HardHomo2.csv"))
+                new_hunters.append(CabAgent(index_to_feed, new_name, True, False, gene="", agent_name="HardHomo2.csv"))
             if agent_type == 5:
-                new_hunters.append(CabAgent(i, new_name, True, False, gene="", agent_name="gen_Z.csv"))
+                new_hunters.append(CabAgent(index_to_feed, new_name, True, False, gene="", agent_name="gen_Z.csv"))
             if agent_type == 6:
-                new_hunters.append(CabAgent(i, new_name, True, False, gene="", agent_name="gen_199.csv"))
+                new_hunters.append(CabAgent(index_to_feed, new_name, True, False, gene="", agent_name="gen_199.csv"))
 
 
 
