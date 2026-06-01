@@ -306,7 +306,7 @@ def print_board(msg):
             else:
                 agent.update(SCREEN, new_tuple, highlight=highlight)
             #agent.update_points(SCREEN, new_tuple)
-        draw_round(msg["CURR_ROUND"])
+        draw_round(msg["CURR_ROUND"], msg["CURR_ITERATION"])
 
     # at the very very end, have a nice little game over screen.
     if "GAME_ENDED" in msg:
@@ -346,9 +346,11 @@ def draw_grid(height, width): # draws the grid on every frame just so we have it
             pygame.draw.rect(SCREEN, BLACKCOLOR, rect, 1)
 
 # put the round top left.
-def draw_round(current_points_dict):
-    txt_surf = font.render("Round : " + str(current_points_dict), True, font_color)
-    SCREEN.blit(txt_surf, [0,0])
+def draw_round(current_round, current_iteration):
+    txt_surf = font.render("Round : " + str(current_round), True, font_color)
+    txt_surf_2 = font.render("Iteration : " + str(current_iteration+1), True, font_color)
+    SCREEN.blit(txt_surf, [10,0])
+    SCREEN.blit(txt_surf_2, [10,25])
 
 # its just text but there it is.
 def draw_game_over():

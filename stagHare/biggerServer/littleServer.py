@@ -37,7 +37,7 @@ class gameInstance():
         self.HUMAN_PLAYERS = len(connected_clients)
         self.AI_AGENTS = 3 - self.HUMAN_PLAYERS
         self.round = round # start with round 1, but I should probably make it an actual thinger so I can keep track of it better.
-        print("this is the round we are dealing with ", round)
+        # print("this is the round we are dealing with ", round)
         self.max_rounds = round + 2 # make it 2 rounds MORE than what we are playing.
         self.num_iterations = num_iterations
         self.kills = None
@@ -65,11 +65,18 @@ class gameInstance():
 
     def set_situation(self, situation):
         # I hate that this is put here like this. we shall see.
+        if situation[0] == "GHareHCabTesting":
+            self.situation = situation[0]
+            agent_types = [5, 5, 1] # look man, happens.
+            return agent_types
+
         agent_name_dict = {
             "GHare": 1,
             "GStag": 2,
             "Allegatr": 3,
             "CABAgent": 4,
+            "HCab": 5,
+            "ECab199": 6,
         }
 
         situation = situation[0]
@@ -140,12 +147,17 @@ class gameInstance():
 
             client_input, client_intent, client_wait_times = self.collect_inputs(current_time, timer)
 
+            # # turn this back on for actual human testing so they can't tell if they are playing with bots
+            # # it will make your life a lot easier.
+
             # if self.HUMAN_PLAYERS > 0:
             #     if not timer.time_out():
             #         time.sleep(self.client_time - timer.time())
             #     pause_time = 2 * sum(client_wait_times) / len(client_wait_times)
             #     self.client_time = min(random.uniform(0, pause_time), 2)
             client_time = 0
+
+            print(client_input)
 
             running = self.stag_hunt_game_loop(self.player_points, client_input, client_intent, index)
             index += 1
@@ -157,28 +169,9 @@ class gameInstance():
                 break
 
             if running == False:
-                print("does this ever break ")
                 break
 
-
-
-
-        # new_points = self.adjust_points()
-        # new_dict = {}
-        # new_dict[self.situation] = new_points
-        # big_dict_finalized = {}
-        # big_dict_finalized[self.situation] = self.big_dict
-        # self.big_dict = big_dict_finalized
-        # if self.save:
-        #     self.save_stuff_big(big_dict_finalized, self.round)
-        # print("this is the new dict ", new_dict)
-        # return new_dict
-
-        # from players I need to pull out the key, and then add that to a specific list.
-        # otherwise its all moot.
-
         new_points = self.adjust_points()
-        return_dict = {}
         return_list = []
         for i, key in enumerate(new_points): # no longer sure what this is iterating through
             new_dict = {}
@@ -212,7 +205,8 @@ class gameInstance():
                 "CLIENT_ID_LIST": self.client_id_list,
                 "AGENT_POSITIONS": current_state,
                 "POINTS": send_player_points,
-                "CURR_ROUND": self.round,
+                "CURR_ROUND": self.start_round,
+                "CURR_ITERATION": self.round - self.start_round,
                 "HEIGHT": self.height,
                 "WIDTH": self.height,
             }
@@ -276,7 +270,8 @@ class gameInstance():
             response = {
                 "AGENT_POSITIONS": current_state,
                 "POINTS": dict(points_to_send),
-                "CURR_ROUND": self.round,
+                "CURR_ROUND": self.start_round,
+                "CURR_ITERATION": self.round - self.start_round,
                 "GAME_OVER": small_dict,
                 "HEIGHT": self.height,
                 "WIDTH": self.width,
@@ -293,7 +288,8 @@ class gameInstance():
                 response = {
                     "AGENT_POSITIONS": current_state,
                     "POINTS": dict(points_to_send),
-                    "CURR_ROUND": self.round,
+                    "CURR_ROUND": self.start_round,
+                    "CURR_ITERATION": self.round - self.start_round,
                     "GAME_OVER": small_dict,
                     "GAME_ENDED": True,
                     "HEIGHT": self.height,
@@ -318,12 +314,12 @@ class gameInstance():
 
         # set up the dict for players and bots, dynamically.
 
-        for i in range(len(self.connected_clients)):
+        for i in range(len(self.client_id_dict)):
             new_name = "H" + str(i) # let H start at 1 i guess.
             new_dict[new_name] = {}
-        bot_number = len(self.connected_clients) # populate this after humans.
-        if len(self.connected_clients.keys()) > 0:
-            for i in range(3-len(self.connected_clients), 4):
+        bot_number = len(self.client_id_dict) # populate this after humans.
+        if len(self.client_id_dict.keys()) > 0:
+            for i in range(3-len(self.client_id_dict), 4):
                 new_name = "R" + str(bot_number)
                 bot_number+=1
                 new_dict[new_name] = {}
@@ -386,13 +382,17 @@ class gameInstance():
     # generate all the other peeps we need to roudn out the game size.
     def create_hunters(self):
         new_hunters = []
-        for i in range(len(self.connected_clients)): # connected clients is only the clients who are supposed to be in the game
+        for i in range(len(self.client_id_dict)): # connected clients is only the clients who are supposed to be in the game
             new_name = "H" + str(i)
             new_hunters.append(humanAgent(name=new_name))
 
-        for i in range(3 - len(self.connected_clients)): # bc they always need to add up to 3
-            index = 0
+        index = 0 # PUT THIS OUTSIDE LOOP GOOD HEAVENS
+        # has literally anything been running correctly???
+        print("Fetcher is ", 3 - len(self.client_id_dict))
+        for i in range(3 - len(self.client_id_dict)): # bc they always need to add up to 3
             new_name = "R" + str(len(new_hunters))
+            print("This is the index ", index)
+            print("This is the agent type ", self.agentType)
             agent_type = self.agentType[index]
             # different types of agents can go here, might be work making a different functioun
             if agent_type == 1:
@@ -403,6 +403,12 @@ class gameInstance():
                 new_hunters.append(AlegAATr(name=new_name, lmbda=0.0, ml_model_type='knn', enhanced=True))
             if agent_type == 4: # start w/ hard homo
                 new_hunters.append(CabAgent(i, new_name, True, False, gene="", agent_name="HardHomo2.csv"))
+            if agent_type == 5:
+                new_hunters.append(CabAgent(i, new_name, True, False, gene="", agent_name="gen_Z.csv"))
+            if agent_type == 6:
+                new_hunters.append(CabAgent(i, new_name, True, False, gene="", agent_name="gen_199.csv"))
+
+
 
             index += 1 # go through the list bc we are expecting it to be an array now.
 
@@ -425,7 +431,7 @@ class gameInstance():
 
             # TODO: Query the hunter if they are actually hunting the hare.
             hunting_hare_map = self.stag_hare.hunting_hare_map
-            if not hunting_hare_map[hunter]:
+            if not hunting_hare_map[hunter]: # OH NICE this filters this it out already. bars.
                 continue # make sure that we only get those that actually want the hare dead.
 
             position = self.stag_hare.state.agent_positions[hunter]
@@ -441,7 +447,7 @@ class gameInstance():
                 small_dict = {}
                 small_dict["hare"] = True
                 small_dict["Stag"] = False
-                print("worker 2 part 1, round ", self.round)
+                # print("worker 2 part 1, round ", self.round)
                 self.worker2(hunter, self.round-self.start_round+1, small_dict)
 
             elif positionX == hare_positionX and (
@@ -451,17 +457,17 @@ class gameInstance():
                 small_dict = {}
                 small_dict["hare"] = True
                 small_dict["Stag"] = False
-                print("worker 2 part 2, round ", self.round)
+                # print("worker 2 part 2, round ", self.round)
                 self.worker2(hunter, self.round-self.start_round+1, small_dict)
 
             elif positionY == hare_positionY and (
-                    (positionX == 0 and hare_positionX == WIDTH - 1) or
-                    (positionX == WIDTH - 1 and hare_positionX == 0)
+                    (positionX == 0 and hare_positionX == self.width - 1) or
+                    (positionX == self.width - 1 and hare_positionX == 0)
             ):  # seperated by width
                 small_dict = {}
                 small_dict["hare"] = True
                 small_dict["Stag"] = False
-                print("worker 2 part 3, round ", self.round)
+                # print("worker 2 part 3, round ", self.round)
                 self.worker2(hunter, self.round-self.start_round+1, small_dict)
 
     # given that we already know that the stag is dead, all players receive points. Much easier than hare
@@ -479,7 +485,6 @@ class gameInstance():
             self.worker2(hunter, self.round-self.start_round+1, small_dict)
 
     def worker2(self, hunter_name, round, updated_states_dict):
-        print("this is the round thats coming in for worker2 ", round)
         # see if the fetcher is empty.
         if hunter_name not in self.player_points:
             # If the hunter doesn't exist in the dictionary, create an entry for them
@@ -494,13 +499,19 @@ class gameInstance():
         # Update the current round with "hare" and "stag" values from updated_states_dict
         if "hare" in updated_states_dict:
             current_entry[round]["hare"] = updated_states_dict["hare"]
-
+            # if hunter_name == "R0" or hunter_name == "R1":
+            #     print("HCAB SUCESSS!!!")
+            # else:
+            #     print("..... GHARE success")
         if "stag" in updated_states_dict:
             current_entry[round]["stag"] = updated_states_dict["stag"]
+            # print("****************************WHAT WHAT WHAT WHAT WHAT****************************")
+
 
         # set the new entry into the thing.
-        print("this is the current entry, wait for him to be awry ", current_entry)
+        # print("this is the current entry, wait for him to be awry ", current_entry)
         self.player_points[hunter_name] = current_entry
+
 
 
     # clear everything out and recreate the sim.
@@ -535,7 +546,7 @@ class gameInstance():
                 if round not in player_points[hunter.name]:
                     player_points[hunter.name] = current_entry
         self.player_points = player_points
-        print("here are the self player points ", self.player_points)
+        # print("here are the self player points ", self.player_points)
 
      # idk why some of these are in C++ naming convention. Who knows?
     def adjust_points(self):
@@ -575,7 +586,7 @@ class gameInstance():
 
         # lets get both the points and the round that we are interested in talking about. return this dict and watch it blow up.
         self.player_points = new_points
-        print("This is player points post adjustment ", self.player_points)
+        # print("This is player points post adjustment ", self.player_points)
         return self.player_points
 
 

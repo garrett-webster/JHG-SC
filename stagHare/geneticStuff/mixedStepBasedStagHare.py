@@ -63,7 +63,7 @@ def write_generational_results(theGenePools, popSize, gen, folder):
     script_dir = os.path.dirname(os.path.abspath(__file__))
     # Construct the full output directory path
     if folder == "":
-        output_dir = os.path.join(script_dir, "HardHomo1Again", "theGenerations") # just to give it somewhere to go
+        output_dir = os.path.join(script_dir, "HardMixed1", "theGenerations") # just to give it somewhere to go
     else:
         output_dir = os.path.join(script_dir, folder) # just to give it somewhere to go
     # Ensure output directory exists
@@ -279,7 +279,7 @@ def run_game_helper(args):
     return metrics
 
 
-def homo_based_SH(popSize, numGeneCopies, startIndex, numGens, gamesPerGen, agentsPerGame, roundsPerGame, povertyLine, folder,
+def mixed_based_SH(popSize, numGeneCopies, startIndex, numGens, gamesPerGen, agentsPerGame, roundsPerGame, povertyLine, folder,
            max_workers, enforce_majority, random_agents, forced_random, height, width):
     theGenePools = []
     theGenePoolsOld = []
@@ -298,15 +298,11 @@ def homo_based_SH(popSize, numGeneCopies, startIndex, numGens, gamesPerGen, agen
 
         for game_idx in range(gamesPerGen):
             # Pick one individual for this whole game (cycle through population)
-            ind_idx = game_idx % popSize
-            base_gene = extractGene(theGenePools[ind_idx].genes_long[0])
-
-            # Create a list of agentsPerGame identical copies
-            # (use deepcopy if the gene is a mutable object that might be mutated during the game)
-            agent_genes = [copy.deepcopy(base_gene) for _ in range(agentsPerGame)]
-
-            # All agents trace back to the same individual
-            agent_indices = [ind_idx] * agentsPerGame
+            agent_indices = [random.randrange(popSize) for _ in range(agentsPerGame)]
+            agent_genes = [
+                extractGene(theGenePools[idx].genes_long[0])
+                for idx in agent_indices
+            ]
 
             # just easier to prepare this all at once.
             args_list.append((
@@ -378,6 +374,6 @@ if __name__ == "__main__":
     forced_random = False
     height = 16
     width = 16
-    homo_based_SH(popSize, numGeneCopies, startIndex, numGens, gamesPerGen, agentsPerGame, rounds_per_game, povertyLine, folder,
+    mixed_based_SH(popSize, numGeneCopies, startIndex, numGens, gamesPerGen, agentsPerGame, rounds_per_game, povertyLine, folder,
                     max_workers, enforce_majority, random_agents, forced_random, height, width)
     # we are running no fear, no chat

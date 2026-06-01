@@ -12,11 +12,11 @@ PAUSE_TIME = 3
 connected_clients = {}
 client_input = {}
 client_usernames = {}
-HEIGHT = 3
-WIDTH = 3
+HEIGHT = 16
+WIDTH = 16
 client_id_dict = {}
 hunters = []
-NUM_ITERATIONS = 2
+NUM_ITERATIONS = 1
 round = 1
 
 # start a game session if we have enough players.

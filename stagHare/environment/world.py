@@ -220,13 +220,21 @@ class StagHare:
             possible_hare_captures = self.get_possible_agent_captures(hare_x, hare_y,
                                                                  self.state.height)  # if its not square kill me
             for agent in self.state.agent_positions:
-                if agent == "hare" or agent == "stag":
+                # filter out agents that can't hunt (the stag and hare) as well as agents that arne't trying to hunt the hare
+                if agent == "hare" or agent == "stag" or self.hunting_hare_map[agent] == False:
                     pass
                 else:
                     agent_position = self.state.agent_positions[agent]
                     if list(agent_position) in possible_hare_captures:
                         id = int(agent[-1])
                         new_score[id] = 1  # add a rabbit to that thing.
+
+                        # if id == 0:
+                        #     print("SUCCESS FOR HCABS")
+                        # if id == 1:
+                        #     print("SUCCESS FOR HCABS")
+                        # if id == 2:
+                        #     print("....sucess for GHare")
 
             return new_score
 

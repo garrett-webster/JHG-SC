@@ -1,5 +1,6 @@
 base_to_csv = {
     "HardHomo": "hardHomo2.csv", # staghunt w/ tweaks. less buggy.
+    "HardHomo1": "hardHomo1.csv",
     "HardHomo10": "hardHomo10.csv", # staghunt trained for 10 games per round. or whatever.
     "HCab": "gen_z.csv", # johnathon EPDM human like agents
     "ECab199": "gen_199.csv", # gen_199 from the JHG paper

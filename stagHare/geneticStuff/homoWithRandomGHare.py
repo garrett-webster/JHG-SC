@@ -378,6 +378,7 @@ if __name__ == "__main__":
     forced_random = False
     height = 16
     width = 16
+    random_hare_chance = 5 # 5% chance that a hare agent spawns in with them.
     homo_based_SH(popSize, numGeneCopies, startIndex, numGens, gamesPerGen, agentsPerGame, rounds_per_game, povertyLine, folder,
                     max_workers, enforce_majority, random_agents, forced_random, height, width)
     # we are running no fear, no chat

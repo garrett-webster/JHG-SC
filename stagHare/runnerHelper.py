@@ -66,6 +66,25 @@ def run_trial_genetic(theGenes, random_agents, forced_random, height, width, rou
     return create_new_score(stag_hare)
 
 
+def run_trial_genetic_but_with_fetchers(theGenes, random_agents, forced_random, height, width, rounds_per_game):
+
+    # create the hunters here and just hope it works.
+    hunters = create_hunters_with_genes(theGenes, random_agents, forced_random)  # the assingment has been undererstood
+
+
+    # create the instance simulator
+    stag_hare = get_stag_hare(height, width, hunters)
+
+    for i in range(rounds_per_game): # 1 game, do this once, flows it all into one.
+        if i != 0:
+            stag_hare = reset_stag_hare(stag_hare) # just puts the guys into new positions without overwriting existing data
+
+        stag_hare = run_trials_given_simulator(stag_hare, False, None, None, True, False)
+
+    # this does append, I triple checked.
+    return create_new_score(stag_hare)
+
+
 # TODO: this breaks when considering human players. Add a total order parameter.
 # SORT THIS BASED ON THE LAST NUMBER, that should always be 0 1 or 2. might have to rework some server stuff
 # but humans should always be first, and then we should have H0, R1, R2 or H0, H1, R2 or H0, H1, H2 (or all bots).
@@ -174,6 +193,7 @@ def run_single_round_given_simulator(stag_hare, noisy=True):
             allocations_dict = get_allocations_from_movements(stag_hare.state, action_map, old_agent_positions, old_state)
 
         allocations_list = allocations_dict_to_list(allocations_dict)
+        print("here is the allocations dict ", allocations_list)
 
 
         if allocations_list != []: # can't update the engine w/ pure allegatrs.

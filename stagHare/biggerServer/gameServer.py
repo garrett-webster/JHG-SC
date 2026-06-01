@@ -26,7 +26,7 @@ class GameServer():
         self.user_name_to_client_id_dict = {v: k for k, v in client_usernames.items()}
         self.points = self.player_points_initialization()
         self.current_round = 0
-        self.max_iterations = 2
+        self.max_iterations = num_iterations # ?? not sure what this dude was supposed to be for??
         # this takes the stuff at a high level.
         self.high_level_dict = {}  # this stores the round and then situation break down.
         self.num_iterations = num_iterations
@@ -47,27 +47,43 @@ class GameServer():
         #     self.run_games(games_list, q, current_round)
         #     self.append_average_points(current_round)
 
-        for i in range(1, 2): # run just a single round so I can check that its running 3 times.
+        # lets make sure this more or less matcehs up
+        for i in range(1, 10): # run just a single round so I can check that its running 3 times.
+            print("This is the round ", i)
             current_round = i
              # TODO: Turn this into an actual parameter somewhere.
             # there's DEFINITELY a better way to do this. Like frfr.
             # well we really only need GHare, GStag, ALlegatr as human information will be limited up higher by connected clients in the room settings.
             players_indicies_round_1 = [[0]] # player indicies in each room
-            situations = [["CABAgent1"], ["CABAgent1"]] # sitation of each room.
+            situations = [["GHare2"]] # sitation of each room.
             games_list = self.create_game_processes(players_indicies_round_1, current_round, new_clients, q, situations, self.num_iterations, self.height, self.width)
             self.run_games(games_list, q, current_round)
             self.append_average_points(current_round)
 
-        for i in range(2, 3): # run just a single round so I can check that its running 3 times.
-            current_round = i
-             # TODO: Turn this into an actual parameter somewhere.
-            # there's DEFINITELY a better way to do this. Like frfr.
-            # well we really only need GHare, GStag, ALlegatr as human information will be limited up higher by connected clients in the room settings.
-            players_indicies_round_1 = [[0]] # player indicies in each room
-            situations = [["CABAgent1"], ["CABAgent1"]] # sitation of each room.
-            games_list = self.create_game_processes(players_indicies_round_1, current_round, new_clients, q, situations, self.num_iterations, self.height, self.width)
-            self.run_games(games_list, q, current_round)
-            self.append_average_points(current_round)
+        # for i in range(1, 2): # run just a single round so I can check that its running 3 times.
+        #     print("This is round 1")
+        #     current_round = i
+        #      # TODO: Turn this into an actual parameter somewhere.
+        #     # there's DEFINITELY a better way to do this. Like frfr.
+        #     # well we really only need GHare, GStag, ALlegatr as human information will be limited up higher by connected clients in the room settings.
+        #     players_indicies_round_1 = [[0]] # player indicies in each room
+        #     situations = [["CABAgent1"], ["CABAgent1"]] # sitation of each room.
+        #     games_list = self.create_game_processes(players_indicies_round_1, current_round, new_clients, q, situations, self.num_iterations, self.height, self.width)
+        #     self.run_games(games_list, q, current_round)
+        #     self.append_average_points(current_round)
+        #
+        #
+        # for i in range(2, 3): # run just a single round so I can check that its running 3 times.
+        #     print("this is round 2 ")
+        #     current_round = i
+        #      # TODO: Turn this into an actual parameter somewhere.
+        #     # there's DEFINITELY a better way to do this. Like frfr.
+        #     # well we really only need GHare, GStag, ALlegatr as human information will be limited up higher by connected clients in the room settings.
+        #     players_indicies_round_1 = [[0]] # player indicies in each room
+        #     situations = [["CABAgent1"], ["CABAgent1"]] # sitation of each room.
+        #     games_list = self.create_game_processes(players_indicies_round_1, current_round, new_clients, q, situations, self.num_iterations, self.height, self.width)
+        #     self.run_games(games_list, q, current_round)
+        #     self.append_average_points(current_round)
 
         # for i in range(3, 4): # run just a single round so I can check that its running 3 times.
         #     current_round = i
@@ -110,7 +126,7 @@ class GameServer():
         # modifies self.points more than anything else after the games conclude.
         self.start_and_join_games(games_list, q)
         points_to_send, points_to_save = self.calc_avg_points(current_round)
-        print("These are the points to save ", points_to_save)
+        # print("These are the points to save ", points_to_save)
         self.points_to_save = points_to_save
         self.points_to_send = points_to_send # I don't want to calculate that by hand, that's dumb.
         self.send_leaderboard(points_to_send)  # sends out the updated leaderboard.
@@ -144,10 +160,12 @@ class GameServer():
             player_1 = list(new_clients.items())[player]
             player_1_key, player_1_socket = player_1
             return_players[player_1_key] = player_1_socket
+        print("this is the reutrn players ", return_players)
         return return_players
 
 
     def game_thread(self, new_clients, q, current_round, situations, num_iterations, height, width, save):
+        print("new clients ", new_clients)
         new_points_1 = gameInstance(new_clients, self.client_id_dict, situations, num_iterations, height, width, current_round, save)  # need to somehow include an agent type
         for game_points_list in new_points_1.return_list:
             q.put(game_points_list) # just throw the points lists onto q and we will go through them later.
@@ -174,7 +192,7 @@ class GameServer():
 
 
     def calc_avg_points(self, target_round):
-        print("here is the self.points ", self.points)
+        # print("here is the self.points ", self.points)
         new_list_to_send = [] # list of tuples, holds the clientID and then the number of points that they have accrued
         new_list_to_save = [] # this holds the serverSide playerID and then the number of points they ahve accrued.
         for player in self.points:
@@ -209,7 +227,7 @@ class GameServer():
 
         sorted_points = sorted(new_list_to_send, key=lambda x: x[1], reverse=True)
         # don't bother sorting the new_list_to_save, that doesn't even make sense
-        print("here is self points post update 208 ", self.points)
+        # print("here is self points post update 208 ", self.points)
         return sorted_points, new_list_to_save
 
         # so now we have the number of current points that they have, but we want to add a new points thing in here somewhere, and apparently it needs to be here. thats dookie.
@@ -219,8 +237,8 @@ class GameServer():
 
     # fairly straightforward. Takes in hte new points and sends them out.
     def send_leaderboard(self, new_points_dict):
-        print("Aight do we get in here first off ")
-        print("And if we do, what is the new points dict \n", new_points_dict)
+        # print("Aight do we get in here first off ")
+        # print("And if we do, what is the new points dict \n", new_points_dict)
         time.sleep(2)  # lets everyone see the leaderboard
         message = {
             "LEADERBOARD": new_points_dict,
@@ -231,7 +249,7 @@ class GameServer():
         time.sleep(2)  # lets everyone see the leaderboard
 
     def append_average_points(self, current_round):
-        print("here are the points to send ", self.points_to_send, " and here are the points to save ", self.points_to_save)
+        # print("here are the points to send ", self.points_to_send, " and here are the points to save ", self.points_to_save)
         for tuple in self.points_to_send:
             client_id = self.user_name_to_client_id_dict[tuple[0]]
             self.points[client_id][current_round]["avg_points"] = tuple[1]
