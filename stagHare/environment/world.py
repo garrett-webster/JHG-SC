@@ -213,7 +213,6 @@ class StagHare:
             return [2, 2, 2]  # stag score
 
         else:
-            print("this ")
             # current_game_logger.add_round(stag_hare.state)
 
             new_score = [0 for _ in range(3)]  # only ever have 3 playuers.
@@ -276,8 +275,6 @@ class StagHare:
         return neighboring_moves
 
     def process_scores(self, scores):
-
-        print("here are the scores ", scores)
 
         score_per_player = list(zip(*scores))
 

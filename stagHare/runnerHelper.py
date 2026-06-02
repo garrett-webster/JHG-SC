@@ -163,17 +163,12 @@ def run_trials_given_simulator(stag_hare, graphing, current_round_grapher, curre
             rewards[i] += reward
 
         if stag_hare.is_over():
-            print("Does it think that the hare is captured ", stag_hare.state.hare_captured())
-            print("What does it think the hunting hare map is right now ", stag_hare.hunting_hare_map)
-
-
             # agent_positions.append(stag_hare.state.agent_positions)
             if graphing:
                 current_game_logger.add_round(stag_hare.state)
                 current_round_grapher.create_round_graph(stag_hare)
 
             intents.append(create_intents_list(stag_hare.state.hunting_hare_map))
-            print("does it chagne here? ", stag_hare.state.hunting_hare_map)
             stag_hare.set_final_variables()
             # do printing afterward that might be helping.
 

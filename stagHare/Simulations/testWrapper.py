@@ -11,7 +11,7 @@ from stagHare.visualziationTools.gameGrapher import GameGrapher
 from stagHare.visualziationTools.gameLogger import information_object_to_game_logger
 
 def run_test(curr_agent_name, scenario_type, height, width, random_agents, forced_random,
-             GamesPerRound, graphing):
+             GamesPerRound, graphing, curr_noise):
 
     # how many resources can we actually devote to this??
     max_workers = max(1, os.cpu_count() - 2)  # save just a few for other processes, plz don't crash.
@@ -24,7 +24,7 @@ def run_test(curr_agent_name, scenario_type, height, width, random_agents, force
         for attempt in range(num_attempts):
             futures.append(
                 executor.submit(run_trial_all, curr_agent_name, height, width, random_agents, forced_random,
-                                scenario_type, GamesPerRound, graphing))
+                                scenario_type, GamesPerRound, graphing, curr_noise))
 
         for future in as_completed(futures):
             results.append(future.result())
@@ -60,6 +60,7 @@ base_agents = ["Allegatr", "HardHomo", "HCab", "ECab199"]
 
 game_types = [1, 5, 10]
 scenarios = ["SelfPlay", "VGHare1", "VGHare2", "VGStag1", "VGStag2", "Allegatr1", "Allegatr2"]
+noise_types = [True, False]
 
 
 def get_agents(agent, scenario):
@@ -87,17 +88,18 @@ if __name__ == "__main__":
     height, width, RandomAgents, forced_random, num_attempts = height, width, RandomAgents, forced_random, num_attempts
     graphing = False
 
-    for agent in tqdm(base_agents):
-        for scenario in scenarios:
-            for game_type in game_types:
-                scenario_type = str(agent) + str(scenario) + str(game_type)
+    for noise in noise_types:
+        for agent in tqdm(base_agents):
+            for scenario in scenarios:
+                for game_type in game_types:
+                    scenario_type = str(noise) + str(agent) + str(scenario) + str(game_type)
 
-                # HOLY FETCH HOW DID I FORGET THIS!!!
-                # uh we need to redo like a lot of stuff.w
-                games_per_round = game_type
+                    # HOLY FETCH HOW DID I FORGET THIS!!!
+                    # uh we need to redo like a lot of stuff.w
+                    games_per_round = game_type
 
-                curr_agent_name = get_agents(agent, scenario)
-                new_batch_logger = run_test(curr_agent_name, scenario_type, height, width, RandomAgents,
-                                            forced_random, games_per_round, graphing)
-                write_batch_results_to_file(new_batch_logger, scenario_type)
+                    curr_agent_name = get_agents(agent, scenario)
+                    new_batch_logger = run_test(curr_agent_name, scenario_type, height, width, RandomAgents,
+                                                forced_random, games_per_round, graphing, noise)
+                    write_batch_results_to_file(new_batch_logger, scenario_type)
 

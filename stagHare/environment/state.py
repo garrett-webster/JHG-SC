@@ -300,8 +300,6 @@ class State:
 
                 n_hunter_neighbors += 1 if self.hunter_ready_to_kill(new_row, new_col, hare=True) else 0
 
-        print("This is how many neighbors we think we have ! ", n_hunter_neighbors)
-        print("This is the hunting hare map ", self.hunting_hare_map)
         return n_hunter_neighbors >= N_REQUIRED_TO_CAPTURE_HARE
 
     def stag_captured(self) -> bool:
