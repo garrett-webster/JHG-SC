@@ -69,10 +69,10 @@ def allocation_to_movement(new_allocation, id, state):
     # make sure to use the ABS when you are summing! otherwise negative breaks everything!
     # new_allocation = [element / np.sum(np.abs(new_allocation)) for element in new_allocation]
     # new allocation is normalized within translateVecToIndexStagHare
-    print("This is the new allocation ", new_allocation)
-    print("this is the new id ", id)
+    # print("This is the new allocation ", new_allocation)
+    # print("this is the new id ", id)
     new_index = translateVecToIndexStagHare(new_allocation, id)
-    print("This is the index we are returning ", new_index)
+    # print("This is the index we are returning ", new_index)
     new_movement = generate_movement(state, id, new_index)
 
     return new_movement, new_index # pull out the raw index we will do stuff with him.
@@ -146,6 +146,8 @@ def get_hunting_hare_map_from_agents(agents, allocation_dict, agent_indicies):
             intent = translateVecToIndexStagHare(allocation_dict[agent.name], id)
             # stag are 2 and 3 and that leads to an input of 0. Hare if anything else.
             hunting_hare_map[agent.name] = False if intent == 2 or intent == 3 else True
+            if isinstance(agent, CabAgent):
+                print("This was there intent ", hunting_hare_map[agent.name])
 
     return hunting_hare_map
 

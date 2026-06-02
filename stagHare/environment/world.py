@@ -16,6 +16,7 @@ from stagHare.utils.utils import HARE_NAME, N_HUNTERS, STAG_NAME
 from stagHare.environment.jhgToStaghunt import *
 from stagHare.environment.staghuntToJHG import *
 from copy import deepcopy
+import time
 
 class StagHare:
     def __init__(self, height: int, width: int, hunters: List[Agent]) -> None:
@@ -206,11 +207,13 @@ class StagHare:
     def create_new_score(self):
         # optional last round printing thing... I think.
         # current_round_grapher.create_round_graph(stag_hare)
+        # time.sleep(0.1) # I want to see something
 
         if self.state.stag_captured():
             return [2, 2, 2]  # stag score
 
         else:
+            print("this ")
             # current_game_logger.add_round(stag_hare.state)
 
             new_score = [0 for _ in range(3)]  # only ever have 3 playuers.
@@ -221,7 +224,8 @@ class StagHare:
                                                                  self.state.height)  # if its not square kill me
             for agent in self.state.agent_positions:
                 # filter out agents that can't hunt (the stag and hare) as well as agents that arne't trying to hunt the hare
-                if agent == "hare" or agent == "stag" or self.hunting_hare_map[agent] == False:
+                                                        # REFERNCE THE STATE VERSION PLEASE PLEASE PLEASE.
+                if agent == "hare" or agent == "stag" or self.state.hunting_hare_map[agent] == False:
                     pass
                 else:
                     agent_position = self.state.agent_positions[agent]
@@ -235,6 +239,12 @@ class StagHare:
                         #     print("SUCCESS FOR HCABS")
                         # if id == 2:
                         #     print("....sucess for GHare")
+
+            if new_score == [0,0,0]:
+                print("WAAAHA")
+                print("stag hare over, ", self.state.hare_captured())
+                print("Hunting hare map ", self.hunting_hare_map)
+                print("Agent positions ", self.state.agent_positions)
 
             return new_score
 
@@ -266,6 +276,8 @@ class StagHare:
         return neighboring_moves
 
     def process_scores(self, scores):
+
+        print("here are the scores ", scores)
 
         score_per_player = list(zip(*scores))
 

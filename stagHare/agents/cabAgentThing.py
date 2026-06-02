@@ -27,8 +27,6 @@ class CabAgent(Agent):
             else:
                 self.agent = GeneAgent3("", 1)  # create a random geneAgent3.
 
-
-
         # print("This is the first agent chromosome ", self.agent.genes_long[0]["alpha"])
         self.hunt = True # by default, they hunt the hare.
         self.set_game_params()

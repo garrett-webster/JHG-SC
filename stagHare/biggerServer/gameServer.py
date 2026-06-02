@@ -55,7 +55,7 @@ class GameServer():
             # there's DEFINITELY a better way to do this. Like frfr.
             # well we really only need GHare, GStag, ALlegatr as human information will be limited up higher by connected clients in the room settings.
             players_indicies_round_1 = [[0]] # player indicies in each room
-            situations = [["GHare2"]] # sitation of each room.
+            situations = [["HCab2"]] # sitation of each room.
             games_list = self.create_game_processes(players_indicies_round_1, current_round, new_clients, q, situations, self.num_iterations, self.height, self.width)
             self.run_games(games_list, q, current_round)
             self.append_average_points(current_round)
@@ -194,10 +194,10 @@ class GameServer():
             curr_points = 0
             for curr_round in self.points[player]:
                 if curr_round <= target_round: # catastrophically stupid idea
-                    print("These are what the curr games look like ", self.points[player][curr_round])
+                    # print("These are what the curr games look like ", self.points[player][curr_round])
                     for curr_game in self.points[player][curr_round]:
-                        print("these are the entries that are causing it to crash \n", player, " ", curr_round, " ", curr_game, " ")
-                        print("and here is the key thats causing the brick ", self.points[player][curr_round][curr_game])
+                        # print("these are the entries that are causing it to crash \n", player, " ", curr_round, " ", curr_game, " ")
+                        # print("and here is the key thats causing the brick ", self.points[player][curr_round][curr_game])
                         if curr_game == "new_points" or curr_game == "avg_points":
                             continue
                         if self.points[player][curr_round][curr_game]["stag"] == True:

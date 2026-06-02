@@ -60,7 +60,7 @@ def get_agents(agent, scenario):
         if "Allegatr" in scenario:
             opponent_type = scenario[0:-1]  # "Allegatr"
         else:
-            opponent_type = scenario[1:6]  # "GHare" or "GStag"
+            opponent_type = scenario[0:5]  # "GHare" or "GStag" # Why did that change??
 
         num_opponents = int(scenario[-1])
         num_test_agents = 3 - num_opponents
@@ -113,8 +113,8 @@ if __name__ == "__main__":
     freeze_seed = False
     random_agents, forced_random = set_seed(freeze_seed)
 
-    agents = ["ECab199"]
-    scenario = "VGHare1"
+    agents = ["HCab"]
+    scenario = "GStag2"
     game_type = "Round"
     graphing = False
     num_games_per_round = 1 # no reason to super scale it rn.

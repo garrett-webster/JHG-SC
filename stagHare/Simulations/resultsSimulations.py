@@ -6,83 +6,112 @@ from pathlib import Path
 
 
 def load_all_results(directory_path="results/"):
-    """Load all results, separated into Round and Step"""
-    results = {'Round': {}, 'Step': {}}
+    """Load all JSON files, grouped by number of rounds (1,5,10)."""
+    results = {1: {}, 5: {}, 10: {}}
 
     for file in os.listdir(directory_path):
-        if file.endswith('.json'):
-            file_path = os.path.join(directory_path, file)
-            scenario_name = file.replace('.json', '')
+        if not file.endswith('.json'):
+            continue
 
-            if scenario_name.endswith('Round'):
-                game_type = 'Round'
-                base_name = scenario_name[:-5]
-            elif scenario_name.endswith('Step'):
-                game_type = 'Step'
-                base_name = scenario_name[:-4]
-            else:
-                continue
+        full_name = file[:-5]  # remove '.json'
+        agent, gene, scenario, rounds = extract_full_info(full_name)
 
-            with open(file_path, 'r') as f:
-                data = json.load(f)
-                results[game_type][base_name] = data
+        # Skip files that couldn't be parsed
+        if agent is None or rounds is None:
+            print(f"Skipping {file} – could not parse")
+            continue
 
+        # Construct base name: just agent + scenario (agent already includes gene version)
+        base_name = agent + scenario
+
+        print("This here be the base name ", base_name)
+
+        # Load JSON data
+        with open(os.path.join(directory_path, file), 'r') as f:
+            data = json.load(f)
+            results[rounds][base_name] = data
+
+    # Optional: print summary to verify
+    for r in [1, 5, 10]:
+        print(f"Loaded {len(results[r])} files for {r}-round games")
     return results
+# Known agent base names (with possible gene versions)
+# Order matters: longer patterns first (e.g., 'ECab199' before 'ECab')
+KNOWN_SCENARIOS = {"SelfPlay", "VGHare1", "VGHare2", "VGStag1", "VGStag2", "Allegatr1", "Allegatr2"}
+
+# Known agent prefixes (longest first to avoid partial matches)
+KNOWN_AGENTS = sorted([
+    'HSCab', 'NCab', 'CCab', 'new3Gene',
+    'HardHomo10', 'HardHomo2', 'HardHomo',
+    'SCab', 'HCab', 'Allegatr', 'Allegtr', 'ECab199', 'ECab99', 'ECab'
+], key=len, reverse=True)
+
+
+def extract_full_info(filename):
+    """
+    Parse a filename (without .json) into (agent_base, gene_version, scenario, rounds).
+    Example: 'ECab199Allegatr21' -> ('ECab', '199', 'Allegatr2', 1)
+    Returns (agent, gene, scenario, rounds). If parsing fails, returns (None, None, None, None)
+    """
+    # Try each known agent prefix (longest first)
+    for agent in KNOWN_AGENTS:
+        if not filename.startswith(agent):
+            continue
+        remainder = filename[len(agent):]
+
+        # Determine rounds by checking suffix (10, 5, or 1)
+        rounds = None
+        if remainder.endswith('10'):
+            rounds = 10
+            candidate_scenario = remainder[:-2]
+        elif remainder.endswith('5'):
+            rounds = 5
+            candidate_scenario = remainder[:-1]
+        elif remainder.endswith('1'):
+            rounds = 1
+            candidate_scenario = remainder[:-1]
+        else:
+            # No known round suffix – skip this agent
+            continue
+
+        # Verify that the remaining part is a known scenario
+        if candidate_scenario in KNOWN_SCENARIOS:
+            scenario = candidate_scenario
+        else:
+            # If not a known scenario, try the next agent (e.g., 'HardHomo' vs 'HardHomo10')
+            continue
+
+        # Extract gene version from agent name if present (e.g., 'ECab199')
+        gene_version = None
+        if agent.startswith('ECab') and agent != 'ECab':
+            gene_version = agent[4:]  # gets '199' from 'ECab199'
+
+        return agent, gene_version, scenario, rounds
+
+    # If we get here, parsing failed
+    print(f"⚠️ Could not parse filename: {filename}")
+    return None, None, None, None
 
 
 def extract_agent_info(scenario_name):
-    """
-    Extract base agent type and gene version from scenario name
-    Examples:
-    - SCabSelfPlay -> ('SCab', None)
-    - HCabVGHare1 -> ('HCab', None)
-    - ECab99SelfPlay -> ('ECab', '99')
-    - ECab199VGHare1 -> ('ECab', '199')
-    - Allegtr -> ('Allegtr', None)
-    """
-    # Handle SCab and HCab (no gene versions)
-    if scenario_name.startswith('HSCab'):
-        return "HSCab", None
-    if scenario_name.startswith("NCab"):
-        return "NCab", None
-    if scenario_name.startswith('CCab'):
-        return "CCab", None
-    if scenario_name.startswith('new3Gene'):
-        return "new3Gene", None
-    if scenario_name.startswith("HardHomo10"):
-        return "HardHomo10", None
-    if scenario_name.startswith("HardHomo2"):
-        return "HardHomo2", None
-    if scenario_name.startswith("HardHomo"):
-        return "HardHomo", None
-    if scenario_name.startswith('SCab'):
-        return 'SCab', None
-    if scenario_name.startswith('HCab'):
-        return 'HCab', None
-    if scenario_name.startswith('Allegatr'):
-        return 'Allegatr', None
-    if scenario_name.startswith('Allegtr'):
-        return 'Allegtr', None
-
-    # Handle ECab with possible gene versions
-    if scenario_name.startswith('ECab'):
-        remainder = scenario_name[4:]  # Remove 'ECab'
-
-        # Extract gene version (digits after ECab)
-        gene_version = ''
-        for char in remainder:
-            if char.isdigit():
-                gene_version += char
-            else:
-                break
-
-        if gene_version:
-            return 'ECab', gene_version
-        return 'ECab', None
-
-    print("The scenario name is as follows ", scenario_name)
+    """Extract (agent_type, gene_version) from scenario name."""
+    for agent in sorted(KNOWN_AGENTS, key=len, reverse=True):
+        if scenario_name.startswith(agent):
+            gene_version = None
+            if agent.startswith('ECab') and agent != 'ECab':
+                gene_version = agent[4:]  # e.g., '199'
+            return agent, gene_version
+    print(f"Unknown agent: {scenario_name}")
     return 'Unknown', None
 
+
+def extract_scenario_category(scenario_name):
+    """Extract scenario type (e.g., 'VGHare1') from base name."""
+    agent, _ = extract_agent_info(scenario_name)
+    if agent == 'Unknown':
+        return scenario_name
+    # Return everything after the agent
+    return scenario_name[len(agent):]
 
 def get_agent_display_name(scenario_name):
     """Get clean display name including gene version"""
@@ -98,20 +127,20 @@ def extract_agent_type(scenario_name):
     return agent_type
 
 
-def extract_scenario_category(scenario_name):
-    """Extract scenario category, handling gene versions correctly"""
-    agent_type, gene_version = extract_agent_info(scenario_name)
-
-    if agent_type == 'Unknown':
-        return scenario_name
-
-    # Calculate prefix length
-    if gene_version:
-        prefix = f"{agent_type}{gene_version}"
-    else:
-        prefix = agent_type
-
-    return scenario_name[len(prefix):]
+# def extract_scenario_category(scenario_name):
+#     """Extract scenario category, handling gene versions correctly"""
+#     agent_type, gene_version = extract_agent_info(scenario_name)
+#
+#     if agent_type == 'Unknown':
+#         return scenario_name
+#
+#     # Calculate prefix length
+#     if gene_version:
+#         prefix = f"{agent_type}{gene_version}"
+#     else:
+#         prefix = agent_type
+#
+#     return scenario_name[len(prefix):]
 
 
 def get_all_agent_groups(results):
@@ -941,11 +970,12 @@ def create_scenario_stag_hunting(results, game_type, save_dir="graphs/scenario_c
 if __name__ == "__main__":
     all_results = load_all_results()
 
-    print(f"Loaded {len(all_results['Round'])} Round results and {len(all_results['Step'])} Step results\n")
+    # print(f"Loaded {len(all_results[])} Round results and {len(all_results['Step'])} Step results\n")
+    print(f"Loaded {len(all_results[1])} results and {len(all_results[5])} results and {len(all_results[10])} results")
 
     # Show detected agent groups
     all_agents = set()
-    for game_type in ['Round', 'Step']:
+    for game_type in [1, 5, 10]:
         all_agents.update(get_all_agent_groups(all_results[game_type]))
     print(f"Detected agent groups: {sorted(all_agents)}\n")
 
@@ -953,36 +983,41 @@ if __name__ == "__main__":
     print("=" * 60)
     print("CREATING OVERVIEW REWARD DISTRIBUTION GRAPHS")
     print("=" * 60)
-    create_overview_reward_distribution(all_results['Round'], 'Round')
-    create_overview_reward_distribution(all_results['Step'], 'Step')
+    create_overview_reward_distribution(all_results[1], '1')
+    create_overview_reward_distribution(all_results[5], '5')
+    create_overview_reward_distribution(all_results[10], '10')
 
     # STAG HUNTING GRAPHS
     print("\n" + "=" * 60)
     print("CREATING STAG HUNTING ANALYSIS GRAPHS")
     print("=" * 60)
-    create_stag_hunting_comparison(all_results['Round'], 'Round')
-    create_stag_hunting_comparison(all_results['Step'], 'Step')
+    create_stag_hunting_comparison(all_results[1], "1")
+    create_stag_hunting_comparison(all_results[5], "5")
+    create_stag_hunting_comparison(all_results[10], "10")
 
     # POPULARITY GRAPHS
     print("\n" + "=" * 60)
     print("CREATING POPULARITY GRAPHS")
     print("=" * 60)
-    create_popularity_graphs(all_results['Round'], 'Round')
-    create_popularity_graphs(all_results['Step'], 'Step')
+    create_popularity_graphs(all_results[1], '1')
+    create_popularity_graphs(all_results[5], '5')
+    create_popularity_graphs(all_results[10], '10')
 
     # HARE INTENT GRAPHS
     print("\n" + "=" * 60)
     print("CREATING HARE INTENT GRAPHS")
     print("=" * 60)
-    create_hare_intent_graphs(all_results['Round'], 'Round')
-    create_hare_intent_graphs(all_results['Step'], 'Step')
+    create_hare_intent_graphs(all_results[1], '1')
+    create_hare_intent_graphs(all_results[5], '5')
+    create_hare_intent_graphs(all_results[10], '10')
+
 
     # SCENARIO COMPARISON GRAPHS (Column View)
     print("\n" + "=" * 60)
     print("CREATING SCENARIO COMPARISON GRAPHS (Column View)")
     print("=" * 60)
-    for game_type in ['Round', 'Step']:
-        results = all_results[game_type]
+    for game_type in ["1", "5", "10"]:
+        results = all_results[int(game_type)]
         create_scenario_reward_distribution(results, game_type)
         create_scenario_hare_intent(results, game_type)
         create_scenario_popularity(results, game_type)

@@ -25,7 +25,8 @@ from stagHare.Simulations.sharedUtils import base_to_csv
 import warnings
 warnings.filterwarnings("ignore", category=UserWarning, module="sklearn")
 
-def create_intents_list(current_intents: dict) -> list:
+def create_intents_list(old_intents: dict) -> list:
+    current_intents = old_intents.copy()
     new_list = [-1 for _ in range(3)] # yeah that might blow up. whatever.
     for key, value in current_intents.items():
         if not key == "stag" and not key == "hare":
@@ -127,10 +128,17 @@ def run_trials_given_simulator(stag_hare, graphing, current_round_grapher, curre
         stag_hare.state.hunting_hare_map = hunting_hare_map
         round_rewards = stag_hare.update_intents_and_get_rewards(action_map, hunting_hare_map)
 
+        # print("Here is the pre noise allocations ", allocations_dict)
         # STAGHARE to JHG SECTION
         if noisy: # means that we need to translate the allocations from movements, as opposed to passing them straight through.
-
             allocations_dict = get_allocations_from_movements(stag_hare.state, action_map, old_agent_positions, old_state)
+        else:
+            # still need to make sure we update allegatr.
+            new_allocations = get_allocations_from_movements(stag_hare.state, action_map, old_agent_positions, old_state)
+            for hunter in stag_hare.hunters:
+                if isinstance(hunter, AlegAATr):
+                    allocations_dict[hunter.name] = new_allocations[hunter.name]
+
 
         allocations_list = allocations_dict_to_list(allocations_dict)
 
@@ -155,12 +163,20 @@ def run_trials_given_simulator(stag_hare, graphing, current_round_grapher, curre
             rewards[i] += reward
 
         if stag_hare.is_over():
-            stag_hare.set_final_variables()
+            print("Does it think that the hare is captured ", stag_hare.state.hare_captured())
+            print("What does it think the hunting hare map is right now ", stag_hare.hunting_hare_map)
+
+
             # agent_positions.append(stag_hare.state.agent_positions)
             if graphing:
                 current_game_logger.add_round(stag_hare.state)
                 current_round_grapher.create_round_graph(stag_hare)
+
             intents.append(create_intents_list(stag_hare.state.hunting_hare_map))
+            print("does it chagne here? ", stag_hare.state.hunting_hare_map)
+            stag_hare.set_final_variables()
+            # do printing afterward that might be helping.
+
             # passes by value. thanks python.
             return stag_hare
 
@@ -193,7 +209,7 @@ def run_single_round_given_simulator(stag_hare, noisy=True):
             allocations_dict = get_allocations_from_movements(stag_hare.state, action_map, old_agent_positions, old_state)
 
         allocations_list = allocations_dict_to_list(allocations_dict)
-        print("here is the allocations dict post processing \n", allocations_list)
+        # print("here is the allocations dict post processing \n", allocations_list)
 
 
         if allocations_list != []: # can't update the engine w/ pure allegatrs.

@@ -405,6 +405,7 @@ class gameInstance():
             if agent_type == 5:
                 new_hunters.append(CabAgent(index_to_feed, new_name, True, False, gene="", agent_name="gen_Z.csv"))
             if agent_type == 6:
+                print('adding 199 sire')
                 new_hunters.append(CabAgent(index_to_feed, new_name, True, False, gene="", agent_name="gen_199.csv"))
 
 
@@ -414,6 +415,9 @@ class gameInstance():
 
 
         self.hunters = new_hunters
+        print("Here are the hunters ")
+        for hunter in self.hunters:
+            print(type(hunter))
 
     # find hte hunters that killed the hare. very annoying.
     def find_hunter_hare(self):

@@ -158,6 +158,7 @@ class State:
         return self.grid[row][col] == AVAILABLE
 
     def hunter_ready_to_kill(self, row_val: int, col_val: int, hare: bool) -> bool:
+
         row, col = self.adjust_vals(row_val, col_val)
         hare_row, hare_col = self.agent_positions[HARE_NAME]
         stag_row, stag_col = self.agent_positions[STAG_NAME]
@@ -172,7 +173,6 @@ class State:
                 if (r, c) == (row, col):
                     hunting_hare = self.hunting_hare_map[name] if self.hunting_hare_map is not None else True
                     hunting_stag = not hunting_hare if self.hunting_hare_map is not None else True
-
                     return (hare and hunting_hare) or (not hare and hunting_stag)
 
         return False
@@ -300,6 +300,8 @@ class State:
 
                 n_hunter_neighbors += 1 if self.hunter_ready_to_kill(new_row, new_col, hare=True) else 0
 
+        print("This is how many neighbors we think we have ! ", n_hunter_neighbors)
+        print("This is the hunting hare map ", self.hunting_hare_map)
         return n_hunter_neighbors >= N_REQUIRED_TO_CAPTURE_HARE
 
     def stag_captured(self) -> bool:
