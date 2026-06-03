@@ -6,37 +6,47 @@ from pathlib import Path
 
 
 def load_all_results(directory_path="results/"):
-    """Load all JSON files, grouped by number of rounds (1,5,10)."""
-    results = {1: {}, 5: {}, 10: {}}
+    """Load all JSON files, grouped by number of rounds (1,5,10) and noise type."""
+    results = {
+        1: {'noise': {}, 'no_noise': {}},
+        5: {'noise': {}, 'no_noise': {}},
+        10: {'noise': {}, 'no_noise': {}}
+    }
 
     for file in os.listdir(directory_path):
         if not file.endswith('.json'):
             continue
 
         full_name = file[:-5]  # remove '.json'
-        agent, gene, scenario, rounds = extract_full_info(full_name)
+        agent, gene, scenario, rounds, has_noise = extract_full_info(full_name)
 
         # Skip files that couldn't be parsed
         if agent is None or rounds is None:
             print(f"Skipping {file} – could not parse")
             continue
 
-        # Construct base name: just agent + scenario (agent already includes gene version)
+        # Construct base name: just agent + scenario
         base_name = agent + scenario
 
-        print("This here be the base name ", base_name)
+        # Determine noise category
+        noise_category = 'noise' if has_noise else 'no_noise'
+
+        print(f"Loading: {base_name} ({rounds} rounds, {noise_category})")
 
         # Load JSON data
         with open(os.path.join(directory_path, file), 'r') as f:
             data = json.load(f)
-            results[rounds][base_name] = data
+            results[rounds][noise_category][base_name] = data
 
-    # Optional: print summary to verify
+    # Print summary to verify
     for r in [1, 5, 10]:
-        print(f"Loaded {len(results[r])} files for {r}-round games")
+        for noise_type in ['noise', 'no_noise']:
+            print(f"Loaded {len(results[r][noise_type])} files for {r}-round games ({noise_type})")
+
     return results
+
+
 # Known agent base names (with possible gene versions)
-# Order matters: longer patterns first (e.g., 'ECab199' before 'ECab')
 KNOWN_SCENARIOS = {"SelfPlay", "VGHare1", "VGHare2", "VGStag1", "VGStag2", "Allegatr1", "Allegatr2"}
 
 # Known agent prefixes (longest first to avoid partial matches)
@@ -49,15 +59,40 @@ KNOWN_AGENTS = sorted([
 
 def extract_full_info(filename):
     """
-    Parse a filename (without .json) into (agent_base, gene_version, scenario, rounds).
-    Example: 'ECab199Allegatr21' -> ('ECab', '199', 'Allegatr2', 1)
-    Returns (agent, gene, scenario, rounds). If parsing fails, returns (None, None, None, None)
+    Parse a filename into (agent_base, gene_version, scenario, rounds, has_noise).
+    Examples:
+    'TrueHardHomoAllegatr11' -> ('HardHomo', None, 'Allegatr1', 1, True)
+    'FalseHardHomoAllegatr11' -> ('HardHomo', None, 'Allegatr1', 1, False)
+    'TrueECab199VGStag25' -> ('ECab', '199', 'VGStag2', 5, True)
     """
+    # Check for noise PREFIX (True/False at start)
+    has_noise = None
+    clean_filename = filename
+
+    if filename.startswith('True'):
+        has_noise = True
+        clean_filename = filename[4:]  # Remove 'True'
+    elif filename.startswith('False'):
+        has_noise = False
+        clean_filename = filename[5:]  # Remove 'False'
+    else:
+        # Fallback: check for old-style suffix
+        if filename.endswith('_noise'):
+            has_noise = True
+            clean_filename = filename[:-6]
+        elif filename.endswith('_no_noise'):
+            has_noise = False
+            clean_filename = filename[:-9]
+        else:
+            # No noise indicator found
+            print(f"⚠️ No noise indicator in filename: {filename}")
+            return None, None, None, None, None
+
     # Try each known agent prefix (longest first)
     for agent in KNOWN_AGENTS:
-        if not filename.startswith(agent):
+        if not clean_filename.startswith(agent):
             continue
-        remainder = filename[len(agent):]
+        remainder = clean_filename[len(agent):]
 
         # Determine rounds by checking suffix (10, 5, or 1)
         rounds = None
@@ -71,26 +106,23 @@ def extract_full_info(filename):
             rounds = 1
             candidate_scenario = remainder[:-1]
         else:
-            # No known round suffix – skip this agent
             continue
 
         # Verify that the remaining part is a known scenario
         if candidate_scenario in KNOWN_SCENARIOS:
             scenario = candidate_scenario
         else:
-            # If not a known scenario, try the next agent (e.g., 'HardHomo' vs 'HardHomo10')
             continue
 
-        # Extract gene version from agent name if present (e.g., 'ECab199')
+        # Extract gene version from agent name if present
         gene_version = None
         if agent.startswith('ECab') and agent != 'ECab':
-            gene_version = agent[4:]  # gets '199' from 'ECab199'
+            gene_version = agent[4:]
 
-        return agent, gene_version, scenario, rounds
+        return agent, gene_version, scenario, rounds, has_noise
 
-    # If we get here, parsing failed
-    print(f"⚠️ Could not parse filename: {filename}")
-    return None, None, None, None
+    print(f"⚠️ Could not parse filename: {filename} (after removing noise prefix: {clean_filename})")
+    return None, None, None, None, None
 
 
 def extract_agent_info(scenario_name):
@@ -113,6 +145,7 @@ def extract_scenario_category(scenario_name):
     # Return everything after the agent
     return scenario_name[len(agent):]
 
+
 def get_agent_display_name(scenario_name):
     """Get clean display name including gene version"""
     agent_type, gene_version = extract_agent_info(scenario_name)
@@ -125,22 +158,6 @@ def extract_agent_type(scenario_name):
     """Extract just the base agent type"""
     agent_type, _ = extract_agent_info(scenario_name)
     return agent_type
-
-
-# def extract_scenario_category(scenario_name):
-#     """Extract scenario category, handling gene versions correctly"""
-#     agent_type, gene_version = extract_agent_info(scenario_name)
-#
-#     if agent_type == 'Unknown':
-#         return scenario_name
-#
-#     # Calculate prefix length
-#     if gene_version:
-#         prefix = f"{agent_type}{gene_version}"
-#     else:
-#         prefix = agent_type
-#
-#     return scenario_name[len(prefix):]
 
 
 def get_all_agent_groups(results):
@@ -192,7 +209,7 @@ def get_agent_labels(scenario_name):
     return ['Agent 1', 'Agent 2', 'Agent 3']
 
 
-# ==================== OVERVIEW GRAPHS ====================
+# ==================== OVERVIEW GRAPHS (Agent-Centric) ====================
 def create_overview_reward_distribution(results, game_type, save_dir="graphs/overview/"):
     """OVERVIEW FOLDER: Reward distribution graphs for each agent group"""
     save_dir_game = os.path.join(save_dir, game_type)
@@ -284,7 +301,7 @@ def create_overview_reward_distribution(results, game_type, save_dir="graphs/ove
         print(f"Created {agent_display} {game_type} overview graph")
 
 
-# ==================== STAG HUNTING GRAPHS ====================
+# ==================== STAG HUNTING GRAPHS (Agent-Centric) ====================
 def create_stag_hunting_comparison(results, game_type, save_dir="graphs/stag_hunting/"):
     """STAG HUNTING FOLDER: Focus on cooperation success (Stag scores)"""
     save_dir_game = os.path.join(save_dir, game_type)
@@ -412,7 +429,7 @@ def create_stag_hunting_comparison(results, game_type, save_dir="graphs/stag_hun
     print(f"Created {game_type} stag hunting graphs")
 
 
-# ==================== POPULARITY GRAPHS ====================
+# ==================== POPULARITY GRAPHS (Agent-Centric) ====================
 def create_popularity_graphs(results, game_type, save_dir="graphs/popularity/"):
     """POPULARITY FOLDER: Show how often test agents win vs opponent agents"""
     save_dir_game = os.path.join(save_dir, game_type)
@@ -664,10 +681,11 @@ def create_hare_intent_graphs(results, game_type, save_dir="graphs/hare_intent/"
         print(f"Created {agent_display} {game_type} hare intent graph")
 
 
-# ==================== SCENARIO COMPARISON GRAPHS ====================
+# ==================== SCENARIO COMPARISON GRAPHS (Scenario-Centric) ====================
 def create_scenario_reward_distribution(results, game_type, save_dir="graphs/scenario_comparison/reward_distribution/"):
     """
-    For each scenario type, compare reward distribution across all agent groups
+    For each scenario type, compare reward distribution across all agent groups.
+    SCENARIO-CENTRIC: One graph per scenario, showing all agents.
     """
     save_dir_game = os.path.join(save_dir, game_type)
     os.makedirs(save_dir_game, exist_ok=True)
@@ -756,7 +774,8 @@ def create_scenario_reward_distribution(results, game_type, save_dir="graphs/sce
 
 def create_scenario_hare_intent(results, game_type, save_dir="graphs/scenario_comparison/hare_intent/"):
     """
-    For each scenario type, compare hare hunting intent across all agent groups
+    For each scenario type, compare hare hunting intent across all agent groups.
+    SCENARIO-CENTRIC: One graph per scenario, showing all agents.
     """
     save_dir_game = os.path.join(save_dir, game_type)
     os.makedirs(save_dir_game, exist_ok=True)
@@ -824,9 +843,11 @@ def create_scenario_hare_intent(results, game_type, save_dir="graphs/scenario_co
 
         print(f"Created {scenario} {game_type} hare intent comparison")
 
+
 def create_scenario_popularity(results, game_type, save_dir="graphs/scenario_comparison/popularity/"):
     """
-    For each scenario type, compare popularity across all agent groups
+    For each scenario type, compare popularity across all agent groups.
+    SCENARIO-CENTRIC: One graph per scenario, showing all agents.
     """
     save_dir_game = os.path.join(save_dir, game_type)
     os.makedirs(save_dir_game, exist_ok=True)
@@ -909,7 +930,8 @@ def create_scenario_popularity(results, game_type, save_dir="graphs/scenario_com
 
 def create_scenario_stag_hunting(results, game_type, save_dir="graphs/scenario_comparison/stag_hunting/"):
     """
-    Overview stag hunting comparison across all scenarios and agents
+    Overview stag hunting comparison across all scenarios and agents.
+    SCENARIO-CENTRIC: One graph showing all agents across all scenarios.
     """
     save_dir_game = os.path.join(save_dir, game_type)
     os.makedirs(save_dir_game, exist_ok=True)
@@ -966,63 +988,305 @@ def create_scenario_stag_hunting(results, game_type, save_dir="graphs/scenario_c
 
     print(f"Created {game_type} scenario stag hunting overview")
 
+
+# ==================== NOISE COMPARISON GRAPHS ====================
+def create_scenario_noise_comparison(results_by_noise, game_type, save_dir="graphs/noise_comparison/"):
+    """
+    For each scenario, show noise vs no-noise side-by-side for all agents.
+    SCENARIO-CENTRIC view.
+    """
+    save_dir_game = os.path.join(save_dir, game_type)
+    os.makedirs(save_dir_game, exist_ok=True)
+
+    noise_results = results_by_noise['noise']
+    no_noise_results = results_by_noise['no_noise']
+
+    # Get all unique scenarios
+    all_scenarios = set()
+    for results_dict in [noise_results, no_noise_results]:
+        for full_name in results_dict.keys():
+            all_scenarios.add(extract_scenario_category(full_name))
+
+    all_scenarios = sorted(all_scenarios)
+
+    for scenario in all_scenarios:
+        # Get agents that have both noise and no-noise data for this scenario
+        noise_agents = {}
+        for full_name, data in noise_results.items():
+            if extract_scenario_category(full_name) == scenario:
+                agent = get_agent_display_name(full_name)
+                scores = data.get('score_per_player', [])
+                if scores and isinstance(scores[0], list):
+                    filtered = filter_relevant_scores(full_name, scores)
+                    noise_agents[agent] = {
+                        'nothing': np.mean([p[0] for p in filtered]),
+                        'hare': np.mean([p[1] for p in filtered]),
+                        'stag': np.mean([p[2] for p in filtered])
+                    }
+
+        no_noise_agents = {}
+        for full_name, data in no_noise_results.items():
+            if extract_scenario_category(full_name) == scenario:
+                agent = get_agent_display_name(full_name)
+                scores = data.get('score_per_player', [])
+                if scores and isinstance(scores[0], list):
+                    filtered = filter_relevant_scores(full_name, scores)
+                    no_noise_agents[agent] = {
+                        'nothing': np.mean([p[0] for p in filtered]),
+                        'hare': np.mean([p[1] for p in filtered]),
+                        'stag': np.mean([p[2] for p in filtered])
+                    }
+
+        common_agents = sorted(set(noise_agents.keys()) & set(no_noise_agents.keys()))
+
+        if not common_agents:
+            continue
+
+        fig, axes = plt.subplots(len(common_agents), 2, figsize=(12, 4 * len(common_agents)))
+        if len(common_agents) == 1:
+            axes = axes.reshape(1, 2)
+
+        colors = ['#e74c3c', '#f39c12', '#2ecc71']  # Nothing, Hare, Stag
+        categories = ['Nothing', 'Hare', 'Stag']
+        x = np.arange(len(categories))
+        width = 0.35
+
+        max_val = 0
+        for agent in common_agents:
+            max_val = max(max_val,
+                          max(noise_agents[agent].values()),
+                          max(no_noise_agents[agent].values()))
+        max_val = max_val * 1.2 if max_val > 0 else 1
+
+        for i, agent in enumerate(common_agents):
+            # Left: With Noise
+            ax1 = axes[i, 0]
+            noise_vals = [noise_agents[agent]['nothing'],
+                          noise_agents[agent]['hare'],
+                          noise_agents[agent]['stag']]
+            ax1.bar(x, noise_vals, width, color=colors, alpha=0.8)
+            ax1.set_title(f'{agent} - With Noise', fontsize=11, fontweight='bold')
+            ax1.set_xticks(x)
+            ax1.set_xticklabels(categories)
+            ax1.set_ylabel('Avg Score')
+            ax1.set_ylim(0, max_val)
+
+            # Add value labels
+            for bar, val in zip(ax1.patches, noise_vals):
+                if val > 0:
+                    ax1.text(bar.get_x() + bar.get_width() / 2., bar.get_height() + 0.01,
+                             f'{val:.3f}', ha='center', va='bottom', fontsize=8)
+
+            # Right: Without Noise
+            ax2 = axes[i, 1]
+            no_noise_vals = [no_noise_agents[agent]['nothing'],
+                             no_noise_agents[agent]['hare'],
+                             no_noise_agents[agent]['stag']]
+            ax2.bar(x, no_noise_vals, width, color=colors, alpha=0.8)
+            ax2.set_title(f'{agent} - Without Noise', fontsize=11, fontweight='bold')
+            ax2.set_xticks(x)
+            ax2.set_xticklabels(categories)
+            ax2.set_ylabel('Avg Score')
+            ax2.set_ylim(0, max_val)
+
+            # Add value labels
+            for bar, val in zip(ax2.patches, no_noise_vals):
+                if val > 0:
+                    ax2.text(bar.get_x() + bar.get_width() / 2., bar.get_height() + 0.01,
+                             f'{val:.3f}', ha='center', va='bottom', fontsize=8)
+
+        plt.suptitle(f'Scenario: {scenario} ({game_type} Games)\nNoise vs No-Noise Comparison',
+                     fontsize=14, fontweight='bold')
+        plt.tight_layout()
+        plt.savefig(f'{save_dir_game}/{scenario}_noise_comparison.png', dpi=150, bbox_inches='tight')
+        plt.close()
+
+        print(f"Created noise comparison for scenario: {scenario} ({game_type} games)")
+
+
+def create_noise_stag_hunting_heatmap(results_by_noise, game_type, save_dir="graphs/noise_comparison/"):
+    """Heatmap showing stag hunting success difference (noise - no_noise)"""
+    save_dir_game = os.path.join(save_dir, game_type)
+    os.makedirs(save_dir_game, exist_ok=True)
+
+    noise_results = results_by_noise['noise']
+    no_noise_results = results_by_noise['no_noise']
+
+    common_agents = sorted(set(get_all_agent_groups(noise_results)) & set(get_all_agent_groups(no_noise_results)))
+
+    # Get all scenarios
+    all_scenarios = set()
+    for results_dict in [noise_results, no_noise_results]:
+        for full_name in results_dict.keys():
+            all_scenarios.add(extract_scenario_category(full_name))
+
+    all_scenarios = sorted(all_scenarios)
+
+    if not all_scenarios or not common_agents:
+        return
+
+    # Calculate difference matrix
+    diff_matrix = np.zeros((len(common_agents), len(all_scenarios)))
+
+    for i, agent in enumerate(common_agents):
+        for j, scenario in enumerate(all_scenarios):
+            noise_stag = get_avg_stag_score(noise_results, agent, scenario)
+            no_noise_stag = get_avg_stag_score(no_noise_results, agent, scenario)
+            diff_matrix[i, j] = noise_stag - no_noise_stag  # Positive = noise helps
+
+    fig, ax = plt.subplots(figsize=(14, 8))
+
+    # Use diverging colormap (red = noise hurts, green = noise helps)
+    max_abs = max(abs(diff_matrix.min()), abs(diff_matrix.max()), 0.001)
+    im = ax.imshow(diff_matrix, cmap='RdYlGn', aspect='auto', vmin=-max_abs, vmax=max_abs)
+
+    for i in range(len(common_agents)):
+        for j in range(len(all_scenarios)):
+            text_color = "white" if abs(diff_matrix[i, j]) > max_abs * 0.6 else "black"
+            ax.text(j, i, f'{diff_matrix[i, j]:.3f}', ha="center", va="center",
+                    color=text_color, fontweight='bold', fontsize=12)
+
+    ax.set_xticks(np.arange(len(all_scenarios)))
+    ax.set_yticks(np.arange(len(common_agents)))
+    ax.set_xticklabels(all_scenarios, rotation=45, ha='right')
+    ax.set_yticklabels(common_agents)
+    ax.set_xlabel('Scenario Type', fontsize=12, fontweight='bold')
+    ax.set_ylabel('Agent Group', fontsize=12, fontweight='bold')
+    ax.set_title(f'{game_type} Games: Noise Impact on Stag Hunting\n(Green = Noise Helps, Red = Noise Hurts)',
+                 fontsize=14, fontweight='bold')
+
+    cbar = plt.colorbar(im)
+    cbar.set_label('Difference in Avg Stag Score (Noise - No Noise)', rotation=270, labelpad=20)
+
+    plt.tight_layout()
+    plt.savefig(f'{save_dir_game}/noise_impact_heatmap.png', dpi=150, bbox_inches='tight')
+    plt.close()
+    print(f"Created noise impact heatmap for {game_type}")
+
+
+def get_avg_stag_score(results_dict, agent_display, scenario):
+    """Helper to get average stag score for a specific agent and scenario"""
+    for full_name, data in results_dict.items():
+        if get_agent_display_name(full_name) == agent_display and \
+                extract_scenario_category(full_name) == scenario:
+            scores = data.get('score_per_player', [])
+            if scores and isinstance(scores[0], list):
+                filtered_scores = filter_relevant_scores(full_name, scores)
+                return np.mean([player[2] for player in filtered_scores])
+    return 0
+
+
 # ==================== MAIN EXECUTION ====================
 if __name__ == "__main__":
     all_results = load_all_results()
 
-    # print(f"Loaded {len(all_results[])} Round results and {len(all_results['Step'])} Step results\n")
-    print(f"Loaded {len(all_results[1])} results and {len(all_results[5])} results and {len(all_results[10])} results")
+    # Print summary
+    for rounds in [1, 5, 10]:
+        for noise_type in ['noise', 'no_noise']:
+            print(f"Loaded {len(all_results[rounds][noise_type])} results for {rounds}-round games ({noise_type})")
 
-    # Show detected agent groups
-    all_agents = set()
+    print()
+
+    # ============ SCENARIO COMPARISON GRAPHS (PRIMARY - What you want) ============
+    # For each scenario, compare all agents side by side
+    for noise_type in ['noise', 'no_noise']:
+        print("\n" + "=" * 60)
+        print(f"CREATING SCENARIO COMPARISON GRAPHS FOR {noise_type.upper()}")
+        print("=" * 60)
+
+        for game_type in [1, 5, 10]:
+            results = all_results[game_type][noise_type]
+            if not results:
+                print(f"  No results for {game_type}-round {noise_type}")
+                continue
+
+            game_label = str(game_type)
+            save_base = f"graphs/{noise_type}/scenario_comparison"
+
+            print(f"\n  Processing {game_type}-round games ({noise_type})...")
+
+            # For each scenario, show reward distribution across all agents
+            print(f"    Creating scenario reward distribution...")
+            create_scenario_reward_distribution(results, game_label,
+                                                save_dir=f"{save_base}/reward_distribution/")
+
+            # For each scenario, show hare hunting intent across all agents
+            print(f"    Creating scenario hare intent comparison...")
+            create_scenario_hare_intent(results, game_label,
+                                        save_dir=f"{save_base}/hare_intent/")
+
+            # For each scenario, show popularity across all agents
+            print(f"    Creating scenario popularity comparison...")
+            create_scenario_popularity(results, game_label,
+                                       save_dir=f"{save_base}/popularity/")
+
+            # For each scenario, show stag hunting success across all agents
+            print(f"    Creating scenario stag hunting comparison...")
+            create_scenario_stag_hunting(results, game_label,
+                                         save_dir=f"{save_base}/stag_hunting/")
+
+    # ============ AGENT-CENTRIC GRAPHS (Secondary) ============
+    for noise_type in ['noise', 'no_noise']:
+        print("\n" + "=" * 60)
+        print(f"CREATING AGENT OVERVIEW GRAPHS FOR {noise_type.upper()}")
+        print("=" * 60)
+
+        for game_type in [1, 5, 10]:
+            results = all_results[game_type][noise_type]
+            if not results:
+                continue
+
+            game_label = str(game_type)
+            save_base = f"graphs/{noise_type}/agent_overview"
+
+            print(f"\n  Processing {game_type}-round games ({noise_type})...")
+
+            # Agent-centric overview
+            print(f"    Creating agent reward distribution...")
+            create_overview_reward_distribution(results, game_label, save_dir=save_base)
+
+            # Stag hunting comparison across agents
+            print(f"    Creating stag hunting comparison...")
+            create_stag_hunting_comparison(results, game_label,
+                                           save_dir=f"graphs/{noise_type}/stag_hunting/")
+
+            # Popularity by agent
+            print(f"    Creating popularity graphs...")
+            create_popularity_graphs(results, game_label,
+                                     save_dir=f"graphs/{noise_type}/popularity/")
+
+            # Hare intent by agent
+            print(f"    Creating hare intent graphs...")
+            create_hare_intent_graphs(results, game_label,
+                                      save_dir=f"graphs/{noise_type}/hare_intent/")
+
+    # ============ NOISE COMPARISON GRAPHS ============
+    print("\n" + "=" * 60)
+    print("CREATING NOISE COMPARISON GRAPHS")
+    print("=" * 60)
+
     for game_type in [1, 5, 10]:
-        all_agents.update(get_all_agent_groups(all_results[game_type]))
-    print(f"Detected agent groups: {sorted(all_agents)}\n")
+        results_by_noise = all_results[game_type]
+        if results_by_noise['noise'] and results_by_noise['no_noise']:
+            print(f"\n  Processing {game_type}-round noise comparison...")
 
-    # OVERVIEW GRAPHS
-    print("=" * 60)
-    print("CREATING OVERVIEW REWARD DISTRIBUTION GRAPHS")
-    print("=" * 60)
-    create_overview_reward_distribution(all_results[1], '1')
-    create_overview_reward_distribution(all_results[5], '5')
-    create_overview_reward_distribution(all_results[10], '10')
+            # Scenario-centric noise comparison
+            print(f"    Creating scenario noise comparison...")
+            create_scenario_noise_comparison(results_by_noise, str(game_type))
 
-    # STAG HUNTING GRAPHS
-    print("\n" + "=" * 60)
-    print("CREATING STAG HUNTING ANALYSIS GRAPHS")
-    print("=" * 60)
-    create_stag_hunting_comparison(all_results[1], "1")
-    create_stag_hunting_comparison(all_results[5], "5")
-    create_stag_hunting_comparison(all_results[10], "10")
-
-    # POPULARITY GRAPHS
-    print("\n" + "=" * 60)
-    print("CREATING POPULARITY GRAPHS")
-    print("=" * 60)
-    create_popularity_graphs(all_results[1], '1')
-    create_popularity_graphs(all_results[5], '5')
-    create_popularity_graphs(all_results[10], '10')
-
-    # HARE INTENT GRAPHS
-    print("\n" + "=" * 60)
-    print("CREATING HARE INTENT GRAPHS")
-    print("=" * 60)
-    create_hare_intent_graphs(all_results[1], '1')
-    create_hare_intent_graphs(all_results[5], '5')
-    create_hare_intent_graphs(all_results[10], '10')
-
-
-    # SCENARIO COMPARISON GRAPHS (Column View)
-    print("\n" + "=" * 60)
-    print("CREATING SCENARIO COMPARISON GRAPHS (Column View)")
-    print("=" * 60)
-    for game_type in ["1", "5", "10"]:
-        results = all_results[int(game_type)]
-        create_scenario_reward_distribution(results, game_type)
-        create_scenario_hare_intent(results, game_type)
-        create_scenario_popularity(results, game_type)
-        create_scenario_stag_hunting(results, game_type)
+            # Heatmap showing noise impact
+            print(f"    Creating noise impact heatmap...")
+            create_noise_stag_hunting_heatmap(results_by_noise, str(game_type))
 
     print("\n" + "=" * 60)
     print("✅ ALL GRAPHS GENERATED SUCCESSFULLY!")
     print("=" * 60)
+    print("\n📁 Graph Locations:")
+    print("   Scenario Comparison (what you want):")
+    print("     graphs/noise/scenario_comparison/")
+    print("     graphs/no_noise/scenario_comparison/")
+    print("   Agent Overview:")
+    print("     graphs/noise/agent_overview/")
+    print("     graphs/no_noise/agent_overview/")
+    print("   Noise Comparison:")
+    print("     graphs/noise_comparison/")

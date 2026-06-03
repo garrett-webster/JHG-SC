@@ -50,13 +50,13 @@ height = 16
 width = 16
 RandomAgents = True
 forced_random = False
-num_attempts = 50
+num_attempts = 200
 
 # base_agents = ["SCab", "HCab", "ECab99", "ECab199", "Allegatr"]
 # base_agents = ["HCab", "ECab99", "ECab199"]
 # base_agents = ["HCab", "ECab199", "Allegatr"]
-base_agents = ["Allegatr", "HardHomo", "HCab", "ECab199"]
-# base_agents = ["HardHomo", "HardHomo10", "HCab", "ECab199", "Allegatr", "CCab", "NCab"]
+# base_agents = ["Allegatr", "HardHomo"]
+base_agents = ["HardHomo", "HardHomo10", "HCab", "ECab199", "Allegatr"]
 
 game_types = [1, 5, 10]
 scenarios = ["SelfPlay", "VGHare1", "VGHare2", "VGStag1", "VGStag2", "Allegatr1", "Allegatr2"]
