@@ -25,6 +25,9 @@ def get_allocations_from_movements(state, action_map, old_agent_positions, old_s
 
     return allocations_dict
 
+# T[i][j] = player j gives to payer i
+# columns represent giving, rows represent receiving.
+
 def translate_intents_to_movements(current_intents, intents_dict, influence):
     # hear me out
     # what if we don't go by players, but instead arrange it as necessary
@@ -33,21 +36,27 @@ def translate_intents_to_movements(current_intents, intents_dict, influence):
 
     current_possible_lists = {}
 
-    if current_intents.all(2):
+    # we only need the ambigous weights if 0 is present. we can check for that immediately actually. 
+
+    # all coop
+    if all(x == 2 for x in current_intents):
         pass # all stags
         # this pattern has the fastest possible growth, there is a test for it under offlineSimStuffTests.
-        current_possible_lists = {
+        matrix_dict = {
             2: {
-                2: 2
+                "id": 0,
+                "2": 3,
             }
         }
 
-    if current_intents.all(1):
-        current_possible_lists = {
+    elif all(x == 1 for x in current_intents):
+        matrix_dict = {
             1: {
-
+                "id": 6,
+                "1": 0,
             }
         }
+
 
     # if current_intents.all(0):
     #     current_possible_lists = {
@@ -56,45 +65,95 @@ def translate_intents_to_movements(current_intents, intents_dict, influence):
 
 
     # SINGLE DEFECTOR
-    if sum(current_intents) == 5: # defectors are last; cooperators first.
+    elif sum(current_intents) == 5:
         matrix_dict = {
-            1: [2, -2, -2],
-            2: [2, 2, 2],
+            1: {
+                "id": 2,
+                "1": -2,
+                "2": -2,
+            },
+            2: {
+                "id": 2,
+                "1": 2,
+                "2": 2,
+            }
         }
 
-    if sum(current_intents) == 4 and 0 not in current_intents:
-        pass # 1 stag, 2 (known) defectors
+    # 2 defectors
+    elif sum(current_intents) == 4 and 0 not in current_intents:
+        pass
         matrix_dict = {
-            2: [2, 2, 2],
-            1: [3, 0, -3], # how do I explain this bc this LOSES its symmetry.
-            # need to tell it that the 0 goes to the other defector, and the
+            1: {
+                "id": 3,
+                "1": 0,
+                "2": -3,
+            },
+            2: {
+                "id": 2,
+                "1": 2,
+                "2": 2,
+            }
+        }
+
+    else:
+        matrix_dict = {
+            0: {
+                "id": 0,
+                "1": 0,
+                "2": 0,
+            },
+            1: {
+                "id": 0,
+                "1": 0,
+                "2": 0,
+            },
+            2: {
+                "id": 0,
+                "1": 0,
+                "2": 0,
+            }
         }
 
     # if sum(current_intents) == 4 and 0 in current_intents:
     #     pass # 2 stag, 1 ambigous (find the zero)
 
-    if sum(current_intents) == 3 and current_intents.all(1):
-        pass # all hare, known
+    # if sum(current_intents) == 3:
+    #     pass # 1 stag, 1 hare, 1 ambg.
 
-    if sum(current_intents) == 3:
-        pass # 1 stag, 1 hare, 1 ambg.
+    # if sum(current_intents) == 2 and 2 in current_intents:
+    #     pass # 1 stag, 2 ambigous
 
-    if sum(current_intents) == 2 and 2 in current_intents:
-        pass # 1 stag, 2 ambigous
+    # if sum(current_intents) == 2 and 1 in current_intents:
+    #     pass # 2 hare, 1 ambg
 
-    if sum(current_intents) == 2 and 1 in current_intents:
-        pass # 2 hare, 1 ambg
+    # if sum(current_intents) == 1:
+    #     pass # 1 hare, 2 ambg.
 
-    if sum(current_intents) == 1:
-        pass # 1 hare, 2 ambg.
+    # if current_intents.all(0):
+    #     pass # if we get here I think we just have to kill ourselves.
 
-    if current_intents.all(0):
-        pass # if we get here I think we just have to kill ourselves.
+    # # here we need to do the ordering
+    # for player in intents_dict:
+    #     pass # find the id, and the other guys and rearrange as necessary.l
 
-    # here we need to do the ordering
-    for player in intents_dict:
-        pass # find the id, and the other guys and rearrange as necessary.l
+    new_allocations_dict = {}
+    new_allocations_list = [[0, 0, 0] for _ in range(len(intents_dict))] # just want something that I can print out ig.
+    for i, intent in enumerate(current_intents):
+        # going through player by player
+        new_allocation = [0 for _ in range(len(intents_dict))] # its another 3. whoopee.
+        for index, j in enumerate(current_intents):
+            if i == index: # use ID
+                new_allocation[index] = matrix_dict[intent]["id"]
+            else:
+                new_allocation[index] = matrix_dict[intent][str(j)]
 
+        new_allocations_list[i] = new_allocation # add that in in the correct spot
+        # i can't remember the best way to get our hands on the dict name for the fetcher.
+        new_allocations_dict[list(intents_dict.keys())[i]] = new_allocation
+
+
+
+    return new_allocations_list, new_allocations_dict
 
 def moves_to_intents(state, old_agent_positions, old_state,
                                            action, name):

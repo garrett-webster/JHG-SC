@@ -177,6 +177,7 @@ def run_jhg_graphing(jhg_sim, graphing, num_rounds):
     for curr_round in range(num_rounds):
 
         jhg_sim.execute_round(curr_round)
+        print("Here is the influence \n", jhg_sim.get_influence())
 
     if graphing:
         draw_jhg_graphs_wrapper(jhg_sim)
@@ -289,11 +290,11 @@ if __name__ == "__main__":
     # agent_name_list = ["new3Gene", "new3Gene", "new3Gene"]
     # agent_name_list = ["ECab199","ECab199","ECab199", "ECab199","ECab199","ECab199","ECab199","ECab199","ECab199","ECab199"]
     # agent_name_list = ["HCab", "HCab", "HCab", "HCab", "HCab", "HCab", "HCab", "HCab", "HCab", "HCab"]
-    # agent_name_list = ["HCab","HCab","HCab","HCab","HCab","HCab","HCab","HCab","HCab","HCab",]
+    agent_name_list = ["HCab","HCab","HCab"]
     # agent_name_list = ["ECab3","ECab3","ECab3"]
     # agent_name_list = ["ECab3","ECab3","ECab3","ECab3","ECab3","ECab3","ECab3","ECab3","ECab3","ECab3"]
     # agent_name_list = ["CCab","CCab","CCab","CCab","CCab","CCab","CCab","CCab","CCab","CCab"]
-    agent_name_list = ["HardHomo", "HardHomo", "HardHomo", "HardHomo", "HardHomo", "HardHomo", "HardHomo", "HardHomo", "HardHomo", "HardHomo"]
+    # agent_name_list = ["HardHomo", "HardHomo", "HardHomo", "HardHomo", "HardHomo", "HardHomo", "HardHomo", "HardHomo", "HardHomo", "HardHomo"]
     # agent_name_list = ["CCab","CCab","CCab"]
     # agent_name_list = ["NCab", "NCab", "NCab", "NCab", "NCab", "NCab", "NCab", "NCab", "NCab", "NCab"]
     # agent_name_list = ["NCab", "NCab", "NCab"]
