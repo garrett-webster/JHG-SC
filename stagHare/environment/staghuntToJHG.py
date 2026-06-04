@@ -36,120 +36,114 @@ def translate_intents_to_movements(current_intents, intents_dict, influence):
 
     current_possible_lists = {}
 
-    # we only need the ambigous weights if 0 is present. we can check for that immediately actually. 
+    # we only need the ambigous weights if 0 is present. we can check for that immediately actually.
 
-    # all coop
-    if all(x == 2 for x in current_intents):
-        pass # all stags
-        # this pattern has the fastest possible growth, there is a test for it under offlineSimStuffTests.
-        matrix_dict = {
-            2: {
-                "id": 0,
-                "2": 3,
-            }
-        }
-
-    elif all(x == 1 for x in current_intents):
-        matrix_dict = {
-            1: {
-                "id": 6,
-                "1": 0,
-            }
-        }
-
-
-    # if current_intents.all(0):
-    #     current_possible_lists = {
-    #         0: [0, 0, 0] # literally have no clue what to do here, I'm praying it never happens otherwise I will flip
-    #     }
-
-
-    # SINGLE DEFECTOR
-    elif sum(current_intents) == 5:
-        matrix_dict = {
-            1: {
-                "id": 2,
-                "1": -2,
-                "2": -2,
-            },
-            2: {
-                "id": 2,
-                "1": 2,
-                "2": 2,
-            }
-        }
-
-    # 2 defectors
-    elif sum(current_intents) == 4 and 0 not in current_intents:
+    if 0 in current_intents:
         pass
-        matrix_dict = {
-            1: {
-                "id": 3,
-                "1": 0,
-                "2": -3,
-            },
-            2: {
-                "id": 2,
-                "1": 2,
-                "2": 2,
-            }
-        }
+        if sum(current_intents) == 4 and 0 in current_intents:
+            pass # 2 stag, 1 ambigous (find the zero)
 
+        if sum(current_intents) == 3:
+            pass # 1 stag, 1 hare, 1 ambg.
+
+        if sum(current_intents) == 2 and 2 in current_intents:
+            pass # 1 stag, 2 ambigous
+
+        if sum(current_intents) == 2 and 1 in current_intents:
+            pass # 2 hare, 1 ambg
+
+        if sum(current_intents) == 1:
+            pass # 1 hare, 2 ambg.
+
+        if current_intents.all(0):
+            pass # if we get here I think we just have to kill ourselves.
+        
     else:
-        matrix_dict = {
-            0: {
-                "id": 0,
-                "1": 0,
-                "2": 0,
-            },
-            1: {
-                "id": 0,
-                "1": 0,
-                "2": 0,
-            },
-            2: {
-                "id": 0,
-                "1": 0,
-                "2": 0,
+
+        # all coop
+        if all(x == 2 for x in current_intents):
+            pass # all stags
+            # this pattern has the fastest possible growth, there is a test for it under offlineSimStuffTests.
+            matrix_dict = {
+                2: {
+                    "id": 0,
+                    "2": 3,
+                }
             }
-        }
 
-    # if sum(current_intents) == 4 and 0 in current_intents:
-    #     pass # 2 stag, 1 ambigous (find the zero)
+        elif all(x == 1 for x in current_intents):
+            matrix_dict = {
+                1: {
+                    "id": 6,
+                    "1": 0,
+                }
+            }
 
-    # if sum(current_intents) == 3:
-    #     pass # 1 stag, 1 hare, 1 ambg.
+        # SINGLE DEFECTOR
+        elif sum(current_intents) == 5:
+            matrix_dict = {
+                1: {
+                    "id": 2,
+                    "1": -2,
+                    "2": -2,
+                },
+                2: {
+                    "id": 2,
+                    "1": 2,
+                    "2": 2,
+                }
+            }
 
-    # if sum(current_intents) == 2 and 2 in current_intents:
-    #     pass # 1 stag, 2 ambigous
+        # 2 defectors
+        elif sum(current_intents) == 4 and 0 not in current_intents:
+            pass
+            matrix_dict = {
+                1: {
+                    "id": 3,
+                    "1": 0,
+                    "2": -3,
+                },
+                2: {
+                    "id": 2,
+                    "1": 2,
+                    "2": 2,
+                }
+            }
 
-    # if sum(current_intents) == 2 and 1 in current_intents:
-    #     pass # 2 hare, 1 ambg
+        else:
+            matrix_dict = {
+                0: {
+                    "id": 0,
+                    "1": 0,
+                    "2": 0,
+                },
+                1: {
+                    "id": 0,
+                    "1": 0,
+                    "2": 0,
+                },
+                2: {
+                    "id": 0,
+                    "1": 0,
+                    "2": 0,
+                }
+            }
 
-    # if sum(current_intents) == 1:
-    #     pass # 1 hare, 2 ambg.
 
-    # if current_intents.all(0):
-    #     pass # if we get here I think we just have to kill ourselves.
+        new_allocations_dict = {}
+        new_allocations_list = [[0, 0, 0] for _ in range(len(intents_dict))] # just want something that I can print out ig.
+        for i, intent in enumerate(current_intents):
+            # going through player by player
+            new_allocation = [0 for _ in range(len(intents_dict))] # its another 3. whoopee.
+            for index, j in enumerate(current_intents):
+                if i == index: # use ID
+                    new_allocation[index] = matrix_dict[intent]["id"]
+                else:
+                    new_allocation[index] = matrix_dict[intent][str(j)]
 
-    # # here we need to do the ordering
-    # for player in intents_dict:
-    #     pass # find the id, and the other guys and rearrange as necessary.l
-
-    new_allocations_dict = {}
-    new_allocations_list = [[0, 0, 0] for _ in range(len(intents_dict))] # just want something that I can print out ig.
-    for i, intent in enumerate(current_intents):
-        # going through player by player
-        new_allocation = [0 for _ in range(len(intents_dict))] # its another 3. whoopee.
-        for index, j in enumerate(current_intents):
-            if i == index: # use ID
-                new_allocation[index] = matrix_dict[intent]["id"]
-            else:
-                new_allocation[index] = matrix_dict[intent][str(j)]
-
-        new_allocations_list[i] = new_allocation # add that in in the correct spot
-        # i can't remember the best way to get our hands on the dict name for the fetcher.
-        new_allocations_dict[list(intents_dict.keys())[i]] = new_allocation
+            new_allocations_list[i] = new_allocation # add that in in the correct spot
+            # i can't remember the best way to get our hands on the dict name for the fetcher.
+            new_allocations_dict[list(intents_dict.keys())[i]] = new_allocation
 
 
 
