@@ -131,10 +131,10 @@ def run_trials_given_simulator(stag_hare, graphing, current_round_grapher, curre
         # print("Here is the pre noise allocations ", allocations_dict)
         # STAGHARE to JHG SECTION
         if noisy: # means that we need to translate the allocations from movements, as opposed to passing them straight through.
-            allocations_dict = get_allocations_from_movements(stag_hare.state, action_map, old_agent_positions, old_state)
+            allocations_dict = get_allocations_from_movements(stag_hare.state, action_map, old_agent_positions, old_state, stag_hare.engine.get_influence())
         else:
             # still need to make sure we update allegatr.
-            new_allocations = get_allocations_from_movements(stag_hare.state, action_map, old_agent_positions, old_state)
+            new_allocations = get_allocations_from_movements(stag_hare.state, action_map, old_agent_positions, old_state, stag_hare.engine.get_influence())
             for hunter in stag_hare.hunters:
                 if isinstance(hunter, AlegAATr):
                     allocations_dict[hunter.name] = new_allocations[hunter.name]
@@ -201,7 +201,7 @@ def run_single_round_given_simulator(stag_hare, noisy=True):
         # STAGHARE to JHG SECTION
         if noisy: # means that we need to translate the allocations from movements, as opposed to passing them straight through.
 
-            allocations_dict = get_allocations_from_movements(stag_hare.state, action_map, old_agent_positions, old_state)
+            allocations_dict = get_allocations_from_movements(stag_hare.state, action_map, old_agent_positions, old_state, stag_hare.engine.get_influence())
 
         allocations_list = allocations_dict_to_list(allocations_dict)
         # print("here is the allocations dict post processing \n", allocations_list)

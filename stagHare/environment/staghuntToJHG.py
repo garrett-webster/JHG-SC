@@ -8,68 +8,96 @@ from stagHare.utils.pathfindingTime import findPathGreedy, findPathTeamAware
 
 # this function
 # takes in the state, the action map, the old agent
-def get_allocations_from_movements(state, action_map, old_agent_positions, old_state):
-    allocations = [[] for _ in range(3)] # we will make this dynamic later.
-    allocations_dict = {}
+def get_allocations_from_movements(state, action_map, old_agent_positions, old_state, influence):
+    current_intents = [[] for _ in range(3)] # we will make this dynamic later.
+    intents_dict = {}
     for name, action in action_map.items():
         if name == "stag" or name == "hare":
             continue # action is irrelevant; not part of the JHG paradigm.
 
         id = int(name[-1]) # rip the number of the back.
-        allocations_list = create_options_matrix(id) # take just the number off of this thing.
 
-        new_allocation = interpret_uncertain_move_to_allocation(state, old_agent_positions, old_state, action,
-                                                                        state.agent_positions["hare"], state.agent_positions["stag"], name,
-                                                                        allocations_list)
-        allocations[id] = new_allocation # this should add it to the list without the need for a dict.
-        allocations_dict[name] = new_allocation
+        new_intent = moves_to_intents(state, old_agent_positions, old_state, action, name)
+        current_intents[id] = new_intent # this should add it to the list without the need for a dict.
+        intents_dict[name] = new_intent
 
-    return allocations_dict
-
-
-def staghunt_to_jhg(state, action_map, old_agent_positions, old_state, hare_captured):
-    allocations = [[] for _ in range(3)] # we will make this dynamic later.
-    allocations_dict = {}
-
-    for name, action in action_map.items():
-
-        if name == "stag" or name == "hare":
-            continue # we don't actually care about these guys
-
-        id = int(name[-1]) # rip the number of the back.
-        # [hare_move, hare_take, stag_move, stag_take]
-        allocations_list = create_options_matrix(id) # take just the number off of this thing.
-
-        # print("This is the id ", id)
-        # print("This is the new allocations \n", allocations_list)
-
-        new_allocation = interpret_uncertain_move_to_allocation(state, old_agent_positions, old_state, action,
-                                                                        state.agent_positions["hare"], state.agent_positions["stag"], name,
-                                                                        allocations_list)
-
-        # ... so I think this was getting scrambled and that was part of the problem.
-        allocations[id] = new_allocation # this should add it to the list without the need for a dict.
-        allocations_dict[name] = new_allocation
-
-
-    # this should now be good to go.
+    allocations_dict = translate_intents_to_movements(current_intents, intents_dict, influence) # for player count and names.
 
     return allocations_dict
 
+def translate_intents_to_movements(current_intents, intents_dict, influence):
+    # hear me out
+    # what if we don't go by players, but instead arrange it as necessary
+    # that could be a lot cooler actually, and it would make more sense.
+    # so just grab the actual matrix, and then break it down from there.
 
-def interpret_uncertain_move_to_allocation(state, old_agent_positions, old_state,
-                                           action, hare_position, stag_position, name, allocations_list):
+    current_possible_lists = {}
 
-    # GAME OVER CHECK, EASY CHECKS.
-    if state.hare_captured() or state.stag_captured():
-        if state.hare_captured():
-            new_allocation = allocations_list[1]
-        else:
-            new_allocation = allocations_list[3]
-        return new_allocation
+    if current_intents.all(2):
+        pass # all stags
+        # this pattern has the fastest possible growth, there is a test for it under offlineSimStuffTests.
+        current_possible_lists = {
+            2: {
+                2: 2
+            }
+        }
 
-    # dynamic checks, a little sillier.
+    if current_intents.all(1):
+        current_possible_lists = {
+            1: {
 
+            }
+        }
+
+    # if current_intents.all(0):
+    #     current_possible_lists = {
+    #         0: [0, 0, 0] # literally have no clue what to do here, I'm praying it never happens otherwise I will flip
+    #     }
+
+
+    # SINGLE DEFECTOR
+    if sum(current_intents) == 5: # defectors are last; cooperators first.
+        matrix_dict = {
+            1: [2, -2, -2],
+            2: [2, 2, 2],
+        }
+
+    if sum(current_intents) == 4 and 0 not in current_intents:
+        pass # 1 stag, 2 (known) defectors
+        matrix_dict = {
+            2: [2, 2, 2],
+            1: [3, 0, -3], # how do I explain this bc this LOSES its symmetry.
+            # need to tell it that the 0 goes to the other defector, and the
+        }
+
+    # if sum(current_intents) == 4 and 0 in current_intents:
+    #     pass # 2 stag, 1 ambigous (find the zero)
+
+    if sum(current_intents) == 3 and current_intents.all(1):
+        pass # all hare, known
+
+    if sum(current_intents) == 3:
+        pass # 1 stag, 1 hare, 1 ambg.
+
+    if sum(current_intents) == 2 and 2 in current_intents:
+        pass # 1 stag, 2 ambigous
+
+    if sum(current_intents) == 2 and 1 in current_intents:
+        pass # 2 hare, 1 ambg
+
+    if sum(current_intents) == 1:
+        pass # 1 hare, 2 ambg.
+
+    if current_intents.all(0):
+        pass # if we get here I think we just have to kill ourselves.
+
+    # here we need to do the ordering
+    for player in intents_dict:
+        pass # find the id, and the other guys and rearrange as necessary.l
+
+
+def moves_to_intents(state, old_agent_positions, old_state,
+                                           action, name):
 
     # for step performance, look exclusively at their old positions. THis should help get rid of jitters. kind of.
     old_hare_x, old_hare_y = old_state.agent_positions["hare"][0], old_state.agent_positions["hare"][1]
@@ -82,27 +110,9 @@ def interpret_uncertain_move_to_allocation(state, old_agent_positions, old_state
 
     old_action = old_agent_positions[name] # moving here WAS the old action. # this is a copy object too
 
-
-
     # eaiser to let the state handle wrap arounds and whatnot.
     num_steps_hare_old = state.n_movements(old_action[0], old_action[1], old_hare_x, old_hare_y) + 1
     num_steps_stag_old = state.n_movements(old_action[0], old_action[1], old_stag_x, old_stag_y) + 1
-
-
-    # now calculate weights
-    total_steps = num_steps_stag_new + 1 + num_steps_hare_new + 1
-    # YES THESE NEED TO BE FLIPPED! If stag steps are low, then stag weight is high. simple as.
-    stag_weight =  (num_steps_hare_new + 1) / total_steps
-    hare_weight = (num_steps_stag_new + 1) / total_steps
-
-    height = len(state.grid) # yeah that should work
-    round_num = state.round_num
-
-    # TODO: maybe change this to 3? this might be higher than I intended.
-    # changing it to 3 takes it down maybe another percent for a flat 35 on 500 games. Not sure how significant it is.
-    # but I think the difference is somewhat neglible.
-    round_modifier = (1 / ((height // 2))) * round_num
-
 
     # for the 3x3 grid that determines the correct weighting function.
     stag_move_neg = (num_steps_stag_new - num_steps_stag_old > 0) # make sure strict greater.
@@ -114,63 +124,25 @@ def interpret_uncertain_move_to_allocation(state, old_agent_positions, old_state
     hare_moves_zero = (num_steps_hare_new - num_steps_hare_old == 0)
     stag_moves_zero = (num_steps_stag_new - num_steps_stag_old == 0)
 
-    # column 1
-    # if they move toward the stag, hare options
-    if stag_move_pos and hare_moves_pos:
-        new_allocation = weight(round_modifier, stag_weight, hare_weight, allocations_list)
-    elif stag_move_pos and hare_moves_zero:
-        new_allocation = allocations_list[2]
-    elif stag_move_pos and hare_moves_neg:
-        new_allocation = allocations_list[2]
+    new_move = -1 # unrealistic fall back just in case.
 
-    # column 2
-    # ambivalent towards the stag, hare options
-    elif stag_moves_zero and hare_moves_pos:
-        new_allocation = allocations_list[0]
-    elif stag_moves_zero and hare_moves_zero:
-        new_allocation = weight(round_modifier, stag_weight, hare_weight, allocations_list)
-    elif stag_moves_zero and hare_moves_neg:
-        new_allocation = allocations_list[2]
+    # covers pos edge case
+    if stag_move_pos and hare_moves_pos and True:
+        return 0
+    # covers neg edge case
+    if stag_move_neg and hare_moves_neg and True:
+        return 0
+    # covers no movement edge case
+    if hare_moves_zero and stag_moves_zero and True:
+        return 0
 
-    # column 3
-    # move away from stag, hare options.
-    elif stag_move_neg and hare_moves_pos:
-        new_allocation = allocations_list[0]
-    elif stag_move_neg and hare_moves_zero:
-        new_allocation = allocations_list[0]
-    elif stag_move_neg and hare_moves_neg:
-        new_allocation = weight(round_modifier, stag_weight, hare_weight, allocations_list)
+    # if we haven't hit any of the edge cases, move into certain cases
+    if stag_move_pos: # we are moving towards the thing
+        return 2
 
-    else:
-        print("SOMETHING SI VERTY VEYR WORNG SIRE")
-        new_allocation = [9, 0, 0]
+    if hare_moves_pos: # moving towards the hares.
+        return 1
 
-    # weighted_allocation = weight(stag_weight, hare_weight, allocations_list) * abs((stag_weight - hare_weight) * 2) # make it a number
-                                                                            # in the middle? very low number
-                                                                            # right next to them? very high.
-    # print("New allocation: ", new_allocation)
-    # print("Weight allocation ", weighted_allocation)
+    return new_move # just to make sure SOMMETHING gets returned.
 
-    # TODO: reimplement this weighting system.
-    # return_allocation = new_allocation + weighted_allocation
-
-    # why are we normalizing upon return?
-    new_allocation = np.array(new_allocation)
-    new_allocation = [element / sum(abs(new_allocation)) for element in new_allocation]
-
-    return new_allocation
-
-
-def weight(round_modifier, stag_weight, hare_weight, allocations_list): # new allocation that sits right in the middle of the fetcher.
-    # print("Doing a weighted allocation")
-    # print("Here is the hare wieght ", hare_weight, " and here is the stag weight ", stag_weight)
-    # so the plan is as follows: if we within teh first few rounds, we can ignore the ambiguitiy and go from there
-    # if we are no longer not, we assume position is now important. lets find out.
-    if round_modifier < 1:
-        # this gets us just barely over stag, not entirely sure where the best number is?
-        new_array = 2 * (allocations_list[2]) + allocations_list[0]
-    else:
-        new_array = (stag_weight * allocations_list[2]) + (hare_weight * allocations_list[0])
-
-    return new_array
 
