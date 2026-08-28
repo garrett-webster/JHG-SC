@@ -24,6 +24,7 @@ class GeneAgent3(GeneAgentMixin, AbstractAgent):
         self.tokens_per_player = 2
         self.pop_history = [] # just slap this up here.
         self.selected_community = {-1} # sign that nothing has changed
+        self.gene_str = geneStr
 
         # Changes in May
         if geneStr == "":

@@ -177,7 +177,8 @@ def run_jhg_graphing(jhg_sim, graphing, num_rounds):
     for curr_round in range(num_rounds):
 
         jhg_sim.execute_round(curr_round)
-        print("Here is the influence \n", jhg_sim.get_influence())
+        print("inf", jhg_sim.get_influence())
+        print("pop", jhg_sim.get_popularities())
 
     if graphing:
         draw_jhg_graphs_wrapper(jhg_sim)
@@ -300,6 +301,9 @@ if __name__ == "__main__":
     # agent_name_list = ["NCab", "NCab", "NCab"]
 
     agents = create_agents_with_list(agent_name_list, forcedRandom, random_agents)
+    for agent in agents:
+        print("algorithm type : 0")
+        print(agent.gene_str)
 
     # I JUST want to run bots here. Don't worry about humans -- this rewrites a few assumptions.
     for attempt in tqdm(range(num_attempts)): # create a new sim for each attempt to prevent bleeding over.
